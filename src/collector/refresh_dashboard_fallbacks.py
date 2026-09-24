@@ -222,7 +222,7 @@ def refresh_leaderboards(seasons_to_try: list) -> dict:
     return {"season": chosen, "leaders": leaders}
 
 
-def _as_date(value) -> datetime.date | None:
+def _as_date(value) -> date | None:
     """Parse the ISO timestamps ESPN puts in schedule rows."""
     if not value:
         return None
@@ -241,7 +241,7 @@ def refresh_projections(season: str, horizon_days: int = 21) -> dict:
     bootstrap state and must not break the daily collector: the previous
     fallback (if any) is deliberately left untouched.
     """
-    import json as _json
+    import pandas as pd
 
     schedule_path = os.path.join(RAW_DIR, season, "schedule.csv")
     model_path = os.path.join(REPO_ROOT, "models", "proj_model.txt")
@@ -262,7 +262,7 @@ def refresh_projections(season: str, horizon_days: int = 21) -> dict:
         import predict
 
         with open(schedule_path, newline="", encoding="utf-8") as f:
-            schedule = __import__("pandas").read_csv(f)
+            schedule = pd.read_csv(f)
         schedule["game_id"] = schedule["game_id"].astype(str)
         today = datetime.now(timezone.utc).date()
         dates = schedule["date"].map(_as_date)
@@ -286,7 +286,7 @@ def refresh_projections(season: str, horizon_days: int = 21) -> dict:
         if projections.empty:
             print("  projection model produced no rows -- keeping existing file")
             return {}
-        records = _json.loads(projections.to_json(orient="records"))
+        records = json.loads(projections.to_json(orient="records"))
         payload = _stamp({
             "season": season,
             "window_days": horizon_days,
@@ -302,18 +302,8 @@ def refresh_projections(season: str, horizon_days: int = 21) -> dict:
 
 
 def main() -> None:
-    import datetime
-
-    today = datetime.date.today()
     current = espn_api.current_season_label()
-    # The last season whose June has already passed: seasons end in June, so
-    # from Jul onward that's {Y-1}-{Y} (e.g. Sep 2026 -> 2025-26), and during
-    # Jan-Jun it's the season that ended the previous June.
-    end_year = today.year if today.month >= 7 else today.year - 1
-    completed = f"{end_year - 1}-{str(end_year)[2:]}"
-    # Candidate seasons, newest first: standings/leaderboards should describe
-    # the most recent season someone can actually look up.
-    candidates = list(dict.fromkeys([current, completed, "2025-26", "2024-25"]))
+    candidates = season_candidates()
 
     print("Refreshing dashboard fallbacks...")
     refresh_teams()

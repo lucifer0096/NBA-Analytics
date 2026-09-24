@@ -191,6 +191,20 @@ def data_age_note(payload: dict, live: bool) -> str:
     return "Offline fallback"
 
 
+def standings_have_results(df: pd.DataFrame) -> bool:
+    """Whether a standings table has at least one completed game.
+
+    ESPN returns 30 structurally valid all-zero rows for a season before
+    tip-off. Treating those as a live 0-0 table is misleading, so both the
+    live loader and the committed fallback use this same guard.
+    """
+    if df.empty or "wins" not in df.columns or "losses" not in df.columns:
+        return False
+    wins = pd.to_numeric(df["wins"], errors="coerce").fillna(0)
+    losses = pd.to_numeric(df["losses"], errors="coerce").fillna(0)
+    return bool((wins + losses).sum() > 0)
+
+
 @st.cache_data(ttl=60, show_spinner=False)
 def load_teams() -> tuple:
     """(teams DataFrame, note). Live teams endpoint, else committed copy."""
@@ -215,7 +229,7 @@ def load_standings(season: str) -> tuple:
 
         raw = espn_api.get_standings(espn_api.season_param(season))
         rows = parsing.parse_standings(raw)
-        if rows:
+        if rows and standings_have_results(pd.DataFrame(rows)):
             return (pd.DataFrame(rows), data_age_note({}, True))
     except Exception:
         pass
