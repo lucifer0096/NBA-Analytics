@@ -3,6 +3,7 @@ split, projection-row building, and optimizer constraints. Synthetic data --
 no network, no collected files needed (pytest.ini's default run).
 """
 
+import json
 import sys
 from pathlib import Path
 
@@ -171,6 +172,57 @@ def test_default_model_seasons_are_disk_driven_and_include_upcoming(monkeypatch)
     assert load_historical.default_seasons() == [
         "2010-11", "2025-26", "2026-27", "2027-28",
     ]
+
+
+# ---------------------------------------------------------------------------
+# schedule join (load_season_games) -- regression: player rows carry
+# is_home/team_id/opponent_id, never home_id, so the cross-check must
+# reconstruct the box score's home team instead of reading a column that
+# doesn't exist (this crashed the real backfill while unit tests passed).
+# ---------------------------------------------------------------------------
+
+def _write_season(tmp_path, monkeypatch, disagree=False):
+    """One collected game + its schedule.csv under a temp RAW_DIR."""
+    raw = tmp_path / "raw"
+    games = raw / "2020-21" / "games"
+    games.mkdir(parents=True)
+    # Box score: team 1 hosts team 2 (is_home on team 1's rows).
+    players = [
+        {"game_id": 100, "player_id": 11, "player_name": "P One",
+         "team_id": 1, "opponent_id": 2, "is_home": True,
+         "min": 30, "pts": 20, "reb": 5, "ast": 3, "stl": 1, "blk": 0, "to": 2},
+        {"game_id": 100, "player_id": 22, "player_name": "P Two",
+         "team_id": 2, "opponent_id": 1, "is_home": False,
+         "min": 28, "pts": 15, "reb": 4, "ast": 2, "stl": 0, "blk": 1, "to": 1},
+    ]
+    (games / "100.json").write_text(json.dumps({"players": players}))
+    # Schedule agrees -- unless the test asks for a home-team mismatch.
+    home_id = 2 if disagree else 1
+    pd.DataFrame([{
+        "game_id": 100, "home_id": home_id, "away_id": 2 if not disagree else 1,
+        "home_score": 110, "away_score": 101, "status": "STATUS_FINAL",
+    }]).to_csv(raw / "2020-21" / "schedule.csv", index=False)
+    monkeypatch.setattr(load_historical, "RAW_DIR", str(raw))
+    return load_historical.load_season_games("2020-21")
+
+
+def test_load_season_games_joins_schedule_scores(tmp_path, monkeypatch):
+    df = _write_season(tmp_path, monkeypatch, disagree=False)
+    assert not df.empty
+    # team_score/opp_score come from the schedule's final scores.
+    home = df[df["is_home"]].iloc[0]
+    away = df[~df["is_home"]].iloc[0]
+    assert (home["team_score"], home["opp_score"]) == (110, 101)
+    assert (away["team_score"], away["opp_score"]) == (101, 110)
+
+
+def test_load_season_games_drops_schedule_context_on_home_disagreement(
+        tmp_path, monkeypatch):
+    # Schedule says team 2 hosted; the box score says team 1 did. The loader
+    # must warn-by-nulling rather than mix the two sources.
+    df = _write_season(tmp_path, monkeypatch, disagree=True)
+    assert df["team_score"].isna().all()
+    assert df["opp_score"].isna().all()
 
 
 # ---------------------------------------------------------------------------

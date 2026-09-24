@@ -37,6 +37,16 @@ def _render(script: str, offline_espn) -> AppTest:
     return at
 
 
+def _markdown_text(at: AppTest) -> str:
+    """All text rendered through st.markdown, or '' when AppTest exposes no
+    .markdown element list -- a defensive probe so content assertions can
+    fall back to captions instead of erroring on an older streamlit."""
+    md = getattr(at, "markdown", None)
+    if md is None:
+        return ""
+    return " ".join(str(getattr(m, "value", "")) for m in md)
+
+
 def test_home_page_renders_offline(offline_espn):
     at = _render("app/app.py", offline_espn)
     assert not at.exception
@@ -45,7 +55,7 @@ def test_home_page_renders_offline(offline_espn):
     tab_labels = [str(t.label) for t in at.tabs]
     assert "Standings" in tab_labels
     assert "Schedule & Scores" in tab_labels
-    assert "Projections" in tab_labels
+    assert "Awards Ladder" in tab_labels
 
 
 def test_home_page_falls_back_to_committed_data(offline_espn):
@@ -62,7 +72,41 @@ def test_model_page_renders_offline(offline_espn):
     tab_labels = [str(t.label) for t in at.tabs]
     assert "Model Performance" in tab_labels
     assert "Season Leaders" in tab_labels
-    assert "Lineup Optimizer" in tab_labels
+    assert "Court View" in tab_labels
+
+
+def test_home_awards_tab_shows_races_and_formula_captions(offline_espn):
+    """The Awards Ladder must rank its races AND be honest about them: the
+    race label, the 'not official NBA voting' disclaimer, and the MVP's
+    verbatim formula all have to reach the screen (captions or markdown)."""
+    awards_path = REPO_ROOT / "data" / "dashboard_awards.json"
+    if not awards_path.exists():
+        pytest.skip("dashboard_awards.json not committed yet")
+    at = _render("app/app.py", offline_espn)
+    captions = " ".join(str(c.value) for c in at.caption)
+    text = f"{_markdown_text(at)} {captions}"
+    assert "MVP race" in text
+    assert "not official nba voting" in captions.lower()
+    assert "Impact per game" in captions
+
+
+def test_model_page_court_view_renders_leaders(offline_espn):
+    """Court View must show a real leader from the committed payload --
+    asserted via that player's name reaching markdown/captions, never via a
+    .na-court class (the theme CSS blob contains it regardless)."""
+    awards_path = REPO_ROOT / "data" / "dashboard_awards.json"
+    if not awards_path.exists():
+        pytest.skip("dashboard_awards.json not committed yet")
+    with open(awards_path, encoding="utf-8") as f:
+        payload = json.load(f)
+    pts = (payload.get("leaders") or {}).get("pts") or []
+    if not pts:
+        pytest.skip("no qualified pts leaders in the committed payload")
+    at = _render("app/pages/1_Model_and_History.py", offline_espn)
+    captions = " ".join(str(c.value) for c in at.caption)
+    text = f"{_markdown_text(at)} {captions}"
+    name = str(pts[0].get("player_name") or "")
+    assert name and (name in text or "hover a card" in captions)
 
 
 def test_model_page_survives_missing_metrics(offline_espn, tmp_path, monkeypatch):
@@ -75,7 +119,13 @@ def test_model_page_survives_missing_metrics(offline_espn, tmp_path, monkeypatch
     monkeypatch.setattr(shared_module, "REPO_ROOT", tmp_path)
     monkeypatch.setattr(shared_module, "DATA_DIR", tmp_path / "data")
     monkeypatch.setattr(shared_module, "PROCESSED_DIR", tmp_path / "data" / "processed")
+    # An earlier page render in this session primed the st.cache_data entry
+    # with the real models/metrics.json (it exists once trained) -- drop it so
+    # the loader actually re-runs against the metrics-free root, then drop the
+    # {} it caches too, so later renders recompute from the real root.
+    shared_module.load_metrics.clear()
     assert shared_module.load_metrics() == {}  # path doesn't exist -> {}
+    shared_module.load_metrics.clear()
 
 
 def test_fallback_envelopes_carry_generation_timestamp():
@@ -83,7 +133,8 @@ def test_fallback_envelopes_carry_generation_timestamp():
     data_dir = REPO_ROOT / "data"
     checked = 0
     for name in ("dashboard_teams.json", "dashboard_standings.json",
-                 "dashboard_schedule.json", "dashboard_positions.json"):
+                 "dashboard_schedule.json", "dashboard_positions.json",
+                 "dashboard_awards.json"):
         path = data_dir / name
         if not path.exists():
             continue

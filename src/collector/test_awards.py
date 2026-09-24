@@ -1,0 +1,216 @@
+"""Deterministic tests for award-race math and aggregation semantics --
+qualifiers, multipliers, boundary conditions, and the payload envelope.
+No network, no pandas: pure stdlib, fixture games under tmp_path.
+"""
+
+import csv
+import json
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+import awards  # noqa: E402
+
+
+def _player(pid, name="Player", team="BOS", gp=10, starts=0, **stats):
+    """A minimal aggregate_players()-shaped entry for the race functions."""
+    entry = {
+        "player_id": pid, "player_name": name, "team_abbrev": team,
+        "gp": gp, "starts": starts, "minutes": gp * 30,
+        "pts": 0, "reb": 0, "ast": 0, "stl": 0, "blk": 0, "to": 0,
+    }
+    entry.update(stats)
+    return entry
+
+
+def _box(pid, name, team, starter=False, dnp=False, minutes=30, pts=0,
+         reb=0, ast=0, stl=0, blk=0, to=0):
+    """A stored box-score player row (the shape snapshot.py writes)."""
+    return {
+        "player_id": pid, "player_name": name, "team_abbrev": team,
+        "starter": starter, "did_not_play": dnp, "min": minutes,
+        "pts": pts, "reb": reb, "ast": ast, "stl": stl, "blk": blk, "to": to,
+    }
+
+
+def _write_games(tmp_path, season, games):
+    """games: {game_id: [player rows]} -> data/raw-shaped JSON files."""
+    gdir = tmp_path / season / "games"
+    gdir.mkdir(parents=True, exist_ok=True)
+    for gid, rows in games.items():
+        (gdir / f"{gid}.json").write_text(
+            json.dumps({"players": rows}), encoding="utf-8"
+        )
+
+
+def _write_schedule(tmp_path, season, rows):
+    """rows: [(status, home, away, home_score, away_score), ...]."""
+    sdir = tmp_path / season
+    sdir.mkdir(parents=True, exist_ok=True)
+    fields = ["game_id", "date", "status", "home_abbrev", "away_abbrev",
+              "home_score", "away_score"]
+    with open(sdir / "schedule.csv", "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        for i, (status, home, away, hs, as_) in enumerate(rows, start=1):
+            writer.writerow({
+                "game_id": 1000 + i, "date": "2026-01-01", "status": status,
+                "home_abbrev": home, "away_abbrev": away,
+                "home_score": hs, "away_score": as_,
+            })
+
+
+def test_previous_season_century_wrap():
+    assert awards.previous_season("2025-26") == "2024-25"
+    # The two-digit suffix must roll 00 -> the previous century, not 25-26.
+    assert awards.previous_season("2000-01") == "1999-00"
+
+
+def test_min_games_floor():
+    # Floored at 8 so early-season runs still produce a race.
+    assert awards.min_games_for(0) == 8
+    assert awards.min_games_for(10) == 8
+    # After that it's half the games any team played.
+    assert awards.min_games_for(82) == 41
+    assert awards.min_games_for(100) == 50
+
+
+def test_team_records_parses_float_scores_and_skips_non_final(tmp_path):
+    _write_schedule(tmp_path, "2012-13", [
+        ("STATUS_FINAL", "BOS", "NYK", "125.0", "110"),   # float-string score
+        ("STATUS_SCHEDULED", "BOS", "NYK", "", ""),       # not final: skip
+        ("STATUS_FINAL", "BOS", "NYK", "", "110"),        # scoreless: skip
+    ])
+    records = awards.team_records("2012-13", raw_dir=str(tmp_path))
+    assert records["BOS"]["games"] == 1
+    assert records["BOS"]["wins"] == 1
+    assert records["BOS"]["win_pct"] == 1.0
+    assert records["BOS"]["opp_pg"] == 110.0
+    assert records["NYK"]["losses"] == 1
+    assert awards.max_games_played(records) == 1
+
+
+def test_mvp_multiplier_orders_equal_production():
+    # Identical lines; only the team record differs -> win% multiplier decides.
+    records = {
+        "BOS": {"wins": 8, "losses": 2, "win_pct": 0.8, "opp_pg": 105.0,
+                "games": 10},
+        "DET": {"wins": 2, "losses": 8, "win_pct": 0.2, "opp_pg": 118.0,
+                "games": 10},
+    }
+    winner = _player(1, "Alpha", "BOS", pts=200, reb=80, ast=60)
+    loser = _player(2, "Beta", "DET", pts=200, reb=80, ast=60)
+    # Below the qualifier: same production, must not appear at all.
+    short = _player(3, "Gamma", "BOS", gp=9, pts=200, reb=80, ast=60)
+
+    rows = awards.mvp_rows([loser, short, winner], records, min_gp=10)
+    assert [r["player_name"] for r in rows] == ["Alpha", "Beta"]
+    assert rows[0]["rank"] == 1 and rows[1]["rank"] == 2
+    # impact = (200 + 0.75*80 + 60)/10 = 32; multipliers 0.92 vs 0.68.
+    assert rows[0]["score"] == 29.44
+    assert rows[1]["score"] == 21.76
+
+
+def test_sixth_man_start_filter_boundary():
+    # Exactly 40% starts is IN (<= the cap); 50% is out.
+    bench = _player(1, "Sixth", "MIA", gp=10, starts=4, pts=200, ast=40,
+                    reb=40)
+    starterish = _player(2, "Starter", "MIA", gp=10, starts=5, pts=300)
+    rows = awards.sixth_man_rows([bench, starterish], {}, min_gp=8)
+    assert [r["player_name"] for r in rows] == ["Sixth"]
+    assert rows[0]["start_pct"] == 0.4
+    # score = (200 + 0.5*40 + 0.25*40)/10 = 230/10 = 23.0
+    assert rows[0]["score"] == 23.0
+
+
+def test_mip_needs_prev_season():
+    p = _player(1, "Riser", "BOS", pts=300)
+    # No collected prior-season games -> honest empty, never an invented winner.
+    assert awards.mip_rows([p], [], min_gp=8, min_gp_prev=8) == []
+
+
+def test_leader_rows_qualification_and_rank_cap():
+    # 12 qualifiers + 1 short-season player; RACE_SIZE caps at 10.
+    players = [_player(i, f"P{i}", "BOS", gp=10, pts=10 * i, minutes=300)
+               for i in range(1, 13)]
+    players.append(_player(99, "Short", "BOS", gp=7, pts=5000))
+
+    out = awards.leader_rows(players, min_gp=10)
+    assert set(out) == set(awards.STAT_CATEGORIES)
+    pts_rows = out["pts"]
+    assert len(pts_rows) == awards.RACE_SIZE
+    assert [r["rank"] for r in pts_rows] == list(range(1, awards.RACE_SIZE + 1))
+    assert 99 not in [r["player_id"] for r in pts_rows]
+    # Highest per-game rate first: P12 has pts 120 / 10 gp = 12.0.
+    assert pts_rows[0]["player_id"] == 12
+    assert pts_rows[0]["per_game"] == 12.0
+    # The tooltip's full stat line needs minutes per game too.
+    assert pts_rows[0]["mpg"] == 30.0
+    assert pts_rows[0]["total"] == 120
+
+
+def test_build_payload_empty_without_games(tmp_path):
+    # A season with no collected box scores -> {} (caller keeps old file).
+    assert awards.build_payload("2099-00", raw_dir=str(tmp_path)) == {}
+
+
+def test_build_payload_envelope(tmp_path):
+    """End-to-end over a synthetic 8-game season: DNP skip, traded majority,
+    a 4-4 traded tie resolved to the first sorted game, starter counts, the
+    qualifier floor, and an honest empty MIP (no prior season collected)."""
+    games = {}
+    for i in range(1, 9):
+        rows = [
+            _box(1, "Star", "BOS", starter=(i <= 4), minutes=30, pts=30,
+                 reb=8, ast=6, stl=1, blk=1),
+            _box(2, "Bench", "BOS", minutes=25, pts=20, reb=5, ast=4,
+                 stl=1, blk=0),
+            # Majority: AAA x3 then BBB x5 -> BBB.
+            _box(4, "Traded", "AAA" if i <= 3 else "BBB", minutes=20, pts=10,
+                 reb=4, ast=3, stl=1, blk=1),
+            # 4-4 tie -> first sorted game (1.json) says AAA.
+            _box(5, "Tie", "AAA" if i % 2 == 1 else "BBB", minutes=20, pts=12,
+                 reb=4, ast=3, stl=2, blk=0),
+            # DNP rows never count: only game 8 gives him gp=1.
+            _box(3, "DNP Guy", "NYK", dnp=(i <= 7),
+                 minutes=10, pts=5, reb=1, ast=1),
+        ]
+        games[i] = rows
+    _write_games(tmp_path, "2012-13", games)
+    _write_schedule(tmp_path, "2012-13", [
+        ("STATUS_FINAL", "BOS", "NYK", "110.0", "100.0") for _ in range(8)
+    ])
+
+    players = {p["player_id"]: p
+               for p in awards.aggregate_players("2012-13", raw_dir=str(tmp_path))}
+    assert players[1]["gp"] == 8 and players[1]["starts"] == 4
+    assert players[3]["gp"] == 1                      # 7 DNPs skipped
+    assert players[4]["team_abbrev"] == "BBB"         # 5 > 3 majority
+    assert players[5]["team_abbrev"] == "AAA"         # 4-4 tie -> first game
+
+    payload = awards.build_payload("2012-13", raw_dir=str(tmp_path))
+    assert payload["season"] == "2012-13"
+    assert payload["prev_season"] is None             # 2011-12 not collected
+    assert payload["min_games"] == 8                  # max(8, 0.5*8)
+    assert payload["races"]["mip"] == []              # needs the prior season
+
+    mvp = payload["races"]["mvp"]
+    assert [r["player_name"] for r in mvp] == ["Star", "Bench", "Tie",
+                                               "Traded"]
+    assert mvp[0]["score"] == 42.0                    # (240+48+48)/8 * 1.0
+    assert mvp[0]["wins"] == 8                        # BOS swept the fixture
+    # DNP guy cleared only 1 game: below the qualifier, in no race.
+    assert all(r["player_id"] != 3 for rows in payload["races"].values()
+               for r in rows)
+
+    sixth = payload["races"]["sixth_man"]
+    # Star started 50% of his games -> out; the three never-started are in.
+    assert [r["player_name"] for r in sixth] == ["Bench", "Tie", "Traded"]
+
+    assert len(payload["races"]["dpoy"]) == 4
+
+    pts = payload["leaders"]["pts"]
+    assert pts[0]["player_name"] == "Star"
+    assert pts[0]["per_game"] == 30.0
+    assert pts[0]["mpg"] == 30.0
+    assert len(pts) == 4                             # DNP guy excluded

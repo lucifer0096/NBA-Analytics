@@ -100,5 +100,6 @@ Streamlit Cloud cannot run the collector and `data/raw/` is gitignored, so
 | `data/dashboard_standings.json` | newest season **with real records** (zero-record preseason tables skipped — verified 2026-27 arrives all-zeros in Sep) | live ESPN |
 | `data/dashboard_schedule.json` | current season schedule (from local `schedule.csv`, no API call) | local |
 | `data/dashboard_positions.json` | current player → position map | local/live |
+| `data/dashboard_awards.json` | MVP/DPOY/6th-Man/MIP races + per-game stat leaders (`awards.py`) | local (collected box scores) |
 | `data/dashboard_projections.json` | upcoming-game model projections | computed where raw data + model exist |
 | `data/processed/dashboard_leaderboards.json` | last completed season's per-player totals + fantasy points | local |

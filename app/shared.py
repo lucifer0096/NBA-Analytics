@@ -11,9 +11,10 @@ data_age_note() so the UI can say "live" vs "as of <time>" honestly instead
 of implying freshness it doesn't have.
 """
 
+import html
 import json
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -27,6 +28,11 @@ sys.path.insert(0, str(REPO_ROOT / "src" / "collector"))
 sys.path.insert(0, str(REPO_ROOT / "src" / "model"))
 
 import espn_api  # noqa: E402
+
+# Award display constants (STAT_LABELS/RACE_FORMULAS/...) come from the module
+# that computes them, so the UI can never show a label/formula that disagrees
+# with the math actually run.
+import awards  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Theme + presentation helpers (the "UI pass")
@@ -109,21 +115,101 @@ div[data-testid="stMetric"] {
 .na-slot--C { color: #FFB37F; border-color: #E07A2E; }
 .na-slot--UTIL { color: var(--na-gold); border-color: color-mix(in srgb, var(--na-gold) 60%, transparent); }
 
-/* Optimizer result cards */
-.na-player-card {
-  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+/* Award-race + stat-leader rows (Awards Ladder) */
+.na-race-row {
+  display: flex; align-items: center; gap: 12px; padding: 8px 12px;
   border: 1px solid var(--na-border); background: var(--na-card);
-  border-radius: 14px; padding: 10px 16px; margin-bottom: 8px;
+  border-radius: 12px; margin-bottom: 6px;
 }
-.na-player-card .na-name { font-weight: 700; }
-.na-player-card .na-meta { opacity: 0.7; font-size: 0.82rem; }
-.na-player-card .na-pts {
-  font-weight: 800; font-size: 1.05rem; color: var(--na-gold); white-space: nowrap;
+.na-race-row .na-rank {
+  width: 34px; flex: none; text-align: center;
+  font-weight: 800; opacity: 0.75;
 }
-.na-total {
-  font-size: 1.9rem; font-weight: 800;
-  color: var(--na-gold); line-height: 1.1;
+.na-race-row .na-rbody { flex: 1; min-width: 0; }
+.na-race-row .na-rname {
+  font-weight: 700; display: flex; align-items: center; gap: 6px;
 }
+.na-race-row .na-rmeta {
+  opacity: 0.7; font-size: 0.8rem; margin-top: 2px;
+}
+.na-race-row .na-rscore {
+  margin-left: auto; font-weight: 800; font-size: 1.05rem;
+  color: var(--na-gold); white-space: nowrap;
+}
+
+/* Real photos: headshot <img> over a team-logo CSS background. The fallback
+   shows through when the CDN 404s -- no JS (Streamlit sanitizes onerror
+   away), no broken-image icon (no alt attribute), no cropped heads
+   (object-fit: contain). */
+.na-shot {
+  position: relative; display: inline-block; overflow: hidden;
+  vertical-align: middle; flex: none;
+  background-size: 78%; background-repeat: no-repeat;
+  background-position: center; background-color: rgba(255, 255, 255, 0.06);
+}
+.na-shot img {
+  display: block; width: 100%; height: 100%; object-fit: contain;
+}
+.na-logo {
+  display: inline-block; vertical-align: middle; flex: none;
+  background-size: contain; background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Court View: CSS-only hardwood, slot rows, hover stat tooltips */
+.na-court {
+  position: relative; border-radius: 12px; padding: 16px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+.na-court-head {
+  position: relative; z-index: 1; text-align: center; color: #fff;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.06em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35); margin-bottom: 6px;
+}
+.na-court-row {
+  position: relative; z-index: 1; display: flex; justify-content: center;
+  gap: 14px; margin: 14px 0; flex-wrap: wrap;
+}
+.na-court-card {
+  position: relative; width: 104px; padding: 8px 6px; text-align: center;
+  background: rgba(18, 14, 10, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 10px;
+}
+.na-court-card .na-cname {
+  font-weight: 700; font-size: 0.78rem; line-height: 1.15; margin-top: 4px;
+}
+.na-court-card .na-cteam {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  font-size: 0.7rem; opacity: 0.8; margin-top: 3px;
+}
+.na-court-card .na-cstat {
+  font-weight: 800; color: var(--na-gold);
+  font-size: 0.92rem; margin-top: 3px;
+}
+.na-bench-label {
+  text-align: center; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.08em; opacity: 0.7; margin-top: 12px;
+}
+.na-bench {
+  display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;
+  margin-top: 8px; padding-top: 10px;
+  border-top: 1px dashed var(--na-border);
+}
+.na-tip {
+  display: none; position: absolute; bottom: calc(100% + 8px); left: 50%;
+  transform: translateX(-50%); z-index: 30;
+  background: rgba(15, 15, 15, 0.97); color: #f0f0f0;
+  border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px;
+  padding: 8px 10px; font-size: 10.5px; line-height: 1.5;
+  text-align: left; white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+.na-tip::after {
+  content: ""; position: absolute; top: 100%; left: 50%;
+  transform: translateX(-50%); border: 6px solid transparent;
+  border-top-color: rgba(15, 15, 15, 0.97);
+}
+.na-court-card:hover .na-tip { display: block; }
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
@@ -158,14 +244,243 @@ def slot_chip(slot: str) -> str:
     return f'<span class="na-slot na-slot--{slot}">{slot}</span>'
 
 
-def player_card_html(slot: str, name: str, meta: str, points: float) -> str:
-    return (
-        f'<div class="na-player-card">'
-        f'<div>{slot_chip(slot)}&nbsp;&nbsp;'
-        f'<span class="na-name">{name}</span>'
-        f'<div class="na-meta">{meta}</div></div>'
-        f'<div class="na-pts">{points:.1f}</div>'
-        f"</div>"
+def team_logo_url(abbrev: str) -> str:
+    """ESPN CDN team logo (verified 200 for upper/lowercase abbrevs). Empty
+    when the abbrev is missing so callers render nothing instead of a URL
+    that is guaranteed to fail."""
+    if not abbrev:
+        return ""
+    return f"https://a.espncdn.com/i/teamlogos/nba/500/{abbrev}.png"
+
+
+def headshot_url(player_id) -> str:
+    """ESPN CDN player headshot (200 for real ids, 404 for fabricated ones --
+    which is exactly why headshot_html wraps it in the CSS fallback below)."""
+    if player_id is None or player_id == "":
+        return ""
+    return f"https://a.espncdn.com/i/headshots/nba/players/full/{player_id}.png"
+
+
+def team_logo_html(abbrev: str, size: int = 18) -> str:
+    """Team logo as a CSS background-image span, deliberately NOT an <img>:
+    a 404 then just paints nothing -- no broken-image icon, no alt-text
+    oddities. Single logical line (see race_row_html's docstring)."""
+    url = team_logo_url(abbrev)
+    if not url:
+        return ""
+    return (f'<span class="na-logo" style="width: {size}px; height: {size}px; '
+            f'background-image: url({url});"></span>')
+
+
+def headshot_html(player_id, team_abbrev: str, size: int = 44) -> str:
+    """Player headshot with FPL-Analytics' proven CSS-only fallback: the
+    <img> sits over the team logo drawn as the wrapper's background-image,
+    object-fit: contain, and deliberately carries NO alt attribute.
+
+    Why this shape: Streamlit sanitizes st.markdown(unsafe_allow_html=True),
+    so an onerror JS handler never fires reliably (broken-image icons showed
+    through in FPL-Analytics), and `alt` would print alt text over the
+    fallback. A failed <img> has no visible content of its own, so the
+    team-logo background shows through instead -- no JS anywhere, and the
+    fallback is the player's real team, not a generic gray box."""
+    src = headshot_url(player_id)
+    bg = f"background-image: url({team_logo_url(team_abbrev)}); " if team_abbrev else ""
+    if not src:
+        return (f'<span class="na-shot" style="width: {size}px; '
+                f'height: {size}px; {bg}"></span>')
+    return (f'<span class="na-shot" style="width: {size}px; height: {size}px; {bg}">'
+            f'<img src="{src}" '
+            f'style="width: 100%; height: 100%; object-fit: contain;" '
+            f'loading="lazy"></span>')
+
+
+def race_meta(race: str, row: dict) -> str:
+    """Race-specific stat line under a player's name (single logical line).
+
+    Each branch shows only fields the race's row actually carries, so a
+    missing record (traded player, unmatched abbrev) drops the fragment
+    instead of printing None."""
+    team = str(row.get("team_abbrev") or "—")
+    gp = row.get("gp", 0)
+    if race == "mvp":
+        rec = (f" · {row['wins']}-{row['losses']} ({row['win_pct']:.3f})"
+               if row.get("wins") is not None else "")
+        return (f"{team} · {gp} GP · {row.get('ppg', 0)} PPG · "
+                f"{row.get('rpg', 0)} RPG · {row.get('apg', 0)} APG{rec}")
+    if race == "dpoy":
+        opp = (f" · {row['opp_pg']} opp pts/g"
+               if row.get("opp_pg") is not None else "")
+        return (f"{team} · {gp} GP · {row.get('stocks_pg', 0)} stocks "
+                f"({row.get('spg', 0)} STL · {row.get('bpg', 0)} BLK){opp}")
+    if race == "sixth_man":
+        start_pct = 100 * float(row.get("start_pct") or 0)
+        return (f"{team} · {gp} GP · {row.get('starts', 0)} starts "
+                f"({start_pct:.0f}%) · {row.get('ppg', 0)} PPG · "
+                f"{row.get('apg', 0)} APG")
+    return (f"{team} · {gp} GP · {row.get('ppg_prev', 0)} → "
+            f"{row.get('ppg', 0)} PPG ({row.get('delta_ppg', 0):+.1f}) · "
+            f"{row.get('gp_prev', 0)} GP last season")
+
+
+def race_row_html(row: dict, race: str) -> str:
+    """One award-race ladder row: medal/rank, real headshot (team-logo CSS
+    fallback behind it), name + team logo, the race's stat line, the score.
+
+    IMPORTANT: single logical line, no leading indentation anywhere in the
+    string -- this goes through st.markdown(unsafe_allow_html=True), which
+    parses Markdown BEFORE HTML, and Markdown renders a newline followed by
+    4+ spaces as a visible code block (the exact trap FPL-Analytics' cards
+    hit). The adjacent f-string literals below concatenate into ONE line at
+    runtime; the Python source's indentation is not part of the string."""
+    rank = int(row.get("rank") or 0)
+    medal = {1: "🥇", 2: "🥈", 3: "🥉"}.get(rank, str(rank))
+    name = html.escape(str(row.get("player_name") or "Unknown"))
+    team = str(row.get("team_abbrev") or "")
+    score = float(row.get("score") or 0)
+    score_text = f"{score:+.1f}" if race == "mip" else f"{score:.1f}"
+    return (f'<div class="na-race-row">'
+            f'<div class="na-rank">{medal}</div>'
+            f'{headshot_html(row.get("player_id"), team, 44)}'
+            f'<div class="na-rbody">'
+            f'<div class="na-rname">{name}{team_logo_html(team, 16)}</div>'
+            f'<div class="na-rmeta">{race_meta(race, row)}</div>'
+            f'</div>'
+            f'<div class="na-rscore">{score_text}</div>'
+            f'</div>')
+
+
+def leader_row_html(row: dict, stat: str) -> str:
+    """One stat-leader row: rank, headshot, name + team logo, games + season
+    total for context, headline per-game rate on the right. Same single-
+    logical-line rule as race_row_html."""
+    rank = int(row.get("rank") or 0)
+    medal = {1: "🥇", 2: "🥈", 3: "🥉"}.get(rank, str(rank))
+    name = html.escape(str(row.get("player_name") or "Unknown"))
+    team = str(row.get("team_abbrev") or "")
+    total = int(row.get("total") or 0)
+    label = awards.STAT_LABELS.get(stat, stat)
+    abbr = awards.STAT_ABBR.get(stat, stat.upper())
+    meta = f"{team} · {row.get('gp', 0)} GP · {total:,} {label.lower()} (season total)"
+    return (f'<div class="na-race-row">'
+            f'<div class="na-rank">{medal}</div>'
+            f'{headshot_html(row.get("player_id"), team, 44)}'
+            f'<div class="na-rbody">'
+            f'<div class="na-rname">{name}{team_logo_html(team, 16)}</div>'
+            f'<div class="na-rmeta">{meta}</div>'
+            f'</div>'
+            f'<div class="na-rscore">{row.get("per_game", 0)} {abbr}</div>'
+            f'</div>')
+
+
+def court_card_html(row: dict, bucket: str, stat: str) -> str:
+    """One Court View player card: headshot over team-logo fallback, name,
+    team logo + position chip, headline per-game rate, and a CSS-only hover
+    tooltip (.na-tip) with the player's full per-game line + season total.
+
+    Single logical line -- see race_row_html's docstring."""
+    name = html.escape(str(row.get("player_name") or "Unknown"))
+    team = str(row.get("team_abbrev") or "")
+    chip = slot_chip(bucket) if bucket else ""
+    total = int(row.get("total") or 0)
+    total_label = awards.STAT_LABELS.get(stat, stat).lower()
+    tip = (f"{row.get('gp', 0)} GP · {row.get('mpg', 0)} MIN · "
+           f"{row.get('ppg', 0)} PTS · {row.get('rpg', 0)} REB · "
+           f"{row.get('apg', 0)} AST · {row.get('spg', 0)} STL · "
+           f"{row.get('bpg', 0)} BLK · {total:,} {total_label} total")
+    abbr = awards.STAT_ABBR.get(stat, stat.upper())
+    return (f'<div class="na-court-card">'
+            f'<div class="na-tip">{tip}</div>'
+            f'{headshot_html(row.get("player_id"), team, 56)}'
+            f'<div class="na-cname">{name}</div>'
+            f'<div class="na-cteam">{team_logo_html(team, 14)}{team}{chip}</div>'
+            f'<div class="na-cstat">{row.get("per_game", 0)} {abbr}</div>'
+            f'</div>')
+
+
+def _court_bucket(raw_pos: str) -> str:
+    """ESPN's coarse roster position -> lineup bucket: PG/SG -> G, SF/PF -> F,
+    C -> C. Anything else (UNK, missing) -> '' so the player sits on the
+    bench strip rather than being forced into a slot he doesn't play."""
+    pos = (raw_pos or "").strip().upper()
+    if pos in ("PG", "SG", "G"):
+        return "G"
+    if pos in ("SF", "PF", "F"):
+        return "F"
+    if pos == "C":
+        return "C"
+    return ""
+
+
+def render_court(leaders: list, positions, stat: str, min_games: int,
+                 season: str) -> None:
+    """Draw a stat race's top players on a real hardwood court: rank order
+    fills a 2 G / 2 F / 1 C formation from the committed roster map (C row
+    first -- the basket is at the top), and everyone else -- formation full,
+    or position unmapped -- lands on the bench strip below the court, never
+    forced into a slot. Hovering a card shows the full per-game line (CSS
+    only). Missing/empty leaders render nothing (the caller says why).
+
+    Every HTML string here is a single logical line -- see race_row_html's
+    docstring on why (Markdown-then-HTML via st.markdown)."""
+    if not leaders:
+        return
+
+    pos_by_id = {}
+    if positions is not None and not getattr(positions, "empty", True):
+        if "position" in positions.columns:
+            pos_by_id = dict(zip(positions["player_id"], positions["position"]))
+
+    capacity = {"G": 2, "F": 2, "C": 1}
+    slots = {"G": [], "F": [], "C": []}
+    bench = []
+    for row in leaders:
+        bucket = _court_bucket(str(pos_by_id.get(row.get("player_id"), "") or ""))
+        if bucket and len(slots[bucket]) < capacity[bucket]:
+            slots[bucket].append(row)
+        else:
+            bench.append((row, bucket))
+
+    rows_html = ""
+    for bucket in ("C", "F", "G"):
+        if not slots[bucket]:
+            continue
+        cards = "".join(court_card_html(r, bucket, stat) for r in slots[bucket])
+        rows_html += f'<div class="na-court-row">{cards}</div>'
+
+    # Court markings, entirely CSS gradients layered under the wood grain
+    # (no extra DOM, so the court stays one logical line -- see above): a
+    # center circle, a half-court line, the boundary, and both painted keys.
+    markings = (
+        "radial-gradient(circle at 50% 50%, transparent 40px, "
+        "rgba(255,255,255,0.45) 41px, rgba(255,255,255,0.45) 43px, transparent 44px), "
+        "linear-gradient(rgba(255,255,255,0.45), rgba(255,255,255,0.45)) 0 50% / 100% 2px no-repeat, "
+        "linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)) 0 0 / 100% 3px no-repeat, "
+        "linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)) 0 100% / 100% 3px no-repeat, "
+        "linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)) 0 0 / 3px 100% no-repeat, "
+        "linear-gradient(rgba(255,255,255,0.4), rgba(255,255,255,0.4)) 100% 0 / 3px 100% no-repeat, "
+        "linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3)) 33% 0 / 34% 72px no-repeat, "
+        "linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0.3)) 33% 100% / 34% 72px no-repeat"
+    )
+    label = awards.STAT_LABELS.get(stat, stat).upper()
+    court = (f'<div class="na-court" style="background: {markings}, '
+             f'repeating-linear-gradient(90deg, #b57a3c 0 46px, #ab7136 46px 92px);">'
+             f'<div class="na-court-head">🏀 {season} · {label} LEADERS · '
+             f'2 G · 2 F · 1 C</div>{rows_html}</div>')
+    st.markdown(court, unsafe_allow_html=True)
+
+    if bench:
+        bench_cards = "".join(court_card_html(r, b, stat) for r, b in bench)
+        st.markdown(
+            f'<div class="na-bench-label">🪑 BENCH · {len(bench)} not slotted '
+            f'(formation full or position unmapped)</div>'
+            f'<div class="na-bench">{bench_cards}</div>',
+            unsafe_allow_html=True,
+        )
+    st.caption(
+        f"Top {len(leaders)} in {awards.STAT_LABELS.get(stat, stat).lower()} "
+        f"per game, qualified at ≥{min_games} GP ({season}); positions from "
+        f"the committed roster map (coarse G/F/C). Hover a card for the "
+        f"player's full per-game line."
     )
 
 
@@ -203,21 +518,6 @@ def standings_have_results(df: pd.DataFrame) -> bool:
     wins = pd.to_numeric(df["wins"], errors="coerce").fillna(0)
     losses = pd.to_numeric(df["losses"], errors="coerce").fillna(0)
     return bool((wins + losses).sum() > 0)
-
-
-def projections_are_current(payload: dict, max_age_hours: int = 48) -> bool:
-    """Reject projections from a prior season or an expired refresh window."""
-    if not payload or payload.get("season") != current_season():
-        return False
-    generated = payload.get("_generated_utc")
-    if not generated:
-        return False
-    try:
-        stamp = datetime.fromisoformat(generated.replace("Z", "+00:00"))
-        age = datetime.now(timezone.utc) - stamp
-    except (TypeError, ValueError):
-        return False
-    return age <= timedelta(hours=max_age_hours)
 
 
 @st.cache_data(ttl=60, show_spinner=False)
@@ -306,50 +606,25 @@ def load_scoreboard(dates: str) -> tuple:
 
 @st.cache_data(ttl=300, show_spinner=False)
 def load_positions() -> pd.DataFrame:
-    """Current player -> position map (for the optimizer pool)."""
+    """Current player -> position map (optimizer pool + Court View formation)."""
     payload = _read_fallback("dashboard_positions.json")
     return pd.DataFrame(payload.get("players", []))
 
 
 @st.cache_data(ttl=300, show_spinner=False)
-def load_projections() -> tuple:
-    """(projections DataFrame, note) -- the committed fallback the refresh
-    script wrote (computed WHERE the raw data exists), since Streamlit Cloud
-    can't rebuild 20k game files to project itself."""
-    payload = _read_fallback("dashboard_projections.json")
-    if not projections_are_current(payload):
-        return (pd.DataFrame(), "No current-season projections available yet")
-    projections = payload.get("projections", [])
-    df = pd.DataFrame(projections)
-    if df.empty:
-        return (df, data_age_note(payload, False))
-
-    # Display-friendly enrichment: projections carry raw ids (Streamlit Cloud
-    # can't rebuild names from 20k game files), so join the committed
-    # position map for player names and the team list for abbreviations --
-    # otherwise the dashboard shows bare numeric ids where a human wants
-    # names.
-    positions = pd.DataFrame(
-        _read_fallback("dashboard_positions.json").get("players", [])
-    )
-    if not positions.empty and "player_name" in positions.columns:
-        df = df.merge(
-            positions[["player_id", "player_name"]].drop_duplicates("player_id"),
-            on="player_id", how="left",
-        )
-    else:
-        df["player_name"] = df["player_id"]
-
-    teams = pd.DataFrame(_read_fallback("dashboard_teams.json").get("teams", []))
-    if not teams.empty:
-        abbrev = teams.set_index("team_id")["abbrev"].to_dict()
-        df["team_abbrev"] = df["team_id"].map(abbrev)
-        df["opponent_abbrev"] = df["opponent_id"].map(abbrev)
-    else:
-        df["team_abbrev"] = df["team_id"].astype(str)
-        df["opponent_abbrev"] = df["opponent_id"].astype(str)
-
-    return (df, data_age_note(payload, False))
+def load_awards() -> tuple:
+    """(payload, note) -- award races + stat leaders computed LOCALLY from
+    the collected box scores (src/collector/awards.py) and committed as
+    data/dashboard_awards.json. There is deliberately no live API for these,
+    so the note states the computation stamp rather than implying live."""
+    payload = _read_fallback("dashboard_awards.json")
+    if not payload.get("races"):
+        return (payload, "No committed award data yet — computed where raw "
+                         "box scores exist (refresh_dashboard_fallbacks.py)")
+    stamp = payload.get("_generated_utc")
+    note = (f"Computed from collected box scores — as of {stamp}" if stamp
+            else "Computed from collected box scores")
+    return (payload, note)
 
 
 @st.cache_data(ttl=3600, show_spinner=False)

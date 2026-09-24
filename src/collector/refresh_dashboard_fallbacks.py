@@ -8,6 +8,7 @@ tabs read, committed here (the same pattern as FPL-Analytics' refresh script):
     data/dashboard_standings.json    latest available season's standings
     data/dashboard_schedule.json     current season schedule + scores
     data/dashboard_positions.json    current player -> position map
+    data/dashboard_awards.json       MVP/DPOY/6th-Man/MIP races + stat leaders
     data/processed/dashboard_leaderboards.json
                                      last completed season's per-player totals
 
@@ -226,6 +227,32 @@ def refresh_leaderboards(seasons_to_try: list) -> dict:
     return {"season": chosen, "leaders": leaders}
 
 
+def refresh_awards(seasons_to_try: list) -> dict:
+    """Award races + stat leaders for the first season with collected games.
+
+    Pure-local computation (awards.py scans the stored box scores -- no API
+    call), so like the leaderboards it silently keeps the previous file when
+    raw data is missing (the normal Streamlit Cloud / fresh-clone state)."""
+    import glob
+
+    import awards
+
+    chosen = None
+    for season in seasons_to_try:
+        if glob.glob(os.path.join(RAW_DIR, season, "games", "*.json")):
+            chosen = season
+            break
+    if chosen is None:
+        print("  no collected games for any candidate season -- skipping awards")
+        return {}
+    payload = awards.build_payload(chosen)
+    if not payload:
+        return {}
+    path = os.path.join(DATA_DIR, "dashboard_awards.json")
+    _write(path, _stamp(payload, "local"))
+    return payload
+
+
 def _as_date(value) -> date | None:
     """Parse the ISO timestamps ESPN puts in schedule rows."""
     if not value:
@@ -315,6 +342,7 @@ def main() -> None:
     refresh_schedule(current)
     refresh_positions()
     refresh_leaderboards(candidates)
+    refresh_awards(candidates)
     # Near-term projections for the deployed app -- silently skipped until
     # train.py has produced models/proj_model.txt (bootstrap state).
     refresh_projections(current)

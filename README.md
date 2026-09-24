@@ -35,7 +35,7 @@ Dependency layout mirrors FPL-Analytics: `requirements.txt` = exact pins everyth
 
 **Stage 3 (done): lineup optimizer.** PuLP MILP over a projected player pool: 2 G / 2 F / 1 C / 2 UTIL slots with structural position eligibility, provably optimal answers, honest infeasibility errors. Verified against synthetic pools with known optima. See [docs/MODELING.md](docs/MODELING.md#lineup-optimizer).
 
-**Stage 4 (done): dashboard.** Two-page Streamlit app — Standings / Schedule & Scores / Projections on Home, Model Performance / Season Leaders / Lineup Optimizer on page 2. Live-first from ESPN with 60s cache, committed `data/dashboard_*` fallbacks for offline deploys, and freshness captions that always say which they're showing. See [docs/DASHBOARD.md](docs/DASHBOARD.md).
+**Stage 4 (done): dashboard.** Two-page Streamlit app — Standings / Schedule & Scores / Awards Ladder on Home, Model Performance / Season Leaders / Court View on page 2. Live-first from ESPN with 60s cache, committed `data/dashboard_*` fallbacks for offline deploys, and freshness captions that always say which they're showing. The Awards Ladder ranks MVP/DPOY/6th-Man/MIP races and per-game stat leaders with transparent homegrown formulas (each printed verbatim on screen — explicitly not official NBA voting); the Court View slots those leaders onto a CSS-drawn court. See [docs/DASHBOARD.md](docs/DASHBOARD.md).
 
 **Stage 5 (in progress): live season.** The 2026-27 schedule (1,200 games) is captured; the daily workflow will collect its box scores as games finalize from late October. The historical backfill (2010-11 → 2025-26, ~19,700 games) runs newest-first so training-ready seasons land first.
 
@@ -55,12 +55,12 @@ gitignored):
    configuration needed.
 
 What works on a deployed instance: Standings/Schedule (live ESPN first,
-committed fallback second), Season Leaders, and the Optimizer over the
-committed projection window. What needs a data machine: historical raw data
-and retraining — the daily GitHub Actions workflow
-(`.github/workflows/collector.yml`) refreshes the committed fallback files
-(and projections, once `models/proj_model.txt` exists) so the deployed app
-stays current without ever seeing `data/raw/`.
+committed fallback second), Season Leaders, and the Awards Ladder + Court
+View (committed award races computed from collected box scores). What needs
+a data machine: historical raw data and retraining — the daily GitHub
+Actions workflow (`.github/workflows/collector.yml`) refreshes the
+committed fallback files so the deployed app stays current without ever
+seeing `data/raw/`.
 
 ## Project Structure
 
@@ -72,9 +72,11 @@ NBA-Analytics/
 │   │   ├── parsing.py                    # Payload → flat rows (pure, fixture-pinned)
 │   │   ├── snapshot.py                   # Idempotent/resumable season snapshots (--backfill/--check-only)
 │   │   ├── refresh_dashboard_fallbacks.py# Stable data/dashboard_* copies for offline deploys
+│   │   ├── awards.py                      # MVP/DPOY/6th-Man/MIP races + stat leaders (local box-score math)
 │   │   ├── fixtures/                     # Real recorded payloads (incl. a 1995-96 game)
 │   │   ├── test_espn_api.py              # Parsing pinned against fixtures + opt-in live tests
-│   │   └── test_snapshot.py              # State decisions: what's fetched, skipped, targeted
+│   │   ├── test_snapshot.py              # State decisions: what's fetched, skipped, targeted
+│   │   └── test_awards.py                # Qualifiers, race math, aggregation edge cases
 │   └── model/
 │       ├── scoring.py                    # Configurable fantasy weights (the "platform" is here)
 │       ├── load_historical.py            # data/raw/* → one training table (+ positions, team scores)
@@ -84,10 +86,10 @@ NBA-Analytics/
 │       ├── optimizer.py                  # PuLP best-lineup (G/F/C/UTIL slots)
 │       └── test_model.py                 # Scoring, leakage guarantees, split, projections, optimizer
 ├── app/
-│   ├── app.py                            # Home: Standings, Schedule & Scores, Projections
+│   ├── app.py                            # Home: Standings, Schedule & Scores, Awards Ladder
 │   ├── shared.py                         # Live-first loaders with committed fallbacks + age notes
 │   ├── test_app_offline.py               # AppTest renders with EVERY ESPN call forced to fail
-│   └── pages/1_Model_and_History.py      # Model Performance, Season Leaders, Lineup Optimizer
+│   └── pages/1_Model_and_History.py      # Model Performance, Season Leaders, Court View
 ├── r/                                    # EDA in R (arrow reads the same parquet)
 ├── docs/
 │   ├── COLLECTOR.md                      # Endpoints, files written, scheduling, resumability
@@ -140,4 +142,4 @@ The investigation log — ESPN WAF blocking User-Agents, the standings link-stub
 - Salary-cap optimizer variant (DraftKings-style): the MILP already separates objective from slot structure; adding a cost column and budget constraint is the natural extension once a cost source (a platform or an ADP proxy) is chosen.
 - Injury/outcome signal: same lesson as FPL-Analytics — the gap to naive baselines concentrates in did-not-play rows, where historical stats can't see a coach's game-time decision. A real availability feed is the lever, not more box-score history.
 - Retrain once 2026-27 box scores accumulate (validation window deliberately fixed at 2024-25 so early-season re-runs stay comparable).
-- Wire `predict.project_upcoming()` into the dashboard's live path when running where raw data exists (today the Projections tab serves the committed fallback everywhere; the refresh script computes it where the data lives).
+- Wire `predict.project_upcoming()` into a dashboard surface again (the Projections tab was replaced by the Awards Ladder; `predict.project_upcoming()` and the daily `refresh_projections()` still compute the committed window for the backend), or surface it as a fifth tab once 2026-27 games give it something current to project.

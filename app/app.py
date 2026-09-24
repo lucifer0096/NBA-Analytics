@@ -2,29 +2,35 @@
 
 Run: streamlit run app/app.py
 
-Three tabs, all live-first from ESPN's free APIs with committed offline
-fallbacks (see shared.py for the contract):
+Three tabs: Standings and Schedule are live-first from ESPN's free APIs with
+committed offline fallbacks (see shared.py for the contract), and Awards
+Ladder is computed locally from the collected box scores:
 
-- **Standings**   -- conference tables for the selected season
-- **Schedule**    -- today's games live (scoreboard) + the selected season's
-                     full schedule/results from the daily collector
-- **Projections** -- model-projected fantasy points for upcoming games (the
-                     committed fallback was computed where raw data exists;
-                     Streamlit Cloud can't rebuild 20k box scores itself)
+- **Standings**    -- conference tables for the selected season
+- **Schedule**     -- today's games live (scoreboard) + the selected season's
+                      full schedule/results from the daily collector
+- **Awards Ladder** -- MVP / DPOY / 6th Man / MIP races plus per-game stat
+                      leaders (src/collector/awards.py, committed as
+                      data/dashboard_awards.json): transparent homegrown
+                      metrics, explicitly NOT official NBA voting -- every
+                      race prints its exact formula as its caption
 
 The Model & History page (pages/1_Model_and_History.py) carries metrics,
-season leaders and the lineup optimizer.
+season leaders and the Court View.
 
 Presentation: shared.inject_css() owns the theme CSS (accent-gradient title,
 hero strip, metric cards, accent tabs) -- all CSS-only, built on Streamlit's
 own theme tokens from .streamlit/config.toml so it survives theme changes,
-and reduced-motion safe.
+and reduced-motion safe. Player headshots/team logos use the CSS-only
+fallback (shared.headshot_html) -- no JS, a 404 just shows the team logo.
 """
 
 import pandas as pd
 import streamlit as st
 
 import shared
+
+import awards
 
 st.set_page_config(page_title="NBA Analytics", page_icon="🏀", layout="wide")
 
@@ -57,7 +63,7 @@ teams, teams_note = shared.load_teams()
 # ---------------------------------------------------------------------------
 
 games, sched_note = shared.load_schedule(season)
-leaders, leaders_note = shared.load_leaderboards()
+awards_payload, awards_note = shared.load_awards()
 metrics = shared.load_metrics()
 
 if not games.empty:
@@ -70,9 +76,16 @@ else:
     kpi_games = "—"
 
 top_scorer = "—"
-if not leaders.empty:
-    best = leaders.sort_values("fantasy_points", ascending=False).iloc[0]
-    top_scorer = f"{best['player_name']} · {best['fantasy_points']:,.0f}"
+scoring_help = "Run refresh_dashboard_fallbacks.py where box scores exist."
+pts_leaders = (awards_payload.get("leaders") or {}).get("pts") or []
+if pts_leaders:
+    best = pts_leaders[0]
+    top_scorer = f"{best.get('player_name', '—')} · {best.get('per_game', 0)} PPG"
+    scoring_help = (
+        f"Per-game rate, qualified at ≥{awards_payload.get('min_games', '?')} GP "
+        f"({awards_payload.get('season', '—')}) — computed from collected box "
+        "scores, a homegrown metric rather than official NBA stats."
+    )
 
 single = metrics.get("single_stage", {})
 naive = metrics.get("naive_baseline", {})
@@ -86,12 +99,12 @@ else:
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Games collected", kpi_games)
 col2.metric("Next tip-off", kpi_next)
-col3.metric("Season fantasy leader", top_scorer)
+col3.metric("Season scoring leader", top_scorer, help=scoring_help)
 col4.metric("Model (validation)", kpi_model, help=model_help)
 
 shared.hero(season, f"Teams source: {teams_note}", extra="ESPN · no auth")
 
-tabs = st.tabs(["Standings", "Schedule & Scores", "Projections"])
+tabs = st.tabs(["Standings", "Schedule & Scores", "Awards Ladder"])
 
 # ---------------------------------------------------------------------------
 # Standings
@@ -216,42 +229,80 @@ with tabs[1]:
         )
 
 # ---------------------------------------------------------------------------
-# Projections
+# Awards Ladder: MVP / DPOY / 6th Man / MIP races + season stat leaders
 # ---------------------------------------------------------------------------
 
 with tabs[2]:
-    projections, proj_note = shared.load_projections()
-    st.caption(f"Source: {proj_note}")
-    if projections.empty:
+    st.caption(f"Source: {awards_note}")
+    if not awards_payload.get("races"):
         st.info(
-            "No projections available yet. They're generated where the raw "
-            "collector data exists (`python src/model/predict.py`) and "
-            "committed as a fallback for this page."
+            "No award data yet — the races are computed from collected box "
+            "scores (`python src/collector/refresh_dashboard_fallbacks.py`) "
+            "and committed as data/dashboard_awards.json."
         )
     else:
-        projections = projections.copy()
-        projections["day"] = projections["date"].astype(str).str[:10]
-        game_days = sorted(projections["day"].unique())
-        shared.section("Projected fantasy points")
-        day = st.selectbox("Game day", game_days)
-        day_rows = projections[projections["day"] == day].sort_values(
-            "projected_points", ascending=False
-        ).head(30)
-        st.dataframe(
-            day_rows.rename(columns={
-                "player_name": "Player",
-                "team_abbrev": "Team",
-                "opponent_abbrev": "Opp",
-                "position": "Pos",
-            })[["Player", "Team", "Opp", "Pos", "projected_points"]],
-            width="stretch", hide_index=True,
-            column_config={
-                "projected_points": st.column_config.ProgressColumn(
-                    "Proj FPTS", min_value=0, max_value=60, format="%.1f",
-                ),
-            },
-        )
         st.caption(
-            "Projected fantasy points use the default configurable scoring "
-            "weights (src/model/scoring.py), not any platform's scheme."
+            "Homegrown transparent metrics — not official NBA voting. Each "
+            "race's caption states the exact formula it ranks by."
+        )
+        races = awards_payload.get("races") or {}
+        col_l, col_r = st.columns(2)
+
+        def _race(key: str) -> None:
+            """One race block: section header, top rows, formula caption."""
+            shared.section(f"{awards.RACE_EMOJI.get(key, '')} "
+                           f"{awards.RACE_LABELS.get(key, key)}")
+            rows = races.get(key) or []
+            if not rows:
+                if key == "mip":
+                    season_label = str(awards_payload.get("season", ""))
+                    prev = (awards_payload.get("prev_season")
+                            or awards.previous_season(season_label))
+                    st.caption(
+                        f"No MIP race yet — it compares against {prev}, "
+                        "which has no collected box scores in this build."
+                    )
+                else:
+                    st.caption(
+                        f"No qualifiers yet — needs ≥"
+                        f"{awards_payload.get('min_games', '?')} GP."
+                    )
+            for row in rows:
+                st.markdown(shared.race_row_html(row, key),
+                            unsafe_allow_html=True)
+            st.caption(
+                f"{awards.RACE_LABELS.get(key, key)} is homegrown math, not "
+                f"official NBA voting — {awards.RACE_FORMULAS.get(key, '')}"
+            )
+
+        with col_l:
+            _race("mvp")
+            _race("sixth_man")
+        with col_r:
+            _race("dpoy")
+            _race("mip")
+
+        shared.section("📈 Season stat leaders")
+        leaders_by_stat = awards_payload.get("leaders") or {}
+        stat_keys = [k for k in awards.STAT_CATEGORIES
+                     if k in leaders_by_stat] or list(leaders_by_stat)
+        stat = st.radio(
+            "Category", stat_keys, horizontal=True, key="awards_stat_cat",
+            format_func=lambda k: (f"{awards.STAT_LABELS.get(k, k)} "
+                                   f"({awards.STAT_ABBR.get(k, k)})"),
+        )
+        stat_rows = leaders_by_stat.get(stat) or []
+        if not stat_rows:
+            st.caption(
+                f"No qualified {awards.STAT_LABELS.get(stat, stat).lower()} "
+                f"leaders yet — needs ≥{awards_payload.get('min_games', '?')} "
+                "GP."
+            )
+        for row in stat_rows:
+            st.markdown(shared.leader_row_html(row, stat),
+                        unsafe_allow_html=True)
+        st.caption(
+            f"Per-game rate (the fair cross-pace comparison) among players "
+            f"with ≥{awards_payload.get('min_games', '?')} GP · "
+            f"{awards_payload.get('season', '—')}. Totals shown for context."
         )

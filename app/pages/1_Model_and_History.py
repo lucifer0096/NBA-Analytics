@@ -5,8 +5,10 @@
   comparison chart
 - **Season Leaders**    -- per-player totals from the committed leaderboards
   fallback (fantasy points under the default scoring), podium-styled
-- **Lineup Optimizer**  -- PuLP best-lineup over a projected player pool,
-  rendered as slot-colored cards with a big optimal-total readout
+- **Court View**         -- the selected stat's leaders on a CSS-only
+  hardwood court: 2 G / 2 F / 1 C filled in rank order by each player's
+  real position, everyone else on a bench strip, hover a card for the full
+  per-game line
 
 This page deliberately shows the naive baseline alongside the model: if the
 model can't beat "last 5 games' average" on a screen, the number on screen
@@ -18,12 +20,14 @@ import streamlit as st
 
 import shared
 
+import awards
+
 st.set_page_config(page_title="Model & History", page_icon="📈", layout="wide")
 
 shared.inject_css()
 st.title("Model & History")
 
-tabs = st.tabs(["Model Performance", "Season Leaders", "Lineup Optimizer"])
+tabs = st.tabs(["Model Performance", "Season Leaders", "Court View"])
 
 # ---------------------------------------------------------------------------
 # Model Performance
@@ -124,112 +128,43 @@ with tabs[1]:
                    "(src/model/scoring.py) applied to season totals.")
 
 # ---------------------------------------------------------------------------
-# Lineup Optimizer
+# Court View: the stat race's leaders on a real court formation
 # ---------------------------------------------------------------------------
 
 with tabs[2]:
-    projections, note = shared.load_projections()
-    if projections.empty:
-        st.info("No committed projections to optimize over yet — see the "
-                "Projections tab on the Home page.")
+    awards_payload, awards_note = shared.load_awards()
+    st.caption(f"Source: {awards_note}")
+    if not awards_payload.get("leaders"):
+        st.info("No committed leader data yet — run "
+                "`python src/collector/refresh_dashboard_fallbacks.py` "
+                "where collected box scores exist.")
     else:
-        st.caption(f"Projection source: {note}")
-        st.markdown(
-            "Best 7-man lineup (2 G · 2 F · 1 C · 2 UTIL) maximizing "
-            "**projected fantasy points** — a PuLP MILP, so the answer is "
-            "provably optimal for the pool and slots chosen."
+        leaders_by_stat = awards_payload.get("leaders") or {}
+        stat_keys = [k for k in awards.STAT_CATEGORIES
+                     if k in leaders_by_stat] or list(leaders_by_stat)
+        stat = st.radio(
+            "Category", stat_keys, horizontal=True, key="court_stat",
+            format_func=lambda k: (f"{awards.STAT_LABELS.get(k, k)} "
+                                   f"({awards.STAT_ABBR.get(k, k)})"),
         )
-
-        projections = projections.copy()
-        projections["day"] = projections["date"].astype(str).str[:10]
-        game_days = sorted(projections["day"].unique())
-        day = st.selectbox("Game day", game_days, key="opt_day")
-
-        teams = shared.load_teams()
-        day_pool = projections[projections["day"] == day]
-        teams_today = sorted(set(day_pool["team_id"]))
-        team_labels = {}
-        if not teams.empty:
-            name_by_id = teams.set_index("team_id")["display_name"].to_dict()
-            team_labels = {t: name_by_id.get(t, str(t)) for t in teams_today}
-
-        col_pool, col_slots = st.columns([2, 1])
-        with col_pool:
-            chosen_teams = st.multiselect(
-                "Restrict pool to teams", teams_today,
-                default=teams_today,
-                format_func=lambda t: team_labels.get(t, str(t)),
+        rows = leaders_by_stat.get(stat) or []
+        if not rows:
+            st.caption(
+                f"No qualified {awards.STAT_LABELS.get(stat, stat).lower()} "
+                f"leaders yet — needs ≥{awards_payload.get('min_games', '?')} "
+                "GP."
             )
-            pool_size = st.slider("Pool size (top-N by projection)", 10, 60, 30)
-
-        pool = day_pool[day_pool["position"].notna()].copy()
-        pool = pool[pool["team_id"].isin(chosen_teams)]
-        pool = pool.sort_values("projected_points", ascending=False).head(pool_size)
-        pool = pool.drop_duplicates(subset="player_id").reset_index(drop=True)
-
-        if pool.empty:
-            st.warning("No pool for this day/team selection.")
         else:
-            import sys  # local import: pulp import cost only when reached
-            from pathlib import Path
-
-            sys.path.insert(0, str(Path(shared.REPO_ROOT) / "src" / "model"))
-            import optimizer
-
-            with col_slots:
-                try:
-                    lineup = optimizer.best_lineup(pool)
-                    total = optimizer.total_points(lineup)
-                    st.markdown(
-                        '<div class="na-total">%.1f'
-                        '<span style="font-size:.85rem;opacity:.7">'
-                        '&nbsp;proj FPTS</span></div>' % total,
-                        unsafe_allow_html=True,
-                    )
-                    slots = lineup["slot"].value_counts().to_dict()
-                    chips = " ".join(shared.slot_chip(s) for s in slots)
-                    st.markdown(
-                        f'<div style="margin-top:6px">{chips}'
-                        f'<span class="na-sub">&nbsp; filled</span></div>',
-                        unsafe_allow_html=True,
-                    )
-                except optimizer.InfeasiblePool as e:
-                    st.error(f"Infeasible pool: {e}")
-                    lineup = None
-
-            with st.expander("Player pool (candidates)"):
-                show_pool = pool.copy()
-                show_pool["projected_points"] = (
-                    show_pool["projected_points"].round(1)
-                )
-                st.dataframe(
-                    show_pool[["player_name", "team_abbrev",
-                               "opponent_abbrev", "position",
-                               "projected_points"]].rename(columns={
-                        "player_name": "Player", "team_abbrev": "Team",
-                        "opponent_abbrev": "Opp", "position": "Pos",
-                        "projected_points": "Proj FPTS",
-                    }),
-                    width="stretch", hide_index=True,
-                )
-
-            if lineup is not None:
-                shared.section("Best lineup")
-                for _, row in lineup.iterrows():
-                    meta = (f"{row.get('team_abbrev', row['team_id'])} vs "
-                            f"{row.get('opponent_abbrev', row['opponent_id'])}"
-                            f" · {row['position']}")
-                    st.markdown(
-                        shared.player_card_html(
-                            row["slot"],
-                            str(row.get("player_name", row["player_id"])),
-                            meta,
-                            float(row["projected_points"]),
-                        ),
-                        unsafe_allow_html=True,
-                    )
-                st.caption(
-                    "Positions are ESPN's coarse G/F/C (its roster endpoint "
-                    "has no PG/SG split); PG/SG/SF/PF inputs are bucketed "
-                    "into G/F by src/model/optimizer.py."
-                )
+            shared.render_court(
+                rows,
+                shared.load_positions(),
+                stat,
+                int(awards_payload.get("min_games") or 8),
+                str(awards_payload.get("season", "—")),
+            )
+        st.caption(
+            "Formation 2 G · 2 F · 1 C mirrors a fantasy-style starting "
+            "lineup slot structure (backend optimizer untouched in "
+            "src/model/optimizer.py); positions are ESPN's coarse G/F/C "
+            "roster buckets, so PG/SG land in G and SF/PF in F."
+        )

@@ -16,7 +16,9 @@
   <_generated_utc>`. Nothing implies freshness it doesn't have; when the
   fallback carries a different season than requested (e.g. 2025-26
   standings while 2026-27 hasn't tipped off), the caption says exactly
-  which season is on screen.
+  which season is on screen. Tabs with no live API (Awards Ladder, Court
+  View) say `Computed from collected box scores — as of <stamp>` instead of
+  ever implying "live".
 - **Offline is the tested state.** `app/test_app_offline.py` forces *every*
   ESPN call to fail (monkeypatches `espn_api._get_json`) and asserts both
   pages still render all their tabs — the deploy condition is the default
@@ -25,8 +27,8 @@
 ## Home (`app/app.py`)
 
 1. **KPI strip** — four glass metric cards: games collected (final / total),
-   next tip-off date, season fantasy leader (from committed leaderboards),
-   and validation MAE vs the naive baseline.
+   next tip-off date, season scoring leader (per-game points from the
+   committed awards payload), and validation MAE vs the naive baseline.
 2. **Standings** — conference tables, W-L combined, Win%, seed, streak,
    PF/g, PA/g; playoff (🟢) and play-in (🟡) zone glyphs appear only when
    the table has real records (preseason all-zero tables get no marks).
@@ -34,10 +36,15 @@
    caption in the offseason, which is the normal Oct–Jun-less state), then
    the selected season's 15 most recent results and next 15 fixtures from
    the collector's schedule.
-4. **Projections** — per-game-day table of model-projected fantasy points
-   with player names/team abbrevs (joined in `load_projections` from the
-   committed position + team files, since raw history isn't on the deploy
-   box) and a progress-bar column for the projection itself.
+4. **Awards Ladder** — MVP / DPOY / 6th Man / MIP races in two columns, then
+   a stat-leaders strip behind a PTS/REB/AST/STL/BLK radio (top-10
+   per-game rates). Every row is a real headshot over a team-logo CSS
+   fallback with the race's stat line and score. Computed locally from the
+   collected box scores (`src/collector/awards.py`, committed as
+   `data/dashboard_awards.json`); each race's caption prints its exact
+   formula verbatim plus the "not official NBA voting" disclaimer, and an
+   empty MIP race says which prior season is missing instead of inventing
+   a winner.
 
 ## Model & History (`app/pages/1_Model_and_History.py`)
 
@@ -49,11 +56,13 @@
    AUC.
 2. **Season Leaders** — top-25 from the committed leaderboards, rank-by
    radio (fantasy pts / pts / reb / ast), 🥇🥈🥉 podium styling.
-3. **Lineup Optimizer** — pick a game day + team filter + pool size, then
-   `optimizer.best_lineup()` solves the MILP; results render as
-   slot-colored player cards (G blue / F green / C orange / UTIL gold) with
-   a big optimal-total readout. Pool candidates sit in an expander; genuine
-   infeasibility surfaces `InfeasiblePool`'s reason instead of a blank.
+3. **Court View** — the selected stat's leaders on a CSS-only hardwood court
+   (gradient markings, no images): rank order fills a 2 G / 2 F / 1 C
+   formation from the committed roster map, C row first under the basket;
+   overflow and unmapped positions land on a bench strip rather than being
+   forced into a slot. Hovering a card shows the player's full per-game
+   line (CSS-only tooltip). The PuLP optimizer remains a backend component
+   (`src/model/optimizer.py` + its tests) — this tab changed, it didn't.
 
 ## UI pass (presentation layer)
 
@@ -61,7 +70,10 @@ All styling is one CSS block in `shared.inject_css()` — CSS-only, no JS:
 
 - accent-gradient page title, hero strip with season/data-age pills,
 - glass metric cards, accent-underlined tabs, uppercase section labels,
-- slot chips + player cards for the optimizer,
+- slot chips, award-race/leader rows, and court cards whose stat tooltips
+  are pure CSS (`:hover`) — no JS anywhere, including the image fallback
+  (headshot `<img>` over a team-logo `background-image`, so a CDN 404 just
+  shows the logo);
 - every color derived from Streamlit's own theme tokens
   (`--primary-color`, `--secondary-background-color`, `--text-color`), so a
   theme change can't break contrast;
@@ -72,10 +84,10 @@ All styling is one CSS block in `shared.inject_css()` — CSS-only, no JS:
 
 | File | Written by | Read by |
 |---|---|---|
-| `data/dashboard_teams.json` | `refresh_dashboard_fallbacks.py` (live) | KPI/team labels, projection team abbrevs |
+| `data/dashboard_teams.json` | `refresh_dashboard_fallbacks.py` (live) | Teams-source hero note, team labels |
 | `data/dashboard_standings.json` | same (live, zero-record gated) | Standings tab |
 | `data/dashboard_schedule.json` | same (local `schedule.csv`) | KPI next tip-off, Schedule tab |
-| `data/dashboard_positions.json` | same (local position map) | Optimizer pool |
-| `data/dashboard_projections.json` | same (model, 21-day window) | Projections tab, Optimizer |
-| `data/processed/dashboard_leaderboards.json` | same (local totals) | KPI leader, Season Leaders |
+| `data/dashboard_positions.json` | same (local position map) | Court View formation |
+| `data/dashboard_awards.json` | same (local award math) | KPI scoring leader, Awards Ladder, Court View |
+| `data/processed/dashboard_leaderboards.json` | same (local totals) | Season Leaders |
 | `models/metrics.json`, `models/proj_model.txt` | `train.py` | Model Performance tab |

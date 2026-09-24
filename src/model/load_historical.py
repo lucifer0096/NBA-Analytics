@@ -122,18 +122,21 @@ def load_season_games(season: str) -> pd.DataFrame:
     sched = load_schedule(season)
     if not sched.empty:
         sched = sched[["game_id", "home_score", "away_score", "home_id", "away_id"]].copy()
-        merged = df.merge(sched, on="game_id", how="left", suffixes=("", "_sched"))
+        merged = df.merge(sched, on="game_id", how="left")
         # Cross-check: box-score and schedule home/away assignment must agree
         # for rows where both exist (they're written by two different ESPN
-        # endpoints -- a mismatch would silently corrupt team form).
-        both = merged["home_id_sched"].notna()
-        disagrees = both & (merged["home_id"] != merged["home_id_sched"])
+        # endpoints -- a mismatch would silently corrupt team form). Player
+        # rows carry no `home_id` of their own: the box score's home team is
+        # reconstructed from the row's is_home/team_id/opponent_id.
+        box_home = merged["team_id"].where(merged["is_home"], merged["opponent_id"])
+        both = merged["home_id"].notna()
+        disagrees = both & (box_home != merged["home_id"])
         if disagrees.any():
             print(f"  WARNING [{season}]: {int(disagrees.sum())} rows where box-score "
                   f"and schedule disagree on home team -- schedule context dropped "
                   f"for those rows")
-        merged.loc[disagrees, ["home_score", "away_score", "home_id_sched", "away_id_sched"]] = pd.NA
-        df = merged.drop(columns=["home_id_sched", "away_id_sched"])
+        merged.loc[disagrees, ["home_score", "away_score"]] = pd.NA
+        df = merged.drop(columns=["home_id", "away_id"])
         df["team_score"] = df["home_score"].where(df["is_home"], df["away_score"])
         df["opp_score"] = df["away_score"].where(df["is_home"], df["home_score"])
         df = df.drop(columns=["home_score", "away_score"])

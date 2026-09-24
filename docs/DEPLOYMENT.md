@@ -31,9 +31,9 @@ SSH remote (`git@github.com:<your-user>/NBA-Analytics.git`).
 | Standings (live ESPN → committed fallback) | `data/raw/` history (gitignored, regenerates via `snapshot.py --backfill`) |
 | Schedule & Scores (committed `dashboard_schedule.json` + live scoreboard) | Retraining (`features.py` + `train.py`) |
 | Season Leaders (committed `dashboard_leaderboards.json`) | — |
-| Projections + Optimizer over the committed window (`dashboard_projections.json`) | — |
+| Awards Ladder + Court View (committed `dashboard_awards.json`) | — |
 
 The daily workflow (`.github/workflows/collector.yml`) keeps every committed
-fallback fresh — schedule, standings, positions, leaderboards, and (once
-`models/proj_model.txt` exists) a rolling 21-day projection window — so the
-deployed app stays current without access to raw data.
+fallback fresh — schedule, standings, positions, leaderboards, award races,
+and (once `models/proj_model.txt` exists) a rolling 21-day projection
+window — so the deployed app stays current without access to raw data.
