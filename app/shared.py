@@ -13,7 +13,7 @@ of implying freshness it doesn't have.
 
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -205,6 +205,21 @@ def standings_have_results(df: pd.DataFrame) -> bool:
     return bool((wins + losses).sum() > 0)
 
 
+def projections_are_current(payload: dict, max_age_hours: int = 48) -> bool:
+    """Reject projections from a prior season or an expired refresh window."""
+    if not payload or payload.get("season") != current_season():
+        return False
+    generated = payload.get("_generated_utc")
+    if not generated:
+        return False
+    try:
+        stamp = datetime.fromisoformat(generated.replace("Z", "+00:00"))
+        age = datetime.now(timezone.utc) - stamp
+    except (TypeError, ValueError):
+        return False
+    return age <= timedelta(hours=max_age_hours)
+
+
 @st.cache_data(ttl=60, show_spinner=False)
 def load_teams() -> tuple:
     """(teams DataFrame, note). Live teams endpoint, else committed copy."""
@@ -243,6 +258,8 @@ def load_standings(season: str) -> tuple:
         # misrepresent 2025-26 numbers as the requested season's.
         note = (f"{note} — showing {payload.get('season')} standings "
                 f"({season} has none yet)")
+    elif rows and not standings_have_results(pd.DataFrame(rows)):
+        return (pd.DataFrame(), f"{season} standings not started yet")
     return (pd.DataFrame(rows), note)
 
 

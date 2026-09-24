@@ -89,14 +89,65 @@ def build_projection_rows(history: pd.DataFrame,
     placeholders["opponent_abbrev"] = pd.NA
     placeholders["team_abbrev"] = pd.NA
 
-    combined = pd.concat([history, placeholders], ignore_index=True, sort=False)
-    combined = feature_builders.build_feature_table(combined)
+    # Build each target date against only the real history available before
+    # that date. If every future placeholder were concatenated at once, a
+    # player's second upcoming game would incorrectly treat the first
+    # placeholder as a prior game (shifting counts, rest, and rolling form
+    # with no actual result). Grouping by date keeps same-day games together
+    # while preserving the leak-free chronology across game days.
+    history_dates = pd.to_datetime(
+        history["date"], format="mixed", utc=True, errors="coerce"
+    )
+    projected_frames = []
+    for date, date_rows in placeholders.groupby("date", sort=True):
+        target_date = pd.to_datetime(date, format="mixed", utc=True).date()
+        prior_history = history.loc[history_dates.dt.date < target_date].drop(
+            columns=["_history_date"], errors="ignore"
+        )
+        combined = pd.concat([prior_history, date_rows], ignore_index=True, sort=False)
+        featured = feature_builders.build_feature_table(combined)
+        target_keys = set(zip(date_rows["game_id"], date_rows["player_id"]))
+        projected_frames.append(featured[
+            featured.apply(
+                lambda row: (row["game_id"], row["player_id"]) in target_keys,
+                axis=1,
+            )
+        ].copy())
 
-    upcoming_keys = set(zip(placeholders["game_id"], placeholders["player_id"]))
-    projected = combined[
-        combined.apply(lambda r: (r["game_id"], r["player_id"]) in upcoming_keys, axis=1)
-    ].copy()
-    return projected.reset_index(drop=True)
+    if not projected_frames:
+        return pd.DataFrame()
+    return pd.concat(projected_frames, ignore_index=True).reset_index(drop=True)
+
+
+def _schedule_for_cli():
+    """Prefer the current/upcoming season's schedule for CLI projections.
+
+    `available_seasons()` only reports directories containing collected games,
+    which is the wrong choice during an offseason: the new season has a real
+    schedule but no games yet, while the previous season's schedule is fully
+    final. The CLI therefore checks schedule-bearing directories explicitly.
+    """
+    import espn_api
+    import load_historical
+
+    raw_dir = os.path.dirname(os.path.dirname(os.path.dirname(
+        os.path.abspath(__file__)
+    )))
+    raw_dir = os.path.join(raw_dir, "data", "raw")
+    current = espn_api.current_season_label()
+    candidates = [current]
+    if os.path.isdir(raw_dir):
+        candidates.extend(sorted(
+            (name for name in os.listdir(raw_dir)
+             if name[:4].isdigit() and "-" in name
+             and os.path.isfile(os.path.join(raw_dir, name, "schedule.csv"))),
+            reverse=True,
+        ))
+    for season in dict.fromkeys(candidates):
+        schedule = load_historical.load_schedule(season)
+        if not schedule.empty:
+            return season, schedule
+    return current, pd.DataFrame()
 
 
 def project_upcoming(history: pd.DataFrame,
@@ -131,17 +182,13 @@ if __name__ == "__main__":
     import load_historical
 
     history = load_historical.load_all_seasons()
-    schedule = None
-    for season in sorted(load_historical.available_seasons(), reverse=True):
-        sched = load_historical.load_schedule(season)
-        if not sched.empty:
-            schedule = sched
-            break
+    schedule_season, schedule = _schedule_for_cli()
     positions = load_historical.load_positions()
-    if schedule is None or positions.empty:
+    if schedule.empty or positions.empty:
         raise SystemExit("Need a collected schedule + player_positions.json "
                          "(run the collector first).")
 
+    print(f"Projecting {schedule_season} schedule ({len(schedule):,} games)...")
     projections = project_upcoming(history, schedule, positions)
     if projections.empty:
         print("No upcoming scheduled games to project.")

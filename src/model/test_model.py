@@ -206,6 +206,27 @@ def test_build_projection_rows_fills_from_history():
     assert not np.isnan(p33["new_player_baseline"])
 
 
+def test_build_projection_rows_does_not_treat_a_future_game_as_prior_history():
+    import predict
+
+    history = _game_rows()
+    upcoming = pd.DataFrame([
+        {"game_id": 999, "date": "2021-01-09", "season": "2020-21",
+         "home_id": 1, "away_id": 2, "status": "STATUS_SCHEDULED"},
+        {"game_id": 1000, "date": "2021-01-11", "season": "2020-21",
+         "home_id": 1, "away_id": 2, "status": "STATUS_SCHEDULED"},
+    ])
+    player_teams = pd.DataFrame([{"player_id": 11, "team_id": 1, "position": "G"}])
+    rows = predict.build_projection_rows(history, upcoming, player_teams)
+    second = rows[rows["game_id"] == 1000].iloc[0]
+
+    # The Jan-09 placeholder has no result and must not shrink the rolling
+    # window or replace the real last-game/rest signals for Jan-11.
+    assert second["fantasy_points_avg_last_3"] == pytest.approx((21 + 22 + 23) / 3)
+    assert second["rest_days"] == 4  # Jan-06 -> Jan-11 = four off days
+    assert second["career_game_count"] == 4
+
+
 # ---------------------------------------------------------------------------
 # optimizer
 # ---------------------------------------------------------------------------
