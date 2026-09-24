@@ -1,0 +1,336 @@
+{
+ "team": {
+  "id": "4",
+  "abbreviation": "CHI"
+ },
+ "positionGroups": [
+  {
+   "position": null,
+   "athletes": [
+    {
+     "id": "5105555",
+     "displayName": "Tobe Awaka",
+     "position": {
+      "id": "7",
+      "name": "Forward",
+      "displayName": "Forward",
+      "abbreviation": "F",
+      "leaf": false,
+      "slug": "forward"
+     },
+     "jersey": null,
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "4711294",
+     "displayName": "Matas Buzelis",
+     "position": {
+      "id": "7",
+      "name": "Forward",
+      "displayName": "Forward",
+      "abbreviation": "F",
+      "leaf": false,
+      "slug": "forward"
+     },
+     "jersey": "14",
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "4278067",
+     "displayName": "Nic Claxton",
+     "position": {
+      "id": "9",
+      "name": "Center",
+      "displayName": "Center",
+      "abbreviation": "C",
+      "leaf": false,
+      "slug": "center"
+     },
+     "jersey": null,
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "4066650",
+     "displayName": "Zach Collins",
+     "position": {
+      "id": "7",
+      "name": "Forward",
+      "displayName": "Forward",
+      "abbreviation": "F",
+      "leaf": false,
+      "slug": "forward"
+     },
+     "jersey": "12",
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "4684275",
+     "displayName": "Rob Dillingham",
+     "position": {
+      "id": "3",
+      "name": "Guard",
+      "displayName": "Guard",
+      "abbreviation": "G",
+      "leaf": false,
+      "slug": "guard"
+     },
+     "jersey": "7",
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "5242496",
+     "displayName": "Noa Essengue",
+     "position": {
+      "id": "7",
+      "name": "Forward",
+      "displayName": "Forward",
+      "abbreviation": "F",
+      "leaf": false,
+      "slug": "forward"
+     },
+     "jersey": "24",
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "4871145",
+     "displayName": "Josh Giddey",
+     "position": {
+      "id": "3",
+      "name": "Guard",
+      "displayName": "Guard",
+      "abbreviation": "G",
+      "leaf": false,
+      "slug": "guard"
+     },
+     "jersey": "3",
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "4395626",
+     "displayName": "Tre Jones",
+     "position": {
+      "id": "3",
+      "name": "Guard",
+      "displayName": "Guard",
+      "abbreviation": "G",
+      "leaf": false,
+      "slug": "guard"
+     },
+     "jersey": "30",
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "4397071",
+     "displayName": "Mac McClung",
+     "position": {
+      "id": "3",
+      "name": "Guard",
+      "displayName": "Guard",
+      "abbreviation": "G",
+      "leaf": false,
+      "slug": "guard"
+     },
+     "jersey": "5",
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "5044385",
+     "displayName": "Leonard Miller",
+     "position": {
+      "id": "7",
+      "name": "Forward",
+      "displayName": "Forward",
+      "abbreviation": "F",
+      "leaf": false,
+      "slug": "forward"
+     },
+     "jersey": "11",
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "4432822",
+     "displayName": "Isaac Okoro",
+     "position": {
+      "id": "7",
+      "name": "Forward",
+      "displayName": "Forward",
+      "abbreviation": "F",
+      "leaf": false,
+      "slug": "forward"
+     },
+     "jersey": "35",
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "2595516",
+     "displayName": "Norman Powell",
+     "position": {
+      "id": "3",
+      "name": "Guard",
+      "displayName": "Guard",
+      "abbreviation": "G",
+      "leaf": false,
+      "slug": "guard"
+     },
+     "jersey": null,
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "4397189",
+     "displayName": "Jalen Smith",
+     "position": {
+      "id": "7",
+      "name": "Forward",
+      "displayName": "Forward",
+      "abbreviation": "F",
+      "leaf": false,
+      "slug": "forward"
+     },
+     "jersey": "25",
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "4848625",
+     "displayName": "Dailyn Swain",
+     "position": {
+      "id": "3",
+      "name": "Guard",
+      "displayName": "Guard",
+      "abbreviation": "G",
+      "leaf": false,
+      "slug": "guard"
+     },
+     "jersey": "5",
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "4431687",
+     "displayName": "Patrick Williams",
+     "position": {
+      "id": "7",
+      "name": "Forward",
+      "displayName": "Forward",
+      "abbreviation": "F",
+      "leaf": false,
+      "slug": "forward"
+     },
+     "jersey": "44",
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "5095151",
+     "displayName": "Caleb Wilson",
+     "position": {
+      "id": "7",
+      "name": "Forward",
+      "displayName": "Forward",
+      "abbreviation": "F",
+      "leaf": false,
+      "slug": "forward"
+     },
+     "jersey": "8",
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    },
+    {
+     "id": "4017844",
+     "displayName": "Guerschon Yabusele",
+     "position": {
+      "id": "7",
+      "name": "Forward",
+      "displayName": "Forward",
+      "abbreviation": "F",
+      "leaf": false,
+      "slug": "forward"
+     },
+     "jersey": "28",
+     "status": {
+      "id": "1",
+      "name": "Active",
+      "type": "active",
+      "abbreviation": "Active"
+     }
+    }
+   ]
+  }
+ ]
+}

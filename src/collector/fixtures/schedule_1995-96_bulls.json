@@ -1,0 +1,4600 @@
+{
+ "team": {
+  "id": "4",
+  "abbreviation": "CHI"
+ },
+ "events": [
+  {
+   "id": "151103004",
+   "date": "1995-11-04T00:00Z",
+   "name": "Charlotte Hornets at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151103004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 105.0,
+        "displayValue": "105"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "3",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 91.0,
+        "displayValue": "91"
+       },
+       "team": {
+        "id": "3",
+        "abbreviation": "CHA",
+        "displayName": "Charlotte Hornets"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151104004",
+   "date": "1995-11-05T00:30Z",
+   "name": "Boston Celtics at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151104004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 107.0,
+        "displayValue": "107"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "2",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 85.0,
+        "displayValue": "85"
+       },
+       "team": {
+        "id": "2",
+        "abbreviation": "BOS",
+        "displayName": "Boston Celtics"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151107004",
+   "date": "1995-11-08T00:30Z",
+   "name": "Toronto Raptors at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151107004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 117.0,
+        "displayValue": "117"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "28",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 108.0,
+        "displayValue": "108"
+       },
+       "team": {
+        "id": "28",
+        "abbreviation": "TOR",
+        "displayName": "Toronto Raptors"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151109005",
+   "date": "1995-11-10T00:30Z",
+   "name": "Chicago Bulls at Cleveland Cavaliers",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151109005",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "5",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 88.0,
+        "displayValue": "88"
+       },
+       "team": {
+        "id": "5",
+        "abbreviation": "CLE",
+        "displayName": "Cleveland Cavaliers"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 106.0,
+        "displayValue": "106"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151111004",
+   "date": "1995-11-12T00:30Z",
+   "name": "Portland Trail Blazers at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151111004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 110.0,
+        "displayValue": "110"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "22",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 106.0,
+        "displayValue": "106"
+       },
+       "team": {
+        "id": "22",
+        "abbreviation": "POR",
+        "displayName": "Portland Trail Blazers"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151114019",
+   "date": "1995-11-15T01:00Z",
+   "name": "Chicago Bulls at Orlando Magic",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151114019",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "19",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 94.0,
+        "displayValue": "94"
+       },
+       "team": {
+        "id": "19",
+        "abbreviation": "ORL",
+        "displayName": "Orlando Magic"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 88.0,
+        "displayValue": "88"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151115004",
+   "date": "1995-11-16T00:30Z",
+   "name": "Cleveland Cavaliers at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151115004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 113.0,
+        "displayValue": "113"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "5",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 94.0,
+        "displayValue": "94"
+       },
+       "team": {
+        "id": "5",
+        "abbreviation": "CLE",
+        "displayName": "Cleveland Cavaliers"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151117004",
+   "date": "1995-11-18T00:30Z",
+   "name": "New Jersey Nets at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151117004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 109.0,
+        "displayValue": "109"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "17",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 94.0,
+        "displayValue": "94"
+       },
+       "team": {
+        "id": "17",
+        "abbreviation": "NJ",
+        "displayName": "New Jersey Nets"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151121006",
+   "date": "1995-11-22T00:30Z",
+   "name": "Chicago Bulls at Dallas Mavericks",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151121006",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "6",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 102.0,
+        "displayValue": "102"
+       },
+       "team": {
+        "id": "6",
+        "abbreviation": "DAL",
+        "displayName": "Dallas Mavericks"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 108.0,
+        "displayValue": "108"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151122024",
+   "date": "1995-11-23T00:00Z",
+   "name": "Chicago Bulls at San Antonio Spurs",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151122024",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "24",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 94.0,
+        "displayValue": "94"
+       },
+       "team": {
+        "id": "24",
+        "abbreviation": "SA",
+        "displayName": "San Antonio Spurs"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 103.0,
+        "displayValue": "103"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151124026",
+   "date": "1995-11-24T23:00Z",
+   "name": "Chicago Bulls at Utah Jazz",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151124026",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "26",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 85.0,
+        "displayValue": "85"
+       },
+       "team": {
+        "id": "26",
+        "abbreviation": "UTAH",
+        "displayName": "Utah Jazz"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 90.0,
+        "displayValue": "90"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151126025",
+   "date": "1995-11-26T22:00Z",
+   "name": "Chicago Bulls at Seattle SuperSonics",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151126025",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "25",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 97.0,
+        "displayValue": "97"
+       },
+       "team": {
+        "id": "25",
+        "abbreviation": "SEA",
+        "displayName": "Seattle SuperSonics"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 92.0,
+        "displayValue": "92"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151127022",
+   "date": "1995-11-28T00:00Z",
+   "name": "Chicago Bulls at Portland Trail Blazers",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151127022",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "22",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 104.0,
+        "displayValue": "104"
+       },
+       "team": {
+        "id": "22",
+        "abbreviation": "POR",
+        "displayName": "Portland Trail Blazers"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 107.0,
+        "displayValue": "107"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151130029",
+   "date": "1995-12-01T00:00Z",
+   "name": "Chicago Bulls at Vancouver Grizzlies",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151130029",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "29",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 88.0,
+        "displayValue": "88"
+       },
+       "team": {
+        "id": "29",
+        "abbreviation": "VAN",
+        "displayName": "Vancouver Grizzlies"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 94.0,
+        "displayValue": "94"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151202012",
+   "date": "1995-12-03T00:30Z",
+   "name": "Chicago Bulls at Los Angeles Clippers",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151202012",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "12",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 98.0,
+        "displayValue": "98"
+       },
+       "team": {
+        "id": "12",
+        "abbreviation": "LAC",
+        "displayName": "Los Angeles Clippers"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 104.0,
+        "displayValue": "104"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151206004",
+   "date": "1995-12-07T00:00Z",
+   "name": "New York Knicks at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151206004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 101.0,
+        "displayValue": "101"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "18",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 94.0,
+        "displayValue": "94"
+       },
+       "team": {
+        "id": "18",
+        "abbreviation": "NY",
+        "displayName": "New York Knicks"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151208004",
+   "date": "1995-12-09T00:30Z",
+   "name": "San Antonio Spurs at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151208004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 106.0,
+        "displayValue": "106"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "24",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 87.0,
+        "displayValue": "87"
+       },
+       "team": {
+        "id": "24",
+        "abbreviation": "SA",
+        "displayName": "San Antonio Spurs"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151209015",
+   "date": "1995-12-10T01:00Z",
+   "name": "Chicago Bulls at Milwaukee Bucks",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151209015",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "15",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 106.0,
+        "displayValue": "106"
+       },
+       "team": {
+        "id": "15",
+        "abbreviation": "MIL",
+        "displayName": "Milwaukee Bucks"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 118.0,
+        "displayValue": "118"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151213004",
+   "date": "1995-12-14T00:00Z",
+   "name": "Orlando Magic at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151213004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 112.0,
+        "displayValue": "112"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "19",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 103.0,
+        "displayValue": "103"
+       },
+       "team": {
+        "id": "19",
+        "abbreviation": "ORL",
+        "displayName": "Orlando Magic"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151214001",
+   "date": "1995-12-15T00:30Z",
+   "name": "Chicago Bulls at Atlanta Hawks",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151214001",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "1",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 108.0,
+        "displayValue": "108"
+       },
+       "team": {
+        "id": "1",
+        "abbreviation": "ATL",
+        "displayName": "Atlanta Hawks"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 127.0,
+        "displayValue": "127"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151216004",
+   "date": "1995-12-17T00:30Z",
+   "name": "Los Angeles Lakers at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151216004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 108.0,
+        "displayValue": "108"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "13",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 88.0,
+        "displayValue": "88"
+       },
+       "team": {
+        "id": "13",
+        "abbreviation": "LAL",
+        "displayName": "Los Angeles Lakers"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151218002",
+   "date": "1995-12-19T00:30Z",
+   "name": "Chicago Bulls at Boston Celtics",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151218002",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "2",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 114.0,
+        "displayValue": "114"
+       },
+       "team": {
+        "id": "2",
+        "abbreviation": "BOS",
+        "displayName": "Boston Celtics"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 123.0,
+        "displayValue": "123"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151219004",
+   "date": "1995-12-20T00:30Z",
+   "name": "Dallas Mavericks at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151219004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 114.0,
+        "displayValue": "114"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "6",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 101.0,
+        "displayValue": "101"
+       },
+       "team": {
+        "id": "6",
+        "abbreviation": "DAL",
+        "displayName": "Dallas Mavericks"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151222004",
+   "date": "1995-12-23T00:30Z",
+   "name": "Toronto Raptors at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151222004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 113.0,
+        "displayValue": "113"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "28",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 104.0,
+        "displayValue": "104"
+       },
+       "team": {
+        "id": "28",
+        "abbreviation": "TOR",
+        "displayName": "Toronto Raptors"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151223004",
+   "date": "1995-12-24T00:30Z",
+   "name": "Utah Jazz at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151223004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 100.0,
+        "displayValue": "100"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "26",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 86.0,
+        "displayValue": "86"
+       },
+       "team": {
+        "id": "26",
+        "abbreviation": "UTAH",
+        "displayName": "Utah Jazz"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151226011",
+   "date": "1995-12-27T01:00Z",
+   "name": "Chicago Bulls at Indiana Pacers",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151226011",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "11",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 103.0,
+        "displayValue": "103"
+       },
+       "team": {
+        "id": "11",
+        "abbreviation": "IND",
+        "displayName": "Indiana Pacers"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 97.0,
+        "displayValue": "97"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151229004",
+   "date": "1995-12-30T00:30Z",
+   "name": "Indiana Pacers at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151229004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 120.0,
+        "displayValue": "120"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "11",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 93.0,
+        "displayValue": "93"
+       },
+       "team": {
+        "id": "11",
+        "abbreviation": "IND",
+        "displayName": "Indiana Pacers"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "151230004",
+   "date": "1995-12-31T00:30Z",
+   "name": "Atlanta Hawks at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "151230004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 95.0,
+        "displayValue": "95"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "1",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 93.0,
+        "displayValue": "93"
+       },
+       "team": {
+        "id": "1",
+        "abbreviation": "ATL",
+        "displayName": "Atlanta Hawks"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160103004",
+   "date": "1996-01-04T00:00Z",
+   "name": "Houston Rockets at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160103004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 100.0,
+        "displayValue": "100"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "10",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 86.0,
+        "displayValue": "86"
+       },
+       "team": {
+        "id": "10",
+        "abbreviation": "HOU",
+        "displayName": "Houston Rockets"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160104003",
+   "date": "1996-01-05T00:30Z",
+   "name": "Chicago Bulls at Charlotte Hornets",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160104003",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "3",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 93.0,
+        "displayValue": "93"
+       },
+       "team": {
+        "id": "3",
+        "abbreviation": "CHA",
+        "displayName": "Charlotte Hornets"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 117.0,
+        "displayValue": "117"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160106004",
+   "date": "1996-01-07T00:30Z",
+   "name": "Milwaukee Bucks at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160106004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 113.0,
+        "displayValue": "113"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "15",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 84.0,
+        "displayValue": "84"
+       },
+       "team": {
+        "id": "15",
+        "abbreviation": "MIL",
+        "displayName": "Milwaukee Bucks"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160110004",
+   "date": "1996-01-11T00:00Z",
+   "name": "Seattle SuperSonics at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160110004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 113.0,
+        "displayValue": "113"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "25",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 87.0,
+        "displayValue": "87"
+       },
+       "team": {
+        "id": "25",
+        "abbreviation": "SEA",
+        "displayName": "Seattle SuperSonics"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160113020",
+   "date": "1996-01-14T00:30Z",
+   "name": "Chicago Bulls at Philadelphia 76ers",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160113020",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "20",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 93.0,
+        "displayValue": "93"
+       },
+       "team": {
+        "id": "20",
+        "abbreviation": "PHI",
+        "displayName": "Philadelphia 76ers"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 120.0,
+        "displayValue": "120"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160115027",
+   "date": "1996-01-15T18:00Z",
+   "name": "Chicago Bulls at Washington Bullets",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160115027",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "27",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 109.0,
+        "displayValue": "109"
+       },
+       "team": {
+        "id": "27",
+        "abbreviation": "WSH",
+        "displayName": "Washington Bullets"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 116.0,
+        "displayValue": "116"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160116004",
+   "date": "1996-01-17T00:30Z",
+   "name": "Philadelphia 76ers at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160116004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 116.0,
+        "displayValue": "116"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "20",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 104.0,
+        "displayValue": "104"
+       },
+       "team": {
+        "id": "20",
+        "abbreviation": "PHI",
+        "displayName": "Philadelphia 76ers"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160118028",
+   "date": "1996-01-19T00:00Z",
+   "name": "Chicago Bulls at Toronto Raptors",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160118028",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "28",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 89.0,
+        "displayValue": "89"
+       },
+       "team": {
+        "id": "28",
+        "abbreviation": "TOR",
+        "displayName": "Toronto Raptors"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 92.0,
+        "displayValue": "92"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160121008",
+   "date": "1996-01-21T17:00Z",
+   "name": "Chicago Bulls at Detroit Pistons",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160121008",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "8",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 96.0,
+        "displayValue": "96"
+       },
+       "team": {
+        "id": "8",
+        "abbreviation": "DET",
+        "displayName": "Detroit Pistons"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 111.0,
+        "displayValue": "111"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160123018",
+   "date": "1996-01-24T01:00Z",
+   "name": "Chicago Bulls at New York Knicks",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160123018",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "18",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 79.0,
+        "displayValue": "79"
+       },
+       "team": {
+        "id": "18",
+        "abbreviation": "NY",
+        "displayName": "New York Knicks"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 99.0,
+        "displayValue": "99"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160124004",
+   "date": "1996-01-25T00:30Z",
+   "name": "Vancouver Grizzlies at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160124004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 104.0,
+        "displayValue": "104"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "29",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 84.0,
+        "displayValue": "84"
+       },
+       "team": {
+        "id": "29",
+        "abbreviation": "VAN",
+        "displayName": "Vancouver Grizzlies"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160126004",
+   "date": "1996-01-27T00:30Z",
+   "name": "Miami Heat at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160126004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 102.0,
+        "displayValue": "102"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "14",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 80.0,
+        "displayValue": "80"
+       },
+       "team": {
+        "id": "14",
+        "abbreviation": "MIA",
+        "displayName": "Miami Heat"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160128004",
+   "date": "1996-01-28T17:00Z",
+   "name": "Phoenix Suns at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160128004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 93.0,
+        "displayValue": "93"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "21",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 82.0,
+        "displayValue": "82"
+       },
+       "team": {
+        "id": "21",
+        "abbreviation": "PHX",
+        "displayName": "Phoenix Suns"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160130010",
+   "date": "1996-01-31T00:00Z",
+   "name": "Chicago Bulls at Houston Rockets",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160130010",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "10",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 87.0,
+        "displayValue": "87"
+       },
+       "team": {
+        "id": "10",
+        "abbreviation": "HOU",
+        "displayName": "Houston Rockets"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 98.0,
+        "displayValue": "98"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160201023",
+   "date": "1996-02-02T00:30Z",
+   "name": "Chicago Bulls at Sacramento Kings",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160201023",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "23",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 85.0,
+        "displayValue": "85"
+       },
+       "team": {
+        "id": "23",
+        "abbreviation": "SAC",
+        "displayName": "Sacramento Kings"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 105.0,
+        "displayValue": "105"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160202013",
+   "date": "1996-02-03T00:30Z",
+   "name": "Chicago Bulls at Los Angeles Lakers",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160202013",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "13",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 84.0,
+        "displayValue": "84"
+       },
+       "team": {
+        "id": "13",
+        "abbreviation": "LAL",
+        "displayName": "Los Angeles Lakers"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 99.0,
+        "displayValue": "99"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160204007",
+   "date": "1996-02-05T00:00Z",
+   "name": "Chicago Bulls at Denver Nuggets",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160204007",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "7",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 105.0,
+        "displayValue": "105"
+       },
+       "team": {
+        "id": "7",
+        "abbreviation": "DEN",
+        "displayName": "Denver Nuggets"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 99.0,
+        "displayValue": "99"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160206021",
+   "date": "1996-02-06T23:00Z",
+   "name": "Chicago Bulls at Phoenix Suns",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160206021",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "21",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 106.0,
+        "displayValue": "106"
+       },
+       "team": {
+        "id": "21",
+        "abbreviation": "PHX",
+        "displayName": "Phoenix Suns"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 96.0,
+        "displayValue": "96"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160207009",
+   "date": "1996-02-08T00:30Z",
+   "name": "Chicago Bulls at Golden State Warriors",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160207009",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "9",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 95.0,
+        "displayValue": "95"
+       },
+       "team": {
+        "id": "9",
+        "abbreviation": "GS",
+        "displayName": "Golden State Warriors"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 99.0,
+        "displayValue": "99"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160213004",
+   "date": "1996-02-14T00:30Z",
+   "name": "Washington Bullets at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160213004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 111.0,
+        "displayValue": "111"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "27",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 98.0,
+        "displayValue": "98"
+       },
+       "team": {
+        "id": "27",
+        "abbreviation": "WSH",
+        "displayName": "Washington Bullets"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160215008",
+   "date": "1996-02-16T00:30Z",
+   "name": "Chicago Bulls at Detroit Pistons",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160215008",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "8",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 109.0,
+        "displayValue": "109"
+       },
+       "team": {
+        "id": "8",
+        "abbreviation": "DET",
+        "displayName": "Detroit Pistons"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 112.0,
+        "displayValue": "112"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160216016",
+   "date": "1996-02-17T00:00Z",
+   "name": "Chicago Bulls at Minnesota Timberwolves",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160216016",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "16",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 100.0,
+        "displayValue": "100"
+       },
+       "team": {
+        "id": "16",
+        "abbreviation": "MIN",
+        "displayName": "Minnesota Timberwolves"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 103.0,
+        "displayValue": "103"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160218011",
+   "date": "1996-02-18T18:00Z",
+   "name": "Chicago Bulls at Indiana Pacers",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160218011",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "11",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 102.0,
+        "displayValue": "102"
+       },
+       "team": {
+        "id": "11",
+        "abbreviation": "IND",
+        "displayName": "Indiana Pacers"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 110.0,
+        "displayValue": "110"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160220004",
+   "date": "1996-02-21T00:00Z",
+   "name": "Cleveland Cavaliers at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160220004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 102.0,
+        "displayValue": "102"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "5",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 76.0,
+        "displayValue": "76"
+       },
+       "team": {
+        "id": "5",
+        "abbreviation": "CLE",
+        "displayName": "Cleveland Cavaliers"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160222001",
+   "date": "1996-02-23T00:30Z",
+   "name": "Chicago Bulls at Atlanta Hawks",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160222001",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "1",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 91.0,
+        "displayValue": "91"
+       },
+       "team": {
+        "id": "1",
+        "abbreviation": "ATL",
+        "displayName": "Atlanta Hawks"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 96.0,
+        "displayValue": "96"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160223014",
+   "date": "1996-02-24T00:30Z",
+   "name": "Chicago Bulls at Miami Heat",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160223014",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "14",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 113.0,
+        "displayValue": "113"
+       },
+       "team": {
+        "id": "14",
+        "abbreviation": "MIA",
+        "displayName": "Miami Heat"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 104.0,
+        "displayValue": "104"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160225004",
+   "date": "1996-02-25T17:00Z",
+   "name": "Orlando Magic at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160225004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 111.0,
+        "displayValue": "111"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "19",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 91.0,
+        "displayValue": "91"
+       },
+       "team": {
+        "id": "19",
+        "abbreviation": "ORL",
+        "displayName": "Orlando Magic"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160227004",
+   "date": "1996-02-28T00:30Z",
+   "name": "Minnesota Timberwolves at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160227004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 120.0,
+        "displayValue": "120"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "16",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 99.0,
+        "displayValue": "99"
+       },
+       "team": {
+        "id": "16",
+        "abbreviation": "MIN",
+        "displayName": "Minnesota Timberwolves"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160301004",
+   "date": "1996-03-02T00:30Z",
+   "name": "Golden State Warriors at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160301004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 110.0,
+        "displayValue": "110"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "9",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 87.0,
+        "displayValue": "87"
+       },
+       "team": {
+        "id": "9",
+        "abbreviation": "GS",
+        "displayName": "Golden State Warriors"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160302004",
+   "date": "1996-03-03T00:30Z",
+   "name": "Boston Celtics at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160302004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 107.0,
+        "displayValue": "107"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "2",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 75.0,
+        "displayValue": "75"
+       },
+       "team": {
+        "id": "2",
+        "abbreviation": "BOS",
+        "displayName": "Boston Celtics"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160305004",
+   "date": "1996-03-06T00:30Z",
+   "name": "Milwaukee Bucks at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160305004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 115.0,
+        "displayValue": "115"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "15",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 106.0,
+        "displayValue": "106"
+       },
+       "team": {
+        "id": "15",
+        "abbreviation": "MIL",
+        "displayName": "Milwaukee Bucks"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160307004",
+   "date": "1996-03-08T00:30Z",
+   "name": "Detroit Pistons at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160307004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 102.0,
+        "displayValue": "102"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "8",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 81.0,
+        "displayValue": "81"
+       },
+       "team": {
+        "id": "8",
+        "abbreviation": "DET",
+        "displayName": "Detroit Pistons"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160310018",
+   "date": "1996-03-10T22:30Z",
+   "name": "Chicago Bulls at New York Knicks",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160310018",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "18",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 104.0,
+        "displayValue": "104"
+       },
+       "team": {
+        "id": "18",
+        "abbreviation": "NY",
+        "displayName": "New York Knicks"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 72.0,
+        "displayValue": "72"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160313004",
+   "date": "1996-03-14T00:30Z",
+   "name": "Washington Bullets at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160313004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 103.0,
+        "displayValue": "103"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "27",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 86.0,
+        "displayValue": "86"
+       },
+       "team": {
+        "id": "27",
+        "abbreviation": "WSH",
+        "displayName": "Washington Bullets"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160315004",
+   "date": "1996-03-16T00:30Z",
+   "name": "Denver Nuggets at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160315004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 108.0,
+        "displayValue": "108"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "7",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 87.0,
+        "displayValue": "87"
+       },
+       "team": {
+        "id": "7",
+        "abbreviation": "DEN",
+        "displayName": "Denver Nuggets"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160316017",
+   "date": "1996-03-17T00:30Z",
+   "name": "Chicago Bulls at New Jersey Nets",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160316017",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "17",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 93.0,
+        "displayValue": "93"
+       },
+       "team": {
+        "id": "17",
+        "abbreviation": "NJ",
+        "displayName": "New Jersey Nets"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 97.0,
+        "displayValue": "97"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160318020",
+   "date": "1996-03-19T00:30Z",
+   "name": "Chicago Bulls at Philadelphia 76ers",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160318020",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "20",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 94.0,
+        "displayValue": "94"
+       },
+       "team": {
+        "id": "20",
+        "abbreviation": "PHI",
+        "displayName": "Philadelphia 76ers"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 98.0,
+        "displayValue": "98"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160319004",
+   "date": "1996-03-20T00:30Z",
+   "name": "Sacramento Kings at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160319004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 89.0,
+        "displayValue": "89"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "23",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 67.0,
+        "displayValue": "67"
+       },
+       "team": {
+        "id": "23",
+        "abbreviation": "SAC",
+        "displayName": "Sacramento Kings"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160321004",
+   "date": "1996-03-22T00:30Z",
+   "name": "New York Knicks at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160321004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 107.0,
+        "displayValue": "107"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "18",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 86.0,
+        "displayValue": "86"
+       },
+       "team": {
+        "id": "18",
+        "abbreviation": "NY",
+        "displayName": "New York Knicks"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160324028",
+   "date": "1996-03-24T20:30Z",
+   "name": "Chicago Bulls at Toronto Raptors",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160324028",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "28",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 109.0,
+        "displayValue": "109"
+       },
+       "team": {
+        "id": "28",
+        "abbreviation": "TOR",
+        "displayName": "Toronto Raptors"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 108.0,
+        "displayValue": "108"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160328004",
+   "date": "1996-03-29T00:30Z",
+   "name": "Atlanta Hawks at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160328004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 111.0,
+        "displayValue": "111"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "1",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 80.0,
+        "displayValue": "80"
+       },
+       "team": {
+        "id": "1",
+        "abbreviation": "ATL",
+        "displayName": "Atlanta Hawks"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160330004",
+   "date": "1996-03-30T17:00Z",
+   "name": "Los Angeles Clippers at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160330004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 106.0,
+        "displayValue": "106"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "12",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 85.0,
+        "displayValue": "85"
+       },
+       "team": {
+        "id": "12",
+        "abbreviation": "LAC",
+        "displayName": "Los Angeles Clippers"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160402014",
+   "date": "1996-04-03T00:30Z",
+   "name": "Chicago Bulls at Miami Heat",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160402014",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "14",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 92.0,
+        "displayValue": "92"
+       },
+       "team": {
+        "id": "14",
+        "abbreviation": "MIA",
+        "displayName": "Miami Heat"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 110.0,
+        "displayValue": "110"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160404004",
+   "date": "1996-04-05T00:30Z",
+   "name": "Miami Heat at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160404004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 100.0,
+        "displayValue": "100"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "14",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 92.0,
+        "displayValue": "92"
+       },
+       "team": {
+        "id": "14",
+        "abbreviation": "MIA",
+        "displayName": "Miami Heat"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160405003",
+   "date": "1996-04-06T01:00Z",
+   "name": "Chicago Bulls at Charlotte Hornets",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160405003",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "3",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 92.0,
+        "displayValue": "92"
+       },
+       "team": {
+        "id": "3",
+        "abbreviation": "CHA",
+        "displayName": "Charlotte Hornets"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 126.0,
+        "displayValue": "126"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160407019",
+   "date": "1996-04-07T21:30Z",
+   "name": "Chicago Bulls at Orlando Magic",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160407019",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "19",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 86.0,
+        "displayValue": "86"
+       },
+       "team": {
+        "id": "19",
+        "abbreviation": "ORL",
+        "displayName": "Orlando Magic"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 90.0,
+        "displayValue": "90"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160408004",
+   "date": "1996-04-08T23:30Z",
+   "name": "Charlotte Hornets at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160408004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 97.0,
+        "displayValue": "97"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "3",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 98.0,
+        "displayValue": "98"
+       },
+       "team": {
+        "id": "3",
+        "abbreviation": "CHA",
+        "displayName": "Charlotte Hornets"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160411017",
+   "date": "1996-04-11T23:30Z",
+   "name": "Chicago Bulls at New Jersey Nets",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160411017",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "17",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 100.0,
+        "displayValue": "100"
+       },
+       "team": {
+        "id": "17",
+        "abbreviation": "NJ",
+        "displayName": "New Jersey Nets"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 113.0,
+        "displayValue": "113"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160412004",
+   "date": "1996-04-12T23:30Z",
+   "name": "Philadelphia 76ers at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160412004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 112.0,
+        "displayValue": "112"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "20",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 82.0,
+        "displayValue": "82"
+       },
+       "team": {
+        "id": "20",
+        "abbreviation": "PHI",
+        "displayName": "Philadelphia 76ers"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160414005",
+   "date": "1996-04-14T17:00Z",
+   "name": "Chicago Bulls at Cleveland Cavaliers",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160414005",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "5",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 72.0,
+        "displayValue": "72"
+       },
+       "team": {
+        "id": "5",
+        "abbreviation": "CLE",
+        "displayName": "Cleveland Cavaliers"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 98.0,
+        "displayValue": "98"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160416015",
+   "date": "1996-04-16T23:30Z",
+   "name": "Chicago Bulls at Milwaukee Bucks",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160416015",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "15",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 80.0,
+        "displayValue": "80"
+       },
+       "team": {
+        "id": "15",
+        "abbreviation": "MIL",
+        "displayName": "Milwaukee Bucks"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 86.0,
+        "displayValue": "86"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160418004",
+   "date": "1996-04-18T23:30Z",
+   "name": "Detroit Pistons at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160418004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": true,
+       "score": {
+        "value": 110.0,
+        "displayValue": "110"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "8",
+       "homeAway": "away",
+       "winner": false,
+       "score": {
+        "value": 79.0,
+        "displayValue": "79"
+       },
+       "team": {
+        "id": "8",
+        "abbreviation": "DET",
+        "displayName": "Detroit Pistons"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160420004",
+   "date": "1996-04-20T18:30Z",
+   "name": "Indiana Pacers at Chicago Bulls",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160420004",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "4",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 99.0,
+        "displayValue": "99"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      },
+      {
+       "id": "11",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 100.0,
+        "displayValue": "100"
+       },
+       "team": {
+        "id": "11",
+        "abbreviation": "IND",
+        "displayName": "Indiana Pacers"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "160421027",
+   "date": "1996-04-21T17:00Z",
+   "name": "Chicago Bulls at Washington Bullets",
+   "season": {
+    "year": 1996,
+    "displayName": "1995-96"
+   },
+   "seasonType": {
+    "id": "2",
+    "type": 2,
+    "name": "Regular Season",
+    "abbreviation": "reg"
+   },
+   "competitions": [
+    {
+     "id": "160421027",
+     "status": {
+      "type": {
+       "name": "STATUS_FINAL"
+      }
+     },
+     "neutralSite": false,
+     "competitors": [
+      {
+       "id": "27",
+       "homeAway": "home",
+       "winner": false,
+       "score": {
+        "value": 93.0,
+        "displayValue": "93"
+       },
+       "team": {
+        "id": "27",
+        "abbreviation": "WSH",
+        "displayName": "Washington Bullets"
+       }
+      },
+      {
+       "id": "4",
+       "homeAway": "away",
+       "winner": true,
+       "score": {
+        "value": 103.0,
+        "displayValue": "103"
+       },
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

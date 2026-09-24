@@ -1,0 +1,342 @@
+{
+ "sports": [
+  {
+   "leagues": [
+    {
+     "teams": [
+      {
+       "team": {
+        "id": "1",
+        "abbreviation": "ATL",
+        "displayName": "Atlanta Hawks",
+        "location": "Atlanta",
+        "name": "Hawks",
+        "slug": "atlanta-hawks",
+        "uid": "s:40~l:46~t:1"
+       }
+      },
+      {
+       "team": {
+        "id": "2",
+        "abbreviation": "BOS",
+        "displayName": "Boston Celtics",
+        "location": "Boston",
+        "name": "Celtics",
+        "slug": "boston-celtics",
+        "uid": "s:40~l:46~t:2"
+       }
+      },
+      {
+       "team": {
+        "id": "17",
+        "abbreviation": "BKN",
+        "displayName": "Brooklyn Nets",
+        "location": "Brooklyn",
+        "name": "Nets",
+        "slug": "brooklyn-nets",
+        "uid": "s:40~l:46~t:17"
+       }
+      },
+      {
+       "team": {
+        "id": "30",
+        "abbreviation": "CHA",
+        "displayName": "Charlotte Hornets",
+        "location": "Charlotte",
+        "name": "Hornets",
+        "slug": "charlotte-hornets",
+        "uid": "s:40~l:46~t:30"
+       }
+      },
+      {
+       "team": {
+        "id": "4",
+        "abbreviation": "CHI",
+        "displayName": "Chicago Bulls",
+        "location": "Chicago",
+        "name": "Bulls",
+        "slug": "chicago-bulls",
+        "uid": "s:40~l:46~t:4"
+       }
+      },
+      {
+       "team": {
+        "id": "5",
+        "abbreviation": "CLE",
+        "displayName": "Cleveland Cavaliers",
+        "location": "Cleveland",
+        "name": "Cavaliers",
+        "slug": "cleveland-cavaliers",
+        "uid": "s:40~l:46~t:5"
+       }
+      },
+      {
+       "team": {
+        "id": "6",
+        "abbreviation": "DAL",
+        "displayName": "Dallas Mavericks",
+        "location": "Dallas",
+        "name": "Mavericks",
+        "slug": "dallas-mavericks",
+        "uid": "s:40~l:46~t:6"
+       }
+      },
+      {
+       "team": {
+        "id": "7",
+        "abbreviation": "DEN",
+        "displayName": "Denver Nuggets",
+        "location": "Denver",
+        "name": "Nuggets",
+        "slug": "denver-nuggets",
+        "uid": "s:40~l:46~t:7"
+       }
+      },
+      {
+       "team": {
+        "id": "8",
+        "abbreviation": "DET",
+        "displayName": "Detroit Pistons",
+        "location": "Detroit",
+        "name": "Pistons",
+        "slug": "detroit-pistons",
+        "uid": "s:40~l:46~t:8"
+       }
+      },
+      {
+       "team": {
+        "id": "9",
+        "abbreviation": "GS",
+        "displayName": "Golden State Warriors",
+        "location": "Golden State",
+        "name": "Warriors",
+        "slug": "golden-state-warriors",
+        "uid": "s:40~l:46~t:9"
+       }
+      },
+      {
+       "team": {
+        "id": "10",
+        "abbreviation": "HOU",
+        "displayName": "Houston Rockets",
+        "location": "Houston",
+        "name": "Rockets",
+        "slug": "houston-rockets",
+        "uid": "s:40~l:46~t:10"
+       }
+      },
+      {
+       "team": {
+        "id": "11",
+        "abbreviation": "IND",
+        "displayName": "Indiana Pacers",
+        "location": "Indiana",
+        "name": "Pacers",
+        "slug": "indiana-pacers",
+        "uid": "s:40~l:46~t:11"
+       }
+      },
+      {
+       "team": {
+        "id": "12",
+        "abbreviation": "LAC",
+        "displayName": "LA Clippers",
+        "location": "LA",
+        "name": "Clippers",
+        "slug": "la-clippers",
+        "uid": "s:40~l:46~t:12"
+       }
+      },
+      {
+       "team": {
+        "id": "13",
+        "abbreviation": "LAL",
+        "displayName": "Los Angeles Lakers",
+        "location": "Los Angeles",
+        "name": "Lakers",
+        "slug": "los-angeles-lakers",
+        "uid": "s:40~l:46~t:13"
+       }
+      },
+      {
+       "team": {
+        "id": "29",
+        "abbreviation": "MEM",
+        "displayName": "Memphis Grizzlies",
+        "location": "Memphis",
+        "name": "Grizzlies",
+        "slug": "memphis-grizzlies",
+        "uid": "s:40~l:46~t:29"
+       }
+      },
+      {
+       "team": {
+        "id": "14",
+        "abbreviation": "MIA",
+        "displayName": "Miami Heat",
+        "location": "Miami",
+        "name": "Heat",
+        "slug": "miami-heat",
+        "uid": "s:40~l:46~t:14"
+       }
+      },
+      {
+       "team": {
+        "id": "15",
+        "abbreviation": "MIL",
+        "displayName": "Milwaukee Bucks",
+        "location": "Milwaukee",
+        "name": "Bucks",
+        "slug": "milwaukee-bucks",
+        "uid": "s:40~l:46~t:15"
+       }
+      },
+      {
+       "team": {
+        "id": "16",
+        "abbreviation": "MIN",
+        "displayName": "Minnesota Timberwolves",
+        "location": "Minnesota",
+        "name": "Timberwolves",
+        "slug": "minnesota-timberwolves",
+        "uid": "s:40~l:46~t:16"
+       }
+      },
+      {
+       "team": {
+        "id": "3",
+        "abbreviation": "NO",
+        "displayName": "New Orleans Pelicans",
+        "location": "New Orleans",
+        "name": "Pelicans",
+        "slug": "new-orleans-pelicans",
+        "uid": "s:40~l:46~t:3"
+       }
+      },
+      {
+       "team": {
+        "id": "18",
+        "abbreviation": "NY",
+        "displayName": "New York Knicks",
+        "location": "New York",
+        "name": "Knicks",
+        "slug": "new-york-knicks",
+        "uid": "s:40~l:46~t:18"
+       }
+      },
+      {
+       "team": {
+        "id": "25",
+        "abbreviation": "OKC",
+        "displayName": "Oklahoma City Thunder",
+        "location": "Oklahoma City",
+        "name": "Thunder",
+        "slug": "oklahoma-city-thunder",
+        "uid": "s:40~l:46~t:25"
+       }
+      },
+      {
+       "team": {
+        "id": "19",
+        "abbreviation": "ORL",
+        "displayName": "Orlando Magic",
+        "location": "Orlando",
+        "name": "Magic",
+        "slug": "orlando-magic",
+        "uid": "s:40~l:46~t:19"
+       }
+      },
+      {
+       "team": {
+        "id": "20",
+        "abbreviation": "PHI",
+        "displayName": "Philadelphia 76ers",
+        "location": "Philadelphia",
+        "name": "76ers",
+        "slug": "philadelphia-76ers",
+        "uid": "s:40~l:46~t:20"
+       }
+      },
+      {
+       "team": {
+        "id": "21",
+        "abbreviation": "PHX",
+        "displayName": "Phoenix Suns",
+        "location": "Phoenix",
+        "name": "Suns",
+        "slug": "phoenix-suns",
+        "uid": "s:40~l:46~t:21"
+       }
+      },
+      {
+       "team": {
+        "id": "22",
+        "abbreviation": "POR",
+        "displayName": "Portland Trail Blazers",
+        "location": "Portland",
+        "name": "Trail Blazers",
+        "slug": "portland-trail-blazers",
+        "uid": "s:40~l:46~t:22"
+       }
+      },
+      {
+       "team": {
+        "id": "23",
+        "abbreviation": "SAC",
+        "displayName": "Sacramento Kings",
+        "location": "Sacramento",
+        "name": "Kings",
+        "slug": "sacramento-kings",
+        "uid": "s:40~l:46~t:23"
+       }
+      },
+      {
+       "team": {
+        "id": "24",
+        "abbreviation": "SA",
+        "displayName": "San Antonio Spurs",
+        "location": "San Antonio",
+        "name": "Spurs",
+        "slug": "san-antonio-spurs",
+        "uid": "s:40~l:46~t:24"
+       }
+      },
+      {
+       "team": {
+        "id": "28",
+        "abbreviation": "TOR",
+        "displayName": "Toronto Raptors",
+        "location": "Toronto",
+        "name": "Raptors",
+        "slug": "toronto-raptors",
+        "uid": "s:40~l:46~t:28"
+       }
+      },
+      {
+       "team": {
+        "id": "26",
+        "abbreviation": "UTAH",
+        "displayName": "Utah Jazz",
+        "location": "Utah",
+        "name": "Jazz",
+        "slug": "utah-jazz",
+        "uid": "s:40~l:46~t:26"
+       }
+      },
+      {
+       "team": {
+        "id": "27",
+        "abbreviation": "WSH",
+        "displayName": "Washington Wizards",
+        "location": "Washington",
+        "name": "Wizards",
+        "slug": "washington-wizards",
+        "uid": "s:40~l:46~t:27"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

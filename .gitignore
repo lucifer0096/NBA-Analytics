@@ -1,0 +1,33 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+
+# Raw collector snapshots (timestamped-free but per-game: ~20k files for the
+# 2010-11+ backfill) fully regenerate from ESPN's public APIs -- keep all of
+# data/raw/ out of git. The dashboard instead reads STABLE, non-timestamped
+# copies committed at the paths below (see refresh_dashboard_fallbacks.py),
+# because Streamlit Cloud can't run the collector itself.
+data/raw/
+
+# Processed data is normally gitignored (regenerates via load_historical.py +
+# features.py against data/raw/), EXCEPT the committed dashboard fallbacks
+# below, which the deployed app reads directly and Streamlit Cloud has no way
+# to regenerate. No personal data -- league-wide stats only.
+data/processed/*
+!data/processed/dashboard_leaderboards.json
+!data/processed/.gitkeep
+
+# Trained model artifacts: only the model the dashboard actually loads is
+# committed (same pattern as FPL-Analytics' single-stage model), everything
+# else regenerates from train.py.
+models/*
+!models/proj_model.txt
+!models/metrics.json
+!models/.gitkeep
+
+# R: generated plots output to r/output/
+r/output/

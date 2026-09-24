@@ -1,0 +1,52 @@
+name: Daily collector
+
+# NBA games happen daily (Oct-Apr) and the ESPN APIs are free/unauthenticated,
+# so a daily run keeps data/raw current: refresh the current season's schedule
+# and standings, fetch any newly-finalized game box scores, refresh the
+# dashboard fallback files, and commit the results back to main (the same
+# pattern as FPL-Analytics' collector workflow). In the offseason (Jun-Sep)
+# the run is nearly a no-op: no new final games, so it only rewrites the
+# schedule/standings copies.
+on:
+  schedule:
+    - cron: "20 12 * * *"   # 12:20 UTC daily -- after most US games finish
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-collector
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Run collector (current season, incremental)
+        # Schedule + newly-final games for the seasons the state file tracks
+        # (defaults to the current season only -- historical backfills are a
+        # deliberate one-off local command, see docs/COLLECTOR.md).
+        run: python src/collector/snapshot.py --season current
+      - name: Refresh dashboard fallbacks
+        run: python src/collector/refresh_dashboard_fallbacks.py
+      - name: Commit refreshed data
+        run: |
+          git config user.name "collector-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "No data changes."
+          else
+            git commit -m "data: daily collector refresh $(date -u +%F)"
+            git push
+          fi
