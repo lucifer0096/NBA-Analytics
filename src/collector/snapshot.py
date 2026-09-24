@@ -102,9 +102,20 @@ def _season_range(first: str, last: str) -> list:
 
 def load_team_ids() -> list:
     teams = parsing.parse_teams(espn_api.get_teams())
-    if not teams:
-        raise RuntimeError("teams endpoint returned no teams -- refusing to continue")
-    return [t["team_id"] for t in teams]
+    team_ids = [t["team_id"] for t in teams]
+    if len(set(team_ids)) < 30:
+        raise RuntimeError(
+            f"teams endpoint returned only {len(set(team_ids))} unique teams "
+            "-- refusing to build a partial snapshot"
+        )
+    return team_ids
+
+
+def _schedule_row_quality(row: dict) -> tuple:
+    """Prefer the most complete copy when team schedules overlap."""
+    final = row.get("status") == "STATUS_FINAL"
+    scores = all(row.get(key) not in (None, "") for key in ("home_score", "away_score"))
+    return (int(final), int(scores), int(bool(row.get("date"))))
 
 
 def snapshot_schedule(season: str, team_ids: list, limiter: RateLimiter) -> str:
@@ -114,7 +125,10 @@ def snapshot_schedule(season: str, team_ids: list, limiter: RateLimiter) -> str:
         limiter.wait()
         payload = espn_api.get_schedule(season_param(season), team_id)
         for row in parsing.parse_schedule(payload, season=season):
-            by_id[row["game_id"]] = row
+            game_id = row["game_id"]
+            previous = by_id.get(game_id)
+            if previous is None or _schedule_row_quality(row) > _schedule_row_quality(previous):
+                by_id[game_id] = row
 
     out_dir = os.path.join(RAW_DIR, season)
     os.makedirs(out_dir, exist_ok=True)
@@ -181,17 +195,34 @@ def snapshot_player_positions(team_ids: list, limiter: RateLimiter,
     return out_path
 
 
+def _valid_box_score_file(path: str, game_id) -> bool:
+    """A file counts as stored only when it is a complete two-team box score."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+        game = payload.get("game") or {}
+        players = payload.get("players") or []
+        if not isinstance(game, dict) or not isinstance(players, list) or not players:
+            return False
+        if int(game.get("game_id", -1)) != int(game_id):
+            return False
+        return len({row.get("team_id") for row in players if row.get("team_id") is not None}) >= 2
+    except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError):
+        return False
+
+
 def pending_box_scores(season: str, schedule_rows: list) -> list:
-    """Game ids that are FINAL but whose parsed box score isn't on disk yet.
+    """Game ids that are FINAL but whose complete box score isn't on disk yet.
     Non-final games are never fetched (their box score wouldn't exist or
-    would be partial) -- they're picked up by a later run instead."""
+    would be partial) -- they're picked up by a later run instead. Corrupt or
+    partial files are also retried rather than silently treated as complete."""
     games_dir = os.path.join(RAW_DIR, season, "games")
     pending = []
     for row in schedule_rows:
         if row.get("status") != "STATUS_FINAL":
             continue
         game_id = row["game_id"]
-        if os.path.exists(os.path.join(games_dir, f"{game_id}.json")):
+        if _valid_box_score_file(os.path.join(games_dir, f"{game_id}.json"), game_id):
             continue
         pending.append(game_id)
     return pending
@@ -209,10 +240,22 @@ def _fetch_and_store_box_score(game_id: str, season: str,
         meta, rows = parsing.parse_summary(payload)
         if not meta or not rows:
             return (game_id, False, "empty parse (box score not available yet?)")
+        if int(meta.get("game_id", -1)) != int(game_id):
+            return (game_id, False, f"summary game id {meta.get('game_id')} != {game_id}")
+        team_ids = {row.get("team_id") for row in rows if row.get("team_id") is not None}
+        if len(team_ids) < 2:
+            return (game_id, False, "incomplete parse: fewer than two teams")
         out_dir = os.path.join(RAW_DIR, season, "games")
         os.makedirs(out_dir, exist_ok=True)
-        with open(os.path.join(out_dir, f"{game_id}.json"), "w", encoding="utf-8") as f:
-            json.dump({"game": meta, "players": rows}, f)
+        out_path = os.path.join(out_dir, f"{game_id}.json")
+        tmp_path = f"{out_path}.tmp-{os.getpid()}-{threading.get_ident()}"
+        try:
+            with open(tmp_path, "w", encoding="utf-8") as f:
+                json.dump({"game": meta, "players": rows}, f)
+            os.replace(tmp_path, out_path)
+        finally:
+            if os.path.exists(tmp_path):
+                os.unlink(tmp_path)
         return (game_id, True, None)
     except Exception as e:  # noqa: BLE001 -- recorded, retried next run
         return (game_id, False, f"{type(e).__name__}: {e}")
@@ -244,16 +287,21 @@ def snapshot_box_scores(season: str, game_ids: list, limiter: RateLimiter,
 
 
 def run_season(season: str, args, limiter: RateLimiter, team_ids: list) -> dict:
+    if args.check_only:
+        # A health check must be genuinely read-only: use the schedule already
+        # on disk rather than refreshing it (which would make a network call
+        # and rewrite a file).
+        games = load_schedule(season)
+        pending = pending_box_scores(season, games)
+        final_count = sum(1 for g in games if g.get("status") == "STATUS_FINAL")
+        print(f"[{season}] {final_count} final games, {len(pending)} box scores pending")
+        return {"season": season, "final_games": final_count, "pending": len(pending)}
+
     print(f"[{season}] refreshing schedule (espn season={season_param(season)})...")
     snapshot_schedule(season, team_ids, limiter)
-
     games = load_schedule(season)
     pending = pending_box_scores(season, games)
     final_count = sum(1 for g in games if g.get("status") == "STATUS_FINAL")
-
-    if args.check_only:
-        print(f"[{season}] {final_count} final games, {len(pending)} box scores pending")
-        return {"season": season, "final_games": final_count, "pending": len(pending)}
 
     if args.schedule_only:
         print(f"[{season}] --schedule-only: skipping {len(pending)} pending box scores")
@@ -324,8 +372,8 @@ def main() -> None:
 
     print(f"Seasons: {', '.join(seasons)}")
     limiter = RateLimiter(args.delay)
-    team_ids = load_team_ids()
-    print(f"Teams: {len(team_ids)}")
+    team_ids = [] if args.check_only else load_team_ids()
+    print(f"Teams: {len(team_ids) if not args.check_only else 'not queried (check-only)'}")
 
     # Positions are a CURRENT-state fact (single global file) -- see
     # snapshot_player_positions docstring for why they're not per-season.
@@ -336,7 +384,8 @@ def main() -> None:
     for season in seasons:
         results.append(run_season(season, args, limiter, team_ids))
 
-    _save_state(results)
+    if not args.check_only:
+        _save_state(results)
 
     if args.check_only:
         pending_total = sum(r.get("pending", 0) for r in results)

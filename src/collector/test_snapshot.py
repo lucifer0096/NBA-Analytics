@@ -48,6 +48,13 @@ def _game(game_id, status):
     return {"game_id": game_id, "date": "2013-01-01", "status": status}
 
 
+def _stored_game(game_id):
+    return {
+        "game": {"game_id": game_id},
+        "players": [{"team_id": 1}, {"team_id": 2}],
+    }
+
+
 def test_pending_box_scores_only_final_and_missing(tmp_path, monkeypatch):
     raw = _write_schedule(tmp_path, monkeypatch, [
         _game(1, "STATUS_FINAL"),
@@ -55,7 +62,7 @@ def test_pending_box_scores_only_final_and_missing(tmp_path, monkeypatch):
         _game(3, "STATUS_SCHEDULED"),
     ])
     games_dir = raw / "2012-13" / "games"
-    (games_dir / "1.json").write_text(json.dumps({"game": {}, "players": []}))
+    (games_dir / "1.json").write_text(json.dumps(_stored_game(1)))
 
     pending = snapshot.pending_box_scores("2012-13", [
         _game(1, "STATUS_FINAL"),
@@ -68,8 +75,16 @@ def test_pending_box_scores_only_final_and_missing(tmp_path, monkeypatch):
 
 def test_pending_empty_when_everything_stored(tmp_path, monkeypatch):
     raw = _write_schedule(tmp_path, monkeypatch, [_game(10, "STATUS_FINAL")])
-    (raw / "2012-13" / "games" / "10.json").write_text("{}")
+    (raw / "2012-13" / "games" / "10.json").write_text(
+        json.dumps(_stored_game(10))
+    )
     assert snapshot.pending_box_scores("2012-13", [_game(10, "STATUS_FINAL")]) == []
+
+
+def test_pending_retries_partial_or_corrupt_box_score(tmp_path, monkeypatch):
+    raw = _write_schedule(tmp_path, monkeypatch, [_game(10, "STATUS_FINAL")])
+    (raw / "2012-13" / "games" / "10.json").write_text("{not-json")
+    assert snapshot.pending_box_scores("2012-13", [_game(10, "STATUS_FINAL")]) == [10]
 
 
 def test_rate_limiter_enforces_min_interval():
