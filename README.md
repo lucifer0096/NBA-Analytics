@@ -35,7 +35,7 @@ Dependency layout mirrors FPL-Analytics: `requirements.txt` = exact pins everyth
 
 **Stage 3 (done): lineup optimizer.** PuLP MILP over a projected player pool: 2 G / 2 F / 1 C / 2 UTIL slots with structural position eligibility, provably optimal answers, honest infeasibility errors. Verified against synthetic pools with known optima. See [docs/MODELING.md](docs/MODELING.md#lineup-optimizer).
 
-**Stage 4 (done): dashboard.** Two-page Streamlit app — Standings / Schedule & Scores / Awards Ladder on Home, Model Performance / Season Leaders / Court View on page 2. Live-first from ESPN with 60s cache, committed `data/dashboard_*` fallbacks for offline deploys, and freshness captions that always say which they're showing. The Awards Ladder ranks MVP/DPOY/6th-Man/MIP races and per-game stat leaders with transparent homegrown formulas (each printed verbatim on screen — explicitly not official NBA voting); the Court View slots those leaders onto a CSS-drawn court. See [docs/DASHBOARD.md](docs/DASHBOARD.md).
+**Stage 4 (done): dashboard.** Two-page Streamlit app — Standings / Schedule & Scores / Awards Ladder / All-Time Stats / GOAT Rankings on Home, Model Performance / Season Leaders / Court View on page 2. Live-first from ESPN with 60s cache, committed `data/dashboard_*` fallbacks for offline deploys, and freshness captions that always say which they're showing. The Awards Ladder follows the sidebar season selector across **every collected season (2010-11 → present)**, ranking MVP/DPOY/6th-Man/MIP races and per-game stat leaders (3PM included, FG/3P shooting splits on every row) with transparent homegrown formulas (each printed verbatim on screen — explicitly not official NBA voting); All-Time Stats shows career totals with the full parameter set (FG/3P/FT splits, FG%/3P%/eFG%/TS%) over the same window; GOAT Rankings composites career production + award-race résumé + peak with its exact formula printed on screen (also explicitly not an official NBA ranking); the Court View slots those leaders onto a CSS-drawn court. See [docs/DASHBOARD.md](docs/DASHBOARD.md).
 
 **Stage 5 (in progress): live season.** The 2026-27 schedule (1,200 games) is captured; the daily workflow will collect its box scores as games finalize from late October. The historical backfill (2010-11 → 2025-26, ~19,700 games) runs newest-first so training-ready seasons land first.
 
@@ -72,7 +72,7 @@ NBA-Analytics/
 │   │   ├── parsing.py                    # Payload → flat rows (pure, fixture-pinned)
 │   │   ├── snapshot.py                   # Idempotent/resumable season snapshots (--backfill/--check-only)
 │   │   ├── refresh_dashboard_fallbacks.py# Stable data/dashboard_* copies for offline deploys
-│   │   ├── awards.py                      # MVP/DPOY/6th-Man/MIP races + stat leaders (local box-score math)
+│   │   ├── awards.py                      # Races + stat leaders per season, all-time boards, GOAT ladder (local box-score math)
 │   │   ├── fixtures/                     # Real recorded payloads (incl. a 1995-96 game)
 │   │   ├── test_espn_api.py              # Parsing pinned against fixtures + opt-in live tests
 │   │   ├── test_snapshot.py              # State decisions: what's fetched, skipped, targeted
@@ -86,7 +86,7 @@ NBA-Analytics/
 │       ├── optimizer.py                  # PuLP best-lineup (G/F/C/UTIL slots)
 │       └── test_model.py                 # Scoring, leakage guarantees, split, projections, optimizer
 ├── app/
-│   ├── app.py                            # Home: Standings, Schedule & Scores, Awards Ladder
+│   ├── app.py                            # Home: Standings, Schedule & Scores, Awards Ladder, All-Time Stats, GOAT Rankings
 │   ├── shared.py                         # Live-first loaders with committed fallbacks + age notes
 │   ├── test_app_offline.py               # AppTest renders with EVERY ESPN call forced to fail
 │   └── pages/1_Model_and_History.py      # Model Performance, Season Leaders, Court View
@@ -129,7 +129,10 @@ Slot structure, eligibility rules, infeasibility handling, and optimality tests:
 
 ## Dashboard
 
-**`streamlit run app/app.py`** — two pages, live-first with offline fallbacks, freshness stated honestly on every tab: **[docs/DASHBOARD.md](docs/DASHBOARD.md)**.
+**`streamlit run app/app.py`** — two pages (Home: Standings, Schedule &
+Scores, Awards Ladder, All-Time Stats, GOAT Rankings), live-first with
+offline fallbacks, freshness stated honestly on every tab:
+**[docs/DASHBOARD.md](docs/DASHBOARD.md)**.
 
 ## Known Issues Found & Fixed
 
@@ -142,4 +145,4 @@ The investigation log — ESPN WAF blocking User-Agents, the standings link-stub
 - Salary-cap optimizer variant (DraftKings-style): the MILP already separates objective from slot structure; adding a cost column and budget constraint is the natural extension once a cost source (a platform or an ADP proxy) is chosen.
 - Injury/outcome signal: same lesson as FPL-Analytics — the gap to naive baselines concentrates in did-not-play rows, where historical stats can't see a coach's game-time decision. A real availability feed is the lever, not more box-score history.
 - Retrain once 2026-27 box scores accumulate (validation window deliberately fixed at 2024-25 so early-season re-runs stay comparable).
-- Wire `predict.project_upcoming()` into a dashboard surface again (the Projections tab was replaced by the Awards Ladder; `predict.project_upcoming()` and the daily `refresh_projections()` still compute the committed window for the backend), or surface it as a fifth tab once 2026-27 games give it something current to project.
+- Wire `predict.project_upcoming()` into a dashboard surface again (the Projections tab was replaced by the Awards Ladder; `predict.project_upcoming()` and the daily `refresh_projections()` still compute the committed window for the backend), or surface it as another Home tab once 2026-27 games give it something current to project.

@@ -50,12 +50,14 @@ def _markdown_text(at: AppTest) -> str:
 def test_home_page_renders_offline(offline_espn):
     at = _render("app/app.py", offline_espn)
     assert not at.exception
-    # Title + the three tabs present even with every live call failing.
+    # Title + the five tabs present even with every live call failing.
     assert any("NBA Analytics" in str(t.value) for t in at.title)
     tab_labels = [str(t.label) for t in at.tabs]
     assert "Standings" in tab_labels
     assert "Schedule & Scores" in tab_labels
     assert "Awards Ladder" in tab_labels
+    assert "All-Time Stats" in tab_labels
+    assert "GOAT Rankings" in tab_labels
 
 
 def test_home_page_falls_back_to_committed_data(offline_espn):
@@ -90,6 +92,83 @@ def test_home_awards_tab_shows_races_and_formula_captions(offline_espn):
     assert "Impact per game" in captions
 
 
+def _committed_awards() -> dict:
+    """The committed envelope: multi-season {"seasons": ...} or legacy."""
+    path = REPO_ROOT / "data" / "dashboard_awards.json"
+    if not path.exists():
+        return {}
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def test_home_alltime_tab_shows_career_board_and_honesty(offline_espn):
+    """All-Time Stats must render the career table with its window caption --
+    and must admit the window (collector starts 2010-11, not full NBA
+    history). Skips when the committed payload predates the career sections."""
+    payload = _committed_awards()
+    pts_rows = (((payload.get("alltime") or {}).get("leaders") or {})
+                .get("pts") or [])
+    if not pts_rows:
+        pytest.skip("no all-time section in the committed payload yet")
+    at = _render("app/app.py", offline_espn)
+    captions = " ".join(str(c.value) for c in at.caption).lower()
+    assert "not full nba history" in captions
+    # The career scoring leader must reach the rendered dataframe.
+    name = str(pts_rows[0].get("player_name") or "")
+    frames = " ".join(str(getattr(df, "value", "")) for df in at.dataframe)
+    assert name and name in frames
+
+
+def test_home_goat_tab_shows_ladder_and_verbatim_formula(offline_espn):
+    """GOAT Rankings must print its exact formula + the not-official
+    disclaimer, and the top-ranked player's name must reach the screen."""
+    payload = _committed_awards()
+    goat_rows = (payload.get("goat") or {}).get("rows") or []
+    if not goat_rows:
+        pytest.skip("no GOAT rows in the committed payload yet")
+    at = _render("app/app.py", offline_espn)
+    captions = " ".join(str(c.value) for c in at.caption)
+    text = f"{_markdown_text(at)} {captions}"
+    assert "GOAT score =" in text
+    assert "not an official nba ranking" in captions.lower()
+    assert str(goat_rows[0].get("player_name") or "") in text
+
+
+def test_load_awards_picks_requested_or_nearest_season(monkeypatch, tmp_path):
+    """The sidebar season must resolve honestly: exact match when collected,
+    the newest season at-or-before it otherwise (2026-27 pre-tip-off ->
+    2025-26), the earliest season before the window -- each fallback SAYING
+    which season it is actually showing."""
+    import shared as shared_module
+
+    envelope = {
+        "_generated_utc": "2026-09-24T00:00:00Z", "source": "local",
+        "seasons": {
+            "2015-16": {"season": "2015-16", "races": {"mvp": []}},
+            "2025-26": {"season": "2025-26", "races": {"mvp": [1]}},
+        },
+    }
+    (tmp_path / "dashboard_awards.json").write_text(
+        json.dumps(envelope), encoding="utf-8")
+    monkeypatch.setattr(shared_module, "DATA_DIR", tmp_path)
+    shared_module.load_awards.clear()
+    try:
+        data, note = shared_module.load_awards("2025-26")
+        assert data.get("season") == "2025-26"
+        assert "showing" not in note
+
+        data, note = shared_module.load_awards("2026-27")
+        assert data.get("season") == "2025-26"
+        assert "showing 2025-26" in note
+        assert "2026-27 has no collected games yet" in note
+
+        data, note = shared_module.load_awards("2014-15")
+        assert data.get("season") == "2015-16"
+        assert "showing 2015-16" in note
+    finally:
+        shared_module.load_awards.clear()
+
+
 def test_model_page_court_view_renders_leaders(offline_espn):
     """Court View must show a real leader from the committed payload --
     asserted via that player's name reaching markdown/captions, never via a
@@ -99,7 +178,11 @@ def test_model_page_court_view_renders_leaders(offline_espn):
         pytest.skip("dashboard_awards.json not committed yet")
     with open(awards_path, encoding="utf-8") as f:
         payload = json.load(f)
-    pts = (payload.get("leaders") or {}).get("pts") or []
+    seasons = payload.get("seasons") or {}
+    newest = payload
+    if seasons:
+        newest = seasons[max(seasons)]
+    pts = (newest.get("leaders") or {}).get("pts") or []
     if not pts:
         pytest.skip("no qualified pts leaders in the committed payload")
     at = _render("app/pages/1_Model_and_History.py", offline_espn)
@@ -134,7 +217,8 @@ def test_fallback_envelopes_carry_generation_timestamp():
     checked = 0
     for name in ("dashboard_teams.json", "dashboard_standings.json",
                  "dashboard_schedule.json", "dashboard_positions.json",
-                 "dashboard_awards.json"):
+                 "dashboard_awards.json",
+                 "processed/dashboard_leaderboards.json"):
         path = data_dir / name
         if not path.exists():
             continue

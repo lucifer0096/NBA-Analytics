@@ -201,7 +201,7 @@ div[data-testid="stMetric"] {
   background: rgba(15, 15, 15, 0.97); color: #f0f0f0;
   border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px;
   padding: 8px 10px; font-size: 10.5px; line-height: 1.5;
-  text-align: left; white-space: nowrap;
+  text-align: left; white-space: normal; max-width: 250px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
 }
 .na-tip::after {
@@ -305,8 +305,9 @@ def race_meta(race: str, row: dict) -> str:
     if race == "mvp":
         rec = (f" · {row['wins']}-{row['losses']} ({row['win_pct']:.3f})"
                if row.get("wins") is not None else "")
+        fg = (f" · {row['fgp']}% FG" if row.get("fgp") is not None else "")
         return (f"{team} · {gp} GP · {row.get('ppg', 0)} PPG · "
-                f"{row.get('rpg', 0)} RPG · {row.get('apg', 0)} APG{rec}")
+                f"{row.get('rpg', 0)} RPG · {row.get('apg', 0)} APG{rec}{fg}")
     if race == "dpoy":
         opp = (f" · {row['opp_pg']} opp pts/g"
                if row.get("opp_pg") is not None else "")
@@ -349,10 +350,24 @@ def race_row_html(row: dict, race: str) -> str:
             f'</div>')
 
 
+def _shooting_fragments(row: dict) -> str:
+    """' · 712-1580 FG (45.1%) · 268-702 3P (38.2%)' fragments for a leader
+    row's meta line, empty when the box scores carry no attempts (older
+    fixtures / DNP-heavy rows), so nothing prints as '0-0'."""
+    bits = []
+    if row.get("fga"):
+        bits.append(f" · {row.get('fgm', 0)}-{row['fga']} FG "
+                    f"({row.get('fgp')}%)")
+    if row.get("fg3a"):
+        bits.append(f" · {row.get('fg3m', 0)}-{row['fg3a']} 3P "
+                    f"({row.get('fg3p')}%)")
+    return "".join(bits)
+
+
 def leader_row_html(row: dict, stat: str) -> str:
     """One stat-leader row: rank, headshot, name + team logo, games + season
-    total for context, headline per-game rate on the right. Same single-
-    logical-line rule as race_row_html."""
+    total for context + the shooting splits, headline per-game rate on the
+    right. Same single-logical-line rule as race_row_html."""
     rank = int(row.get("rank") or 0)
     medal = {1: "🥇", 2: "🥈", 3: "🥉"}.get(rank, str(rank))
     name = html.escape(str(row.get("player_name") or "Unknown"))
@@ -360,7 +375,8 @@ def leader_row_html(row: dict, stat: str) -> str:
     total = int(row.get("total") or 0)
     label = awards.STAT_LABELS.get(stat, stat)
     abbr = awards.STAT_ABBR.get(stat, stat.upper())
-    meta = f"{team} · {row.get('gp', 0)} GP · {total:,} {label.lower()} (season total)"
+    meta = (f"{team} · {row.get('gp', 0)} GP · {total:,} {label.lower()} "
+            f"(season total){_shooting_fragments(row)}")
     return (f'<div class="na-race-row">'
             f'<div class="na-rank">{medal}</div>'
             f'{headshot_html(row.get("player_id"), team, 44)}'
@@ -375,7 +391,8 @@ def leader_row_html(row: dict, stat: str) -> str:
 def court_card_html(row: dict, bucket: str, stat: str) -> str:
     """One Court View player card: headshot over team-logo fallback, name,
     team logo + position chip, headline per-game rate, and a CSS-only hover
-    tooltip (.na-tip) with the player's full per-game line + season total.
+    tooltip (.na-tip) with the player's full per-game line, shooting splits
+    and season total.
 
     Single logical line -- see race_row_html's docstring."""
     name = html.escape(str(row.get("player_name") or "Unknown"))
@@ -386,7 +403,8 @@ def court_card_html(row: dict, bucket: str, stat: str) -> str:
     tip = (f"{row.get('gp', 0)} GP · {row.get('mpg', 0)} MIN · "
            f"{row.get('ppg', 0)} PTS · {row.get('rpg', 0)} REB · "
            f"{row.get('apg', 0)} AST · {row.get('spg', 0)} STL · "
-           f"{row.get('bpg', 0)} BLK · {total:,} {total_label} total")
+           f"{row.get('bpg', 0)} BLK{_shooting_fragments(row)} · "
+           f"{total:,} {total_label} total")
     abbr = awards.STAT_ABBR.get(stat, stat.upper())
     return (f'<div class="na-court-card">'
             f'<div class="na-tip">{tip}</div>'
@@ -409,6 +427,36 @@ def _court_bucket(raw_pos: str) -> str:
     if pos == "C":
         return "C"
     return ""
+
+
+def goat_row_html(row: dict) -> str:
+    """One GOAT-ladder row: rank/medal, real headshot (team-logo CSS
+    fallback), career line, race titles won in this repo's races, the three
+    component scores, and the headline GOAT score on the right.
+
+    Single logical line -- see race_row_html's docstring."""
+    rank = int(row.get("rank") or 0)
+    medal = {1: "🥇", 2: "🥈", 3: "🥉"}.get(rank, str(rank))
+    name = html.escape(str(row.get("player_name") or "Unknown"))
+    team = str(row.get("team_abbrev") or "")
+    titles = row.get("titles") or {}
+    title_bits = [f"{awards.RACE_EMOJI.get(race, '')}×{count}"
+                  for race, count in titles.items() if count]
+    titles_text = " · ".join(title_bits) if title_bits else "no race titles"
+    meta = (f"{team} · {row.get('seasons', 0)} seasons · "
+            f"{row.get('gp', 0)} GP · {row.get('pts', 0):,} PTS · "
+            f"{row.get('ppg', 0)} PPG · {titles_text} · "
+            f"prod {row.get('production', 0)} · awards "
+            f"{row.get('awards_score', 0)} · peak {row.get('peak_score', 0)}")
+    return (f'<div class="na-race-row">'
+            f'<div class="na-rank">{medal}</div>'
+            f'{headshot_html(row.get("player_id"), team, 44)}'
+            f'<div class="na-rbody">'
+            f'<div class="na-rname">{name}{team_logo_html(team, 16)}</div>'
+            f'<div class="na-rmeta">{meta}</div>'
+            f'</div>'
+            f'<div class="na-rscore">{row.get("score", 0)}</div>'
+            f'</div>')
 
 
 def render_court(leaders: list, positions, stat: str, min_games: int,
@@ -612,19 +660,63 @@ def load_positions() -> pd.DataFrame:
 
 
 @st.cache_data(ttl=300, show_spinner=False)
-def load_awards() -> tuple:
-    """(payload, note) -- award races + stat leaders computed LOCALLY from
-    the collected box scores (src/collector/awards.py) and committed as
+def load_awards(season: str = None) -> tuple:
+    """(season payload, note) -- award races + stat leaders computed LOCALLY
+    from the collected box scores (src/collector/awards.py) and committed as
     data/dashboard_awards.json. There is deliberately no live API for these,
-    so the note states the computation stamp rather than implying live."""
+    so the note states the computation stamp rather than implying live.
+
+    The committed file carries EVERY collected season under "seasons"
+    (2010-11 -> present); `season` picks one, falling back to the newest
+    season at or before the request (sidebar can select 2026-27 before any
+    games exist) and SAYING so, mirroring load_standings' honesty rule.
+    The legacy single-season envelope (no "seasons" key) still loads."""
     payload = _read_fallback("dashboard_awards.json")
-    if not payload.get("races"):
-        return (payload, "No committed award data yet — computed where raw "
-                         "box scores exist (refresh_dashboard_fallbacks.py)")
+    seasons = payload.get("seasons")
+    if not seasons:
+        if not payload.get("races"):
+            return (payload, "No committed award data yet — computed where "
+                              "raw box scores exist "
+                              "(refresh_dashboard_fallbacks.py)")
+        data, actual = payload, payload.get("season")
+    else:
+        requested = season or ""
+        if requested in seasons:
+            actual = requested
+        elif not requested:
+            actual = max(seasons)
+        else:
+            # Nearest season at or before the request (2026-27 before tip-off
+            # -> 2025-26); before the window entirely -> the earliest season.
+            at_or_before = [s for s in seasons if s <= requested]
+            actual = max(at_or_before) if at_or_before else min(seasons)
+        data = seasons[actual] or {}
+        if not data.get("races"):
+            return (data, "No committed award data yet — computed where "
+                           "raw box scores exist "
+                           "(refresh_dashboard_fallbacks.py)")
     stamp = payload.get("_generated_utc")
     note = (f"Computed from collected box scores — as of {stamp}" if stamp
             else "Computed from collected box scores")
-    return (payload, note)
+    if season and actual != season:
+        note = (f"{note} — showing {actual} "
+                f"({season} has no collected games yet)")
+    return (data, note)
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def load_awards_career() -> tuple:
+    """(alltime dict, goat dict, window dict, note) -- the cross-season
+    sections of the committed awards file: career totals across every
+    collected season (2010-11 -> present), the GOAT ladder built from them,
+    and the window descriptor. Same honest stamp-only freshness as
+    load_awards (computed locally, never live)."""
+    payload = _read_fallback("dashboard_awards.json")
+    stamp = payload.get("_generated_utc")
+    note = (f"Computed from collected box scores — as of {stamp}" if stamp
+            else "Computed from collected box scores")
+    return (payload.get("alltime") or {}, payload.get("goat") or {},
+            payload.get("window") or {}, note)
 
 
 @st.cache_data(ttl=3600, show_spinner=False)

@@ -24,13 +24,16 @@ def _player(pid, name="Player", team="BOS", gp=10, starts=0, **stats):
 
 
 def _box(pid, name, team, starter=False, dnp=False, minutes=30, pts=0,
-         reb=0, ast=0, stl=0, blk=0, to=0):
-    """A stored box-score player row (the shape snapshot.py writes)."""
-    return {
+         reb=0, ast=0, stl=0, blk=0, to=0, **extra):
+    """A stored box-score player row (the shape snapshot.py writes); `extra`
+    carries shooting splits (fgm/fga/fg3m/...) when a test needs them."""
+    row = {
         "player_id": pid, "player_name": name, "team_abbrev": team,
         "starter": starter, "did_not_play": dnp, "min": minutes,
         "pts": pts, "reb": reb, "ast": ast, "stl": stl, "blk": blk, "to": to,
     }
+    row.update(extra)
+    return row
 
 
 def _write_games(tmp_path, season, games):
@@ -152,6 +155,161 @@ def test_leader_rows_qualification_and_rank_cap():
 def test_build_payload_empty_without_games(tmp_path):
     # A season with no collected box scores -> {} (caller keeps old file).
     assert awards.build_payload("2099-00", raw_dir=str(tmp_path)) == {}
+
+
+def test_efficiency_splits_and_none_guards():
+    # 10-20 FG, 4-10 3P, 6-7 FT, 30 pts:
+    # eFG = (10 + 0.5*4)/20 = 60%, TS = 30 / (2*(20 + 0.44*7)) = 65%.
+    eff = awards.efficiency({"pts": 30, "fgm": 10, "fga": 20, "fg3m": 4,
+                             "fg3a": 10, "ftm": 6, "fta": 7})
+    assert eff == {"fgp": 50.0, "fg3p": 40.0, "ftp": 85.7, "efg": 60.0,
+                   "ts": 65.0}
+    # No attempts at all -> None everywhere, never an invented 0.0/100.0.
+    assert set(awards.efficiency({}).values()) == {None}
+
+
+def test_aggregate_players_sums_shooting_splits(tmp_path):
+    _write_games(tmp_path, "2018-19", {
+        1: [_box(1, "Shooter", "BOS", minutes=36, pts=30, fgm=11, fga=20,
+                 fg3m=4, fg3a=10, ftm=4, fta=5, oreb=1, dreb=4)],
+        2: [_box(1, "Shooter", "BOS", minutes=34, pts=20, fgm=8, fga=18,
+                 fg3m=2, fg3a=8, ftm=2, fta=2, oreb=0, dreb=5)],
+    })
+    players = {p["player_id"]: p for p in
+               awards.aggregate_players("2018-19", raw_dir=str(tmp_path))}
+    p = players[1]
+    assert p["gp"] == 2 and p["minutes"] == 70
+    assert (p["fgm"], p["fga"]) == (19, 38)
+    assert (p["fg3m"], p["fg3a"]) == (6, 18)
+    assert (p["ftm"], p["fta"]) == (6, 7)
+    assert (p["oreb"], p["dreb"]) == (1, 9)
+
+
+def test_leader_rows_carry_shooting_splits_and_3pm_board():
+    players = [_player(1, "Sniper", "BOS", gp=10, pts=100, fgm=40, fga=80,
+                       fg3m=20, fg3a=50, minutes=300),
+               _player(2, "Driver", "CLE", gp=10, pts=120, fgm=50, fga=90,
+                       fg3m=0, fg3a=0, minutes=300)]
+    out = awards.leader_rows(players, min_gp=8)
+    # 3PM joins the season boards; totals rank, 0-for-0 shows no fake 3P%.
+    assert "fg3m" in out
+    assert out["fg3m"][0]["player_name"] == "Sniper"
+    assert out["fg3m"][0]["per_game"] == 2.0
+    row = out["pts"][0]
+    assert (row["fgm"], row["fga"]) == (50, 90)
+    assert row["fgp"] is not None
+    sniper = next(r for r in out["fg3m"] if r["player_name"] == "Sniper")
+    assert sniper["fg3p"] == 40.0
+
+
+def test_alltime_players_merges_seasons_and_tracks_peak(tmp_path):
+    _write_games(tmp_path, "2016-17", {
+        1: [_box(1, "Ace", "BOS", minutes=30, pts=20, fgm=8, fga=16)],
+        2: [_box(9, "Ghost", "BOS", dnp=True)],
+    })
+    _write_games(tmp_path, "2017-18", {
+        1: [_box(1, "Ace", "CLE", minutes=32, pts=30, fgm=11, fga=20)],
+    })
+    merged = {p["player_id"]: p
+              for p in awards.alltime_players(raw_dir=str(tmp_path))}
+    ace = merged[1]
+    assert ace["seasons"] == 2 and ace["gp"] == 2
+    assert ace["pts"] == 50
+    assert (ace["fgm"], ace["fga"]) == (19, 36)
+    assert ace["team_abbrev"] == "CLE"        # latest season wins
+    assert ace["peak_impact"] == 30.0         # best season's impact/pg
+    assert 9 not in merged                    # DNP-only rows never aggregate
+
+
+def test_alltime_rows_boards_and_qualifiers():
+    players = [
+        _player(1, "Volume", "BOS", gp=82, pts=2000, fgm=700, fga=1500,
+                fg3m=100, fg3a=300, ftm=500, fta=600),
+        _player(2, "Efficient", "CLE", gp=82, pts=1600, fgm=640, fga=1100,
+                fg3m=150, fg3a=350, ftm=170, fta=200),
+        _player(3, "Tiny", "NYK", gp=40, pts=800),        # < 41 career GP
+        _player(4, "OneGame", "MIA", gp=41, pts=200, fgm=5, fga=6),
+    ]
+    boards = awards.alltime_rows(players)
+    assert set(boards) == set(awards.ALLTIME_CATEGORIES)
+    # Counting boards rank by career TOTAL behind the GP floor (OneGame
+    # clears 41 GP, so his tiny total legitimately lands third).
+    pts_names = [r["player_name"] for r in boards["pts"]]
+    assert pts_names == ["Volume", "Efficient", "OneGame"]
+    assert boards["pts"][0]["pts"] == 2000
+    # FG%: Efficient (58.2%) over Volume (46.7%); OneGame fails the
+    # >=5 FGA/g floor; Tiny already failed the career GP floor.
+    fgp_names = [r["player_name"] for r in boards["fgp"]]
+    assert fgp_names == ["Efficient", "Volume"]
+    # Every row carries the full parameter set for the dashboard table.
+    row = boards["pts"][0]
+    for field in ("oreb", "dreb", "to", "ftm", "fta", "minutes", "efg", "ts"):
+        assert field in row
+
+
+def test_goat_rows_formula_titles_and_career_gate():
+    players = [
+        _player(1, "King", "CLE", gp=164, pts=4000, reb=1600, ast=1600,
+                stl=300, blk=100, fg3m=300, peak_impact=35.0),
+        _player(2, "Role", "BOS", gp=82, pts=1000, reb=400, ast=400,
+                stl=80, blk=20, fg3m=60, peak_impact=15.0),
+        _player(3, "Short", "MIA", gp=81, pts=3000),      # < 82 career GP
+    ]
+    season_payloads = [{
+        "season": "2016-17",
+        "races": {
+            "mvp": [{"player_id": 1, "rank": 1},
+                    {"player_id": 2, "rank": 2}],
+            "dpoy": [{"player_id": 1, "rank": 2},
+                     {"player_id": 2, "rank": 1}],
+            "sixth_man": [], "mip": [],
+        },
+    }]
+    rows = awards.goat_rows(players, season_payloads)
+    assert [r["player_name"] for r in rows] == ["King", "Role"]
+    king, role = rows
+    # Resume points: King = (11-1)*1.0 + (11-2)*0.8 = 17.2,
+    # Role = (11-2)*1.0 + (11-1)*0.8 = 17.0; rank-1s become titles.
+    assert king["award_points"] == 17.2
+    assert king["titles"] == {"mvp": 1, "dpoy": 0, "sixth_man": 0, "mip": 0}
+    assert role["award_points"] == 17.0
+    assert role["titles"]["dpoy"] == 1
+    # The headline score IS the captioned weighted mix (0-100 components).
+    for r in rows:
+        expected = (awards.GOAT_WEIGHTS["production"] * r["production"]
+                    + awards.GOAT_WEIGHTS["awards"] * r["awards_score"]
+                    + awards.GOAT_WEIGHTS["peak"] * r["peak_score"])
+        assert abs(r["score"] - round(expected, 1)) <= 0.15
+    # Production is normalized against the window's best: King leads every
+    # counted category -> 100.0.
+    assert king["production"] == 100.0
+    # Below the career gate: never appears, however good the stats.
+    assert all(r["player_name"] != "Short" for r in rows)
+    # The formula string shown on screen is the committed one.
+    assert awards.GOAT_FORMULA.count("+") >= 2
+    assert f"{awards.GOAT_MIN_CAREER_GP}" in awards.GOAT_FORMULA
+
+
+def test_build_career_window_and_honest_empties(tmp_path):
+    for season, scorer in (("2016-17", 20), ("2017-18", 30)):
+        _write_games(tmp_path, season, {
+            1: [_box(1, "Ace", "BOS", minutes=30, pts=scorer,
+                     fgm=8, fga=16)],
+        })
+    season_payloads = [awards.build_payload(s, raw_dir=str(tmp_path))
+                       for s in ("2017-18", "2016-17")]
+    career = awards.build_career(season_payloads, raw_dir=str(tmp_path))
+    assert career["window"] == {"first": "2016-17", "last": "2017-18",
+                                "seasons": 2, "players": 1}
+    assert set(career["alltime"]["leaders"]) == set(awards.ALLTIME_CATEGORIES)
+    assert career["goat"]["formula"] == awards.GOAT_FORMULA
+    # 2 career games: below the 41-GP boards and the 82-GP ladder ->
+    # honest empties, never an invented king.
+    assert all(rows == []
+               for rows in career["alltime"]["leaders"].values())
+    assert career["goat"]["rows"] == []
+    # No season payloads at all -> {} (caller keeps the previous file).
+    assert awards.build_career([], raw_dir=str(tmp_path)) == {}
 
 
 def test_build_payload_envelope(tmp_path):

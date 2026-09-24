@@ -4,11 +4,13 @@
   (single-stage vs two-stage vs the naive rolling-5 baseline), with an MAE
   comparison chart
 - **Season Leaders**    -- per-player totals from the committed leaderboards
-  fallback (fantasy points under the default scoring), podium-styled
+  fallback (fantasy points under the default scoring + full shooting splits:
+  FG/3P made-attempt counts, FG%, eFG%, TS%), podium-styled
 - **Court View**         -- the selected stat's leaders on a CSS-only
   hardwood court: 2 G / 2 F / 1 C filled in rank order by each player's
   real position, everyone else on a bench strip, hover a card for the full
-  per-game line
+  per-game line incl. shooting splits. Follows the sidebar's season
+  selector (every collected season, 2010-11 -> present).
 
 This page deliberately shows the naive baseline alongside the model: if the
 model can't beat "last 5 games' average" on a screen, the number on screen
@@ -26,6 +28,16 @@ st.set_page_config(page_title="Model & History", page_icon="📈", layout="wide"
 
 shared.inject_css()
 st.title("Model & History")
+
+with st.sidebar:
+    st.markdown("### Settings")
+    options = shared.season_options()
+    season = st.selectbox(
+        "Season", options,
+        index=0 if options else None,
+        help="Newest season with collected data first; drives Court View.",
+    )
+    st.caption(f"Today (UTC): {shared.now_utc():%Y-%m-%d}")
 
 tabs = st.tabs(["Model Performance", "Season Leaders", "Court View"])
 
@@ -107,6 +119,8 @@ with tabs[1]:
         st.caption(f"Source: {note}")
         rank_labels = {"fantasy_points": "Fantasy pts", "pts": "Points",
                        "reb": "Rebounds", "ast": "Assists"}
+        if "fg3m" in leaders.columns:
+            rank_labels["fg3m"] = "3PM"
         metric = st.radio("Rank by", list(rank_labels), horizontal=True,
                           format_func=rank_labels.__getitem__)
         top = leaders.sort_values(metric, ascending=False).head(25).copy()
@@ -115,24 +129,39 @@ with tabs[1]:
         top["rank"] = [medals.get(i, str(i + 1)) for i in top.index]
         top["fantasy_points"] = top["fantasy_points"].round(1)
         shared.section("Top 25")
+        columns = {
+            "rank": "", "player_name": "Player", "team_abbrev": "Team",
+            "games": "GP", "minutes": "MIN", "pts": "PTS", "reb": "REB",
+            "ast": "AST", "fantasy_points": "FPTS",
+        }
+        keep = ["rank", "player_name", "team_abbrev", "games", "minutes",
+                "pts", "reb", "ast", "fantasy_points"]
+        if "fgm" in top.columns:
+            top["FG"] = (top["fgm"].astype(int).astype(str) + "-"
+                         + top["fga"].astype(int).astype(str))
+            top["3P"] = (top["fg3m"].astype(int).astype(str) + "-"
+                         + top["fg3a"].astype(int).astype(str))
+            for col in ("fgp", "fg3p", "efg", "ts"):
+                top[col] = pd.to_numeric(top[col], errors="coerce")
+            keep += ["FG", "fgp", "3P", "fg3p", "efg", "ts"]
+            columns.update({"FG": "FG", "fgp": "FG%", "3P": "3P",
+                            "fg3p": "3P%", "efg": "eFG%", "ts": "TS%"})
         st.dataframe(
-            top[["rank", "player_name", "team_abbrev", "games", "minutes",
-                 "pts", "reb", "ast", "fantasy_points"]].rename(columns={
-                "rank": "", "player_name": "Player", "team_abbrev": "Team",
-                "games": "GP", "minutes": "MIN", "pts": "PTS", "reb": "REB",
-                "ast": "AST", "fantasy_points": "FPTS",
-            }),
+            top[keep].rename(columns=columns),
             width="stretch", hide_index=True,
         )
         st.caption("Fantasy points = default configurable weights "
-                   "(src/model/scoring.py) applied to season totals.")
+                   "(src/model/scoring.py) applied to season totals; "
+                   "FG/3P = made-attempt, eFG% = (FGM + 0.5·3PM) / FGA, "
+                   "TS% = PTS / (2·(FGA + 0.44·FTA)) — computed from the "
+                   "collected box scores.")
 
 # ---------------------------------------------------------------------------
 # Court View: the stat race's leaders on a real court formation
 # ---------------------------------------------------------------------------
 
 with tabs[2]:
-    awards_payload, awards_note = shared.load_awards()
+    awards_payload, awards_note = shared.load_awards(season)
     st.caption(f"Source: {awards_note}")
     if not awards_payload.get("leaders"):
         st.info("No committed leader data yet — run "

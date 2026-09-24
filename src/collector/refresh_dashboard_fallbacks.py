@@ -8,9 +8,13 @@ tabs read, committed here (the same pattern as FPL-Analytics' refresh script):
     data/dashboard_standings.json    latest available season's standings
     data/dashboard_schedule.json     current season schedule + scores
     data/dashboard_positions.json    current player -> position map
-    data/dashboard_awards.json       MVP/DPOY/6th-Man/MIP races + stat leaders
+    data/dashboard_awards.json       every collected season's MVP/DPOY/6th-Man/
+                                     MIP races + stat leaders, plus the
+                                     cross-season all-time boards and GOAT
+                                     ladder
     data/processed/dashboard_leaderboards.json
                                      last completed season's per-player totals
+                                     + shooting splits + fantasy points
 
 Each file carries its own {"_generated_utc": ..., "source": "espn"|"local"}
 envelope so the dashboard can show data age honestly instead of implying
@@ -175,11 +179,13 @@ def refresh_positions() -> dict:
 
 
 def refresh_leaderboards(seasons_to_try: list) -> dict:
-    """Per-player season totals (incl. fantasy points under default scoring)
-    for the first season with collected games -- powers the dashboard's
-    historical-leaderboard tab offline, without pandas on Streamlit Cloud
+    """Per-player season totals (incl. shooting splits + fantasy points under
+    default scoring) for the first season with collected games -- powers the
+    dashboard's Season Leaders tab offline, without pandas on Streamlit Cloud
     having to scan 20k raw files... (it could, but a 200KB JSON is cheaper)."""
     import glob
+
+    import awards
 
     rows_by_player: dict = {}
     chosen = None
@@ -197,18 +203,12 @@ def refresh_leaderboards(seasons_to_try: list) -> dict:
                         "player_id": row["player_id"],
                         "player_name": row["player_name"],
                         "team_abbrev": row.get("team_abbrev"),
-                        "games": 0, "minutes": 0, "pts": 0, "reb": 0,
-                        "ast": 0, "stl": 0, "blk": 0, "to": 0,
-                        "fantasy_points": 0.0,
+                        "games": 0, "minutes": 0, "fantasy_points": 0.0,
                     })
                     entry["games"] += 1
                     entry["minutes"] += row.get("min") or 0
-                    entry["pts"] += row.get("pts") or 0
-                    entry["reb"] += row.get("reb") or 0
-                    entry["ast"] += row.get("ast") or 0
-                    entry["stl"] += row.get("stl") or 0
-                    entry["blk"] += row.get("blk") or 0
-                    entry["to"] += row.get("to") or 0
+                    for stat in awards.CAREER_SUM_STATS:
+                        entry[stat] = (entry.get(stat) or 0) + (row.get(stat) or 0)
         break  # ONE season only (the newest available in the try-order)
     if chosen is None:
         print("  no collected games for any candidate season -- skipping leaderboards")
@@ -218,39 +218,49 @@ def refresh_leaderboards(seasons_to_try: list) -> dict:
     sys.path.insert(0, os.path.join(REPO_ROOT, "src", "model"))
     import scoring
 
-    leaders = sorted(
-        ({**v, "fantasy_points": scoring.score_row(v)} for v in rows_by_player.values()),
-        key=lambda r: r["fantasy_points"], reverse=True,
-    )
+    leaders = []
+    for v in rows_by_player.values():
+        row = {**v, "fantasy_points": scoring.score_row(v)}
+        row.update(awards.efficiency(row))
+        leaders.append(row)
+    leaders.sort(key=lambda r: r["fantasy_points"], reverse=True)
     path = os.path.join(PROCESSED_DIR, "dashboard_leaderboards.json")
     _write(path, _stamp({"season": chosen, "leaders": leaders}, "local"))
     return {"season": chosen, "leaders": leaders}
 
 
 def refresh_awards(seasons_to_try: list) -> dict:
-    """Award races + stat leaders for the first season with collected games.
+    """Award races + stat leaders for EVERY collected season (2010-11 ->),
+    plus the cross-season all-time boards and GOAT ladder.
 
     Pure-local computation (awards.py scans the stored box scores -- no API
     call), so like the leaderboards it silently keeps the previous file when
-    raw data is missing (the normal Streamlit Cloud / fresh-clone state)."""
+    raw data is missing (the normal Streamlit Cloud / fresh-clone state).
+    The envelope shape is {"seasons": {label: payload}, "window", "alltime",
+    "goat"} so the dashboard's sidebar season selector can pick any year."""
     import glob
 
     import awards
 
-    chosen = None
-    for season in seasons_to_try:
-        if glob.glob(os.path.join(RAW_DIR, season, "games", "*.json")):
-            chosen = season
-            break
-    if chosen is None:
+    labels = [s for s in dict.fromkeys(seasons_to_try)
+              if glob.glob(os.path.join(RAW_DIR, s, "games", "*.json"))]
+    if not labels:
         print("  no collected games for any candidate season -- skipping awards")
         return {}
-    payload = awards.build_payload(chosen)
-    if not payload:
+
+    season_payloads = []
+    for season in labels:
+        payload = awards.build_payload(season)
+        if payload:
+            season_payloads.append(payload)
+    if not season_payloads:
         return {}
+    career = awards.build_career(season_payloads)
+    envelope = {"seasons": {p["season"]: p for p in season_payloads}}
+    envelope.update(career or {})
     path = os.path.join(DATA_DIR, "dashboard_awards.json")
-    _write(path, _stamp(payload, "local"))
-    return payload
+    _write(path, _stamp(envelope, "local"))
+    return envelope
 
 
 def _as_date(value) -> date | None:
