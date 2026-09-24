@@ -197,13 +197,17 @@ def refresh_leaderboards(seasons_to_try: list) -> dict:
                         "player_name": row["player_name"],
                         "team_abbrev": row.get("team_abbrev"),
                         "games": 0, "minutes": 0, "pts": 0, "reb": 0,
-                        "ast": 0, "fantasy_points": 0.0,
+                        "ast": 0, "stl": 0, "blk": 0, "to": 0,
+                        "fantasy_points": 0.0,
                     })
                     entry["games"] += 1
                     entry["minutes"] += row.get("min") or 0
                     entry["pts"] += row.get("pts") or 0
                     entry["reb"] += row.get("reb") or 0
                     entry["ast"] += row.get("ast") or 0
+                    entry["stl"] += row.get("stl") or 0
+                    entry["blk"] += row.get("blk") or 0
+                    entry["to"] += row.get("to") or 0
         break  # ONE season only (the newest available in the try-order)
     if chosen is None:
         print("  no collected games for any candidate season -- skipping leaderboards")
