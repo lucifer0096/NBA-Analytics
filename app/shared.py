@@ -317,6 +317,8 @@ def load_projections() -> tuple:
     script wrote (computed WHERE the raw data exists), since Streamlit Cloud
     can't rebuild 20k game files to project itself."""
     payload = _read_fallback("dashboard_projections.json")
+    if not projections_are_current(payload):
+        return (pd.DataFrame(), "No current-season projections available yet")
     projections = payload.get("projections", [])
     df = pd.DataFrame(projections)
     if df.empty:
@@ -368,7 +370,10 @@ def load_leaderboards() -> tuple:
     # The file is a JSON object envelope (season/leaders/source/_generated_utc).
     with open(path, encoding="utf-8") as f:
         envelope = json.load(f)
-    return (pd.DataFrame(envelope.get("leaders", [])), data_age_note(envelope, False))
+    note = data_age_note(envelope, False)
+    if envelope.get("season"):
+        note = f"{note} — season {envelope['season']}"
+    return (pd.DataFrame(envelope.get("leaders", [])), note)
 
 
 def current_season() -> str:
