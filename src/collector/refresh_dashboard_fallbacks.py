@@ -10,11 +10,22 @@ tabs read, committed here (the same pattern as FPL-Analytics' refresh script):
     data/dashboard_positions.json    current player -> position map
     data/dashboard_awards.json       every collected season's MVP/DPOY/6th-Man/
                                      MIP races + stat leaders, plus the
-                                     cross-season all-time boards and GOAT
-                                     ladder
+                                     all-NBA-history all-time boards, GOAT
+                                     ladder (official honours) and the
+                                     per-season games-collected inventory
+    data/dashboard_players.json      Player Profile index: career lines,
+                                     per-season logs, official honours and
+                                     GOAT ranks for every notable player
+                                     (largest committed data file -- compact
+                                     JSON, only regenerated when the
+                                     all-history fetch succeeds)
     data/processed/dashboard_leaderboards.json
                                      last completed season's per-player totals
                                      + shooting splits + fantasy points
+    data/processed/history_cache.json
+                                     ESPN career/honours cache (gitignore
+                                     exception so the daily CI run refetches
+                                     only what moved, not ~10k requests)
 
 Each file carries its own {"_generated_utc": ..., "source": "espn"|"local"}
 envelope so the dashboard can show data age honestly instead of implying
@@ -229,18 +240,74 @@ def refresh_leaderboards(seasons_to_try: list) -> dict:
     return {"season": chosen, "leaders": leaders}
 
 
+def _games_by_season() -> dict:
+    """Collected box-score counts for EVERY season directory -- the sidebar's
+    per-season inventory ("games collected number for every season"). A
+    season dir that exists but has no games yet (the upcoming one) counts 0
+    instead of being silently absent."""
+    import glob
+
+    counts = {name: len(glob.glob(os.path.join(RAW_DIR, name, "games",
+                                                "*.json")))
+              for name in _available_raw_seasons()}
+    counts.setdefault(espn_api.current_season_label(), 0)
+    return counts
+
+
+def _write_players(career: dict, history: dict) -> None:
+    """data/dashboard_players.json -- the Player Profile index.
+
+    Every all-history pool player with >=41 career GP or at least one
+    official honour, carrying his career line, per-season log (the
+    progression graph), official honours + points, championships and -- when
+    he made the ladder -- GOAT rank/score. Written only after a successful
+    history build so a failed fetch never degrades a committed file."""
+    import awards
+
+    ladder = {row["player_id"]: row
+              for row in (career.get("goat") or {}).get("rows") or []}
+    honours_map = history.get("honours") or {}
+    players = {}
+    for source in history.get("players") or []:
+        pid = int(source["player_id"])
+        player_honours = honours_map.get(pid) or {}
+        if ((source.get("gp") or 0) < awards.ALLTIME_MIN_GP
+                and not player_honours):
+            continue
+        row = dict(source)
+        row["honours"] = player_honours
+        row["honour_points"] = round(sum(
+            awards.GOAT_HONOURS_WEIGHTS.get(name, 0.0) * count
+            for name, count in player_honours.items()), 1)
+        placed = ladder.get(pid)
+        row["goat_rank"] = placed.get("rank") if placed else None
+        row["goat_score"] = placed.get("score") if placed else None
+        players[str(pid)] = row
+    path = os.path.join(DATA_DIR, "dashboard_players.json")
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    payload = _stamp({"players": players,
+                      "meta": history.get("meta") or {}}, "local")
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, separators=(",", ":"))
+    print(f"  wrote {path} ({len(players)} players)")
+
+
 def refresh_awards(seasons_to_try: list) -> dict:
     """Award races + stat leaders for EVERY collected season (2010-11 ->),
-    plus the cross-season all-time boards and GOAT ladder.
+    plus the all-NBA-history all-time boards, GOAT ladder (official NBA
+    honours) and the per-season games inventory.
 
-    Pure-local computation (awards.py scans the stored box scores -- no API
-    call), so like the leaderboards it silently keeps the previous file when
-    raw data is missing (the normal Streamlit Cloud / fresh-clone state).
-    The envelope shape is {"seasons": {label: payload}, "window", "alltime",
-    "goat"} so the dashboard's sidebar season selector can pick any year."""
+    Season payloads/games counts are pure-local; the all-history half runs
+    through history.py (ESPN + its cache). When THAT fails the previous
+    dashboard_awards.json and dashboard_players.json are kept untouched --
+    a window-only ladder sneaking in on a bad network day would mislead far
+    more than a stale-but-labelled one. Envelope shape: {"seasons": {label:
+    payload}, "window", "games_by_season", "alltime", "goat",
+    "career_note"} so the sidebar season selector can pick any year."""
     import glob
 
     import awards
+    import history as history_mod
 
     labels = [s for s in dict.fromkeys(seasons_to_try)
               if glob.glob(os.path.join(RAW_DIR, s, "games", "*.json"))]
@@ -255,11 +322,24 @@ def refresh_awards(seasons_to_try: list) -> dict:
             season_payloads.append(payload)
     if not season_payloads:
         return {}
-    career = awards.build_career(season_payloads)
+
+    players = awards.alltime_players()
+    try:
+        hist = history_mod.build(players)
+    except Exception as exc:  # noqa: BLE001 -- collector must remain resumable
+        print(f"  all-history fetch failed ({type(exc).__name__}: {exc}) -- "
+              "keeping the previous awards/players files")
+        return {}
+
+    career = awards.build_career(season_payloads, players=players, history=hist)
+    if not career:
+        return {}
     envelope = {"seasons": {p["season"]: p for p in season_payloads}}
-    envelope.update(career or {})
+    envelope.update(career)
+    envelope["games_by_season"] = _games_by_season()
     path = os.path.join(DATA_DIR, "dashboard_awards.json")
     _write(path, _stamp(envelope, "local"))
+    _write_players(career, hist)
     return envelope
 
 

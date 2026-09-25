@@ -16,9 +16,12 @@ data/raw/
 # Processed data is normally gitignored (regenerates via load_historical.py +
 # features.py against data/raw/), EXCEPT the committed dashboard fallbacks
 # below, which the deployed app reads directly and Streamlit Cloud has no way
-# to regenerate. No personal data -- league-wide stats only.
+# to regenerate, plus history_cache.json -- ESPN career/honours data that
+# history.py would otherwise refetch (~10k requests) on every fresh CI clone.
+# No personal data -- league-wide stats only.
 data/processed/*
 !data/processed/dashboard_leaderboards.json
+!data/processed/history_cache.json
 !data/processed/.gitkeep
 
 # Trained model artifacts: only the model the dashboard actually loads is
