@@ -52,8 +52,9 @@ with st.sidebar:
     options = shared.season_options()
     season = st.selectbox(
         "Season", options,
-        index=0 if options else None,
-        help="Newest season with collected data first.",
+        index=shared.default_season_index(options) if options else None,
+        help="Leads with the newest season that has collected games; every "
+             "year from 2010-11 through the upcoming season is selectable.",
     )
     st.caption(f"Today (UTC): {shared.now_utc():%Y-%m-%d}")
     st.markdown("---")
@@ -101,6 +102,16 @@ if single and naive:
 else:
     kpi_model = "not trained"
     model_help = "Run src/model/train.py to populate this."
+
+# When the sidebar points at the upcoming season, the awards-derived cards
+# fall back to the newest season WITH data -- say so loudly, not in a caption.
+_awards_season = awards_payload.get("season")
+if _awards_season and _awards_season != season:
+    st.warning(
+        f"{season} has no collected games yet — Awards Ladder and the "
+        f"season-scoring-leader card show {_awards_season}, the newest "
+        "season with collected data."
+    )
 
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Games collected", kpi_games)

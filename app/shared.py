@@ -760,20 +760,50 @@ def latest_season_with_data() -> str:
 
 
 def season_options() -> list:
-    """Selectable seasons for the sidebar: every collected/committed season,
-    newest first, plus the current label always available."""
+    """Selectable seasons for the sidebar: every season from the project's
+    first collected year (2010-11) through the current one -- the upcoming
+    2026-27 included -- unioned with whatever the committed files and raw
+    dirs actually carry, newest first. The contiguous range is generated so
+    the full list shows even on a deploy without data/raw/ (Streamlit
+    Cloud), which previously only offered the two committed fallback
+    seasons."""
     labels = set()
-    for name in ("dashboard_schedule.json", "dashboard_standings.json"):
+    for name in ("dashboard_schedule.json", "dashboard_standings.json",
+                 "dashboard_awards.json"):
         payload = _read_fallback(name)
         if payload.get("season"):
             labels.add(payload["season"])
+        for key in (payload.get("seasons") or {}):
+            labels.add(key)
     raw_dir = DATA_DIR / "raw"
     if raw_dir.exists():
         for entry in raw_dir.iterdir():
             if entry.is_dir() and "-" in entry.name and entry.name[:4].isdigit():
                 labels.add(entry.name)
-    labels.add(current_season())
+    current = current_season()
+    if current:
+        labels.add(current)
+    try:
+        last_end = min(int(str(current)[:4]), 2100)
+    except (TypeError, ValueError):
+        last_end = 0
+    for end_year in range(2011, max(last_end, 2010) + 1):
+        labels.add(f"{end_year - 1}-{str(end_year)[2:]}")
     return sorted(labels, reverse=True)
+
+
+def default_season_index(options: list) -> int:
+    """Index of the newest season with COLLECTED games (awards file keys);
+    0 when unknown. The upcoming season stays selectable but never leads
+    the app -- until its games are actually collected, every panel would
+    otherwise open on a fallback."""
+    if not options:
+        return 0
+    payload = _read_fallback("dashboard_awards.json")
+    collected = [s for s in (payload.get("seasons") or {}) if s in options]
+    if collected:
+        return options.index(max(collected))
+    return 0
 
 
 def now_utc() -> datetime:

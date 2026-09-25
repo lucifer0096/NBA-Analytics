@@ -230,3 +230,20 @@ def test_fallback_envelopes_carry_generation_timestamp():
     # At least the refresh-runnable subset should exist once bootstrapped;
     # tolerate a truly fresh clone having none yet.
     assert checked >= 0
+
+
+def test_sidebar_every_year_leads_with_data_and_flags_fallback(offline_espn):
+    """Sidebar offers every season 2010-11 -> upcoming 2026-27, leads with
+    the newest season that HAS collected games (not the empty upcoming one),
+    and selecting the upcoming season raises a loud banner instead of
+    silently showing another year's data."""
+    at = _render("app/app.py", offline_espn)
+    box = at.selectbox[0]
+    labels = list(box.options)
+    assert "2010-11" in labels and "2025-26" in labels and "2026-27" in labels
+    assert box.value == "2025-26"
+    assert len(at.warning) == 0
+    box.select("2026-27").run()
+    warns = " ".join(str(w.value) for w in at.warning)
+    assert "2026-27 has no collected games yet" in warns
+    assert "2025-26" in warns

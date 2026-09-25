@@ -34,8 +34,10 @@ with st.sidebar:
     options = shared.season_options()
     season = st.selectbox(
         "Season", options,
-        index=0 if options else None,
-        help="Newest season with collected data first; drives Court View.",
+        index=shared.default_season_index(options) if options else None,
+        help="Leads with the newest season that has collected games; every "
+             "year from 2010-11 through the upcoming season is selectable. "
+             "Drives Court View.",
     )
     st.caption(f"Today (UTC): {shared.now_utc():%Y-%m-%d}")
 
@@ -163,6 +165,12 @@ with tabs[1]:
 with tabs[2]:
     awards_payload, awards_note = shared.load_awards(season)
     st.caption(f"Source: {awards_note}")
+    _shown = awards_payload.get("season")
+    if _shown and _shown != season:
+        st.warning(
+            f"{season} has no collected games yet — Court View shows "
+            f"{_shown}, the newest season with collected data."
+        )
     if not awards_payload.get("leaders"):
         st.info("No committed leader data yet — run "
                 "`python src/collector/refresh_dashboard_fallbacks.py` "
