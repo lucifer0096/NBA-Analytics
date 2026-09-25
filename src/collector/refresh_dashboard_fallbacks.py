@@ -152,20 +152,65 @@ def refresh_standings(seasons_to_try: list) -> dict:
 
 
 def refresh_schedule(season: str) -> dict:
-    """Current season schedule from the collector's own schedule.csv (no API
-    call -- the daily workflow runs snapshot.py first, so this file is fresh
-    exactly when it matters)."""
+    """Schedule envelope for EVERY collected season -- the Schedule tab must
+    show final scores for previous seasons too, and data/raw/ is gitignored,
+    so this committed file is the deployed app's only offline source for them.
+
+    All raw schedule.csvs are merged under "seasons". Seasons already in the
+    committed envelope but absent locally are PRESERVED (the CI checkout has
+    raw/ for the current season only -- dropping them would wipe history on
+    the first daily run). Scores are normalised "94.0" -> "94" so the tab
+    doesn't print floats. The legacy top-level "season"/"games" keys keep
+    pointing at `season` for any reader of the old single-season shape."""
     import csv
 
-    path_in = os.path.join(RAW_DIR, season, "schedule.csv")
-    if not os.path.exists(path_in):
-        print(f"  no schedule.csv for {season} yet -- skipping schedule fallback")
-        return {}
-    with open(path_in, newline="", encoding="utf-8") as f:
-        games = list(csv.DictReader(f))
     path = os.path.join(DATA_DIR, "dashboard_schedule.json")
-    _write(path, _stamp({"season": season, "games": games}, "local"))
-    return {"season": season, "games": games}
+    seasons: dict = {}
+    if os.path.exists(path):
+        try:
+            with open(path, encoding="utf-8") as f:
+                seasons = dict(json.load(f).get("seasons") or {})
+        except (OSError, ValueError):
+            seasons = {}
+    found = False
+    for name in _available_raw_seasons():
+        csv_path = os.path.join(RAW_DIR, name, "schedule.csv")
+        if not os.path.isfile(csv_path):
+            continue
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        if not rows:
+            continue  # header-only file must not erase a committed season
+        for row in rows:
+            row["home_score"] = _clean_score(row.get("home_score"))
+            row["away_score"] = _clean_score(row.get("away_score"))
+        seasons[name] = rows
+        found = True
+    if not found and not seasons:
+        print("  no schedule.csv anywhere -- skipping schedule fallback")
+        return {}
+    current = season if season in seasons else max(seasons)
+    payload = _stamp({"season": current, "games": seasons.get(current) or [],
+                      "seasons": seasons}, "local")
+    # Largest dashboard file (~20k games): compact JSON like
+    # dashboard_players.json, not the indent=1 default.
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(payload, f, separators=(",", ":"))
+    print(f"  wrote {path} ({len(seasons)} seasons, "
+          f"{sum(len(g) for g in seasons.values())} games)")
+    return payload
+
+
+def _clean_score(value) -> str:
+    """Schedule CSVs store floats ('94.0'); the tab prints '94'. Empty
+    (scheduled games) stays empty."""
+    raw = (value or "").strip()
+    if not raw:
+        return ""
+    try:
+        return str(int(float(raw)))
+    except ValueError:
+        return raw
 
 
 def refresh_positions() -> dict:

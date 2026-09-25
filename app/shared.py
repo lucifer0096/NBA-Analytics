@@ -586,37 +586,56 @@ def load_teams() -> tuple:
 
 @st.cache_data(ttl=60, show_spinner=False)
 def load_standings(season: str) -> tuple:
-    """(standings DataFrame, note) for one season label like '2025-26'."""
+    """(standings DataFrame, note) for one season label like '2025-26'.
+
+    Honest empty states: a season the live API answers with all-zero rows
+    (not started yet) or a fetch failure over a committed copy that carries a
+    DIFFERENT season returns NO rows -- showing another season's table under
+    this header is exactly the kind of quiet substitution the app refuses."""
+    live_rows = None
     try:
         import parsing
 
         raw = espn_api.get_standings(espn_api.season_param(season))
         rows = parsing.parse_standings(raw)
-        if rows and standings_have_results(pd.DataFrame(rows)):
-            return (pd.DataFrame(rows), data_age_note({}, True))
+        if rows:
+            live_rows = pd.DataFrame(rows)
+        if live_rows is not None and standings_have_results(live_rows):
+            return (live_rows, data_age_note({}, True))
     except Exception:
         pass
     payload = _read_fallback("dashboard_standings.json")
     rows = payload.get("standings", [])
-    note = data_age_note(payload, False)
-    if rows and payload.get("season") != season:
-        # The committed fallback carries ONE season (the newest with data --
-        # e.g. 2025-26 while 2026-27 hasn't tipped off). Show it rather than
-        # an empty tab, but SAY which season it is, so the header can't
-        # misrepresent 2025-26 numbers as the requested season's.
-        note = (f"{note} — showing {payload.get('season')} standings "
-                f"({season} has none yet)")
-    elif rows and not standings_have_results(pd.DataFrame(rows)):
+    if rows and payload.get("season") == season:
+        committed = pd.DataFrame(rows)
+        if standings_have_results(committed):
+            return (committed, data_age_note(payload, False))
         return (pd.DataFrame(), f"{season} standings not started yet")
-    return (pd.DataFrame(rows), note)
+    if live_rows is not None:
+        # Live answered structurally but every record is 0-0: not tipped off.
+        return (pd.DataFrame(), f"{season} standings not started yet")
+    return (pd.DataFrame(),
+            f"Live standings fetch failed and the committed copy is "
+            f"{payload.get('season') or 'empty'} — no table shown for "
+            f"{season}")
 
 
 @st.cache_data(ttl=300, show_spinner=False)
 def load_schedule(season: str) -> tuple:
-    """(games DataFrame, note). Local-first: the schedule is collector output
-    refreshed daily (30 live calls would be too slow for a page render), with
-    live TODAY games layered on top by load_scoreboard()."""
+    """(games DataFrame, note). Local-first: the committed envelope carries
+    EVERY collected season under "seasons" (final scores included -- the
+    Schedule tab needs previous seasons' results too), refreshed daily by the
+    collector. The legacy single-season file (top-level "games") still loads
+    when it matches the requested season; anything else is an honest empty."""
     payload = _read_fallback("dashboard_schedule.json")
+    seasons = payload.get("seasons")
+    if seasons:
+        rows = seasons.get(season)
+        if rows:
+            return (pd.DataFrame(rows), data_age_note(payload, False))
+        return (pd.DataFrame(),
+                f"{season} schedule absent — the committed file covers "
+                f"{len(seasons)} seasons")
     games = payload.get("games", [])
     if games and payload.get("season") == season:
         return (pd.DataFrame(games), data_age_note(payload, False))
