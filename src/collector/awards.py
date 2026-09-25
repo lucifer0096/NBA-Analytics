@@ -175,20 +175,24 @@ RACE_FORMULAS = {
 }
 
 # The GOAT formula is assembled from the very constants the math runs with,
-# so the caption can never drift from the computation.
+# so the caption can never drift from the computation. Every one of the 20
+# official-honour weights is printed verbatim (test_goat_* asserts each
+# fragment), because a resume component you can't audit is marketing.
 GOAT_FORMULA = (
     "GOAT score = "
     f"{GOAT_WEIGHTS['production']:.0%} career production ("
     + ", ".join(f"{GOAT_PROD_LABELS[s]} {w:.0%}"
                 for s, w in GOAT_PRODUCTION_WEIGHTS.items())
-    + " of the component, each career total vs the window's best) + "
-    f"{GOAT_WEIGHTS['awards']:.0%} award-race resume (top-"
-    f"{RACE_SIZE} finishes are worth {RACE_SIZE + 1}-rank points, race "
-    + ", ".join(f"{RACE_LABELS[k].split()[0]} ×{w:.1f}"
-                for k, w in GOAT_AWARD_WEIGHTS.items())
+    + " of the component, each career total vs the best career among "
+    "qualified players) + "
+    f"{GOAT_WEIGHTS['honours']:.0%} official NBA honours (points per win: "
+    + ", ".join(f"{GOAT_HONOUR_LABELS[name]} ×{weight:g}"
+                for name, weight in GOAT_HONOURS_WEIGHTS.items())
     + f") + {GOAT_WEIGHTS['peak']:.0%} peak (best season's per-game impact), "
-    f"each component 0-100 vs the best player in the window; requires "
-    f"≥{GOAT_MIN_CAREER_GP} career games in the collected seasons."
+    "each component 0-100 vs the best qualified player; a component with no "
+    "trusted data for a player (impossible-zero career totals, untrusted "
+    "peak, no honours input) is dropped for him and the remaining weights "
+    f"rescaled; requires ≥{GOAT_MIN_CAREER_GP} career games."
 )
 
 
