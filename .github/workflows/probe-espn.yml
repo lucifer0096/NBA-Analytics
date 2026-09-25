@@ -1,0 +1,50 @@
+name: ESPN probe
+
+# Triage tool for the daily collector's runner-side 403s: run this from the
+# Actions tab and read the log to see which ESPN host + header combination a
+# GitHub-hosted runner can actually reach. The fix belongs in espn_api.py's
+# _HEADERS/_HOSTS, so the answer here drives that one place.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe ESPN endpoints with curl
+        run: |
+          UA="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+          probe() {
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 "${@:3}" "$2" || echo "ERR")
+            echo "$1 -> $code"
+          }
+          probe "site.api/default-ua"            "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams"
+          probe "site.api/browser-ua"             "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams" -A "$UA" -H "Accept: application/json" -H "Referer: https://www.nba.com/"
+          probe "site.api/no-ua"                  "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams" -A ""
+          probe "site.web.api/browser-ua"         "https://site.web.api.espn.com/apis/site/v2/sports/basketball/nba/teams" -A "$UA" -H "Accept: application/json" -H "Referer: https://www.nba.com/"
+          probe "site.web.api/default-ua"         "https://site.web.api.espn.com/apis/site/v2/sports/basketball/nba/teams"
+          probe "sports.core.api/browser-ua"      "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/teams" -A "$UA" -H "Accept: application/json" -H "Referer: https://www.nba.com/"
+          probe "site.api/http2"                  "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams" -A "$UA" --http2
+          probe "site.api/full-browser"           "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams" -A "$UA" -H "Accept: application/json,text/plain,*/*" -H "Accept-Language: en-US,en;q=0.9" -H "Referer: https://www.nba.com/" -H "Sec-Fetch-Dest: empty" -H "Sec-Fetch-Mode: cors" -H "Sec-Fetch-Site: cross-site"
+      - name: Probe ESPN with the project's Python client
+        run: |
+          python - <<'PY'
+          import sys
+          sys.path.insert(0, "src/collector")
+          import espn_api
+          for name, fn in [
+              ("py/site.api.get_teams", lambda: espn_api.get_teams()),
+              ("py/sports.core raw", lambda: espn_api._get_json(
+                  "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/teams")),
+              ("py/site.web raw", lambda: espn_api._get_json(
+                  "https://site.web.api.espn.com/apis/site/v2/sports/basketball/nba/teams")),
+          ]:
+              try:
+                  data = fn()
+                  print(f"{name} -> 200 ({len(str(data))} chars)")
+              except Exception as exc:  # noqa: BLE001 -- probe output
+                  print(f"{name} -> {type(exc).__name__}: {exc}")
+          PY
