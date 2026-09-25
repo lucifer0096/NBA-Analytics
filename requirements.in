@@ -21,3 +21,7 @@ streamlit>=1.63
 pytest>=8.0
 # Parquet engine -- pandas reads/writes every processed dataset through it.
 pyarrow>=15.0
+# Player Profile career-progression chart (shared.progression_figure) --
+# st.plotly_chart needs the package itself, plotly isn't a streamlit
+# transitive dependency.
+plotly>=7.0

@@ -134,11 +134,12 @@ def test_home_goat_tab_shows_ladder_and_verbatim_formula(offline_espn):
     assert str(goat_rows[0].get("player_name") or "") in text
 
 
-def test_load_awards_picks_requested_or_nearest_season(monkeypatch, tmp_path):
-    """The sidebar season must resolve honestly: exact match when collected,
-    the newest season at-or-before it otherwise (2026-27 pre-tip-off ->
-    2025-26), the earliest season before the window -- each fallback SAYING
-    which season it is actually showing."""
+def test_load_awards_honest_empty_for_uncollected_season(monkeypatch,
+                                                         tmp_path):
+    """The sidebar season must resolve honestly: exact match when collected;
+    a season with NO collected games (2026-27 pre-tip-off, or anything before
+    the window) gets an EMPTY payload for that exact season and a note that
+    says so -- never another season's races substituted under its label."""
     import shared as shared_module
 
     envelope = {
@@ -155,16 +156,18 @@ def test_load_awards_picks_requested_or_nearest_season(monkeypatch, tmp_path):
     try:
         data, note = shared_module.load_awards("2025-26")
         assert data.get("season") == "2025-26"
-        assert "showing" not in note
+        assert data.get("races")
 
         data, note = shared_module.load_awards("2026-27")
-        assert data.get("season") == "2025-26"
-        assert "showing 2025-26" in note
+        assert data.get("season") == "2026-27"
+        assert not data.get("races") and not data.get("leaders")
         assert "2026-27 has no collected games yet" in note
+        assert "2025-26" in note  # says where the newest data IS, without showing it
 
         data, note = shared_module.load_awards("2014-15")
-        assert data.get("season") == "2015-16"
-        assert "showing 2015-16" in note
+        assert data.get("season") == "2014-15"
+        assert not data.get("races")
+        assert "2014-15 has no collected games yet" in note
     finally:
         shared_module.load_awards.clear()
 
@@ -232,18 +235,20 @@ def test_fallback_envelopes_carry_generation_timestamp():
     assert checked >= 0
 
 
-def test_sidebar_every_year_leads_with_data_and_flags_fallback(offline_espn):
-    """Sidebar offers every season 2010-11 -> upcoming 2026-27, leads with
-    the newest season that HAS collected games (not the empty upcoming one),
-    and selecting the upcoming season raises a loud banner instead of
-    silently showing another year's data."""
+def test_sidebar_every_year_leads_with_data_and_honest_empty(offline_espn):
+    """Sidebar offers every season 2010-11 -> upcoming 2026-27 and leads with
+    the newest season that HAS collected games. Selecting the not-yet-started
+    2026-27 shows honest empty states: no loud fallback banner (the old
+    show-2025-26-with-a-warning contract is gone) and the Awards note says
+    the season has no collected games -- never another year's races."""
     at = _render("app/app.py", offline_espn)
     box = at.selectbox[0]
     labels = list(box.options)
     assert "2010-11" in labels and "2025-26" in labels and "2026-27" in labels
     assert box.value == "2025-26"
-    assert len(at.warning) == 0
     box.select("2026-27").run()
-    warns = " ".join(str(w.value) for w in at.warning)
-    assert "2026-27 has no collected games yet" in warns
-    assert "2025-26" in warns
+    assert not at.exception
+    assert len(at.warning) == 0
+    text = f"{_markdown_text(at)} " + " ".join(
+        str(c.value) for c in at.caption)
+    assert "2026-27 has no collected games yet" in text

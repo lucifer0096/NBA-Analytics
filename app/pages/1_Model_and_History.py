@@ -40,6 +40,8 @@ with st.sidebar:
              "Drives Court View.",
     )
     st.caption(f"Today (UTC): {shared.now_utc():%Y-%m-%d}")
+    st.markdown("---")
+    shared.sidebar_games(shared.load_games_by_season(), options)
 
 tabs = st.tabs(["Model Performance", "Season Leaders", "Court View"])
 

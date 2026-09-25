@@ -18,6 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import pandas as pd
+import plotly.graph_objects as go
 import streamlit as st
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -488,6 +489,92 @@ def goat_row_html(row: dict) -> str:
             f'</div>'
             f'<div class="na-rscore">{row.get("score", 0)}</div>'
             f'</div>')
+
+
+def profile_card_html(p: dict) -> str:
+    """Player Profile header card: large headshot (team-logo CSS fallback
+    behind it), name + team logo, career line, official-honour tally with
+    points, championship count and -- if he made the ladder -- GOAT rank.
+
+    Single logical line -- see race_row_html's docstring."""
+    name = html.escape(str(p.get("player_name") or "Unknown"))
+    team = str(p.get("team_abbrev") or "")
+    rings = p.get("championships")
+    rings_text = "🏆 —" if rings is None else f"🏆×{int(rings)}"
+    seasons = p.get("seasons")
+    seasons_text = "—" if seasons is None else str(int(seasons))
+    debut_text = f" · debut {p['debut']}" if p.get("debut") else ""
+    honours = p.get("honours") or {}
+    honour_count = int(sum(honours.values()))
+    honours_text = (f"{honour_count} official honours "
+                    f"({p.get('honour_points', 0)} pts)" if honour_count
+                    else "no official honours")
+    rank = p.get("goat_rank")
+    goat_text = (f" · GOAT #{int(rank)} ({p.get('goat_score')})"
+                 if rank else "")
+    meta = (f"{seasons_text} seasons · {p.get('gp', 0):,} GP · "
+            f"{p.get('pts', 0):,} PTS · {p.get('reb', 0):,} REB · "
+            f"{p.get('ast', 0):,} AST{debut_text} · {honours_text} · "
+            f"{rings_text}{goat_text}")
+    return (f'<div class="na-race-row">'
+            f'{headshot_html(p.get("player_id"), team, 64)}'
+            f'<div class="na-rbody">'
+            f'<div class="na-rname">{name}{team_logo_html(team, 18)}</div>'
+            f'<div class="na-rmeta">{meta}</div>'
+            f'</div>'
+            f'</div>')
+
+
+# Career-progression metrics -> display labels (keys are seasons_log fields;
+# STAT_LABELS keys differ for the % metrics and lack minutes, so the chart
+# keeps its own map rather than borrowing a mismatched one).
+PROGRESSION_METRICS = {"pts": "Points", "reb": "Rebounds", "ast": "Assists",
+                       "stl": "Steals", "blk": "Blocks", "min": "Minutes",
+                       "fg_pct": "FG%", "fg3_pct": "3P%"}
+PROGRESSION_PCT = ("fg_pct", "fg3_pct")
+
+
+def progression_figure(series: dict, metric: str, mode: str) -> go.Figure:
+    """Interactive career-progression chart: one line per player across his
+    seasons (x = season label, y = the chosen metric), hover carrying the
+    season, team, GP and exact value, legend toggling players on/off, zoom/
+    pan native to plotly.
+
+    `series` maps player name -> seasons_log rows (history.py's per-season
+    ESPN averages); `mode` is "Per game" or "Totals" -- totals multiply the
+    average by that season's GP (seasons without GP are skipped honestly);
+    % metrics ignore the toggle (percentages don't sum)."""
+    fig = go.Figure()
+    pct = metric in PROGRESSION_PCT
+    for name, rows in series.items():
+        xs, ys, hover = [], [], []
+        for r in rows or []:
+            value = r.get(metric)
+            if value is None:
+                continue
+            if mode == "Totals" and not pct:
+                gp = r.get("gp")
+                if not gp:
+                    continue
+                value = round(value * gp)
+            xs.append(r.get("season"))
+            ys.append(value)
+            hover.append(f"{r.get('team') or ''} · {r.get('gp', 0)} GP")
+        if not xs:
+            continue
+        fmt = "%{y:.1f}%" if pct else "%{y:,.1f}"
+        fig.add_trace(go.Scatter(
+            x=xs, y=ys, mode="lines+markers", name=name, text=hover,
+            hovertemplate=(f"%{{x}}<br>%{{text}}<br>{fmt}"
+                           f"<extra>{html.escape(name)}</extra>")))
+    label = PROGRESSION_METRICS.get(metric, metric)
+    ytitle = label if pct else f"{label} ({'totals' if mode == 'Totals' else 'per game'})"
+    fig.update_layout(
+        xaxis_title="Season", yaxis_title=ytitle, hovermode="x unified",
+        margin=dict(l=10, r=10, t=24, b=10), height=430,
+        legend_title_text="")
+    fig.update_xaxes(tickangle=-45)
+    return fig
 
 
 def render_court(leaders: list, positions, stat: str, min_games: int,

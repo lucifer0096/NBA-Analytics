@@ -2,27 +2,31 @@
 
 Run: streamlit run app/app.py
 
-Five tabs: Standings and Schedule are live-first from ESPN's free APIs with
-committed offline fallbacks (see shared.py for the contract), while the rest
-is computed locally from the collected box scores and follows the sidebar's
-season selector (every collected season, 2010-11 -> present):
+Three tabs: Standings and Schedule are live-first from ESPN's free APIs with
+committed offline fallbacks (see shared.py for the contract), while the
+Awards Ladder is computed locally from the collected box scores and follows
+the sidebar's season selector (every collected season, 2010-11 -> upcoming):
 
-- **Standings**     -- conference tables for the selected season
-- **Schedule**      -- today's games live (scoreboard) + the selected season's
-                       full schedule/results from the daily collector
-- **Awards Ladder** -- MVP / DPOY / 6th Man / MIP races plus per-game stat
-                       leaders incl. 3PM and shooting splits
-                       (src/collector/awards.py, committed as
-                       data/dashboard_awards.json): transparent homegrown
-                       metrics, explicitly NOT official NBA voting -- every
-                       race prints its exact formula as its caption
-- **All-Time Stats** -- career totals across ALL collected seasons with the
-                       full parameter set (FG/3P/FT splits, FG%/3P%/eFG%/TS%)
-- **GOAT Rankings**  -- a transparent career production + award-race resume +
-                       peak composite, formula printed verbatim on screen
+- **Standings**        -- conference tables for the selected season; a
+                          season that hasn't started shows an honest empty
+                          state, never another season's table under its label
+- **Schedule & Scores** -- today's games live (scoreboard) + the selected
+                          season's schedule from the committed MULTI-SEASON
+                          envelope: every completed game with its final score
+                          (finished seasons render the full table)
+- **Awards Ladder**    -- MVP / DPOY / 6th Man / MIP races plus per-game stat
+                          leaders incl. 3PM and shooting splits
+                          (src/collector/awards.py, committed as
+                          data/dashboard_awards.json): transparent homegrown
+                          metrics, explicitly NOT official NBA voting -- every
+                          race prints its exact formula as its caption; a
+                          season with no collected games shows an empty state
 
-The Model & History page (pages/1_Model_and_History.py) carries metrics,
-season leaders and the Court View.
+Left-nav pages carry the rest:
+- pages/1_Model_and_History.py -- validation metrics, season leaders, Court View
+- pages/2_All-Time_Stats.py    -- career boards across the collected window
+- pages/3_GOAT_Rankings.py     -- the all-NBA-history GOAT ladder
+- pages/4_Player_Profile.py    -- careers, official accolades, progression chart
 
 Presentation: shared.inject_css() owns the theme CSS (accent-gradient title,
 hero strip, metric cards, accent tabs) -- all CSS-only, built on Streamlit's
@@ -44,7 +48,7 @@ shared.inject_css()
 st.title("NBA Analytics")
 
 # ---------------------------------------------------------------------------
-# Sidebar: season selector + honest freshness everywhere
+# Sidebar: season selector + per-season inventory + honest freshness
 # ---------------------------------------------------------------------------
 
 with st.sidebar:
@@ -58,32 +62,48 @@ with st.sidebar:
     )
     st.caption(f"Today (UTC): {shared.now_utc():%Y-%m-%d}")
     st.markdown("---")
-    st.caption(
-        "Live data: [ESPN public APIs](https://site.api.espn.com) — no auth, "
-        "no key. Offline copies refresh daily via GitHub Actions."
-    )
+    shared.sidebar_games(shared.load_games_by_season(), options)
 
 teams, teams_note = shared.load_teams()
 
 # ---------------------------------------------------------------------------
-# KPI strip: four glass cards giving the page instant context
+# KPI strip: three glass cards scoped to the SELECTED season
 # ---------------------------------------------------------------------------
 
 games, sched_note = shared.load_schedule(season)
 awards_payload, awards_note = shared.load_awards(season)
-metrics = shared.load_metrics()
+games_counts = shared.load_games_by_season()
 
 if not games.empty:
-    finals = games[games["status"] == "STATUS_FINAL"]
-    upcoming = games[games["status"] != "STATUS_FINAL"].sort_values("date")
-    kpi_games = f"{len(finals):,} / {len(games):,}"
-    kpi_next = str(upcoming.iloc[0]["date"])[:10] if not upcoming.empty else "—"
+    finals = games[games["status"] == "STATUS_FINAL"].sort_values("date")
+    rest = games[games["status"] != "STATUS_FINAL"]
+    _today = f"{shared.now_utc():%Y-%m-%d}"
+    upcoming = rest[rest["date"].astype(str).str[:10] >= _today].sort_values(
+        "date")
+    stale = rest[rest["date"].astype(str).str[:10] < _today]  # postponed etc.
 else:
-    kpi_next = "—"
+    finals = upcoming = stale = games  # empty frames (no columns to touch)
+
+# Games collected: the box-score inventory per season (0 for a season that
+# hasn't started -- an honest number, not a fallback to another year's).
+if season in games_counts:
+    kpi_games = f"{int(games_counts[season] or 0):,}"
+    games_help = ("Box-score files collected for this season -- the sidebar "
+                  "inventory lists every year.")
+elif not finals.empty:
+    kpi_games = f"{len(finals):,}"
+    games_help = "Final games in the committed schedule (inventory absent)."
+else:
     kpi_games = "—"
+    games_help = "No games collected for this season yet."
+
+# Next tip-off exists only for seasons with unplayed games left.
+kpi_next = str(upcoming.iloc[0]["date"])[:10] if not upcoming.empty else "—"
+next_help = ("First unplayed game of this season's schedule."
+             if not upcoming.empty else
+             "No unplayed games left in this season.")
 
 top_scorer = "—"
-scoring_help = "Run refresh_dashboard_fallbacks.py where box scores exist."
 pts_leaders = (awards_payload.get("leaders") or {}).get("pts") or []
 if pts_leaders:
     best = pts_leaders[0]
@@ -93,36 +113,20 @@ if pts_leaders:
         f"({awards_payload.get('season', '—')}) — computed from collected box "
         "scores, a homegrown metric rather than official NBA stats."
     )
-
-single = metrics.get("single_stage", {})
-naive = metrics.get("naive_baseline", {})
-if single and naive:
-    kpi_model = f"{single.get('mae', float('nan')):.3f} MAE"
-    model_help = f"Naive baseline: {naive.get('mae', float('nan')):.3f} on {metrics.get('validation_season')}"
+elif not int(games_counts.get(season) or 0):
+    scoring_help = (f"{season} has no collected games yet — the scoring "
+                    "leader appears once the season starts.")
 else:
-    kpi_model = "not trained"
-    model_help = "Run src/model/train.py to populate this."
+    scoring_help = "Run refresh_dashboard_fallbacks.py where box scores exist."
 
-# When the sidebar points at the upcoming season, the awards-derived cards
-# fall back to the newest season WITH data -- say so loudly, not in a caption.
-_awards_season = awards_payload.get("season")
-if _awards_season and _awards_season != season:
-    st.warning(
-        f"{season} has no collected games yet — Awards Ladder and the "
-        f"season-scoring-leader card show {_awards_season}, the newest "
-        "season with collected data."
-    )
-
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Games collected", kpi_games)
-col2.metric("Next tip-off", kpi_next)
+col1, col2, col3 = st.columns(3)
+col1.metric("Games collected", kpi_games, help=games_help)
+col2.metric("Next tip-off", kpi_next, help=next_help)
 col3.metric("Season scoring leader", top_scorer, help=scoring_help)
-col4.metric("Model (validation)", kpi_model, help=model_help)
 
-shared.hero(season, f"Teams source: {teams_note}", extra="ESPN · no auth")
+shared.hero(season, f"Teams source: {teams_note}")
 
-tabs = st.tabs(["Standings", "Schedule & Scores", "Awards Ladder",
-                "All-Time Stats", "GOAT Rankings"])
+tabs = st.tabs(["Standings", "Schedule & Scores", "Awards Ladder"])
 
 # ---------------------------------------------------------------------------
 # Standings
@@ -183,7 +187,7 @@ with tabs[0]:
         st.caption("🟢 top-6 (playoff) · 🟡 play-in (7–10)")
 
 # ---------------------------------------------------------------------------
-# Schedule & Scores
+# Schedule & Scores: today live + the selected season's results with scores
 # ---------------------------------------------------------------------------
 
 with tabs[1]:
@@ -211,27 +215,28 @@ with tabs[1]:
                 f"(`python src/collector/snapshot.py --season {season}`).")
     else:
         st.caption(f"Source: {sched_note}")
-        frame = games.copy()
-        finals = frame[frame["status"] == "STATUS_FINAL"].copy()
-        upcoming = frame[frame["status"] != "STATUS_FINAL"].sort_values("date")
-
-        if not finals.empty:
-            recent = finals.sort_values("date", ascending=False).head(15).copy()
-            recent["day"] = recent["date"].astype(str).str[:10]
-            recent["matchup"] = (
-                recent["away_abbrev"] + " @ " + recent["home_abbrev"]
-                + "  " + recent["away_score"].astype(str)
-                + ":" + recent["home_score"].astype(str)
-            )
-            st.markdown("**Most recent results**")
-            st.dataframe(
-                recent[["day", "matchup"]].rename(
-                    columns={"day": "Date", "matchup": "Matchup (away : home)"}
-                ),
-                width="stretch", hide_index=True,
-            )
         if not upcoming.empty:
-            nxt = upcoming.head(15).copy()
+            # Season in progress (or not started): scores of what's played
+            # plus the next fixtures. Historical leftovers (postponed rows
+            # never replayed) are counted in the caption, not listed.
+            if not finals.empty:
+                recent = finals.sort_values(
+                    "date", ascending=False).head(15).copy()
+                recent["day"] = recent["date"].astype(str).str[:10]
+                recent["matchup"] = (
+                    recent["away_abbrev"] + " @ " + recent["home_abbrev"]
+                    + "  " + recent["away_score"].astype(str)
+                    + ":" + recent["home_score"].astype(str)
+                )
+                st.markdown("**Most recent results**")
+                st.dataframe(
+                    recent[["day", "matchup"]].rename(
+                        columns={"day": "Date",
+                                 "matchup": "Matchup (away : home)"}
+                    ),
+                    width="stretch", hide_index=True,
+                )
+            nxt = upcoming.head(25).copy()
             nxt["day"] = nxt["date"].astype(str).str[:10]
             nxt["matchup"] = nxt["away_abbrev"] + " @ " + nxt["home_abbrev"]
             st.markdown("**Upcoming**")
@@ -241,10 +246,33 @@ with tabs[1]:
                 ),
                 width="stretch", hide_index=True,
             )
-        st.caption(
-            f"{len(finals):,} final · {len(upcoming):,} upcoming "
-            f"({frame['game_id'].nunique():,} total)"
-        )
+            extra = (f" · {len(stale):,} postponed/canceled rows"
+                     if not stale.empty else "")
+            st.caption(
+                f"{len(finals):,} final · {len(upcoming):,} upcoming "
+                f"({games['game_id'].nunique():,} total){extra} — showing the "
+                "15 most recent results and the next 25 fixtures."
+            )
+        else:
+            # Finished season: the full schedule, every completed game with
+            # its score (chronological; the dataframe header sorts too).
+            table = finals.copy()
+            table["Date"] = table["date"].astype(str).str[:10]
+            table = table.rename(columns={
+                "away_abbrev": "Away", "away_score": "Away pts",
+                "home_abbrev": "Home", "home_score": "Home pts",
+            })
+            st.markdown("**Final scores (every completed game)**")
+            st.dataframe(
+                table[["Date", "Away", "Away pts", "Home", "Home pts"]],
+                width="stretch", hide_index=True,
+            )
+            extra = (f" · {len(stale):,} postponed/canceled rows excluded"
+                     if not stale.empty else "")
+            st.caption(
+                f"{len(finals):,} games, all final ({season} complete)"
+                f"{extra} — chronological; click a column header to sort."
+            )
 
 # ---------------------------------------------------------------------------
 # Awards Ladder: MVP / DPOY / 6th Man / MIP races + season stat leaders
@@ -253,11 +281,17 @@ with tabs[1]:
 with tabs[2]:
     st.caption(f"Source: {awards_note}")
     if not awards_payload.get("races"):
-        st.info(
-            "No award data yet — the races are computed from collected box "
-            "scores (`python src/collector/refresh_dashboard_fallbacks.py`) "
-            "and committed as data/dashboard_awards.json."
-        )
+        if int(games_counts.get(season) or 0):
+            st.info(
+                "No award data yet — the races are computed from collected box "
+                "scores (`python src/collector/refresh_dashboard_fallbacks.py`) "
+                "and committed as data/dashboard_awards.json."
+            )
+        else:
+            st.info(
+                f"{season} has no collected games yet — the races and stat "
+                "leaders appear once the season starts."
+            )
     else:
         st.caption(
             "Homegrown transparent metrics — not official NBA voting. Each "
@@ -304,119 +338,30 @@ with tabs[2]:
         leaders_by_stat = awards_payload.get("leaders") or {}
         stat_keys = [k for k in awards.STAT_CATEGORIES
                      if k in leaders_by_stat] or list(leaders_by_stat)
-        stat = st.radio(
-            "Category", stat_keys, horizontal=True, key="awards_stat_cat",
-            format_func=lambda k: (f"{awards.STAT_LABELS.get(k, k)} "
-                                   f"({awards.STAT_ABBR.get(k, k)})"),
-        )
-        stat_rows = leaders_by_stat.get(stat) or []
-        if not stat_rows:
+        if not stat_keys:
             st.caption(
-                f"No qualified {awards.STAT_LABELS.get(stat, stat).lower()} "
-                f"leaders yet — needs ≥{awards_payload.get('min_games', '?')} "
-                "GP."
-            )
-        for row in stat_rows:
-            st.markdown(shared.leader_row_html(row, stat),
-                        unsafe_allow_html=True)
-        st.caption(
-            f"Per-game rate (the fair cross-pace comparison) among players "
-            f"with ≥{awards_payload.get('min_games', '?')} GP · "
-            f"{awards_payload.get('season', '—')}. Totals shown for context; "
-            "FG/3P splits + FG% come straight from the collected box scores."
-        )
-
-# ---------------------------------------------------------------------------
-# All-Time Stats: career totals across every collected season (2010-11 ->)
-# ---------------------------------------------------------------------------
-
-with tabs[3]:
-    alltime, _, window, career_note = shared.load_awards_career()
-    st.caption(f"Source: {career_note}")
-    career_leaders = alltime.get("leaders") or {}
-    if not career_leaders:
-        st.info("No all-time data yet — the career boards are computed from "
-                "collected box scores (`python src/collector/"
-                "refresh_dashboard_fallbacks.py`) into data/dashboard_awards.json.")
-    else:
-        st.caption(
-            f"Career totals across {window.get('seasons', 0)} collected "
-            f"seasons ({window.get('first', '—')} → "
-            f"{window.get('last', '—')}) — the collector starts at 2010-11, "
-            "so this is all-time WITHIN that window, not full NBA history. "
-            f"Qualified at ≥{awards.ALLTIME_MIN_GP} career GP; % boards "
-            "additionally need ≥5 FGA/g (3P ≥2 3PA/g, FT ≥1 FTA/g)."
-        )
-        stat_keys = [k for k in awards.ALLTIME_CATEGORIES
-                     if k in career_leaders] or list(career_leaders)
-        stat = st.radio(
-            "Rank by", stat_keys, horizontal=True, key="alltime_stat_cat",
-            format_func=lambda k: (f"{awards.STAT_LABELS.get(k, k)} "
-                                   f"({awards.STAT_ABBR.get(k, k)})"),
-        )
-        frame = pd.DataFrame(career_leaders.get(stat) or [])
-        if frame.empty:
-            st.caption(
-                f"No qualified {awards.STAT_LABELS.get(stat, stat).lower()} "
-                "leaders in the collected window."
+                f"No qualified leaders yet — needs ≥"
+                f"{awards_payload.get('min_games', '?')} GP."
             )
         else:
-            for col in ("fgp", "fg3p", "ftp", "efg", "ts"):
-                frame[col] = pd.to_numeric(frame[col], errors="coerce")
-            frame["FG"] = (frame["fgm"].astype(int).astype(str) + "-"
-                           + frame["fga"].astype(int).astype(str))
-            frame["3P"] = (frame["fg3m"].astype(int).astype(str) + "-"
-                           + frame["fg3a"].astype(int).astype(str))
-            frame["FT"] = (frame["ftm"].astype(int).astype(str) + "-"
-                           + frame["fta"].astype(int).astype(str))
-            display = frame.rename(columns={
-                "rank": "", "player_name": "Player", "team_abbrev": "Team",
-                "seasons": "Seas", "gp": "GP", "minutes": "MIN",
-                "pts": "PTS", "reb": "REB", "oreb": "ORB", "dreb": "DREB",
-                "ast": "AST", "stl": "STL", "blk": "BLK", "to": "TO",
-                "fgp": "FG%", "fg3p": "3P%", "ftp": "FT%",
-                "efg": "eFG%", "ts": "TS%",
-            })
-            keep = ["", "Player", "Team", "Seas", "GP", "MIN", "PTS", "REB",
-                    "ORB", "DREB", "AST", "STL", "BLK", "TO", "FG", "FG%",
-                    "3P", "3P%", "FT", "FT%", "eFG%", "TS%"]
-            st.dataframe(
-                display[[c for c in keep if c in display.columns]],
-                width="stretch", hide_index=True,
+            stat = st.radio(
+                "Category", stat_keys, horizontal=True, key="awards_stat_cat",
+                format_func=lambda k: (f"{awards.STAT_LABELS.get(k, k)} "
+                                       f"({awards.STAT_ABBR.get(k, k)})"),
             )
+            stat_rows = leaders_by_stat.get(stat) or []
+            if not stat_rows:
+                st.caption(
+                    f"No qualified {awards.STAT_LABELS.get(stat, stat).lower()} "
+                    f"leaders yet — needs ≥{awards_payload.get('min_games', '?')} "
+                    "GP."
+                )
+            for row in stat_rows:
+                st.markdown(shared.leader_row_html(row, stat),
+                            unsafe_allow_html=True)
             st.caption(
-                "FG/3P/FT are made-attempt season totals rolled into the "
-                "career; eFG% = (FGM + 0.5·3PM) / FGA, "
-                "TS% = PTS / (2·(FGA + 0.44·FTA)) — computed here from the "
-                "box scores, not copied from any official NBA source."
+                f"Per-game rate (the fair cross-pace comparison) among players "
+                f"with ≥{awards_payload.get('min_games', '?')} GP · "
+                f"{awards_payload.get('season', '—')}. Totals shown for context; "
+                "FG/3P splits + FG% come straight from the collected box scores."
             )
-
-# ---------------------------------------------------------------------------
-# GOAT Rankings: career production + award-race resume + peak, transparently
-# ---------------------------------------------------------------------------
-
-with tabs[4]:
-    _, goat, window, career_note = shared.load_awards_career()
-    goat_rows = goat.get("rows") or []
-    if not goat_rows:
-        st.info("No qualified players yet — the GOAT ladder needs players "
-                f"with ≥{goat.get('min_career_gp', awards.GOAT_MIN_CAREER_GP)} "
-                "career games across the collected seasons "
-                "(`python src/collector/refresh_dashboard_fallbacks.py`).")
-    else:
-        st.caption(f"Source: {career_note}")
-        st.caption(
-            "Homegrown composite — NOT an official NBA ranking, award, or "
-            "any vendor's rating. "
-            f"{goat.get('formula') or awards.GOAT_FORMULA}"
-        )
-        shared.section("🐐 GOAT ladder · career board · top "
-                       f"{len(goat_rows)}")
-        for row in goat_rows:
-            st.markdown(shared.goat_row_html(row), unsafe_allow_html=True)
-        st.caption(
-            "🏆/🛡/🪑/📈 count rank-1 finishes in THIS repo's "
-            "MVP/DPOY/6th-Man/MIP races (the homegrown formulas printed on "
-            "the Awards Ladder tab, not official NBA awards); prod/awards/"
-            "peak are the 0-100 component scores behind the headline number."
-        )
