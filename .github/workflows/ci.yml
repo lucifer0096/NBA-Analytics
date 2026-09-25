@@ -75,7 +75,8 @@ jobs:
           [ -f coverage.xml ] || exit 0
           python - >> "$GITHUB_STEP_SUMMARY" <<'PY'
           import xml.etree.ElementTree as ET
-          line = ET.parse("coverage.xml").getroot().find("coverage")
+          line = ET.parse("coverage.xml").getroot()
+          assert line.tag == "coverage", line.tag
           print("### Coverage")
           print(f"{float(line.get('line-rate')) * 100:.1f}% lines "
                 f"({line.get('lines-covered')}/{line.get('lines-valid')}) "
