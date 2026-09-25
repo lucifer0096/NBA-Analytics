@@ -2,9 +2,10 @@
 fresh-checkout/deploy condition: every live ESPN call forced to fail, no
 data/raw/ needed (committed data/dashboard_* fallbacks only). No network.
 
-Pins the contract that would otherwise rot silently: both pages render,
-their tabs exist, and the fallback-failure path shows an honest empty state
-rather than a stack trace.
+Pins the contract that would otherwise rot silently: every page renders,
+its tabs and KPI cards exist, and the fallback-failure path shows an honest
+empty state rather than a stack trace -- including the not-yet-started
+season (2026-27) showing empty states instead of another year's data.
 """
 
 import json
@@ -50,14 +51,20 @@ def _markdown_text(at: AppTest) -> str:
 def test_home_page_renders_offline(offline_espn):
     at = _render("app/app.py", offline_espn)
     assert not at.exception
-    # Title + the five tabs present even with every live call failing.
+    # Title + exactly the three home tabs (All-Time/GOAT/Profile moved to
+    # left-nav pages) even with every live call failing.
     assert any("NBA Analytics" in str(t.value) for t in at.title)
     tab_labels = [str(t.label) for t in at.tabs]
-    assert "Standings" in tab_labels
-    assert "Schedule & Scores" in tab_labels
-    assert "Awards Ladder" in tab_labels
-    assert "All-Time Stats" in tab_labels
-    assert "GOAT Rankings" in tab_labels
+    assert tab_labels == ["Standings", "Schedule & Scores", "Awards Ladder"]
+    # KPI strip is season-scoped: inventory, tip-off, scoring leader. The
+    # Model (validation) KPI was removed from this page.
+    metric_labels = [str(m.label) for m in at.metric]
+    assert metric_labels == ["Games collected", "Next tip-off",
+                             "Season scoring leader"]
+    # Neither "no auth" message survived (sidebar caption and hero extra).
+    text = f"{_markdown_text(at)} " + " ".join(
+        str(c.value) for c in at.caption)
+    assert "no auth" not in text.lower()
 
 
 def test_home_page_falls_back_to_committed_data(offline_espn):
@@ -101,16 +108,17 @@ def _committed_awards() -> dict:
         return json.load(f)
 
 
-def test_home_alltime_tab_shows_career_board_and_honesty(offline_espn):
-    """All-Time Stats must render the career table with its window caption --
-    and must admit the window (collector starts 2010-11, not full NBA
-    history). Skips when the committed payload predates the career sections."""
+def test_alltime_page_shows_career_board_and_honesty(offline_espn):
+    """All-Time Stats (its own left-nav page now) must render the career
+    table with its window caption -- and must admit the window (collector
+    starts 2010-11, not full NBA history). Skips when the committed payload
+    predates the career sections."""
     payload = _committed_awards()
     pts_rows = (((payload.get("alltime") or {}).get("leaders") or {})
                 .get("pts") or [])
     if not pts_rows:
         pytest.skip("no all-time section in the committed payload yet")
-    at = _render("app/app.py", offline_espn)
+    at = _render("app/pages/2_All-Time_Stats.py", offline_espn)
     captions = " ".join(str(c.value) for c in at.caption).lower()
     assert "not full nba history" in captions
     # The career scoring leader must reach the rendered dataframe.
@@ -119,19 +127,70 @@ def test_home_alltime_tab_shows_career_board_and_honesty(offline_espn):
     assert name and name in frames
 
 
-def test_home_goat_tab_shows_ladder_and_verbatim_formula(offline_espn):
-    """GOAT Rankings must print its exact formula + the not-official
+def test_goat_page_shows_ladder_and_verbatim_formula(offline_espn):
+    """GOAT Rankings page must print its exact formula + the not-official
     disclaimer, and the top-ranked player's name must reach the screen."""
     payload = _committed_awards()
     goat_rows = (payload.get("goat") or {}).get("rows") or []
     if not goat_rows:
         pytest.skip("no GOAT rows in the committed payload yet")
-    at = _render("app/app.py", offline_espn)
+    at = _render("app/pages/3_GOAT_Rankings.py", offline_espn)
     captions = " ".join(str(c.value) for c in at.caption)
     text = f"{_markdown_text(at)} {captions}"
     assert "GOAT score =" in text
     assert "not an official nba ranking" in captions.lower()
     assert str(goat_rows[0].get("player_name") or "") in text
+
+
+def test_profile_page_renders_cards_accolades_and_chart(offline_espn):
+    """Player Profile: the committed index loads, defaults to the GOAT top,
+    and the career cards, accolades table and progression section reach the
+    screen with zero live calls."""
+    path = REPO_ROOT / "data" / "dashboard_players.json"
+    if not path.exists():
+        pytest.skip("dashboard_players.json not committed yet")
+    with open(path, encoding="utf-8") as f:
+        players = json.load(f).get("players") or {}
+    if not players:
+        pytest.skip("empty player index")
+    at = _render("app/pages/4_Player_Profile.py", offline_espn)
+    assert not at.exception
+    box = at.multiselect[0]
+    assert 1 <= len(box.value) <= 4
+    text = f"{_markdown_text(at)} " + " ".join(
+        str(c.value) for c in at.caption)
+    assert "Official accolades" in text
+    assert "Career progression" in text
+    top = [p for p in players.values() if p.get("goat_rank") == 1]
+    if top:
+        assert str(top[0].get("player_name")) in text
+
+
+def test_load_schedule_serves_every_committed_season():
+    """The multi-season schedule envelope feeds ANY selected season -- a
+    PREVIOUS season's completed games must arrive with their final scores
+    (integers, not the raw CSV's '94.0' floats)."""
+    import shared as shared_module
+
+    path = REPO_ROOT / "data" / "dashboard_schedule.json"
+    if not path.exists():
+        pytest.skip("dashboard_schedule.json not committed yet")
+    with open(path, encoding="utf-8") as f:
+        payload = json.load(f)
+    seasons = payload.get("seasons") or {}
+    sample = next((s for s, games in seasons.items()
+                   if s != payload.get("season") and games), None)
+    if not sample:
+        pytest.skip("single-season schedule envelope")
+    shared_module.load_schedule.clear()
+    try:
+        frame, _ = shared_module.load_schedule(sample)
+        assert not frame.empty
+        finals = frame[frame["status"] == "STATUS_FINAL"]
+        assert not finals.empty
+        assert str(finals.iloc[0]["home_score"]).isdigit()
+    finally:
+        shared_module.load_schedule.clear()
 
 
 def test_load_awards_honest_empty_for_uncollected_season(monkeypatch,
@@ -220,7 +279,7 @@ def test_fallback_envelopes_carry_generation_timestamp():
     checked = 0
     for name in ("dashboard_teams.json", "dashboard_standings.json",
                  "dashboard_schedule.json", "dashboard_positions.json",
-                 "dashboard_awards.json",
+                 "dashboard_awards.json", "dashboard_players.json",
                  "processed/dashboard_leaderboards.json"):
         path = data_dir / name
         if not path.exists():
@@ -252,3 +311,7 @@ def test_sidebar_every_year_leads_with_data_and_honest_empty(offline_espn):
     text = f"{_markdown_text(at)} " + " ".join(
         str(c.value) for c in at.caption)
     assert "2026-27 has no collected games yet" in text
+    # Standings empty out too (the committed copy is 2025-26 -- never shown
+    # under the 2026-27 header).
+    infos = " ".join(str(i.value) for i in at.info)
+    assert "No standings available for 2026-27" in infos
