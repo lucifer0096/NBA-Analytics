@@ -109,14 +109,17 @@ def _has_played_standings(rows: list) -> bool:
 
 
 def _read_json(path: str, default):
-    """json.load with a type-checked default -- a corrupt or wrong-shaped
+    """json.load with a checked default -- a corrupt or wrong-shaped
     committed file degrades to `default` (the caller keeps honest state)
-    instead of raising inside the collector."""
+    instead of raising inside the collector. `default=None` means "hand me
+    whatever was there" (the caller type-checks the shape itself)."""
     try:
         with open(path, encoding="utf-8") as f:
             data = json.load(f)
     except (OSError, ValueError):
         return default
+    if default is None:
+        return data
     return data if isinstance(data, type(default)) else default
 
 

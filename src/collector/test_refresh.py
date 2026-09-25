@@ -38,6 +38,7 @@ def isolated(tmp_path, monkeypatch):
     raw = tmp_path / "raw"
     data = tmp_path / "data"
     (data / "processed").mkdir(parents=True)
+    (data / "races").mkdir()
     raw.mkdir()
     monkeypatch.setattr(refresh, "RAW_DIR", str(raw))
     monkeypatch.setattr(refresh, "DATA_DIR", str(data))
@@ -79,7 +80,8 @@ def test_refresh_schedule_splits_and_migrates(isolated):
     (isolated["data"] / "dashboard_schedule.json").write_text(
         json.dumps(legacy), encoding="utf-8")
     _write_csv(isolated["raw"] / "2026-27" / "schedule.csv",
-               [_row("2", "2026-27", "STATUS_SCHEDULED", "", "")])
+               [_row("2", "2026-27"),
+                _row("3", "2026-27", "STATUS_SCHEDULED", "", "")])
 
     index = refresh.refresh_schedule("2026-27")
 
@@ -91,10 +93,12 @@ def test_refresh_schedule_splits_and_migrates(isolated):
     new = json.loads((isolated["data"] / "schedules" / "2026-27.json")
                      .read_text(encoding="utf-8"))
     assert new["games"][0]["home_score"] == "94"  # "94.0" cleaned
+    assert new["games"][0]["away_score"] == "88"
+    assert new["games"][1]["home_score"] == ""  # scheduled stays empty
 
     assert index["season"] == "2026-27"
     assert index["seasons"] == {"2015-16": {"games": 1},
-                                "2026-27": {"games": 1}}
+                                "2026-27": {"games": 2}}
     assert "games" not in index  # no merged 4.5MB blob in the index
     assert index["source"] == "local"
     assert index["_generated_utc"] == max(old["_generated_utc"],
@@ -162,7 +166,7 @@ def test_record_race_history_gates_on_content_and_day(isolated):
     path.write_text(json.dumps(doc), encoding="utf-8")
     refresh._record_race_history([payload])
     doc = json.loads(path.read_text(encoding="utf-8"))
-    assert len(doc["snapshots"]) == 1
+    assert [s["date"] for s in doc["snapshots"]] == ["2000-01-01"]
 
     # Moved on a later day: appended as a new snapshot.
     moved = json.loads(json.dumps(payload))
@@ -171,6 +175,8 @@ def test_record_race_history_gates_on_content_and_day(isolated):
     doc = json.loads(path.read_text(encoding="utf-8"))
     assert [s["date"] for s in doc["snapshots"]] == ["2000-01-01",
                                                      doc["snapshots"][-1]["date"]]
+    assert len(doc["snapshots"]) == 2
+    assert doc["snapshots"][0]["races"]["mvp"][0]["score"] == 50.0
 
     # Same day, content changed again (late box scores): replaced, not grown.
     moved["races"]["mvp"][0]["score"] = 60.0
@@ -180,14 +186,12 @@ def test_record_race_history_gates_on_content_and_day(isolated):
     assert doc["snapshots"][-1]["races"]["mvp"][0]["score"] == 60.0
 
     # A frozen season (content identical to the last snapshot) stops forever.
-    last_date = doc["snapshots"][-1]["date"]
     doc["snapshots"][-1]["date"] = "2000-01-02"
     path.write_text(json.dumps(doc), encoding="utf-8")
     refresh._record_race_history([moved])
     doc = json.loads(path.read_text(encoding="utf-8"))
     assert len(doc["snapshots"]) == 2
     assert doc["snapshots"][-1]["date"] == "2000-01-02"
-    assert last_date  # (kept the shape check honest for the day assertion)
 
 
 def test_record_race_history_caps_snapshots(isolated):
