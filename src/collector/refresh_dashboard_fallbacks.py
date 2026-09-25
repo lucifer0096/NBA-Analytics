@@ -6,7 +6,12 @@ tabs read, committed here (the same pattern as FPL-Analytics' refresh script):
 
     data/dashboard_teams.json        team list (ids/abbrevs/names)
     data/dashboard_standings.json    latest available season's standings
-    data/dashboard_schedule.json     current season schedule + scores
+    data/dashboard_schedule.json     thin index: which per-season files exist
+    data/schedules/{season}.json     one season's schedule + final scores
+                                     (the app reads only the selected
+                                     season's file, not a 4.5MB merged blob)
+    data/races/{season}.json         daily race snapshots -> the Awards
+                                     Ladder's movement arrows + trend
     data/dashboard_positions.json    current player -> position map
     data/dashboard_awards.json       every collected season's MVP/DPOY/6th-Man/
                                      MIP races + stat leaders, plus the
@@ -51,7 +56,15 @@ REPO_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 RAW_DIR = os.path.join(REPO_ROOT, "data", "raw")
 DATA_DIR = os.path.join(REPO_ROOT, "data")
 PROCESSED_DIR = os.path.join(DATA_DIR, "processed")
+SCHEDULES_DIR = os.path.join(DATA_DIR, "schedules")
+RACES_DIR = os.path.join(DATA_DIR, "races")
 SEASON_DIR_RE = re.compile(r"^\d{4}-\d{2}$")
+
+# Race history bounds: one snapshot per UTC day per season, newest capped
+# (a full NBA season is ~200 days of games; 90 keeps the trend chart's
+# window wide while the file stays a few hundred KB at most).
+RACE_HISTORY_CAP = 90
+RACE_SNAPSHOT_TOP = 25  # players kept per race (ladders render far fewer)
 
 
 def _available_raw_seasons() -> list:
@@ -93,6 +106,18 @@ def _has_played_standings(rows: list) -> bool:
             except (TypeError, ValueError):
                 continue
     return False
+
+
+def _read_json(path: str, default):
+    """json.load with a type-checked default -- a corrupt or wrong-shaped
+    committed file degrades to `default` (the caller keeps honest state)
+    instead of raising inside the collector."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        return default
+    return data if isinstance(data, type(default)) else default
 
 
 def _write(path: str, payload: dict) -> None:
@@ -152,27 +177,49 @@ def refresh_standings(seasons_to_try: list) -> dict:
 
 
 def refresh_schedule(season: str) -> dict:
-    """Schedule envelope for EVERY collected season -- the Schedule tab must
-    show final scores for previous seasons too, and data/raw/ is gitignored,
-    so this committed file is the deployed app's only offline source for them.
+    """Schedule data as ONE file per season under data/schedules/ plus a thin
+    index at data/dashboard_schedule.json (the sidebar reads the index; the
+    Schedule tab reads only the selected season's file -- the merged 4.5MB
+    envelope used to be parsed for one season's worth of rows).
 
-    All raw schedule.csvs are merged under "seasons". Seasons already in the
-    committed envelope but absent locally are PRESERVED (the CI checkout has
-    raw/ for the current season only -- dropping them would wipe history on
-    the first daily run). Scores are normalised "94.0" -> "94" so the tab
-    doesn't print floats. The legacy top-level "season"/"games" keys keep
-    pointing at `season` for any reader of the old single-season shape."""
+    Each per-season file carries its own _generated_utc, so the freshness
+    caption is honest per season. A file is rewritten only when its rows
+    actually CHANGED, so daily runs don't churn stamps (or git) for seasons
+    nobody is playing; the index's stamp is the max child stamp for the same
+    reason.
+
+    Seasons present in the committed files but absent locally are PRESERVED
+    (the CI checkout has raw/ for the current season only -- dropping them
+    would wipe history on the first daily run), and the legacy merged
+    envelope (top-level "seasons" of row lists) is read once as a migration
+    source. Scores are normalised "94.0" -> "94" so the tab doesn't print
+    floats."""
     import csv
 
-    path = os.path.join(DATA_DIR, "dashboard_schedule.json")
-    seasons: dict = {}
-    if os.path.exists(path):
-        try:
-            with open(path, encoding="utf-8") as f:
-                seasons = dict(json.load(f).get("seasons") or {})
-        except (OSError, ValueError):
-            seasons = {}
-    found = False
+    os.makedirs(SCHEDULES_DIR, exist_ok=True)
+    seasons_rows: dict = {}
+    stamps: dict = {}
+
+    # 1. Committed per-season files (the normal path).
+    for fname in sorted(os.listdir(SCHEDULES_DIR)):
+        if not fname.endswith(".json"):
+            continue
+        payload = _read_json(os.path.join(SCHEDULES_DIR, fname), {})
+        rows = payload.get("games")
+        if isinstance(rows, list) and rows:
+            label = payload.get("season") or fname[:-5]
+            seasons_rows[label] = rows
+            stamps[label] = payload.get("_generated_utc")
+
+    # 2. Legacy merged envelope: migration source only.
+    legacy = _read_json(os.path.join(DATA_DIR, "dashboard_schedule.json"), {})
+    for label, rows in (legacy.get("seasons") or {}).items():
+        if isinstance(rows, list) and rows and label not in seasons_rows:
+            seasons_rows[label] = rows
+            stamps[label] = legacy.get("_generated_utc")
+
+    # 3. Local raw csvs win -- but only rewrite seasons whose rows changed.
+    changed = 0
     for name in _available_raw_seasons():
         csv_path = os.path.join(RAW_DIR, name, "schedule.csv")
         if not os.path.isfile(csv_path):
@@ -184,21 +231,36 @@ def refresh_schedule(season: str) -> dict:
         for row in rows:
             row["home_score"] = _clean_score(row.get("home_score"))
             row["away_score"] = _clean_score(row.get("away_score"))
-        seasons[name] = rows
-        found = True
-    if not found and not seasons:
+        if seasons_rows.get(name) == rows:
+            continue  # unchanged: keep the file and its stamp as they are
+        payload = _stamp({"season": name, "games": rows}, "local")
+        with open(os.path.join(SCHEDULES_DIR, f"{name}.json"), "w",
+                  encoding="utf-8") as f:
+            json.dump(payload, f, separators=(",", ":"))
+        seasons_rows[name] = rows
+        stamps[name] = payload["_generated_utc"]
+        changed += 1
+
+    if not seasons_rows:
         print("  no schedule.csv anywhere -- skipping schedule fallback")
         return {}
-    current = season if season in seasons else max(seasons)
-    payload = _stamp({"season": current, "games": seasons.get(current) or [],
-                      "seasons": seasons}, "local")
-    # Largest dashboard file (~20k games): compact JSON like
-    # dashboard_players.json, not the indent=1 default.
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(payload, f, separators=(",", ":"))
-    print(f"  wrote {path} ({len(seasons)} seasons, "
-          f"{sum(len(g) for g in seasons.values())} games)")
-    return payload
+
+    current = season if season in seasons_rows else max(seasons_rows)
+    index = {
+        "season": current,
+        "seasons": {label: {"games": len(rows)}
+                    for label, rows in sorted(seasons_rows.items())},
+        "_generated_utc": max(s for s in stamps.values() if s)
+                          or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "source": "local",
+    }
+    with open(os.path.join(DATA_DIR, "dashboard_schedule.json"), "w",
+              encoding="utf-8") as f:
+        json.dump(index, f, indent=1)
+    print(f"  wrote schedule index ({len(seasons_rows)} seasons, "
+          f"{sum(len(g) for g in seasons_rows.values())} games, "
+          f"{changed} season file(s) updated)")
+    return index
 
 
 def _clean_score(value) -> str:
@@ -338,6 +400,52 @@ def _write_players(career: dict, history: dict) -> None:
     print(f"  wrote {path} ({len(players)} players)")
 
 
+def _record_race_history(payloads: list) -> None:
+    """Append today's race state to data/races/{season}.json -- the Awards
+    Ladder's movement arrows and trend chart read these snapshots.
+
+    Rules that keep it honest and small: one snapshot per UTC day, written
+    only when the race content actually MOVED (a finished season freezes
+    after its first snapshot or two instead of growing forever), the same
+    day's snapshot replaced rather than duplicated when late box scores
+    change it, and only the newest RACE_HISTORY_CAP snapshots kept."""
+    if not payloads:
+        return
+    os.makedirs(RACES_DIR, exist_ok=True)
+    today = time.strftime("%Y-%m-%d", time.gmtime())
+    for payload in payloads:
+        races = payload.get("races") or {}
+        label = payload.get("season")
+        if not races or not label:
+            continue
+        projection = {
+            key: [{field: row.get(field)
+                   for field in ("player_id", "player_name", "rank", "score")}
+                  for row in (rows or [])[:RACE_SNAPSHOT_TOP]]
+            for key, rows in races.items()
+        }
+        path = os.path.join(RACES_DIR, f"{label}.json")
+        doc = _read_json(path, None)
+        if not isinstance(doc, dict) or not isinstance(doc.get("snapshots"),
+                                                       list):
+            doc = {"season": label, "snapshots": []}
+        snapshots = doc["snapshots"]
+        last = snapshots[-1] if snapshots else None
+        if last is not None and last.get("races") == projection:
+            if last.get("date") != today:
+                continue  # nothing moved since the last snapshot
+        elif last is not None and last.get("date") == today:
+            pass  # same day, race content changed: replace below
+        else:
+            snapshots.append({"date": today, "races": projection})
+            del snapshots[:-RACE_HISTORY_CAP]
+        doc.update({"season": label, "snapshots": snapshots})
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(doc, f, indent=1)
+        print(f"  race history: {label} -> {path} "
+              f"({len(snapshots)} snapshot(s))")
+
+
 def refresh_awards(seasons_to_try: list) -> dict:
     """Award races + stat leaders for EVERY collected season (2010-11 ->),
     plus the all-NBA-history all-time boards, GOAT ladder (official NBA
@@ -345,16 +453,27 @@ def refresh_awards(seasons_to_try: list) -> dict:
 
     Season payloads/games counts are pure-local; the all-history half runs
     through history.py (ESPN + its cache). When THAT fails the previous
-    dashboard_awards.json and dashboard_players.json are kept untouched --
-    a window-only ladder sneaking in on a bad network day would mislead far
-    more than a stale-but-labelled one. Envelope shape: {"seasons": {label:
-    payload}, "window", "games_by_season", "alltime", "goat",
-    "career_note"} so the sidebar season selector can pick any year."""
+    career sections and dashboard_players.json are kept, and the freshly
+    computed season races still land -- a window-only ladder sneaking in on
+    a bad network day would mislead far more than a stale-but-labelled one.
+
+    CI SURVIVAL (why merged state exists): every CI checkout has data/raw/
+    for the CURRENT season only, so rebuilding `seasons` from scratch would
+    erase the 16 historical payloads on the first successful run, collapse
+    the games inventory to one entry, and feed history.build() a one-season
+    window pool (shrinking the GOAT ladder and the player index). So:
+    local seasons are rebuilt, every other committed season/inventory count
+    is preserved, and when raw coverage is incomplete the window pool comes
+    from the committed dashboard_players.json projection instead of the
+    local box scan. Envelope shape: {"seasons": {label: payload}, "window",
+    "games_by_season", "alltime", "goat", "career_note"}."""
     import glob
 
     import awards
     import history as history_mod
 
+    prior = _read_json(os.path.join(DATA_DIR, "dashboard_awards.json"), {})
+    prior_seasons = dict(prior.get("seasons") or {})
     labels = [s for s in dict.fromkeys(seasons_to_try)
               if glob.glob(os.path.join(RAW_DIR, s, "games", "*.json"))]
     if not labels:
@@ -366,26 +485,57 @@ def refresh_awards(seasons_to_try: list) -> dict:
         payload = awards.build_payload(season)
         if payload:
             season_payloads.append(payload)
-    if not season_payloads:
+    rebuilt = {p["season"]: p for p in season_payloads}
+    merged_seasons = {**{label: rows for label, rows in prior_seasons.items()
+                         if label not in rebuilt}, **rebuilt}
+    if not merged_seasons:
         return {}
+    if season_payloads:
+        _record_race_history(season_payloads)
 
-    players = awards.alltime_players()
-    try:
-        hist = history_mod.build(players)
-    except Exception as exc:  # noqa: BLE001 -- collector must remain resumable
-        print(f"  all-history fetch failed ({type(exc).__name__}: {exc}) -- "
-              "keeping the previous awards/players files")
-        return {}
+    if prior_seasons and not set(prior_seasons) <= set(labels):
+        # Partial local raw (every CI run): reuse the committed player
+        # projection as the window pool -- it already carries career lines,
+        # seasons, peak and team for everyone the box scan would find.
+        players_payload = _read_json(
+            os.path.join(DATA_DIR, "dashboard_players.json"), {})
+        window_players = list((players_payload.get("players") or {}).values())
+        print(f"  window pool: {len(window_players)} committed players "
+              "(raw covers one season only)")
+    else:
+        window_players = awards.alltime_players()
+    if not window_players:
+        print("  no window players to build careers from -- keeping the "
+              "previous career sections")
+        window_players = None
 
-    career = awards.build_career(season_payloads, players=players, history=hist)
-    if not career:
-        return {}
-    envelope = {"seasons": {p["season"]: p for p in season_payloads}}
-    envelope.update(career)
-    envelope["games_by_season"] = _games_by_season()
+    hist = None
+    if window_players:
+        try:
+            hist = history_mod.build(window_players)
+        except Exception as exc:  # noqa: BLE001 -- collector must stay resumable
+            print(f"  all-history fetch failed ({type(exc).__name__}: {exc}) -- "
+                  "keeping the previous career sections/players file")
+
+    # Career half: freshly built when history succeeded, else whatever the
+    # committed envelope already carries (its window/alltime/goat/career_note).
+    envelope = {key: value for key, value in prior.items()
+                if key not in ("seasons", "games_by_season",
+                               "_generated_utc", "source")}
+    if hist and window_players:
+        career = awards.build_career(list(merged_seasons.values()),
+                                     players=window_players, history=hist)
+        if career:
+            envelope.update(career)
+        else:
+            print("  career build empty -- keeping previous career sections")
+    envelope["seasons"] = merged_seasons
+    envelope["games_by_season"] = {
+        **(prior.get("games_by_season") or {}), **_games_by_season()}
     path = os.path.join(DATA_DIR, "dashboard_awards.json")
     _write(path, _stamp(envelope, "local"))
-    _write_players(career, hist)
+    if hist:
+        _write_players(envelope, hist)
     return envelope
 
 

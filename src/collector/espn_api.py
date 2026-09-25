@@ -41,36 +41,57 @@ SITE_API = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba"
 WEB_API_V2 = "https://site.web.api.espn.com/apis/v2/sports/basketball/nba"
 WEB_API_COMMON = "https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba"
 
-# ESPN's edge (Fastly WAF) 403s simplistic User-Agents -- verified directly:
-# a bare "Mozilla/5.0" and the old FPL-style "Mozilla/5.0 (project...)" UA
-# both got 403 while this full browser-like header set (and even Python's
-# default urllib UA) got 200. The complete header set is kept because it's
-# the most future-proof of the forms that work, not because UA-guessing is a
-# reliable strategy -- if this ever 403s again, the fix belongs HERE, in one
-# place, not scattered across callers.
-_HEADERS = {
-    "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-                   "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"),
-    "Accept": "application/json",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Referer": "https://www.nba.com/",
-}
+# ESPN's edge (Fastly WAF) answers DIFFERENTLY depending on the client AND
+# the caller's network -- verified directly with the probe-espn.yml workflow
+# (run it from the Actions tab after any future 403):
+#
+#   GitHub-hosted runner:  spoofed Chrome UA -> 403, default/curl UA -> 200
+#                          site.web.api + sports.core.api -> 200 either way
+#   Dev machine:           every form below -> 200
+#
+# So the primary client is the HONEST one (urllib's own User-Agent, no
+# browser impersonation), and a 403 rotates through the alternatives below
+# before giving up. UA-guessing is not a reliable strategy -- if this ever
+# 403s again, re-run the probe and fix the sets HERE, in one place, not
+# scattered across callers.
+_HEADER_SETS = (
+    # 1. Honest default: no User-Agent/Accept spoofing at all. This is the
+    #    form the runner-side probe proved 200 from a datacenter IP.
+    {},
+    # 2. curl's default UA -- the other runner-proven 200, for edges that
+    #    block unknown libraries specifically.
+    {"User-Agent": "curl/8.5.0", "Accept": "application/json"},
+    # 3. Full browser-looking set: works from ordinary networks (and is kept
+    #    last, because it is the one datacenter IPs get challenged for).
+    {
+        "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                       "AppleWebKit/537.36 (KHTML, like Gecko) "
+                       "Chrome/124.0.0.0 Safari/537.36"),
+        "Accept": "application/json",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer": "https://www.nba.com/",
+    },
+)
 
 # ESPN rate-limits aggressive clients; a polite floor between retries of the
 # SAME request (the snapshot's own inter-request delay lives in snapshot.py).
+# Four attempts cover every header set once plus one wrap-around.
 _MAX_RETRIES = 4
 
 
 def _get_json(url: str, timeout: int = 20) -> dict:
-    """GET url and parse JSON, retrying 429/5xx with exponential backoff.
+    """GET url and parse JSON, retrying 429/403/5xx with exponential backoff
+    while ROTATING through _HEADER_SETS (attempt N uses set N % 3), so a WAF
+    that rejects one client form is offered the next instead of the same
+    rejected header four times.
 
     4xx other than 429/403 are NOT retried (a 404 is a bug, not a hiccup);
-    403 is retried because ESPN's WAF occasionally challenges bursts of
-    otherwise-legitimate traffic (see _HEADERS note), then surfaced to the
-    caller."""
+    403 is retried with rotation because the WAF challenges by client form
+    (see _HEADER_SETS note), then surfaced to the caller."""
     last_error: Exception | None = None
     for attempt in range(_MAX_RETRIES):
-        req = urllib.request.Request(url, headers=_HEADERS)
+        headers = _HEADER_SETS[attempt % len(_HEADER_SETS)]
+        req = urllib.request.Request(url, headers=headers)
         try:
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 return json.load(resp)

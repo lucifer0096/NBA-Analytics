@@ -63,6 +63,37 @@ def test_parse_teams_fixture():
 
 
 # ---------------------------------------------------------------------------
+# WAF header rotation (the runner-side 403 fix)
+# ---------------------------------------------------------------------------
+
+def test_get_json_rotates_header_sets_on_403(monkeypatch):
+    """A WAF that 403s the first client form must be offered the NEXT header
+    set instead of the same rejected headers four times: the probe workflow
+    proved site.api 403s the spoofed Chrome UA from runner IPs while the
+    honest default client gets 200, so rotation is the fix contract."""
+    import io
+    import urllib.error
+    import urllib.request
+
+    seen = []
+
+    def fake_urlopen(req, timeout=None):
+        seen.append(dict(req.headers))
+        if len(seen) < 3:
+            raise urllib.error.HTTPError(req.full_url, 403, "forbidden", {})
+        return io.BytesIO(b'{"ok": 1}')
+
+    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(espn_api.time, "sleep", lambda _s: None)
+    assert espn_api._get_json("https://example.test/x") == {"ok": 1}
+    # Three attempts: honest default (no UA), curl UA, browser UA.
+    assert len(seen) == 3
+    assert "User-agent" not in seen[0] and "Accept" not in seen[0]
+    assert seen[1].get("User-agent") == "curl/8.5.0"
+    assert "Chrome" in seen[2].get("User-agent", "")
+
+
+# ---------------------------------------------------------------------------
 # schedule (1995-96 fixture -- the pre-2010 window)
 # ---------------------------------------------------------------------------
 
