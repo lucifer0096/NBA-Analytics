@@ -431,11 +431,13 @@ def _record_race_history(payloads: list) -> None:
             doc = {"season": label, "snapshots": []}
         snapshots = doc["snapshots"]
         last = snapshots[-1] if snapshots else None
-        if last is not None and last.get("races") == projection:
-            if last.get("date") != today:
-                continue  # nothing moved since the last snapshot
-        elif last is not None and last.get("date") == today:
-            pass  # same day, race content changed: replace below
+        if last is None:
+            snapshots.append({"date": today, "races": projection})
+            del snapshots[:-RACE_HISTORY_CAP]
+        elif last.get("races") == projection:
+            continue  # nothing moved (a finished season stops here forever)
+        elif last.get("date") == today:
+            last["races"] = projection  # same day, late box scores moved it
         else:
             snapshots.append({"date": today, "races": projection})
             del snapshots[:-RACE_HISTORY_CAP]
