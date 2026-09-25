@@ -13,6 +13,10 @@ on:
       - "data/**"
       - "models/**"
   pull_request:
+  # Manual trigger from the gh CLI (`gh workflow run CI`) -- without this the
+  # dispatch call fails with HTTP 422 "Workflow does not have
+  # 'workflow_dispatch' trigger".
+  workflow_dispatch:
 
 permissions:
   contents: read

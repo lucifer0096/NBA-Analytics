@@ -255,32 +255,27 @@ def test_goat_rows_formula_titles_and_career_gate():
                 stl=80, blk=20, fg3m=60, peak_impact=15.0),
         _player(3, "Short", "MIA", gp=81, pts=3000),      # < 82 career GP
     ]
-    season_payloads = [{
-        "season": "2016-17",
-        "races": {
-            "mvp": [{"player_id": 1, "rank": 1},
-                    {"player_id": 2, "rank": 2}],
-            "dpoy": [{"player_id": 1, "rank": 2},
-                     {"player_id": 2, "rank": 1}],
-            "sixth_man": [], "mip": [],
-        },
-    }]
-    rows = awards.goat_rows(players, season_payloads)
+    # Official ESPN award names -> wins (history.py's shape).
+    honours = {
+        1: {"MVP": 4, "Finals MVP": 3, "All-NBA 1st Team": 8},
+        2: {"All-Defensive 2nd Team": 3, "All-Rookie 1st Team": 1},
+    }
+    rows = awards.goat_rows(players, honours)
     assert [r["player_name"] for r in rows] == ["King", "Role"]
     king, role = rows
-    # Resume points: King = (11-1)*1.0 + (11-2)*0.8 = 17.2,
-    # Role = (11-2)*1.0 + (11-1)*0.8 = 17.0; rank-1s become titles.
-    assert king["award_points"] == 17.2
-    assert king["titles"] == {"mvp": 1, "dpoy": 0, "sixth_man": 0, "mip": 0}
-    assert role["award_points"] == 17.0
-    assert role["titles"]["dpoy"] == 1
+    # Honour points: King = 4×6 + 3×5 + 8×3 = 63.0,
+    # Role = 3×1.5 + 1×0.5 = 5.0; unweighted names contribute nothing.
+    assert king["honour_points"] == 63.0
+    assert king["honours_total"] == 15
+    assert role["honour_points"] == 5.0
+    assert king["honours"] == honours[1]
     # The headline score IS the captioned weighted mix (0-100 components).
     for r in rows:
         expected = (awards.GOAT_WEIGHTS["production"] * r["production"]
-                    + awards.GOAT_WEIGHTS["awards"] * r["awards_score"]
+                    + awards.GOAT_WEIGHTS["honours"] * r["honours_score"]
                     + awards.GOAT_WEIGHTS["peak"] * r["peak_score"])
         assert abs(r["score"] - round(expected, 1)) <= 0.15
-    # Production is normalized against the window's best: King leads every
+    # Production is normalized against the pool's best: King leads every
     # counted category -> 100.0.
     assert king["production"] == 100.0
     # Below the career gate: never appears, however good the stats.
@@ -288,6 +283,61 @@ def test_goat_rows_formula_titles_and_career_gate():
     # The formula string shown on screen is the committed one.
     assert awards.GOAT_FORMULA.count("+") >= 2
     assert f"{awards.GOAT_MIN_CAREER_GP}" in awards.GOAT_FORMULA
+
+
+def test_goat_formula_prints_every_weight_verbatim():
+    """GOAT_FORMULA must contain each component weight and each of the 20
+    honour-point weights, so an on-screen reader can audit the whole math
+    without opening the source."""
+    formula = awards.GOAT_FORMULA
+    for w in awards.GOAT_WEIGHTS.values():
+        assert f"{w:.0%}" in formula
+    for stat, w in awards.GOAT_PRODUCTION_WEIGHTS.items():
+        assert f"{awards.GOAT_PROD_LABELS[stat]} {w:.0%}" in formula
+    for name, w in awards.GOAT_HONOURS_WEIGHTS.items():
+        assert f"{awards.GOAT_HONOUR_LABELS[name]} ×{w:g}" in formula
+    assert len(awards.GOAT_HONOURS_WEIGHTS) == 20
+    assert "rescaled" in formula
+    assert f"≥{awards.GOAT_MIN_CAREER_GP} career games" in formula
+
+
+def test_goat_rows_drop_untrusted_components_and_rescale():
+    """A player with impossible-zero REB (Wilt's ESPN line) has that stat
+    dropped and the remaining production weights rescaled; missing peak or
+    honours input drops that component and rescales GOAT_WEIGHTS."""
+    players = [
+        _player(1, "King", "CLE", gp=164, pts=4000, reb=1600, ast=1600,
+                stl=300, blk=100, fg3m=300, peak_impact=35.0),
+        _player(4, "Broken", "LAL", gp=1045, pts=31419, reb=0, ast=4643,
+                peak_impact=30.0),
+    ]
+    honours = {1: {"MVP": 4}, 4: {"MVP": 2}}
+    rows = {r["player_name"]: r for r in awards.goat_rows(players, honours)}
+    broken = rows["Broken"]
+    assert "reb" in broken["data_gaps"]
+    # Production rescaled over PTS/AST/STL/BLK/3PM only -- the gap is
+    # disclosed, not silently counted as zero.
+    assert broken["production"] > 0
+    # No honours input at all -> the component is dropped for everyone.
+    rows2 = awards.goat_rows(players, None)
+    for r in rows2:
+        assert "honours" in r["data_gaps"]
+        assert r["honours_score"] is None
+        expected = (awards.GOAT_WEIGHTS["production"] * r["production"]
+                    + awards.GOAT_WEIGHTS["peak"] * r["peak_score"]) / (
+            awards.GOAT_WEIGHTS["production"] + awards.GOAT_WEIGHTS["peak"])
+        assert abs(r["score"] - round(expected, 1)) <= 0.15
+    # No peak (untrusted rows, no collected season) -> peak dropped.
+    players[0]["peak_impact"] = 0
+    players[1]["peak_impact"] = 0
+    rows3 = awards.goat_rows(players, honours)
+    for r in rows3:
+        assert "peak" in r["data_gaps"]
+        assert r["peak_score"] is None
+        expected = (awards.GOAT_WEIGHTS["production"] * r["production"]
+                    + awards.GOAT_WEIGHTS["honours"] * r["honours_score"]) / (
+            awards.GOAT_WEIGHTS["production"] + awards.GOAT_WEIGHTS["honours"])
+        assert abs(r["score"] - round(expected, 1)) <= 0.15
 
 
 def test_build_career_window_and_honest_empties(tmp_path):
