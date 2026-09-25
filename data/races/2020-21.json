@@ -1,0 +1,258 @@
+{
+ "season": "2020-21",
+ "snapshots": [
+  {
+   "date": "2026-09-25",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3112335,
+      "player_name": "Nikola Jokic",
+      "rank": 1,
+      "score": 36.86
+     },
+     {
+      "player_id": 3032977,
+      "player_name": "Giannis Antetokounmpo",
+      "rank": 2,
+      "score": 36.15
+     },
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 3,
+      "score": 35.83
+     },
+     {
+      "player_id": 3945274,
+      "player_name": "Luka Doncic",
+      "rank": 4,
+      "score": 35.25
+     },
+     {
+      "player_id": 3059318,
+      "player_name": "Joel Embiid",
+      "rank": 5,
+      "score": 34.22
+     },
+     {
+      "player_id": 3975,
+      "player_name": "Stephen Curry",
+      "rank": 6,
+      "score": 34.19
+     },
+     {
+      "player_id": 3468,
+      "player_name": "Russell Westbrook",
+      "rank": 7,
+      "score": 33.62
+     },
+     {
+      "player_id": 6606,
+      "player_name": "Damian Lillard",
+      "rank": 8,
+      "score": 32.9
+     },
+     {
+      "player_id": 1966,
+      "player_name": "LeBron James",
+      "rank": 9,
+      "score": 32.13
+     },
+     {
+      "player_id": 6442,
+      "player_name": "Kyrie Irving",
+      "rank": 10,
+      "score": 31.59
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 2991280,
+      "player_name": "Nerlens Noel",
+      "rank": 1,
+      "score": 3.3
+     },
+     {
+      "player_id": 3032976,
+      "player_name": "Rudy Gobert",
+      "rank": 2,
+      "score": 3.15
+     },
+     {
+      "player_id": 3133628,
+      "player_name": "Myles Turner",
+      "rank": 3,
+      "score": 2.88
+     },
+     {
+      "player_id": 6583,
+      "player_name": "Anthony Davis",
+      "rank": 4,
+      "score": 2.85
+     },
+     {
+      "player_id": 3907498,
+      "player_name": "Matisse Thybulle",
+      "rank": 5,
+      "score": 2.53
+     },
+     {
+      "player_id": 3102529,
+      "player_name": "Clint Capela",
+      "rank": 6,
+      "score": 2.31
+     },
+     {
+      "player_id": 6430,
+      "player_name": "Jimmy Butler III",
+      "rank": 7,
+      "score": 2.29
+     },
+     {
+      "player_id": 4066211,
+      "player_name": "Robert Williams III",
+      "rank": 8,
+      "score": 2.23
+     },
+     {
+      "player_id": 3059318,
+      "player_name": "Joel Embiid",
+      "rank": 9,
+      "score": 2.18
+     },
+     {
+      "player_id": 4066261,
+      "player_name": "Bam Adebayo",
+      "rank": 10,
+      "score": 2.09
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 2528426,
+      "player_name": "Jordan Clarkson",
+      "rank": 1,
+      "score": 20.64
+     },
+     {
+      "player_id": 4395725,
+      "player_name": "Tyler Herro",
+      "rank": 2,
+      "score": 18.04
+     },
+     {
+      "player_id": 6619,
+      "player_name": "Terrence Ross",
+      "rank": 3,
+      "score": 17.63
+     },
+     {
+      "player_id": 3456,
+      "player_name": "Derrick Rose",
+      "rank": 4,
+      "score": 17.42
+     },
+     {
+      "player_id": 3423,
+      "player_name": "Goran Dragic",
+      "rank": 5,
+      "score": 16.46
+     },
+     {
+      "player_id": 4396993,
+      "player_name": "Tyrese Haliburton",
+      "rank": 6,
+      "score": 16.39
+     },
+     {
+      "player_id": 3948153,
+      "player_name": "Chris Boucher",
+      "rank": 7,
+      "score": 15.85
+     },
+     {
+      "player_id": 3244,
+      "player_name": "Thaddeus Young",
+      "rank": 8,
+      "score": 15.79
+     },
+     {
+      "player_id": 2991055,
+      "player_name": "Montrezl Harrell",
+      "rank": 9,
+      "score": 15.58
+     },
+     {
+      "player_id": 4066383,
+      "player_name": "Miles Bridges",
+      "rank": 10,
+      "score": 15.34
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 2991070,
+      "player_name": "Jerami Grant",
+      "rank": 1,
+      "score": 12.76
+     },
+     {
+      "player_id": 4278104,
+      "player_name": "Michael Porter Jr.",
+      "rank": 2,
+      "score": 11.99
+     },
+     {
+      "player_id": 4423545,
+      "player_name": "Darius Bazley",
+      "rank": 3,
+      "score": 11.59
+     },
+     {
+      "player_id": 3058254,
+      "player_name": "Christian Wood",
+      "rank": 4,
+      "score": 11.18
+     },
+     {
+      "player_id": 3907822,
+      "player_name": "Malik Beasley",
+      "rank": 5,
+      "score": 10.67
+     },
+     {
+      "player_id": 3948153,
+      "player_name": "Chris Boucher",
+      "rank": 6,
+      "score": 9.35
+     },
+     {
+      "player_id": 2993874,
+      "player_name": "Kyle Anderson",
+      "rank": 7,
+      "score": 8.88
+     },
+     {
+      "player_id": 3112335,
+      "player_name": "Nikola Jokic",
+      "rank": 8,
+      "score": 8.54
+     },
+     {
+      "player_id": 2489663,
+      "player_name": "Kelly Olynyk",
+      "rank": 9,
+      "score": 8.3
+     },
+     {
+      "player_id": 3064514,
+      "player_name": "Julius Randle",
+      "rank": 10,
+      "score": 7.88
+     }
+    ]
+   }
+  }
+ ]
+}

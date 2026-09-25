@@ -1,0 +1,258 @@
+{
+ "season": "2017-18",
+ "snapshots": [
+  {
+   "date": "2026-09-25",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 1,
+      "score": 37.5
+     },
+     {
+      "player_id": 3468,
+      "player_name": "Russell Westbrook",
+      "rank": 2,
+      "score": 33.88
+     },
+     {
+      "player_id": 1966,
+      "player_name": "LeBron James",
+      "rank": 3,
+      "score": 33.68
+     },
+     {
+      "player_id": 3202,
+      "player_name": "Kevin Durant",
+      "rank": 4,
+      "score": 30.65
+     },
+     {
+      "player_id": 3032977,
+      "player_name": "Giannis Antetokounmpo",
+      "rank": 5,
+      "score": 29.81
+     },
+     {
+      "player_id": 6606,
+      "player_name": "Damian Lillard",
+      "rank": 6,
+      "score": 28.89
+     },
+     {
+      "player_id": 3975,
+      "player_name": "Stephen Curry",
+      "rank": 7,
+      "score": 28.54
+     },
+     {
+      "player_id": 3059318,
+      "player_name": "Joel Embiid",
+      "rank": 8,
+      "score": 27.8
+     },
+     {
+      "player_id": 6442,
+      "player_name": "Kyrie Irving",
+      "rank": 9,
+      "score": 26.6
+     },
+     {
+      "player_id": 3112335,
+      "player_name": "Nikola Jokic",
+      "rank": 10,
+      "score": 25.79
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 3032976,
+      "player_name": "Rudy Gobert",
+      "rank": 1,
+      "score": 2.93
+     },
+     {
+      "player_id": 2527963,
+      "player_name": "Victor Oladipo",
+      "rank": 2,
+      "score": 2.63
+     },
+     {
+      "player_id": 6585,
+      "player_name": "Andre Drummond",
+      "rank": 3,
+      "score": 2.57
+     },
+     {
+      "player_id": 3102529,
+      "player_name": "Clint Capela",
+      "rank": 4,
+      "score": 2.21
+     },
+     {
+      "player_id": 4262,
+      "player_name": "Hassan Whiteside",
+      "rank": 5,
+      "score": 2.17
+     },
+     {
+      "player_id": 2993874,
+      "player_name": "Kyle Anderson",
+      "rank": 6,
+      "score": 2.17
+     },
+     {
+      "player_id": 3032977,
+      "player_name": "Giannis Antetokounmpo",
+      "rank": 7,
+      "score": 2.15
+     },
+     {
+      "player_id": 2490620,
+      "player_name": "Robert Covington",
+      "rank": 8,
+      "score": 2.15
+     },
+     {
+      "player_id": 2581190,
+      "player_name": "Josh Richardson",
+      "rank": 9,
+      "score": 2.13
+     },
+     {
+      "player_id": 3907387,
+      "player_name": "Ben Simmons",
+      "rank": 10,
+      "score": 2.11
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 2799,
+      "player_name": "Lou Williams",
+      "rank": 1,
+      "score": 24.2
+     },
+     {
+      "player_id": 2581177,
+      "player_name": "Rodney Hood",
+      "rank": 2,
+      "score": 14.65
+     },
+     {
+      "player_id": 2528426,
+      "player_name": "Jordan Clarkson",
+      "rank": 3,
+      "score": 14.61
+     },
+     {
+      "player_id": 2990984,
+      "player_name": "Buddy Hield",
+      "rank": 4,
+      "score": 14.47
+     },
+     {
+      "player_id": 6462,
+      "player_name": "Marcus Morris Sr.",
+      "rank": 5,
+      "score": 14.27
+     },
+     {
+      "player_id": 6603,
+      "player_name": "Jeremy Lamb",
+      "rank": 6,
+      "score": 14.2
+     },
+     {
+      "player_id": 3055,
+      "player_name": "J.J. Barea",
+      "rank": 7,
+      "score": 14.18
+     },
+     {
+      "player_id": 2991043,
+      "player_name": "Caris LeVert",
+      "rank": 8,
+      "score": 14.07
+     },
+     {
+      "player_id": 3155942,
+      "player_name": "Domantas Sabonis",
+      "rank": 9,
+      "score": 13.79
+     },
+     {
+      "player_id": 2489663,
+      "player_name": "Kelly Olynyk",
+      "rank": 10,
+      "score": 13.31
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 6430,
+      "player_name": "Jimmy Butler III",
+      "rank": 1,
+      "score": 28.0
+     },
+     {
+      "player_id": 1987,
+      "player_name": "Dwyane Wade",
+      "rank": 2,
+      "score": 15.88
+     },
+     {
+      "player_id": 3986,
+      "player_name": "Taj Gibson",
+      "rank": 3,
+      "score": 13.47
+     },
+     {
+      "player_id": 2990984,
+      "player_name": "Buddy Hield",
+      "rank": 4,
+      "score": 11.39
+     },
+     {
+      "player_id": 2990962,
+      "player_name": "Taurean Prince",
+      "rank": 5,
+      "score": 11.12
+     },
+     {
+      "player_id": 3155942,
+      "player_name": "Domantas Sabonis",
+      "rank": 6,
+      "score": 9.44
+     },
+     {
+      "player_id": 3936299,
+      "player_name": "Jamal Murray",
+      "rank": 7,
+      "score": 9.11
+     },
+     {
+      "player_id": 3913176,
+      "player_name": "Brandon Ingram",
+      "rank": 8,
+      "score": 9.08
+     },
+     {
+      "player_id": 3917376,
+      "player_name": "Jaylen Brown",
+      "rank": 9,
+      "score": 8.74
+     },
+     {
+      "player_id": 2579466,
+      "player_name": "Jonathon Simmons",
+      "rank": 10,
+      "score": 8.7
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,258 @@
+{
+ "season": "2019-20",
+ "snapshots": [
+  {
+   "date": "2026-09-25",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3032977,
+      "player_name": "Giannis Antetokounmpo",
+      "rank": 1,
+      "score": 41.07
+     },
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 2,
+      "score": 39.51
+     },
+     {
+      "player_id": 3945274,
+      "player_name": "Luka Doncic",
+      "rank": 3,
+      "score": 37.07
+     },
+     {
+      "player_id": 1966,
+      "player_name": "LeBron James",
+      "rank": 4,
+      "score": 36.99
+     },
+     {
+      "player_id": 3468,
+      "player_name": "Russell Westbrook",
+      "rank": 5,
+      "score": 33.96
+     },
+     {
+      "player_id": 6606,
+      "player_name": "Damian Lillard",
+      "rank": 6,
+      "score": 32.54
+     },
+     {
+      "player_id": 6450,
+      "player_name": "Kawhi Leonard",
+      "rank": 7,
+      "score": 32.52
+     },
+     {
+      "player_id": 6583,
+      "player_name": "Anthony Davis",
+      "rank": 8,
+      "score": 32.41
+     },
+     {
+      "player_id": 4277905,
+      "player_name": "Trae Young",
+      "rank": 9,
+      "score": 30.33
+     },
+     {
+      "player_id": 6580,
+      "player_name": "Bradley Beal",
+      "rank": 10,
+      "score": 29.42
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 6583,
+      "player_name": "Anthony Davis",
+      "rank": 1,
+      "score": 3.62
+     },
+     {
+      "player_id": 6585,
+      "player_name": "Andre Drummond",
+      "rank": 2,
+      "score": 2.88
+     },
+     {
+      "player_id": 3448,
+      "player_name": "Brook Lopez",
+      "rank": 3,
+      "score": 2.79
+     },
+     {
+      "player_id": 3133628,
+      "player_name": "Myles Turner",
+      "rank": 4,
+      "score": 2.79
+     },
+     {
+      "player_id": 3907387,
+      "player_name": "Ben Simmons",
+      "rank": 5,
+      "score": 2.49
+     },
+     {
+      "player_id": 3032976,
+      "player_name": "Rudy Gobert",
+      "rank": 6,
+      "score": 2.44
+     },
+     {
+      "player_id": 2991280,
+      "player_name": "Nerlens Noel",
+      "rank": 7,
+      "score": 2.26
+     },
+     {
+      "player_id": 4065648,
+      "player_name": "Jayson Tatum",
+      "rank": 8,
+      "score": 2.24
+     },
+     {
+      "player_id": 4262,
+      "player_name": "Hassan Whiteside",
+      "rank": 9,
+      "score": 2.21
+     },
+     {
+      "player_id": 3102531,
+      "player_name": "Kristaps Porzingis",
+      "rank": 10,
+      "score": 2.19
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 3032979,
+      "player_name": "Dennis Schroder",
+      "rank": 1,
+      "score": 21.83
+     },
+     {
+      "player_id": 2799,
+      "player_name": "Lou Williams",
+      "rank": 2,
+      "score": 21.81
+     },
+     {
+      "player_id": 3456,
+      "player_name": "Derrick Rose",
+      "rank": 3,
+      "score": 21.46
+     },
+     {
+      "player_id": 2991055,
+      "player_name": "Montrezl Harrell",
+      "rank": 4,
+      "score": 21.23
+     },
+     {
+      "player_id": 3423,
+      "player_name": "Goran Dragic",
+      "rank": 5,
+      "score": 19.5
+     },
+     {
+      "player_id": 6429,
+      "player_name": "Alec Burks",
+      "rank": 6,
+      "score": 17.55
+     },
+     {
+      "player_id": 6426,
+      "player_name": "Davis Bertans",
+      "rank": 7,
+      "score": 17.43
+     },
+     {
+      "player_id": 2528426,
+      "player_name": "Jordan Clarkson",
+      "rank": 8,
+      "score": 16.8
+     },
+     {
+      "player_id": 6619,
+      "player_name": "Terrence Ross",
+      "rank": 9,
+      "score": 16.12
+     },
+     {
+      "player_id": 4395725,
+      "player_name": "Tyler Herro",
+      "rank": 10,
+      "score": 15.63
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 3133601,
+      "player_name": "Devonte' Graham",
+      "rank": 1,
+      "score": 19.8
+     },
+     {
+      "player_id": 4277905,
+      "player_name": "Trae Young",
+      "rank": 2,
+      "score": 12.18
+     },
+     {
+      "player_id": 4066261,
+      "player_name": "Bam Adebayo",
+      "rank": 3,
+      "score": 12.09
+     },
+     {
+      "player_id": 3945274,
+      "player_name": "Luka Doncic",
+      "rank": 4,
+      "score": 11.68
+     },
+     {
+      "player_id": 2991039,
+      "player_name": "Glenn Robinson III",
+      "rank": 5,
+      "score": 10.75
+     },
+     {
+      "player_id": 3074752,
+      "player_name": "Terry Rozier",
+      "rank": 6,
+      "score": 10.6
+     },
+     {
+      "player_id": 4278073,
+      "player_name": "Shai Gilgeous-Alexander",
+      "rank": 7,
+      "score": 10.49
+     },
+     {
+      "player_id": 3917376,
+      "player_name": "Jaylen Brown",
+      "rank": 8,
+      "score": 9.64
+     },
+     {
+      "player_id": 2991230,
+      "player_name": "Fred VanVleet",
+      "rank": 9,
+      "score": 9.35
+     },
+     {
+      "player_id": 4065648,
+      "player_name": "Jayson Tatum",
+      "rank": 10,
+      "score": 9.31
+     }
+    ]
+   }
+  }
+ ]
+}

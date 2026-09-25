@@ -1,0 +1,258 @@
+{
+ "season": "2018-19",
+ "snapshots": [
+  {
+   "date": "2026-09-25",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 1,
+      "score": 41.74
+     },
+     {
+      "player_id": 3032977,
+      "player_name": "Giannis Antetokounmpo",
+      "rank": 2,
+      "score": 38.33
+     },
+     {
+      "player_id": 3468,
+      "player_name": "Russell Westbrook",
+      "rank": 3,
+      "score": 35.23
+     },
+     {
+      "player_id": 3059318,
+      "player_name": "Joel Embiid",
+      "rank": 4,
+      "score": 35.12
+     },
+     {
+      "player_id": 1966,
+      "player_name": "LeBron James",
+      "rank": 5,
+      "score": 32.74
+     },
+     {
+      "player_id": 3202,
+      "player_name": "Kevin Durant",
+      "rank": 6,
+      "score": 32.16
+     },
+     {
+      "player_id": 4251,
+      "player_name": "Paul George",
+      "rank": 7,
+      "score": 32.13
+     },
+     {
+      "player_id": 3975,
+      "player_name": "Stephen Curry",
+      "rank": 8,
+      "score": 32.05
+     },
+     {
+      "player_id": 6450,
+      "player_name": "Kawhi Leonard",
+      "rank": 9,
+      "score": 31.25
+     },
+     {
+      "player_id": 6606,
+      "player_name": "Damian Lillard",
+      "rank": 10,
+      "score": 31.08
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 3133628,
+      "player_name": "Myles Turner",
+      "rank": 1,
+      "score": 3.5
+     },
+     {
+      "player_id": 6585,
+      "player_name": "Andre Drummond",
+      "rank": 2,
+      "score": 3.19
+     },
+     {
+      "player_id": 3032976,
+      "player_name": "Rudy Gobert",
+      "rank": 3,
+      "score": 3.0
+     },
+     {
+      "player_id": 6583,
+      "player_name": "Anthony Davis",
+      "rank": 4,
+      "score": 2.6
+     },
+     {
+      "player_id": 4262,
+      "player_name": "Hassan Whiteside",
+      "rank": 5,
+      "score": 2.49
+     },
+     {
+      "player_id": 3448,
+      "player_name": "Brook Lopez",
+      "rank": 6,
+      "score": 2.46
+     },
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 7,
+      "score": 2.44
+     },
+     {
+      "player_id": 3032977,
+      "player_name": "Giannis Antetokounmpo",
+      "rank": 8,
+      "score": 2.43
+     },
+     {
+      "player_id": 4351852,
+      "player_name": "Mitchell Robinson",
+      "rank": 9,
+      "score": 2.32
+     },
+     {
+      "player_id": 4277961,
+      "player_name": "Jaren Jackson Jr.",
+      "rank": 10,
+      "score": 2.25
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 2799,
+      "player_name": "Lou Williams",
+      "rank": 1,
+      "score": 23.39
+     },
+     {
+      "player_id": 3456,
+      "player_name": "Derrick Rose",
+      "rank": 2,
+      "score": 20.82
+     },
+     {
+      "player_id": 2580782,
+      "player_name": "Spencer Dinwiddie",
+      "rank": 3,
+      "score": 19.71
+     },
+     {
+      "player_id": 2991055,
+      "player_name": "Montrezl Harrell",
+      "rank": 4,
+      "score": 19.22
+     },
+     {
+      "player_id": 2528426,
+      "player_name": "Jordan Clarkson",
+      "rank": 5,
+      "score": 18.88
+     },
+     {
+      "player_id": 3032979,
+      "player_name": "Dennis Schroder",
+      "rank": 6,
+      "score": 18.44
+     },
+     {
+      "player_id": 1987,
+      "player_name": "Dwyane Wade",
+      "rank": 7,
+      "score": 18.12
+     },
+     {
+      "player_id": 3155942,
+      "player_name": "Domantas Sabonis",
+      "rank": 8,
+      "score": 17.86
+     },
+     {
+      "player_id": 3056600,
+      "player_name": "Jabari Parker",
+      "rank": 9,
+      "score": 17.36
+     },
+     {
+      "player_id": 4277848,
+      "player_name": "Marvin Bagley III",
+      "rank": 10,
+      "score": 17.29
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 6583,
+      "player_name": "Anthony Davis",
+      "rank": 1,
+      "score": 38.82
+     },
+     {
+      "player_id": 3995,
+      "player_name": "Jrue Holiday",
+      "rank": 2,
+      "score": 32.66
+     },
+     {
+      "player_id": 4066336,
+      "player_name": "Lauri Markkanen",
+      "rank": 3,
+      "score": 26.95
+     },
+     {
+      "player_id": 6459,
+      "player_name": "Nikola Mirotic",
+      "rank": 4,
+      "score": 21.88
+     },
+     {
+      "player_id": 3064482,
+      "player_name": "Bobby Portis",
+      "rank": 5,
+      "score": 21.68
+     },
+     {
+      "player_id": 3026,
+      "player_name": "Rajon Rondo",
+      "rank": 6,
+      "score": 21.16
+     },
+     {
+      "player_id": 2991139,
+      "player_name": "Kris Dunn",
+      "rank": 7,
+      "score": 20.35
+     },
+     {
+      "player_id": 6460,
+      "player_name": "E'Twaun Moore",
+      "rank": 8,
+      "score": 15.67
+     },
+     {
+      "player_id": 2284101,
+      "player_name": "Justin Holiday",
+      "rank": 9,
+      "score": 15.19
+     },
+     {
+      "player_id": 3447,
+      "player_name": "Robin Lopez",
+      "rank": 10,
+      "score": 13.61
+     }
+    ]
+   }
+  }
+ ]
+}

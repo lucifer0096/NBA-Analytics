@@ -1,0 +1,258 @@
+{
+ "season": "2024-25",
+ "snapshots": [
+  {
+   "date": "2026-09-25",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3112335,
+      "player_name": "Nikola Jokic",
+      "rank": 1,
+      "score": 41.67
+     },
+     {
+      "player_id": 4278073,
+      "player_name": "Shai Gilgeous-Alexander",
+      "rank": 2,
+      "score": 39.52
+     },
+     {
+      "player_id": 3032977,
+      "player_name": "Giannis Antetokounmpo",
+      "rank": 3,
+      "score": 38.33
+     },
+     {
+      "player_id": 3945274,
+      "player_name": "Luka Doncic",
+      "rank": 4,
+      "score": 35.41
+     },
+     {
+      "player_id": 4065648,
+      "player_name": "Jayson Tatum",
+      "rank": 5,
+      "score": 35.28
+     },
+     {
+      "player_id": 1966,
+      "player_name": "LeBron James",
+      "rank": 6,
+      "score": 32.49
+     },
+     {
+      "player_id": 4432166,
+      "player_name": "Cade Cunningham",
+      "rank": 7,
+      "score": 32.44
+     },
+     {
+      "player_id": 3136195,
+      "player_name": "Karl-Anthony Towns",
+      "rank": 8,
+      "score": 31.49
+     },
+     {
+      "player_id": 6583,
+      "player_name": "Anthony Davis",
+      "rank": 9,
+      "score": 31.19
+     },
+     {
+      "player_id": 4594268,
+      "player_name": "Anthony Edwards",
+      "rank": 10,
+      "score": 30.52
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 5104157,
+      "player_name": "Victor Wembanyama",
+      "rank": 1,
+      "score": 3.5
+     },
+     {
+      "player_id": 6583,
+      "player_name": "Anthony Davis",
+      "rank": 2,
+      "score": 2.92
+     },
+     {
+      "player_id": 4278073,
+      "player_name": "Shai Gilgeous-Alexander",
+      "rank": 3,
+      "score": 2.65
+     },
+     {
+      "player_id": 4684740,
+      "player_name": "Amen Thompson",
+      "rank": 4,
+      "score": 2.52
+     },
+     {
+      "player_id": 4869342,
+      "player_name": "Dyson Daniels",
+      "rank": 5,
+      "score": 2.49
+     },
+     {
+      "player_id": 4433192,
+      "player_name": "Tari Eason",
+      "rank": 6,
+      "score": 2.41
+     },
+     {
+      "player_id": 6589,
+      "player_name": "Draymond Green",
+      "rank": 7,
+      "score": 2.25
+     },
+     {
+      "player_id": 4593803,
+      "player_name": "Jalen Williams",
+      "rank": 8,
+      "score": 2.25
+     },
+     {
+      "player_id": 4683692,
+      "player_name": "Cason Wallace",
+      "rank": 9,
+      "score": 2.23
+     },
+     {
+      "player_id": 3102531,
+      "player_name": "Kristaps Porzingis",
+      "rank": 10,
+      "score": 2.21
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 4065732,
+      "player_name": "De'Andre Hunter",
+      "rank": 1,
+      "score": 18.73
+     },
+     {
+      "player_id": 3907822,
+      "player_name": "Malik Beasley",
+      "rank": 2,
+      "score": 17.79
+     },
+     {
+      "player_id": 4433247,
+      "player_name": "Jonathan Kuminga",
+      "rank": 3,
+      "score": 17.56
+     },
+     {
+      "player_id": 4066354,
+      "player_name": "Payton Pritchard",
+      "rank": 4,
+      "score": 17.0
+     },
+     {
+      "player_id": 3064482,
+      "player_name": "Bobby Portis",
+      "rank": 5,
+      "score": 16.87
+     },
+     {
+      "player_id": 4396971,
+      "player_name": "Naz Reid",
+      "rank": 6,
+      "score": 16.86
+     },
+     {
+      "player_id": 4683678,
+      "player_name": "Scoot Henderson",
+      "rank": 7,
+      "score": 15.97
+     },
+     {
+      "player_id": 4593125,
+      "player_name": "Santi Aldama",
+      "rank": 8,
+      "score": 15.52
+     },
+     {
+      "player_id": 4065733,
+      "player_name": "Ty Jerome",
+      "rank": 9,
+      "score": 14.85
+     },
+     {
+      "player_id": 4395723,
+      "player_name": "Keldon Johnson",
+      "rank": 10,
+      "score": 14.73
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 4869342,
+      "player_name": "Dyson Daniels",
+      "rank": 1,
+      "score": 11.54
+     },
+     {
+      "player_id": 4397014,
+      "player_name": "Quentin Grimes",
+      "rank": 2,
+      "score": 11.04
+     },
+     {
+      "player_id": 4431767,
+      "player_name": "Christian Braun",
+      "rank": 3,
+      "score": 10.18
+     },
+     {
+      "player_id": 2595516,
+      "player_name": "Norman Powell",
+      "rank": 4,
+      "score": 9.33
+     },
+     {
+      "player_id": 4017837,
+      "player_name": "Ivica Zubac",
+      "rank": 5,
+      "score": 8.95
+     },
+     {
+      "player_id": 4278594,
+      "player_name": "Naji Marshall",
+      "rank": 6,
+      "score": 8.1
+     },
+     {
+      "player_id": 4397688,
+      "player_name": "Trey Murphy III",
+      "rank": 7,
+      "score": 7.92
+     },
+     {
+      "player_id": 5106258,
+      "player_name": "Gradey Dick",
+      "rank": 8,
+      "score": 7.6
+     },
+     {
+      "player_id": 4712849,
+      "player_name": "Anthony Black",
+      "rank": 9,
+      "score": 7.31
+     },
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 10,
+      "score": 7.3
+     }
+    ]
+   }
+  }
+ ]
+}

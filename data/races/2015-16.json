@@ -1,0 +1,258 @@
+{
+ "season": "2015-16",
+ "snapshots": [
+  {
+   "date": "2026-09-25",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3975,
+      "player_name": "Stephen Curry",
+      "rank": 1,
+      "score": 36.26
+     },
+     {
+      "player_id": 3202,
+      "player_name": "Kevin Durant",
+      "rank": 2,
+      "score": 32.15
+     },
+     {
+      "player_id": 3468,
+      "player_name": "Russell Westbrook",
+      "rank": 3,
+      "score": 32.05
+     },
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 4,
+      "score": 30.27
+     },
+     {
+      "player_id": 1966,
+      "player_name": "LeBron James",
+      "rank": 5,
+      "score": 30.11
+     },
+     {
+      "player_id": 4258,
+      "player_name": "DeMarcus Cousins",
+      "rank": 6,
+      "score": 26.6
+     },
+     {
+      "player_id": 6606,
+      "player_name": "Damian Lillard",
+      "rank": 7,
+      "score": 26.39
+     },
+     {
+      "player_id": 2779,
+      "player_name": "Chris Paul",
+      "rank": 8,
+      "score": 25.96
+     },
+     {
+      "player_id": 6589,
+      "player_name": "Draymond Green",
+      "rank": 9,
+      "score": 25.82
+     },
+     {
+      "player_id": 4237,
+      "player_name": "John Wall",
+      "rank": 10,
+      "score": 25.14
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 4262,
+      "player_name": "Hassan Whiteside",
+      "rank": 1,
+      "score": 3.83
+     },
+     {
+      "player_id": 3015,
+      "player_name": "Paul Millsap",
+      "rank": 2,
+      "score": 2.94
+     },
+     {
+      "player_id": 3032976,
+      "player_name": "Rudy Gobert",
+      "rank": 3,
+      "score": 2.72
+     },
+     {
+      "player_id": 3442,
+      "player_name": "DeAndre Jordan",
+      "rank": 4,
+      "score": 2.53
+     },
+     {
+      "player_id": 6450,
+      "player_name": "Kawhi Leonard",
+      "rank": 5,
+      "score": 2.49
+     },
+     {
+      "player_id": 4257,
+      "player_name": "Derrick Favors",
+      "rank": 6,
+      "score": 2.36
+     },
+     {
+      "player_id": 3012,
+      "player_name": "Kyle Lowry",
+      "rank": 7,
+      "score": 2.21
+     },
+     {
+      "player_id": 6585,
+      "player_name": "Andre Drummond",
+      "rank": 8,
+      "score": 2.2
+     },
+     {
+      "player_id": 3102531,
+      "player_name": "Kristaps Porzingis",
+      "rank": 9,
+      "score": 2.11
+     },
+     {
+      "player_id": 6589,
+      "player_name": "Draymond Green",
+      "rank": 10,
+      "score": 2.1
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 6579,
+      "player_name": "Will Barton",
+      "rank": 1,
+      "score": 15.8
+     },
+     {
+      "player_id": 3973,
+      "player_name": "Darren Collison",
+      "rank": 2,
+      "score": 15.37
+     },
+     {
+      "player_id": 165,
+      "player_name": "Jamal Crawford",
+      "rank": 3,
+      "score": 14.57
+     },
+     {
+      "player_id": 6447,
+      "player_name": "Enes Freedom",
+      "rank": 4,
+      "score": 13.89
+     },
+     {
+      "player_id": 2389,
+      "player_name": "Al Jefferson",
+      "rank": 5,
+      "score": 13.63
+     },
+     {
+      "player_id": 4239,
+      "player_name": "Evan Turner",
+      "rank": 6,
+      "score": 13.29
+     },
+     {
+      "player_id": 4299,
+      "player_name": "Jeremy Lin",
+      "rank": 7,
+      "score": 13.27
+     },
+     {
+      "player_id": 3554,
+      "player_name": "Omri Casspi",
+      "rank": 8,
+      "score": 12.89
+     },
+     {
+      "player_id": 4385,
+      "player_name": "Mirza Teletovic",
+      "rank": 9,
+      "score": 12.78
+     },
+     {
+      "player_id": 3032979,
+      "player_name": "Dennis Schroder",
+      "rank": 10,
+      "score": 12.62
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 2490149,
+      "player_name": "CJ McCollum",
+      "rank": 1,
+      "score": 16.81
+     },
+     {
+      "player_id": 2999547,
+      "player_name": "Gary Harris",
+      "rank": 2,
+      "score": 11.01
+     },
+     {
+      "player_id": 6579,
+      "player_name": "Will Barton",
+      "rank": 3,
+      "score": 10.5
+     },
+     {
+      "player_id": 3428,
+      "player_name": "Danilo Gallinari",
+      "rank": 4,
+      "score": 8.87
+     },
+     {
+      "player_id": 6637,
+      "player_name": "Kent Bazemore",
+      "rank": 5,
+      "score": 8.61
+     },
+     {
+      "player_id": 2531210,
+      "player_name": "Allen Crabbe",
+      "rank": 6,
+      "score": 8.11
+     },
+     {
+      "player_id": 6581,
+      "player_name": "Jae Crowder",
+      "rank": 7,
+      "score": 8.09
+     },
+     {
+      "player_id": 6589,
+      "player_name": "Draymond Green",
+      "rank": 8,
+      "score": 7.65
+     },
+     {
+      "player_id": 2594922,
+      "player_name": "Otto Porter Jr.",
+      "rank": 9,
+      "score": 7.44
+     },
+     {
+      "player_id": 6472,
+      "player_name": "Isaiah Thomas",
+      "rank": 10,
+      "score": 7.25
+     }
+    ]
+   }
+  }
+ ]
+}

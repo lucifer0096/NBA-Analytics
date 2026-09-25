@@ -1,0 +1,258 @@
+{
+ "season": "2016-17",
+ "snapshots": [
+  {
+   "date": "2026-09-25",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3468,
+      "player_name": "Russell Westbrook",
+      "rank": 1,
+      "score": 38.38
+     },
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 2,
+      "score": 37.06
+     },
+     {
+      "player_id": 1966,
+      "player_name": "LeBron James",
+      "rank": 3,
+      "score": 32.89
+     },
+     {
+      "player_id": 3202,
+      "player_name": "Kevin Durant",
+      "rank": 4,
+      "score": 30.86
+     },
+     {
+      "player_id": 3975,
+      "player_name": "Stephen Curry",
+      "rank": 5,
+      "score": 30.61
+     },
+     {
+      "player_id": 6472,
+      "player_name": "Isaiah Thomas",
+      "rank": 6,
+      "score": 29.2
+     },
+     {
+      "player_id": 4237,
+      "player_name": "John Wall",
+      "rank": 7,
+      "score": 28.93
+     },
+     {
+      "player_id": 3978,
+      "player_name": "DeMar DeRozan",
+      "rank": 8,
+      "score": 28.15
+     },
+     {
+      "player_id": 6450,
+      "player_name": "Kawhi Leonard",
+      "rank": 9,
+      "score": 27.68
+     },
+     {
+      "player_id": 6606,
+      "player_name": "Damian Lillard",
+      "rank": 10,
+      "score": 27.39
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 3032976,
+      "player_name": "Rudy Gobert",
+      "rank": 1,
+      "score": 3.01
+     },
+     {
+      "player_id": 3032977,
+      "player_name": "Giannis Antetokounmpo",
+      "rank": 2,
+      "score": 2.89
+     },
+     {
+      "player_id": 6589,
+      "player_name": "Draymond Green",
+      "rank": 3,
+      "score": 2.76
+     },
+     {
+      "player_id": 4262,
+      "player_name": "Hassan Whiteside",
+      "rank": 4,
+      "score": 2.52
+     },
+     {
+      "player_id": 6450,
+      "player_name": "Kawhi Leonard",
+      "rank": 5,
+      "score": 2.32
+     },
+     {
+      "player_id": 3133628,
+      "player_name": "Myles Turner",
+      "rank": 6,
+      "score": 2.31
+     },
+     {
+      "player_id": 6585,
+      "player_name": "Andre Drummond",
+      "rank": 7,
+      "score": 2.27
+     },
+     {
+      "player_id": 3202,
+      "player_name": "Kevin Durant",
+      "rank": 8,
+      "score": 2.14
+     },
+     {
+      "player_id": 3032980,
+      "player_name": "Lucas Nogueira",
+      "rank": 9,
+      "score": 2.13
+     },
+     {
+      "player_id": 3999,
+      "player_name": "James Johnson",
+      "rank": 10,
+      "score": 1.97
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 2799,
+      "player_name": "Lou Williams",
+      "rank": 1,
+      "score": 17.66
+     },
+     {
+      "player_id": 3431,
+      "player_name": "Eric Gordon",
+      "rank": 2,
+      "score": 16.64
+     },
+     {
+      "player_id": 1017,
+      "player_name": "Zach Randolph",
+      "rank": 3,
+      "score": 16.01
+     },
+     {
+      "player_id": 2528426,
+      "player_name": "Jordan Clarkson",
+      "rank": 4,
+      "score": 15.58
+     },
+     {
+      "player_id": 2530276,
+      "player_name": "Tyler Johnson",
+      "rank": 5,
+      "score": 15.46
+     },
+     {
+      "player_id": 6579,
+      "player_name": "Will Barton",
+      "rank": 6,
+      "score": 15.38
+     },
+     {
+      "player_id": 3999,
+      "player_name": "James Johnson",
+      "rank": 7,
+      "score": 15.27
+     },
+     {
+      "player_id": 6447,
+      "player_name": "Enes Freedom",
+      "rank": 8,
+      "score": 15.01
+     },
+     {
+      "player_id": 2528210,
+      "player_name": "Tim Hardaway Jr.",
+      "rank": 9,
+      "score": 14.83
+     },
+     {
+      "player_id": 2488689,
+      "player_name": "Sean Kilpatrick",
+      "rank": 10,
+      "score": 14.46
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 3456,
+      "player_name": "Derrick Rose",
+      "rank": 1,
+      "score": 23.74
+     },
+     {
+      "player_id": 3431,
+      "player_name": "Eric Gordon",
+      "rank": 2,
+      "score": 19.06
+     },
+     {
+      "player_id": 996,
+      "player_name": "Pau Gasol",
+      "rank": 3,
+      "score": 18.44
+     },
+     {
+      "player_id": 3412,
+      "player_name": "Ryan Anderson",
+      "rank": 4,
+      "score": 16.59
+     },
+     {
+      "player_id": 3999,
+      "player_name": "James Johnson",
+      "rank": 5,
+      "score": 11.81
+     },
+     {
+      "player_id": 2528353,
+      "player_name": "Tony Snell",
+      "rank": 6,
+      "score": 10.96
+     },
+     {
+      "player_id": 3112335,
+      "player_name": "Nikola Jokic",
+      "rank": 7,
+      "score": 10.17
+     },
+     {
+      "player_id": 3136195,
+      "player_name": "Karl-Anthony Towns",
+      "rank": 8,
+      "score": 9.58
+     },
+     {
+      "player_id": 3468,
+      "player_name": "Russell Westbrook",
+      "rank": 9,
+      "score": 9.37
+     },
+     {
+      "player_id": 2528210,
+      "player_name": "Tim Hardaway Jr.",
+      "rank": 10,
+      "score": 9.0
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,258 @@
+{
+ "season": "2013-14",
+ "snapshots": [
+  {
+   "date": "2026-09-25",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3202,
+      "player_name": "Kevin Durant",
+      "rank": 1,
+      "score": 35.97
+     },
+     {
+      "player_id": 1966,
+      "player_name": "LeBron James",
+      "rank": 2,
+      "score": 31.52
+     },
+     {
+      "player_id": 3449,
+      "player_name": "Kevin Love",
+      "rank": 3,
+      "score": 29.84
+     },
+     {
+      "player_id": 3989,
+      "player_name": "Blake Griffin",
+      "rank": 4,
+      "score": 28.77
+     },
+     {
+      "player_id": 3975,
+      "player_name": "Stephen Curry",
+      "rank": 5,
+      "score": 28.49
+     },
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 6,
+      "score": 28.45
+     },
+     {
+      "player_id": 2983,
+      "player_name": "LaMarcus Aldridge",
+      "rank": 7,
+      "score": 27.68
+     },
+     {
+      "player_id": 2779,
+      "player_name": "Chris Paul",
+      "rank": 8,
+      "score": 26.98
+     },
+     {
+      "player_id": 3468,
+      "player_name": "Russell Westbrook",
+      "rank": 9,
+      "score": 26.82
+     },
+     {
+      "player_id": 1975,
+      "player_name": "Carmelo Anthony",
+      "rank": 10,
+      "score": 26.55
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 3442,
+      "player_name": "DeAndre Jordan",
+      "rank": 1,
+      "score": 2.64
+     },
+     {
+      "player_id": 3439,
+      "player_name": "Serge Ibaka",
+      "rank": 2,
+      "score": 2.52
+     },
+     {
+      "player_id": 3436,
+      "player_name": "Roy Hibbert",
+      "rank": 3,
+      "score": 2.27
+     },
+     {
+      "player_id": 6450,
+      "player_name": "Kawhi Leonard",
+      "rank": 4,
+      "score": 2.22
+     },
+     {
+      "player_id": 3015,
+      "player_name": "Paul Millsap",
+      "rank": 5,
+      "score": 2.12
+     },
+     {
+      "player_id": 2747,
+      "player_name": "Andrew Bogut",
+      "rank": 6,
+      "score": 2.1
+     },
+     {
+      "player_id": 3206,
+      "player_name": "Marc Gasol",
+      "rank": 7,
+      "score": 2.1
+     },
+     {
+      "player_id": 215,
+      "player_name": "Tim Duncan",
+      "rank": 8,
+      "score": 2.07
+     },
+     {
+      "player_id": 4251,
+      "player_name": "Paul George",
+      "rank": 9,
+      "score": 1.99
+     },
+     {
+      "player_id": 4237,
+      "player_name": "John Wall",
+      "rank": 10,
+      "score": 1.98
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 165,
+      "player_name": "Jamal Crawford",
+      "rank": 1,
+      "score": 19.18
+     },
+     {
+      "player_id": 3243,
+      "player_name": "Nick Young",
+      "rank": 2,
+      "score": 18.27
+     },
+     {
+      "player_id": 6628,
+      "player_name": "Dion Waiters",
+      "rank": 3,
+      "score": 16.8
+     },
+     {
+      "player_id": 6429,
+      "player_name": "Alec Burks",
+      "rank": 4,
+      "score": 15.47
+     },
+     {
+      "player_id": 6461,
+      "player_name": "Markieff Morris",
+      "rank": 5,
+      "score": 14.92
+     },
+     {
+      "player_id": 3235,
+      "player_name": "Rodney Stuckey",
+      "rank": 6,
+      "score": 14.2
+     },
+     {
+      "player_id": 6630,
+      "player_name": "Tony Wroten",
+      "rank": 7,
+      "score": 14.18
+     },
+     {
+      "player_id": 272,
+      "player_name": "Manu Ginobili",
+      "rank": 8,
+      "score": 14.09
+     },
+     {
+      "player_id": 3231,
+      "player_name": "Ramon Sessions",
+      "rank": 9,
+      "score": 13.86
+     },
+     {
+      "player_id": 136,
+      "player_name": "Vince Carter",
+      "rank": 10,
+      "score": 12.88
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 3447,
+      "player_name": "Robin Lopez",
+      "rank": 1,
+      "score": 17.03
+     },
+     {
+      "player_id": 4291,
+      "player_name": "Greivis Vasquez",
+      "rank": 2,
+      "score": 14.57
+     },
+     {
+      "player_id": 3190,
+      "player_name": "Marco Belinelli",
+      "rank": 3,
+      "score": 14.44
+     },
+     {
+      "player_id": 2782,
+      "player_name": "Nate Robinson",
+      "rank": 4,
+      "score": 13.49
+     },
+     {
+      "player_id": 2429,
+      "player_name": "Luol Deng",
+      "rank": 5,
+      "score": 12.65
+     },
+     {
+      "player_id": 4241,
+      "player_name": "Xavier Henry",
+      "rank": 6,
+      "score": 12.27
+     },
+     {
+      "player_id": 4238,
+      "player_name": "Eric Bledsoe",
+      "rank": 7,
+      "score": 11.75
+     },
+     {
+      "player_id": 6607,
+      "player_name": "Kendall Marshall",
+      "rank": 8,
+      "score": 11.52
+     },
+     {
+      "player_id": 6443,
+      "player_name": "Reggie Jackson",
+      "rank": 9,
+      "score": 10.75
+     },
+     {
+      "player_id": 4298,
+      "player_name": "Timofey Mozgov",
+      "rank": 10,
+      "score": 9.68
+     }
+    ]
+   }
+  }
+ ]
+}

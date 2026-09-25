@@ -176,6 +176,20 @@ def refresh_standings(seasons_to_try: list) -> dict:
     return {}
 
 
+def _write_season_file(label: str, rows: list, stamp: str = None) -> None:
+    """One season's schedule file under data/schedules/ (compact JSON, own
+    stamp). `stamp` lets the legacy migration keep the old envelope's
+    timestamp instead of inventing a new one."""
+    payload = {"season": label, "games": rows,
+               "_generated_utc": stamp or time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                                        time.gmtime()),
+               "source": "local"}
+    os.makedirs(SCHEDULES_DIR, exist_ok=True)
+    with open(os.path.join(SCHEDULES_DIR, f"{label}.json"), "w",
+              encoding="utf-8") as f:
+        json.dump(payload, f, separators=(",", ":"))
+
+
 def refresh_schedule(season: str) -> dict:
     """Schedule data as ONE file per season under data/schedules/ plus a thin
     index at data/dashboard_schedule.json (the sidebar reads the index; the
@@ -211,12 +225,16 @@ def refresh_schedule(season: str) -> dict:
             seasons_rows[label] = rows
             stamps[label] = payload.get("_generated_utc")
 
-    # 2. Legacy merged envelope: migration source only.
+    # 2. Legacy merged envelope: any season that never got its own file is
+    #    materialised now (one-time migration), keeping the old stamp so the
+    #    file doesn't claim freshness it doesn't have.
     legacy = _read_json(os.path.join(DATA_DIR, "dashboard_schedule.json"), {})
     for label, rows in (legacy.get("seasons") or {}).items():
-        if isinstance(rows, list) and rows and label not in seasons_rows:
-            seasons_rows[label] = rows
-            stamps[label] = legacy.get("_generated_utc")
+        if not (isinstance(rows, list) and rows) or label in seasons_rows:
+            continue
+        seasons_rows[label] = rows
+        stamps[label] = legacy.get("_generated_utc")
+        _write_season_file(label, rows, stamps[label])
 
     # 3. Local raw csvs win -- but only rewrite seasons whose rows changed.
     changed = 0
@@ -233,12 +251,9 @@ def refresh_schedule(season: str) -> dict:
             row["away_score"] = _clean_score(row.get("away_score"))
         if seasons_rows.get(name) == rows:
             continue  # unchanged: keep the file and its stamp as they are
-        payload = _stamp({"season": name, "games": rows}, "local")
-        with open(os.path.join(SCHEDULES_DIR, f"{name}.json"), "w",
-                  encoding="utf-8") as f:
-            json.dump(payload, f, separators=(",", ":"))
+        _write_season_file(name, rows)
         seasons_rows[name] = rows
-        stamps[name] = payload["_generated_utc"]
+        stamps[name] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         changed += 1
 
     if not seasons_rows:

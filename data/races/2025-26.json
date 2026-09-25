@@ -1,0 +1,258 @@
+{
+ "season": "2025-26",
+ "snapshots": [
+  {
+   "date": "2026-09-25",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3112335,
+      "player_name": "Nikola Jokic",
+      "rank": 1,
+      "score": 41.49
+     },
+     {
+      "player_id": 3945274,
+      "player_name": "Luka Doncic",
+      "rank": 2,
+      "score": 40.83
+     },
+     {
+      "player_id": 4278073,
+      "player_name": "Shai Gilgeous-Alexander",
+      "rank": 3,
+      "score": 37.34
+     },
+     {
+      "player_id": 3917376,
+      "player_name": "Jaylen Brown",
+      "rank": 4,
+      "score": 34.08
+     },
+     {
+      "player_id": 4432166,
+      "player_name": "Cade Cunningham",
+      "rank": 5,
+      "score": 33.92
+     },
+     {
+      "player_id": 5104157,
+      "player_name": "Victor Wembanyama",
+      "rank": 6,
+      "score": 32.83
+     },
+     {
+      "player_id": 3908809,
+      "player_name": "Donovan Mitchell",
+      "rank": 7,
+      "score": 31.55
+     },
+     {
+      "player_id": 4701230,
+      "player_name": "Jalen Johnson",
+      "rank": 8,
+      "score": 31.4
+     },
+     {
+      "player_id": 4431678,
+      "player_name": "Tyrese Maxey",
+      "rank": 9,
+      "score": 31.13
+     },
+     {
+      "player_id": 3936299,
+      "player_name": "Jamal Murray",
+      "rank": 10,
+      "score": 30.95
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 5104157,
+      "player_name": "Victor Wembanyama",
+      "rank": 1,
+      "score": 3.71
+     },
+     {
+      "player_id": 4684742,
+      "player_name": "Ausar Thompson",
+      "rank": 2,
+      "score": 2.87
+     },
+     {
+      "player_id": 4433134,
+      "player_name": "Scottie Barnes",
+      "rank": 3,
+      "score": 2.57
+     },
+     {
+      "player_id": 4433255,
+      "player_name": "Chet Holmgren",
+      "rank": 4,
+      "score": 2.49
+     },
+     {
+      "player_id": 3078576,
+      "player_name": "Derrick White",
+      "rank": 5,
+      "score": 2.42
+     },
+     {
+      "player_id": 4683692,
+      "player_name": "Cason Wallace",
+      "rank": 6,
+      "score": 2.28
+     },
+     {
+      "player_id": 4432166,
+      "player_name": "Cade Cunningham",
+      "rank": 7,
+      "score": 2.22
+     },
+     {
+      "player_id": 4871144,
+      "player_name": "Alperen Sengun",
+      "rank": 8,
+      "score": 2.16
+     },
+     {
+      "player_id": 4432165,
+      "player_name": "Jalen Suggs",
+      "rank": 9,
+      "score": 2.14
+     },
+     {
+      "player_id": 3934719,
+      "player_name": "OG Anunoby",
+      "rank": 10,
+      "score": 2.13
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 4432848,
+      "player_name": "Jaime Jaquez Jr.",
+      "rank": 1,
+      "score": 18.96
+     },
+     {
+      "player_id": 4277811,
+      "player_name": "Collin Sexton",
+      "rank": 2,
+      "score": 17.65
+     },
+     {
+      "player_id": 4397002,
+      "player_name": "Ayo Dosunmu",
+      "rank": 3,
+      "score": 17.47
+     },
+     {
+      "player_id": 4593125,
+      "player_name": "Santi Aldama",
+      "rank": 4,
+      "score": 17.13
+     },
+     {
+      "player_id": 5105839,
+      "player_name": "Brice Sensabaugh",
+      "rank": 5,
+      "score": 16.6
+     },
+     {
+      "player_id": 4396971,
+      "player_name": "Naz Reid",
+      "rank": 6,
+      "score": 16.24
+     },
+     {
+      "player_id": 4900671,
+      "player_name": "Ajay Mitchell",
+      "rank": 7,
+      "score": 16.22
+     },
+     {
+      "player_id": 4351851,
+      "player_name": "Anfernee Simons",
+      "rank": 8,
+      "score": 16.1
+     },
+     {
+      "player_id": 3064482,
+      "player_name": "Bobby Portis",
+      "rank": 9,
+      "score": 16.04
+     },
+     {
+      "player_id": 4711272,
+      "player_name": "Reed Sheppard",
+      "rank": 10,
+      "score": 15.95
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 4591725,
+      "player_name": "Ryan Rollins",
+      "rank": 1,
+      "score": 16.8
+     },
+     {
+      "player_id": 4683747,
+      "player_name": "Jaylon Tyson",
+      "rank": 2,
+      "score": 13.26
+     },
+     {
+      "player_id": 4278039,
+      "player_name": "Nickeil Alexander-Walker",
+      "rank": 3,
+      "score": 12.49
+     },
+     {
+      "player_id": 4711272,
+      "player_name": "Reed Sheppard",
+      "rank": 4,
+      "score": 12.12
+     },
+     {
+      "player_id": 4711294,
+      "player_name": "Matas Buzelis",
+      "rank": 5,
+      "score": 10.48
+     },
+     {
+      "player_id": 4601025,
+      "player_name": "Pelle Larsson",
+      "rank": 6,
+      "score": 10.41
+     },
+     {
+      "player_id": 4683021,
+      "player_name": "Deni Avdija",
+      "rank": 7,
+      "score": 9.8
+     },
+     {
+      "player_id": 4397424,
+      "player_name": "Neemias Queta",
+      "rank": 8,
+      "score": 9.56
+     },
+     {
+      "player_id": 5105565,
+      "player_name": "Donovan Clingan",
+      "rank": 9,
+      "score": 9.37
+     },
+     {
+      "player_id": 4432848,
+      "player_name": "Jaime Jaquez Jr.",
+      "rank": 10,
+      "score": 9.36
+     }
+    ]
+   }
+  }
+ ]
+}

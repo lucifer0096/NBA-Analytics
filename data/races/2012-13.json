@@ -1,0 +1,258 @@
+{
+ "season": "2012-13",
+ "snapshots": [
+  {
+   "date": "2026-09-25",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 1966,
+      "player_name": "LeBron James",
+      "rank": 1,
+      "score": 33.57
+     },
+     {
+      "player_id": 3202,
+      "player_name": "Kevin Durant",
+      "rank": 2,
+      "score": 31.73
+     },
+     {
+      "player_id": 1975,
+      "player_name": "Carmelo Anthony",
+      "rank": 3,
+      "score": 28.73
+     },
+     {
+      "player_id": 3468,
+      "player_name": "Russell Westbrook",
+      "rank": 4,
+      "score": 28.6
+     },
+     {
+      "player_id": 110,
+      "player_name": "Kobe Bryant",
+      "rank": 5,
+      "score": 28.38
+     },
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 6,
+      "score": 26.74
+     },
+     {
+      "player_id": 3975,
+      "player_name": "Stephen Curry",
+      "rank": 7,
+      "score": 25.59
+     },
+     {
+      "player_id": 1987,
+      "player_name": "Dwyane Wade",
+      "rank": 8,
+      "score": 25.1
+     },
+     {
+      "player_id": 1015,
+      "player_name": "Tony Parker",
+      "rank": 9,
+      "score": 24.97
+     },
+     {
+      "player_id": 2779,
+      "player_name": "Chris Paul",
+      "rank": 10,
+      "score": 23.61
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 3439,
+      "player_name": "Serge Ibaka",
+      "rank": 1,
+      "score": 2.74
+     },
+     {
+      "player_id": 215,
+      "player_name": "Tim Duncan",
+      "rank": 2,
+      "score": 2.73
+     },
+     {
+      "player_id": 3436,
+      "player_name": "Roy Hibbert",
+      "rank": 3,
+      "score": 2.67
+     },
+     {
+      "player_id": 3206,
+      "player_name": "Marc Gasol",
+      "rank": 4,
+      "score": 2.49
+     },
+     {
+      "player_id": 4265,
+      "player_name": "Larry Sanders",
+      "rank": 5,
+      "score": 2.37
+     },
+     {
+      "player_id": 2411,
+      "player_name": "Josh Smith",
+      "rank": 6,
+      "score": 2.32
+     },
+     {
+      "player_id": 2384,
+      "player_name": "Dwight Howard",
+      "rank": 7,
+      "score": 2.27
+     },
+     {
+      "player_id": 3202,
+      "player_name": "Kevin Durant",
+      "rank": 8,
+      "score": 2.24
+     },
+     {
+      "player_id": 1987,
+      "player_name": "Dwyane Wade",
+      "rank": 9,
+      "score": 2.24
+     },
+     {
+      "player_id": 3195,
+      "player_name": "Mike Conley",
+      "rank": 10,
+      "score": 2.24
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 2444,
+      "player_name": "JR Smith",
+      "rank": 1,
+      "score": 19.24
+     },
+     {
+      "player_id": 165,
+      "player_name": "Jamal Crawford",
+      "rank": 2,
+      "score": 16.87
+     },
+     {
+      "player_id": 3231,
+      "player_name": "Ramon Sessions",
+      "rank": 3,
+      "score": 16.06
+     },
+     {
+      "player_id": 3024,
+      "player_name": "JJ Redick",
+      "rank": 4,
+      "score": 16.05
+     },
+     {
+      "player_id": 4249,
+      "player_name": "Gordon Hayward",
+      "rank": 5,
+      "score": 15.51
+     },
+     {
+      "player_id": 2768,
+      "player_name": "Jarrett Jack",
+      "rank": 6,
+      "score": 14.5
+     },
+     {
+      "player_id": 136,
+      "player_name": "Vince Carter",
+      "rank": 7,
+      "score": 14.2
+     },
+     {
+      "player_id": 3209,
+      "player_name": "Jeff Green",
+      "rank": 8,
+      "score": 14.04
+     },
+     {
+      "player_id": 2394,
+      "player_name": "Kevin Martin",
+      "rank": 9,
+      "score": 13.64
+     },
+     {
+      "player_id": 272,
+      "player_name": "Manu Ginobili",
+      "rank": 10,
+      "score": 13.6
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 3213,
+      "player_name": "Al Horford",
+      "rank": 1,
+      "score": 23.5
+     },
+     {
+      "player_id": 3975,
+      "player_name": "Stephen Curry",
+      "rank": 2,
+      "score": 21.97
+     },
+     {
+      "player_id": 3448,
+      "player_name": "Brook Lopez",
+      "rank": 3,
+      "score": 21.53
+     },
+     {
+      "player_id": 1017,
+      "player_name": "Zach Randolph",
+      "rank": 4,
+      "score": 15.44
+     },
+     {
+      "player_id": 6478,
+      "player_name": "Nikola Vucevic",
+      "rank": 5,
+      "score": 14.28
+     },
+     {
+      "player_id": 4265,
+      "player_name": "Larry Sanders",
+      "rank": 6,
+      "score": 12.0
+     },
+     {
+      "player_id": 3414,
+      "player_name": "Omer Asik",
+      "rank": 7,
+      "score": 10.82
+     },
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 8,
+      "score": 10.47
+     },
+     {
+      "player_id": 4244,
+      "player_name": "Lance Stephenson",
+      "rank": 9,
+      "score": 10.21
+     },
+     {
+      "player_id": 6462,
+      "player_name": "Marcus Morris Sr.",
+      "rank": 10,
+      "score": 9.61
+     }
+    ]
+   }
+  }
+ ]
+}

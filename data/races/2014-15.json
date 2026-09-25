@@ -1,0 +1,258 @@
+{
+ "season": "2014-15",
+ "snapshots": [
+  {
+   "date": "2026-09-25",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 1,
+      "score": 31.73
+     },
+     {
+      "player_id": 3468,
+      "player_name": "Russell Westbrook",
+      "rank": 2,
+      "score": 30.89
+     },
+     {
+      "player_id": 3975,
+      "player_name": "Stephen Curry",
+      "rank": 3,
+      "score": 29.72
+     },
+     {
+      "player_id": 1966,
+      "player_name": "LeBron James",
+      "rank": 4,
+      "score": 28.71
+     },
+     {
+      "player_id": 3989,
+      "player_name": "Blake Griffin",
+      "rank": 5,
+      "score": 27.04
+     },
+     {
+      "player_id": 2779,
+      "player_name": "Chris Paul",
+      "rank": 6,
+      "score": 26.68
+     },
+     {
+      "player_id": 2983,
+      "player_name": "LaMarcus Aldridge",
+      "rank": 7,
+      "score": 25.81
+     },
+     {
+      "player_id": 4258,
+      "player_name": "DeMarcus Cousins",
+      "rank": 8,
+      "score": 24.41
+     },
+     {
+      "player_id": 6606,
+      "player_name": "Damian Lillard",
+      "rank": 9,
+      "score": 24.3
+     },
+     {
+      "player_id": 4237,
+      "player_name": "John Wall",
+      "rank": 10,
+      "score": 23.76
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 6450,
+      "player_name": "Kawhi Leonard",
+      "rank": 1,
+      "score": 2.89
+     },
+     {
+      "player_id": 3032976,
+      "player_name": "Rudy Gobert",
+      "rank": 2,
+      "score": 2.84
+     },
+     {
+      "player_id": 2991280,
+      "player_name": "Nerlens Noel",
+      "rank": 3,
+      "score": 2.59
+     },
+     {
+      "player_id": 215,
+      "player_name": "Tim Duncan",
+      "rank": 4,
+      "score": 2.59
+     },
+     {
+      "player_id": 4262,
+      "player_name": "Hassan Whiteside",
+      "rank": 5,
+      "score": 2.43
+     },
+     {
+      "player_id": 3442,
+      "player_name": "DeAndre Jordan",
+      "rank": 6,
+      "score": 2.39
+     },
+     {
+      "player_id": 4257,
+      "player_name": "Derrick Favors",
+      "rank": 7,
+      "score": 2.36
+     },
+     {
+      "player_id": 3015,
+      "player_name": "Paul Millsap",
+      "rank": 8,
+      "score": 2.33
+     },
+     {
+      "player_id": 2367,
+      "player_name": "Tony Allen",
+      "rank": 9,
+      "score": 2.27
+     },
+     {
+      "player_id": 3206,
+      "player_name": "Marc Gasol",
+      "rank": 10,
+      "score": 2.24
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 6472,
+      "player_name": "Isaiah Thomas",
+      "rank": 1,
+      "score": 18.48
+     },
+     {
+      "player_id": 165,
+      "player_name": "Jamal Crawford",
+      "rank": 2,
+      "score": 16.25
+     },
+     {
+      "player_id": 2799,
+      "player_name": "Lou Williams",
+      "rank": 3,
+      "score": 16.11
+     },
+     {
+      "player_id": 2768,
+      "player_name": "Jarrett Jack",
+      "rank": 4,
+      "score": 13.94
+     },
+     {
+      "player_id": 3243,
+      "player_name": "Nick Young",
+      "rank": 5,
+      "score": 13.8
+     },
+     {
+      "player_id": 1703,
+      "player_name": "Carlos Boozer",
+      "rank": 6,
+      "score": 13.05
+     },
+     {
+      "player_id": 6628,
+      "player_name": "Dion Waiters",
+      "rank": 7,
+      "score": 12.76
+     },
+     {
+      "player_id": 3450,
+      "player_name": "O.J. Mayo",
+      "rank": 8,
+      "score": 12.69
+     },
+     {
+      "player_id": 2761,
+      "player_name": "Gerald Green",
+      "rank": 9,
+      "score": 12.61
+     },
+     {
+      "player_id": 3191,
+      "player_name": "Corey Brewer",
+      "rank": 10,
+      "score": 12.48
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 1703,
+      "player_name": "Carlos Boozer",
+      "rank": 1,
+      "score": 16.87
+     },
+     {
+      "player_id": 3415,
+      "player_name": "D.J. Augustin",
+      "rank": 2,
+      "score": 13.99
+     },
+     {
+      "player_id": 3474,
+      "player_name": "Anthony Morrow",
+      "rank": 3,
+      "score": 12.56
+     },
+     {
+      "player_id": 3032976,
+      "player_name": "Rudy Gobert",
+      "rank": 4,
+      "score": 11.51
+     },
+     {
+      "player_id": 4248,
+      "player_name": "Al-Farouq Aminu",
+      "rank": 5,
+      "score": 9.55
+     },
+     {
+      "player_id": 6641,
+      "player_name": "Brian Roberts",
+      "rank": 6,
+      "score": 9.43
+     },
+     {
+      "player_id": 4303,
+      "player_name": "Donald Sloan",
+      "rank": 7,
+      "score": 9.38
+     },
+     {
+      "player_id": 3882,
+      "player_name": "Alexey Shved",
+      "rank": 8,
+      "score": 8.96
+     },
+     {
+      "player_id": 6464,
+      "player_name": "Donatas Motiejunas",
+      "rank": 9,
+      "score": 8.75
+     },
+     {
+      "player_id": 3981,
+      "player_name": "Wayne Ellington",
+      "rank": 10,
+      "score": 8.74
+     }
+    ]
+   }
+  }
+ ]
+}
