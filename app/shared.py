@@ -534,11 +534,18 @@ PROGRESSION_METRICS = {"pts": "Points", "reb": "Rebounds", "ast": "Assists",
 PROGRESSION_PCT = ("fg_pct", "fg3_pct")
 
 
-def progression_figure(series: dict, metric: str, mode: str) -> go.Figure:
+def progression_figure(series: dict, metric: str, mode: str,
+                       height: int = 430) -> go.Figure:
     """Interactive career-progression chart: one line per player across his
     seasons (x = season label, y = the chosen metric), hover carrying the
     season, team, GP and exact value, legend toggling players on/off, zoom/
     pan native to plotly.
+
+    The x-axis is forced to a CATEGORICAL season axis: plotly otherwise
+    parses '2003-04' as a date and ticks every 3 months instead of once
+    per season. Seasons are ordered chronologically (string sort of the
+    'YYYY-YY' label) so every selected player's arc lines up on the same
+    season grid.
 
     `series` maps player name -> seasons_log rows (history.py's per-season
     ESPN averages); `mode` is "Per game" or "Totals" -- totals multiply the
@@ -546,18 +553,21 @@ def progression_figure(series: dict, metric: str, mode: str) -> go.Figure:
     % metrics ignore the toggle (percentages don't sum)."""
     fig = go.Figure()
     pct = metric in PROGRESSION_PCT
+    seasons = set()
     for name, rows in series.items():
         xs, ys, hover = [], [], []
         for r in rows or []:
             value = r.get(metric)
-            if value is None:
+            season = r.get("season")
+            if value is None or not season:
                 continue
             if mode == "Totals" and not pct:
                 gp = r.get("gp")
                 if not gp:
                     continue
                 value = round(value * gp)
-            xs.append(r.get("season"))
+            xs.append(str(season))
+            seasons.add(str(season))
             ys.append(value)
             hover.append(f"{r.get('team') or ''} · {r.get('gp', 0)} GP")
         if not xs:
@@ -571,9 +581,11 @@ def progression_figure(series: dict, metric: str, mode: str) -> go.Figure:
     ytitle = label if pct else f"{label} ({'totals' if mode == 'Totals' else 'per game'})"
     fig.update_layout(
         xaxis_title="Season", yaxis_title=ytitle, hovermode="x unified",
-        margin=dict(l=10, r=10, t=24, b=10), height=430,
+        margin=dict(l=10, r=10, t=24, b=10), height=height,
         legend_title_text="")
-    fig.update_xaxes(tickangle=-45)
+    fig.update_xaxes(
+        type="category", categoryorder="array",
+        categoryarray=sorted(seasons), tickangle=-45)
     return fig
 
 

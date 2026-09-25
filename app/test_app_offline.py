@@ -172,6 +172,23 @@ def test_profile_page_renders_cards_accolades_and_chart(offline_espn):
         assert str(top[0].get("player_name")) in text
 
 
+def test_progression_chart_ticks_once_per_season():
+    """plotly parses '2003-04' as a DATE and ticks every 3 months; the
+    profile chart must force a chronological CATEGORICAL season axis so the
+    scale reads per season."""
+    import shared as shared_module
+
+    rows = [
+        {"season": "2004-05", "team": "CLE", "gp": 80, "pts": 27.2},
+        {"season": "2003-04", "team": "CLE", "gp": 79, "pts": 20.9},
+    ]
+    fig = shared_module.progression_figure({"LeBron James": rows}, "pts",
+                                           "Per game")
+    xaxis = fig.layout.xaxis
+    assert str(xaxis.type) == "category"
+    assert list(xaxis.categoryarray) == ["2003-04", "2004-05"]
+
+
 def test_load_schedule_serves_every_committed_season():
     """The multi-season schedule envelope feeds ANY selected season -- a
     PREVIOUS season's completed games must arrive with their final scores
