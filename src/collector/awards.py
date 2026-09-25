@@ -840,7 +840,7 @@ def build_career(season_payloads: list, raw_dir: str = None,
             f"Career lines for {meta.get('pool', 0)} players from ESPN "
             f"career statistics (full NBA history: {meta.get('espn_lines', 0)} "
             f"career lines, {meta.get('window_fallback', 0)} collected-window "
-            f"fallbacks) — not just the {labels[0]}→{labels[-1]} box scores"
+            f"fallbacks), not just the {labels[0]}→{labels[-1]} box scores"
             + (f"; {as_of}" if as_of else "")
         )
         out["goat"]["source"] = (
@@ -871,11 +871,11 @@ def build_career(season_payloads: list, raw_dir: str = None,
         # that -- no career_note key at all (the dashboard falls back to its
         # generic stamp note).
         out["alltime"]["source"] = (
-            f"Collected box scores {labels[0]}→{labels[-1]} only — no ESPN "
+            f"Collected box scores {labels[0]}→{labels[-1]} only; no ESPN "
             "career fetch (window-only build)")
         out["goat"]["source"] = (
             f"Collected window {labels[0]}→{labels[-1]} without official "
-            "honours input — every row's honours component is dropped and "
+            "honours input: every row's honours component is dropped and "
             "rescaled (see data_gaps)")
     return out
 

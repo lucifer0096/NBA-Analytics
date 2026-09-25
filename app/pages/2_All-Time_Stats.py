@@ -29,14 +29,14 @@ alltime, _, window, career_note = shared.load_awards_career()
 st.caption(f"Source: {career_note}")
 career_leaders = alltime.get("leaders") or {}
 if not career_leaders:
-    st.info("No all-time data yet — the career boards are computed from "
+    st.info("No all-time data yet: the career boards are computed from "
             "collected box scores (`python src/collector/"
             "refresh_dashboard_fallbacks.py`) into data/dashboard_awards.json.")
 else:
     st.caption(
         f"Career totals across {window.get('seasons', 0)} collected "
         f"seasons ({window.get('first', '—')} → "
-        f"{window.get('last', '—')}) — the collector starts at 2010-11, "
+        f"{window.get('last', '—')}). The collector starts at 2010-11, "
         "so this is all-time WITHIN that window, not full NBA history. "
         f"Qualified at ≥{awards.ALLTIME_MIN_GP} career GP; % boards "
         "additionally need ≥5 FGA/g (3P ≥2 3PA/g, FT ≥1 FTA/g)."
@@ -81,6 +81,6 @@ else:
         st.caption(
             "FG/3P/FT are made-attempt season totals rolled into the "
             "career; eFG% = (FGM + 0.5·3PM) / FGA, "
-            "TS% = PTS / (2·(FGA + 0.44·FTA)) — computed here from the "
+            "TS% = PTS / (2·(FGA + 0.44·FTA)): computed here from the "
             "box scores, not copied from any official NBA source."
         )

@@ -434,7 +434,7 @@ def goat_row_html(row: dict) -> str:
     """One GOAT-ladder row: rank/medal, real headshot (team-logo CSS
     fallback), career line, official-honour chips (heaviest first, the order
     the formula weights them), championship count (display-only), the three
-    component scores -- a dropped component prints as — with its gap named --
+    component scores (a dropped component prints as `—` with its gap named)
     and the headline GOAT score on the right.
 
     Single logical line -- see race_row_html's docstring."""
@@ -680,7 +680,7 @@ def data_age_note(payload: dict, live: bool) -> str:
         return "Live (60s cache)"
     generated = payload.get("_generated_utc")
     if generated:
-        return f"Offline fallback — data as of {generated}"
+        return f"Offline fallback: data as of {generated}"
     return "Offline fallback"
 
 
@@ -746,7 +746,7 @@ def load_standings(season: str) -> tuple:
         return (pd.DataFrame(), f"{season} standings not started yet")
     return (pd.DataFrame(),
             f"Live standings fetch failed and the committed copy is "
-            f"{payload.get('season') or 'empty'} — no table shown for "
+            f"{payload.get('season') or 'empty'}: no table shown for "
             f"{season}")
 
 
@@ -764,7 +764,7 @@ def load_schedule(season: str) -> tuple:
         if rows:
             return (pd.DataFrame(rows), data_age_note(payload, False))
         return (pd.DataFrame(),
-                f"{season} schedule absent — the committed file covers "
+                f"{season} schedule absent: the committed file covers "
                 f"{len(seasons)} seasons")
     games = payload.get("games", [])
     if games and payload.get("season") == season:
@@ -824,7 +824,7 @@ def load_awards(season: str = None) -> tuple:
     seasons = payload.get("seasons")
     if not seasons:
         if not payload.get("races"):
-            return (payload, "No committed award data yet — computed where "
+            return (payload, "No committed award data yet: computed where "
                               "raw box scores exist "
                               "(refresh_dashboard_fallbacks.py)")
         data, actual = payload, payload.get("season")
@@ -838,16 +838,16 @@ def load_awards(season: str = None) -> tuple:
             # Nothing collected for the requested season (2026-27 before
             # tip-off): empty state, no fallback to another season's data.
             return ({"season": requested, "races": {}, "leaders": {}},
-                    f"{requested} has no collected games yet — award races "
+                    f"{requested} has no collected games yet: award races "
                     f"appear once the season starts (newest data: "
                     f"{max(seasons)})")
         data = seasons[actual] or {}
         if not data.get("races"):
-            return (data, "No committed award data yet — computed where "
+            return (data, "No committed award data yet: computed where "
                            "raw box scores exist "
                            "(refresh_dashboard_fallbacks.py)")
     stamp = payload.get("_generated_utc")
-    note = (f"Computed from collected box scores — as of {stamp}" if stamp
+    note = (f"Computed from collected box scores, as of {stamp}" if stamp
             else "Computed from collected box scores")
     return (data, note)
 
@@ -863,7 +863,7 @@ def load_awards_career() -> tuple:
     payload = _read_fallback("dashboard_awards.json")
     stamp = payload.get("_generated_utc")
     note = payload.get("career_note") or (
-        f"Computed from collected box scores — as of {stamp}" if stamp
+        f"Computed from collected box scores, as of {stamp}" if stamp
         else "Computed from collected box scores")
     return (payload.get("alltime") or {}, payload.get("goat") or {},
             payload.get("window") or {}, note)
@@ -901,7 +901,7 @@ def load_players() -> tuple:
     meta = payload.get("meta") or {}
     stamp = payload.get("_generated_utc")
     note = (f"ESPN career lines + official honours for "
-            f"{len(players):,} players — as of {stamp}" if stamp
+            f"{len(players):,} players, as of {stamp}" if stamp
             else f"ESPN career lines + official honours for "
                  f"{len(players):,} players")
     return (players, meta, note)
@@ -927,7 +927,7 @@ def load_leaderboards() -> tuple:
         envelope = json.load(f)
     note = data_age_note(envelope, False)
     if envelope.get("season"):
-        note = f"{note} — season {envelope['season']}"
+        note = f"{note} · season {envelope['season']}"
     return (pd.DataFrame(envelope.get("leaders", [])), note)
 
 

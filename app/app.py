@@ -78,12 +78,12 @@ with st.sidebar:
             st.caption(
                 f"{_m.get('validation_season', '—')}: model "
                 f"{_single.get('mae', float('nan')):.3f} MAE vs naive "
-                f"{_naive.get('mae', float('nan')):.3f} — model {_beats} "
+                f"{_naive.get('mae', float('nan')):.3f}: model {_beats} "
                 "the baseline, trained on the box-score history inventoried "
                 "above (full validation: models/metrics.json)."
             )
         else:
-            st.caption("Model not trained yet — run `python "
+            st.caption("Model not trained yet: run `python "
                        "src/model/features.py && python "
                        "src/model/train.py`.")
 
@@ -133,11 +133,11 @@ if pts_leaders:
     top_scorer = f"{best.get('player_name', '—')} · {best.get('per_game', 0)} PPG"
     scoring_help = (
         f"Per-game rate, qualified at ≥{awards_payload.get('min_games', '?')} GP "
-        f"({awards_payload.get('season', '—')}) — computed from collected box "
+        f"({awards_payload.get('season', '—')}): computed from collected box "
         "scores, a homegrown metric rather than official NBA stats."
     )
 elif not int(games_counts.get(season) or 0):
-    scoring_help = (f"{season} has no collected games yet — the scoring "
+    scoring_help = (f"{season} has no collected games yet: the scoring "
                     "leader appears once the season starts.")
 else:
     scoring_help = "Run refresh_dashboard_fallbacks.py where box scores exist."
@@ -220,7 +220,7 @@ with tabs[1]:
     shared.section("Today's games")
     if scoreboard.empty:
         st.caption(
-            f"No games on {today} — {sb_note}. The NBA offseason runs Jun–Oct; "
+            f"No games on {today}: {sb_note}. The NBA offseason runs Jun–Oct; "
             "historical results and the full upcoming schedule are below."
         )
     else:
@@ -235,7 +235,7 @@ with tabs[1]:
 
     shared.section(f"{season} schedule & results")
     if games.empty:
-        st.info(f"No collected schedule for {season} yet — run the collector "
+        st.info(f"No collected schedule for {season} yet: run the collector "
                 f"(`python src/collector/snapshot.py --season {season}`).")
     else:
         st.caption(f"Source: {sched_note}")
@@ -274,7 +274,7 @@ with tabs[1]:
                      if not stale.empty else "")
             st.caption(
                 f"{len(finals):,} final · {len(upcoming):,} upcoming "
-                f"({games['game_id'].nunique():,} total){extra} — showing the "
+                f"({games['game_id'].nunique():,} total){extra}: showing the "
                 "15 most recent results and the next 25 fixtures."
             )
         else:
@@ -295,7 +295,7 @@ with tabs[1]:
                      if not stale.empty else "")
             st.caption(
                 f"{len(finals):,} games, all final ({season} complete)"
-                f"{extra} — chronological; click a column header to sort."
+                f"{extra}: chronological; click a column header to sort."
             )
 
 # ---------------------------------------------------------------------------
@@ -307,18 +307,18 @@ with tabs[2]:
     if not awards_payload.get("races"):
         if int(games_counts.get(season) or 0):
             st.info(
-                "No award data yet — the races are computed from collected box "
+                "No award data yet: the races are computed from collected box "
                 "scores (`python src/collector/refresh_dashboard_fallbacks.py`) "
                 "and committed as data/dashboard_awards.json."
             )
         else:
             st.info(
-                f"{season} has no collected games yet — the races and stat "
+                f"{season} has no collected games yet: the races and stat "
                 "leaders appear once the season starts."
             )
     else:
         st.caption(
-            "Homegrown transparent metrics — not official NBA voting. Each "
+            "Homegrown transparent metrics, not official NBA voting. Each "
             "race's caption states the exact formula it ranks by."
         )
         races = awards_payload.get("races") or {}
@@ -335,12 +335,12 @@ with tabs[2]:
                     prev = (awards_payload.get("prev_season")
                             or awards.previous_season(season_label))
                     st.caption(
-                        f"No MIP race yet — it compares against {prev}, "
+                        f"No MIP race yet: it compares against {prev}, "
                         "which has no collected box scores in this build."
                     )
                 else:
                     st.caption(
-                        f"No qualifiers yet — needs ≥"
+                        f"No qualifiers yet: needs ≥"
                         f"{awards_payload.get('min_games', '?')} GP."
                     )
             for row in rows:
@@ -348,7 +348,7 @@ with tabs[2]:
                             unsafe_allow_html=True)
             st.caption(
                 f"{awards.RACE_LABELS.get(key, key)} is homegrown math, not "
-                f"official NBA voting — {awards.RACE_FORMULAS.get(key, '')}"
+                f"official NBA voting: {awards.RACE_FORMULAS.get(key, '')}"
             )
 
         with col_l:
@@ -364,7 +364,7 @@ with tabs[2]:
                      if k in leaders_by_stat] or list(leaders_by_stat)
         if not stat_keys:
             st.caption(
-                f"No qualified leaders yet — needs ≥"
+                f"No qualified leaders yet: needs ≥"
                 f"{awards_payload.get('min_games', '?')} GP."
             )
         else:
@@ -377,7 +377,7 @@ with tabs[2]:
             if not stat_rows:
                 st.caption(
                     f"No qualified {awards.STAT_LABELS.get(stat, stat).lower()} "
-                    f"leaders yet — needs ≥{awards_payload.get('min_games', '?')} "
+                    f"leaders yet: needs ≥{awards_payload.get('min_games', '?')} "
                     "GP."
                 )
             for row in stat_rows:
@@ -398,11 +398,11 @@ with tabs[3]:
     st.caption(f"Source: {awards_note}")
     if not awards_payload.get("leaders"):
         if int(games_counts.get(season) or 0):
-            st.info("No committed leader data yet — run "
+            st.info("No committed leader data yet: run "
                     "`python src/collector/refresh_dashboard_fallbacks.py` "
                     "where collected box scores exist.")
         else:
-            st.info(f"{season} has no collected games yet — Court View "
+            st.info(f"{season} has no collected games yet: Court View "
                     "needs leaders from a played season.")
     else:
         leaders_by_stat = awards_payload.get("leaders") or {}
@@ -417,7 +417,7 @@ with tabs[3]:
         if not rows:
             st.caption(
                 f"No qualified {awards.STAT_LABELS.get(stat, stat).lower()} "
-                f"leaders yet — needs ≥{awards_payload.get('min_games', '?')} "
+                f"leaders yet: needs ≥{awards_payload.get('min_games', '?')} "
                 "GP."
             )
         else:

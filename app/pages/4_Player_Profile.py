@@ -35,7 +35,7 @@ with st.sidebar:
 
 players, _meta, note = shared.load_players()
 if not players:
-    st.info("No player index yet — data/dashboard_players.json is written "
+    st.info("No player index yet: data/dashboard_players.json is written "
             "by `python src/collector/refresh_dashboard_fallbacks.py` after "
             "a successful all-history fetch.")
     st.stop()
@@ -126,7 +126,7 @@ if figure.data:
     st.plotly_chart(figure, width="stretch")
     missing = [n for n, rows in series.items() if not rows]
     if missing:
-        st.caption(f"No per-season rows for {', '.join(missing)} — ESPN's "
+        st.caption(f"No per-season rows for {', '.join(missing)}: ESPN's "
                    "career lines don't cover those seasons fully (see the "
                    "card's gap marks); their line simply isn't drawn.")
     note_bits = (
@@ -135,9 +135,9 @@ if figure.data:
         "double-click to reset."
     )
     if metric in shared.PROGRESSION_PCT:
-        note_bits += (" Percentages are rates — the totals toggle applies "
+        note_bits += (" Percentages are rates; the totals toggle applies "
                       "to counting stats only.")
     st.caption(note_bits)
 else:
-    st.caption("No per-season data for this selection — pick another "
+    st.caption("No per-season data for this selection: pick another "
                "player or metric.")
