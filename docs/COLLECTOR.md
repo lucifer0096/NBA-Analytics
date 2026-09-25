@@ -35,14 +35,14 @@ returned 200). `espn_api._HEADERS` is the one place this is encoded.
 data/raw/{season}/
 ├── schedule.csv        # every regular-season game: id, date, teams, scores, status
 └── games/
-    └── {game_id}.json  # {"game": meta, "players": [...]} — PARSED rows, one file per FINAL game
+    └── {game_id}.json  # {"game": meta, "players": [...]}, PARSED rows, one file per FINAL game
 data/raw/
 ├── player_positions.json  # ONE global file: current player → G/F/C (roster endpoint is current-only)
 └── collector_state.json   # last run: season, counts, timestamps (--check-only feeds from this)
 ```
 
 Box-score files store the **parsed form** (the raw payload is multi-MB with
-plays/winprobability we never read), ~5–8 KB per game — about 120 MB for the
+plays/winprobability we never read), ~5–8 KB per game, about 120 MB for the
 full 2010-11+ backfill.
 
 Regular season only (`seasontype=2`): fantasy leagues play regular seasons.
@@ -77,13 +77,13 @@ python src/collector/snapshot.py --check-only       # report pending work; exit 
 `.github/workflows/collector.yml` runs daily at 12:20 UTC (after most US
 games finish):
 
-1. `snapshot.py --season current` — schedule refresh + newly-final box scores
-2. `refresh_dashboard_fallbacks.py` — rewrites the committed `data/dashboard_*`
+1. `snapshot.py --season current`: schedule refresh + newly-final box scores
+2. `refresh_dashboard_fallbacks.py`: rewrites the committed `data/dashboard_*`
    fallbacks and `data/processed/dashboard_leaderboards.json`
 3. commits any data changes back to `main`
 
 CI (`.github/workflows/ci.yml`) skips pushes where **every** changed file is
-under `data/**`/`models/**` — data-only refreshes exercise no code.
+under `data/**`/`models/**`: data-only refreshes exercise no code.
 
 In the offseason this run is nearly a no-op: no new final games, schedule
 rewritten identically, fallbacks re-stamped.
@@ -97,7 +97,7 @@ Streamlit Cloud cannot run the collector and `data/raw/` is gitignored, so
 | File | Content | Source |
 |---|---|---|
 | `data/dashboard_teams.json` | team list | live ESPN |
-| `data/dashboard_standings.json` | newest season **with real records** (zero-record preseason tables skipped — verified 2026-27 arrives all-zeros in Sep) | live ESPN |
+| `data/dashboard_standings.json` | newest season **with real records** (zero-record preseason tables skipped; verified 2026-27 arrives all-zeros in Sep) | live ESPN |
 | `data/dashboard_schedule.json` | every collected season's schedule merged from `data/raw/{season}/schedule.csv` (17 seasons, 20,394 games with final scores; a committed season missing locally is preserved) | local |
 | `data/dashboard_positions.json` | current player → position map | local/live |
 | `data/dashboard_awards.json` | **every collected season's** MVP/DPOY/6th-Man/MIP races + per-game stat leaders (incl. 3PM, FG/3P splits), plus the cross-season all-time boards and the all-NBA-history GOAT ladder (`awards.py` + `history.py`) | local (collected box scores + cached ESPN history) |

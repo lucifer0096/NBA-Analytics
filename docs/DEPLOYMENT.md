@@ -5,14 +5,14 @@
 This repo may already have a remote. From the repo root:
 
 ```bash
-# Create an empty repo named NBA-Analytics on github.com/new (no README —
+# Create an empty repo named NBA-Analytics on github.com/new (no README:
 # the local history already has one), then:
 git remote add origin https://github.com/<your-user>/NBA-Analytics.git
 git push -u origin main
 ```
 
 If `git push` asks for credentials: GitHub no longer accepts account
-passwords over HTTPS — use a Personal Access Token
+passwords over HTTPS: use a Personal Access Token
 (<https://github.com/settings/tokens>, `repo` scope) as the password, or an
 SSH remote (`git@github.com:<your-user>/NBA-Analytics.git`).
 
@@ -21,8 +21,8 @@ SSH remote (`git@github.com:<your-user>/NBA-Analytics.git`).
 1. <https://share.streamlit.io> → **New app** → select the repo.
 2. **Main file path**: `app/app.py`
 3. Deploy. Cloud installs `requirements.txt` (the exact tested pins; Python
-   3.14, matching CI) and picks up `.streamlit/config.toml` for the theme —
-   nothing else to configure.
+   3.14, matching CI) and picks up `.streamlit/config.toml` for the theme,
+   with nothing else to configure.
 
 ### What a deployed instance can and cannot do
 
