@@ -51,11 +51,13 @@ def _markdown_text(at: AppTest) -> str:
 def test_home_page_renders_offline(offline_espn):
     at = _render("app/app.py", offline_espn)
     assert not at.exception
-    # Title + exactly the three home tabs (All-Time/GOAT/Profile moved to
-    # left-nav pages) even with every live call failing.
+    # Title + exactly the four home tabs (All-Time/GOAT/Profile moved to
+    # left-nav pages; Court View moved here from the deleted Model & History
+    # page) even with every live call failing.
     assert any("NBA Analytics" in str(t.value) for t in at.title)
     tab_labels = [str(t.label) for t in at.tabs]
-    assert tab_labels == ["Standings", "Schedule & Scores", "Awards Ladder"]
+    assert tab_labels == ["Standings", "Schedule & Scores", "Awards Ladder",
+                          "Court View"]
     # KPI strip is season-scoped: inventory, tip-off, scoring leader. The
     # Model (validation) KPI was removed from this page.
     metric_labels = [str(m.label) for m in at.metric]
@@ -75,13 +77,17 @@ def test_home_page_falls_back_to_committed_data(offline_espn):
     assert "Offline fallback" in captions or "fallback" in captions.lower()
 
 
-def test_model_page_renders_offline(offline_espn):
-    at = _render("app/pages/1_Model_and_History.py", offline_espn)
+def test_sidebar_mentions_model_and_history(offline_espn):
+    """The Model & History page was deleted: its mention lives in the sidebar
+    expander instead -- headline validation numbers or the 'train first'
+    note, never an exception."""
+    at = _render("app/app.py", offline_espn)
     assert not at.exception
-    tab_labels = [str(t.label) for t in at.tabs]
-    assert "Model Performance" in tab_labels
-    assert "Season Leaders" in tab_labels
-    assert "Court View" in tab_labels
+    expander_labels = [str(e.label) for e in getattr(at, "expander", [])]
+    assert "📈 Model & History" in expander_labels
+    text = f"{_markdown_text(at)} " + " ".join(
+        str(c.value) for c in at.caption)
+    assert ("MAE" in text) or ("Model not trained yet" in text)
 
 
 def test_home_awards_tab_shows_races_and_formula_captions(offline_espn):
@@ -231,10 +237,11 @@ def test_load_awards_honest_empty_for_uncollected_season(monkeypatch,
         shared_module.load_awards.clear()
 
 
-def test_model_page_court_view_renders_leaders(offline_espn):
-    """Court View must show a real leader from the committed payload --
-    asserted via that player's name reaching markdown/captions, never via a
-    .na-court class (the theme CSS blob contains it regardless)."""
+def test_court_view_tab_renders_leaders(offline_espn):
+    """Court View (now a home tab) must show a real leader from the
+    committed payload -- asserted via that player's name reaching
+    markdown/captions, never via a .na-court class (the theme CSS blob
+    contains it regardless)."""
     awards_path = REPO_ROOT / "data" / "dashboard_awards.json"
     if not awards_path.exists():
         pytest.skip("dashboard_awards.json not committed yet")
@@ -247,14 +254,14 @@ def test_model_page_court_view_renders_leaders(offline_espn):
     pts = (newest.get("leaders") or {}).get("pts") or []
     if not pts:
         pytest.skip("no qualified pts leaders in the committed payload")
-    at = _render("app/pages/1_Model_and_History.py", offline_espn)
+    at = _render("app/app.py", offline_espn)
     captions = " ".join(str(c.value) for c in at.caption)
     text = f"{_markdown_text(at)} {captions}"
     name = str(pts[0].get("player_name") or "")
     assert name and (name in text or "hover a card" in captions)
 
 
-def test_model_page_survives_missing_metrics(offline_espn, tmp_path, monkeypatch):
+def test_load_metrics_absent_returns_empty(offline_espn, tmp_path, monkeypatch):
     """metrics.json absent (fresh clone before first training) must render
     the 'train first' info, not an exception."""
     # Point shared.REPO_ROOT-style lookup at a metrics-free root by moving

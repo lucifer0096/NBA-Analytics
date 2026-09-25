@@ -2,10 +2,11 @@
 
 Run: streamlit run app/app.py
 
-Three tabs: Standings and Schedule are live-first from ESPN's free APIs with
+Four tabs: Standings and Schedule are live-first from ESPN's free APIs with
 committed offline fallbacks (see shared.py for the contract), while the
-Awards Ladder is computed locally from the collected box scores and follows
-the sidebar's season selector (every collected season, 2010-11 -> upcoming):
+Awards Ladder and Court View are computed locally from the collected box
+scores and follow the sidebar's season selector (every collected season,
+2010-11 -> upcoming):
 
 - **Standings**        -- conference tables for the selected season; a
                           season that hasn't started shows an honest empty
@@ -21,9 +22,14 @@ the sidebar's season selector (every collected season, 2010-11 -> upcoming):
                           metrics, explicitly NOT official NBA voting -- every
                           race prints its exact formula as its caption; a
                           season with no collected games shows an empty state
+- **Court View**       -- the selected stat's leaders on a CSS-only hardwood
+                          court: 2 G / 2 F / 1 C filled in rank order by each
+                          player's real position, everyone else on a bench
+                          strip, hover a card for the full per-game line
 
+The sidebar carries the per-season games inventory and a one-line Model &
+History mention (validation headline; full numbers in models/metrics.json).
 Left-nav pages carry the rest:
-- pages/1_Model_and_History.py -- validation metrics, season leaders, Court View
 - pages/2_All-Time_Stats.py    -- career boards across the collected window
 - pages/3_GOAT_Rankings.py     -- the all-NBA-history GOAT ladder
 - pages/4_Player_Profile.py    -- careers, official accolades, progression chart
@@ -63,6 +69,23 @@ with st.sidebar:
     st.caption(f"Today (UTC): {shared.now_utc():%Y-%m-%d}")
     st.markdown("---")
     shared.sidebar_games(shared.load_games_by_season(), options)
+    with st.expander("📈 Model & History"):
+        _m = shared.load_metrics()
+        _single, _naive = _m.get("single_stage", {}), _m.get("naive_baseline", {})
+        if _single and _naive:
+            _beats = "beats" if (_single.get("mae", 1)
+                                 < _naive.get("mae", 0)) else "trails"
+            st.caption(
+                f"{_m.get('validation_season', '—')}: model "
+                f"{_single.get('mae', float('nan')):.3f} MAE vs naive "
+                f"{_naive.get('mae', float('nan')):.3f} — model {_beats} "
+                "the baseline, trained on the box-score history inventoried "
+                "above (full validation: models/metrics.json)."
+            )
+        else:
+            st.caption("Model not trained yet — run `python "
+                       "src/model/features.py && python "
+                       "src/model/train.py`.")
 
 teams, teams_note = shared.load_teams()
 
@@ -126,7 +149,8 @@ col3.metric("Season scoring leader", top_scorer, help=scoring_help)
 
 shared.hero(season, f"Teams source: {teams_note}")
 
-tabs = st.tabs(["Standings", "Schedule & Scores", "Awards Ladder"])
+tabs = st.tabs(["Standings", "Schedule & Scores", "Awards Ladder",
+                "Court View"])
 
 # ---------------------------------------------------------------------------
 # Standings
@@ -365,3 +389,48 @@ with tabs[2]:
                 f"{awards_payload.get('season', '—')}. Totals shown for context; "
                 "FG/3P splits + FG% come straight from the collected box scores."
             )
+
+# ---------------------------------------------------------------------------
+# Court View: the stat race's leaders on a real court formation
+# ---------------------------------------------------------------------------
+
+with tabs[3]:
+    st.caption(f"Source: {awards_note}")
+    if not awards_payload.get("leaders"):
+        if int(games_counts.get(season) or 0):
+            st.info("No committed leader data yet — run "
+                    "`python src/collector/refresh_dashboard_fallbacks.py` "
+                    "where collected box scores exist.")
+        else:
+            st.info(f"{season} has no collected games yet — Court View "
+                    "needs leaders from a played season.")
+    else:
+        leaders_by_stat = awards_payload.get("leaders") or {}
+        stat_keys = [k for k in awards.STAT_CATEGORIES
+                     if k in leaders_by_stat] or list(leaders_by_stat)
+        stat = st.radio(
+            "Category", stat_keys, horizontal=True, key="court_stat",
+            format_func=lambda k: (f"{awards.STAT_LABELS.get(k, k)} "
+                                   f"({awards.STAT_ABBR.get(k, k)})"),
+        )
+        rows = leaders_by_stat.get(stat) or []
+        if not rows:
+            st.caption(
+                f"No qualified {awards.STAT_LABELS.get(stat, stat).lower()} "
+                f"leaders yet — needs ≥{awards_payload.get('min_games', '?')} "
+                "GP."
+            )
+        else:
+            shared.render_court(
+                rows,
+                shared.load_positions(),
+                stat,
+                int(awards_payload.get("min_games") or 8),
+                str(awards_payload.get("season", "—")),
+            )
+        st.caption(
+            "Formation 2 G · 2 F · 1 C mirrors a fantasy-style starting "
+            "lineup slot structure (backend optimizer untouched in "
+            "src/model/optimizer.py); positions are ESPN's coarse G/F/C "
+            "roster buckets, so PG/SG land in G and SF/PF in F."
+        )
