@@ -2,7 +2,7 @@
 
 Snapshots NBA data from ESPN's free public APIs into `data/raw/`. Design
 mirrors FPL-Analytics' collector: cheap to run frequently, **idempotent and
-resumable** — the filesystem itself is the state, so there is no separate
+resumable**: the filesystem itself is the state, so there is no separate
 "last fetched" bookkeeping to drift. A game whose parsed box score already
 exists at `data/raw/{season}/games/{game_id}.json` is simply never refetched.
 
@@ -14,7 +14,7 @@ exists at `data/raw/{season}/games/{game_id}.json` is simply never refetched.
 | Season schedule | `site.api.espn.com/.../nba/teams/{id}/schedule?season={end_year}&seasontype=2` | 30 calls/season; **no season-wide schedule endpoint exists** (verified 404) |
 | Game box score | `site.api.espn.com/.../nba/summary?event={id}` | per-game; verified back to **1995-96**; includes DNP rows |
 | Standings | `site.web.api.espn.com/apis/v2/.../nba/standings?season={end_year}` | the `site.api` standings path only returns a link stub (verified) |
-| Player positions | `site.web.api.espn.com/apis/common/v3/.../nba/teams/{id}/roster?season={end_year}` | **season param ignored** — always current roster (verified: 2011/2026/2027 identical) |
+| Player positions | `site.web.api.espn.com/apis/common/v3/.../nba/teams/{id}/roster?season={end_year}` | **season param ignored**, always current roster (verified: 2011/2026/2027 identical) |
 | Day's games | `site.api.espn.com/.../nba/scoreboard?dates=YYYYMMDD` | works for historical dates too |
 
 ### The season-parameter rule
@@ -60,13 +60,13 @@ python src/collector/snapshot.py --check-only       # report pending work; exit 
 ```
 
 - **Newest-first backfill**: the validation season (2024-25) and its
-  neighbors are what training needs first — walking backward from there means
+  neighbors are what training needs first: walking backward from there means
   a usable training set exists long before the 2010s tail finishes.
 - **Rate limiting**: a process-wide `RateLimiter` enforces `--delay` between
   request *starts* across all worker threads (default `--workers 4`,
   `--delay 0.15`), so raising workers can't silently multiply request rate.
 - **Retries**: 429/5xx (and WAF 403) retry with exponential backoff
-  (`espn_api._get_json`); a game that still fails is recorded, not fatal —
+  (`espn_api._get_json`); a game that still fails is recorded, not fatal:
   its file simply wasn't written, so the next run retries it. One bad game
   can't kill a 19.7k-game backfill.
 - **Offseason guard**: a schedule refresh that returns 0 games will not
@@ -98,8 +98,9 @@ Streamlit Cloud cannot run the collector and `data/raw/` is gitignored, so
 |---|---|---|
 | `data/dashboard_teams.json` | team list | live ESPN |
 | `data/dashboard_standings.json` | newest season **with real records** (zero-record preseason tables skipped — verified 2026-27 arrives all-zeros in Sep) | live ESPN |
-| `data/dashboard_schedule.json` | current season schedule (from local `schedule.csv`, no API call) | local |
+| `data/dashboard_schedule.json` | every collected season's schedule merged from `data/raw/{season}/schedule.csv` (17 seasons, 20,394 games with final scores; a committed season missing locally is preserved) | local |
 | `data/dashboard_positions.json` | current player → position map | local/live |
-| `data/dashboard_awards.json` | **every collected season's** MVP/DPOY/6th-Man/MIP races + per-game stat leaders (incl. 3PM, FG/3P splits), plus the cross-season all-time boards and GOAT ladder (`awards.py`) | local (collected box scores) |
+| `data/dashboard_awards.json` | **every collected season's** MVP/DPOY/6th-Man/MIP races + per-game stat leaders (incl. 3PM, FG/3P splits), plus the cross-season all-time boards and the all-NBA-history GOAT ladder (`awards.py` + `history.py`) | local (collected box scores + cached ESPN history) |
+| `data/dashboard_players.json` | all-history player index for the Player Profile page: career line, per-season rows, official honours, GOAT score/rank (`history.py`) | local |
 | `data/dashboard_projections.json` | upcoming-game model projections | computed where raw data + model exist |
-| `data/processed/dashboard_leaderboards.json` | last completed season's per-player totals + shooting splits (FG/3P/FT counts, FG%, eFG%, TS%) + fantasy points | local |
+| `data/processed/dashboard_leaderboards.json` | last completed season's per-player totals + shooting splits (FG/3P/FT counts, FG%, eFG%, TS%) + fantasy points; kept as a committed artifact (no page reads it since Season Leaders was removed) | local |

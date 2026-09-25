@@ -236,9 +236,10 @@ def refresh_positions() -> dict:
 
 def refresh_leaderboards(seasons_to_try: list) -> dict:
     """Per-player season totals (incl. shooting splits + fantasy points under
-    default scoring) for the first season with collected games -- powers the
-    dashboard's Season Leaders tab offline, without pandas on Streamlit Cloud
-    having to scan 20k raw files... (it could, but a 200KB JSON is cheaper)."""
+    default scoring) for the first season with collected games, written as a
+    200KB JSON so nobody has to scan 20k raw files with pandas on Streamlit
+    Cloud (it could, but the JSON is cheaper). No page reads it since Season
+    Leaders was removed; it stays as a committed data artifact."""
     import glob
 
     import awards

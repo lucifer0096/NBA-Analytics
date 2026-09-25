@@ -2,7 +2,7 @@
 
 ## 1. Push to GitHub
 
-This repo has no remote yet. From the repo root:
+This repo may already have a remote. From the repo root:
 
 ```bash
 # Create an empty repo named NBA-Analytics on github.com/new (no README —
@@ -29,12 +29,12 @@ SSH remote (`git@github.com:<your-user>/NBA-Analytics.git`).
 | Works | Needs a data machine |
 |---|---|
 | Standings (live ESPN → committed fallback) | `data/raw/` history (gitignored, regenerates via `snapshot.py --backfill`) |
-| Schedule & Scores (committed `dashboard_schedule.json` + live scoreboard) | Retraining (`features.py` + `train.py`) |
-| Season Leaders (committed `dashboard_leaderboards.json`) | — |
-| Awards Ladder + Court View (committed `dashboard_awards.json`, every collected season) | — |
-| All-Time Stats + GOAT Rankings (career sections of the same file) | — |
+| Schedule & Scores (committed multi-season `dashboard_schedule.json` + live scoreboard) | Retraining (`features.py` + `train.py`) |
+| Awards Ladder + Court View (committed `dashboard_awards.json`, every collected season) | Nothing |
+| All-Time Stats + GOAT Rankings (career sections of the same file) | Nothing |
+| Player Profile (committed `dashboard_players.json`) | Nothing |
 
 The daily workflow (`.github/workflows/collector.yml`) keeps every committed
-fallback fresh — schedule, standings, positions, leaderboards, award races,
-and (once `models/proj_model.txt` exists) a rolling 21-day projection
-window — so the deployed app stays current without access to raw data.
+fallback fresh (schedule, standings, positions, leaderboards, award races,
+and, once `models/proj_model.txt` exists, a rolling 21-day projection
+window), so the deployed app stays current without access to raw data.
