@@ -20,11 +20,21 @@ qualifier, the same way rate titles work, with shooting splits (FG/3P/FT
 counts + FG%/3P%/eFG%/TS%) attached to every row.
 
 Cross-season sections (built from ALL collected seasons at once):
-    all-time  career totals across the collected window (2010-11 -> present),
-              counting-stat boards + efficiency boards behind attempt floors
-    GOAT      a transparent composite of career production (40%), award-race
-              resume (35%) and peak season (25%) -- homegrown like everything
-              here, explicitly NOT an official NBA ranking
+    all-time  career totals over the merged pool: full-career ESPN lines for
+              every history/award/window player history.py fetches (see its
+              module docstring), counting-stat boards + efficiency boards
+              behind attempt floors -- i.e. NBA history, not just the window;
+              with no history input it degrades to window-only (legacy shape)
+    GOAT      a transparent composite of career production (40%), official
+              NBA honours (35%, ESPN's 20 award types -- GOAT_HONOURS_WEIGHTS
+              prints every per-win weight) and peak season (25%); computed
+              from the same merged pool, with impossible-zero totals or an
+              untrusted peak dropped per player and the remaining weights
+              rescaled (the row says so in data_gaps). Homegrown, explicitly
+              NOT an official NBA ranking.
+    profile   build_career's `history` input also carries per-season logs and
+              honours that refresh_dashboard_fallbacks.py publishes as
+              data/dashboard_players.json (Player Profile page).
 
 Season convention follows espn_api: a season label's END year is the calendar
 year it finishes in (2025-26 games live under data/raw/2025-26/).
@@ -74,17 +84,70 @@ ALLTIME_ATTEMPT_FLOORS = {"fgp": ("fga", 5.0), "fg3p": ("fg3a", 2.0),
                           "ftp": ("fta", 1.0), "efg": ("fga", 5.0),
                           "ts": ("fga", 5.0)}
 
-# GOAT ladder: three components, each normalized 0-100 against the best player
-# in the collected window, then mixed with these weights (they MUST match
-# GOAT_FORMULA's text -- test_goat_* asserts the pair stays in sync).
+# GOAT ladder: three components, each normalized 0-100 against the best
+# qualified player in the merged pool, then mixed with these weights (they
+# MUST match GOAT_FORMULA's text -- test_goat_* asserts the pair stays in
+# sync). Production spans careers over ALL of NBA history when history.py's
+# lines are merged in; honours are the OFFICIAL NBA awards ESPN carries.
 GOAT_SIZE = 25
 GOAT_MIN_CAREER_GP = 82
-GOAT_WEIGHTS = {"production": 0.40, "awards": 0.35, "peak": 0.25}
+GOAT_WEIGHTS = {"production": 0.40, "honours": 0.35, "peak": 0.25}
 GOAT_PRODUCTION_WEIGHTS = {"pts": 0.40, "reb": 0.15, "ast": 0.15,
                            "stl": 0.10, "blk": 0.10, "fg3m": 0.10}
 GOAT_PROD_LABELS = {"pts": "PTS", "reb": "REB", "ast": "AST",
                     "stl": "STL", "blk": "BLK", "fg3m": "3PM"}
-GOAT_AWARD_WEIGHTS = {"mvp": 1.0, "dpoy": 0.8, "sixth_man": 0.5, "mip": 0.4}
+# Official NBA honours -> points per win (keys are ESPN's EXACT award names;
+# verified live Sep 2026 against the 20 non-empty award types -- ids 34/37
+# are empty. All-Star game SELECTIONS and team championships are not in
+# ESPN's awards API at all, so they can't be scored here: championships are
+# counted separately from champion-team rows and shown next to the ladder,
+# never inside the score).
+GOAT_HONOURS_WEIGHTS = {
+    "MVP": 6.0,
+    "Finals MVP": 5.0,
+    "Defensive Player of the Year": 4.5,
+    "All-NBA 1st Team": 3.0,
+    "All-Defensive 1st Team": 2.5,
+    "All-NBA 2nd Team": 2.0,
+    "NBA Western Conference Finals MVP": 2.0,
+    "NBA Eastern Conference Finals MVP": 2.0,
+    "All-Defensive 2nd Team": 1.5,
+    "Rookie of the Year": 1.5,
+    "Sixth Man of the Year": 1.5,
+    "Most Improved Player": 1.5,
+    "All-Star MVP": 1.5,
+    "All-NBA 3rd Team": 1.0,
+    "Clutch Player of the Year": 1.0,
+    "NBA Cup MVP": 1.0,
+    "NBA Cup All-Tournament Team": 0.5,
+    "All-Rookie 1st Team": 0.5,
+    "All-Rookie 2nd Team": 0.25,
+    "Twyman-Stokes Teammate of the Year Award": 0.25,
+}
+# Short display names for the caption (the weights above are what the math
+# runs with; both dicts are asserted against GOAT_FORMULA in the tests).
+GOAT_HONOUR_LABELS = {
+    "MVP": "MVP",
+    "Finals MVP": "Finals MVP",
+    "Defensive Player of the Year": "DPOY",
+    "All-NBA 1st Team": "All-NBA 1st",
+    "All-Defensive 1st Team": "All-Def 1st",
+    "All-NBA 2nd Team": "All-NBA 2nd",
+    "NBA Western Conference Finals MVP": "Conf MVP (W)",
+    "NBA Eastern Conference Finals MVP": "Conf MVP (E)",
+    "All-Defensive 2nd Team": "All-Def 2nd",
+    "Rookie of the Year": "ROY",
+    "Sixth Man of the Year": "6MOY",
+    "Most Improved Player": "MIP",
+    "All-Star MVP": "All-Star MVP",
+    "All-NBA 3rd Team": "All-NBA 3rd",
+    "Clutch Player of the Year": "Clutch POY",
+    "NBA Cup MVP": "Cup MVP",
+    "NBA Cup All-Tournament Team": "Cup Tourney",
+    "All-Rookie 1st Team": "All-Rookie 1st",
+    "All-Rookie 2nd Team": "All-Rookie 2nd",
+    "Twyman-Stokes Teammate of the Year Award": "Twyman-Stokes",
+}
 
 # Display metadata shared with the dashboard (shared.py imports these so the
 # formula text shown in a caption is the SAME string that defines the math --
