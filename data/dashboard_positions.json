@@ -745,6 +745,12 @@
    "team_id": 6
   },
   {
+   "player_id": 2531367,
+   "player_name": "Dwight Powell",
+   "position": "F",
+   "team_id": 6
+  },
+  {
    "player_id": 5211175,
    "player_name": "Zaccharie Risacher",
    "position": "F",
@@ -1318,12 +1324,6 @@
    "player_id": 6580,
    "player_name": "Bradley Beal",
    "position": "G",
-   "team_id": 12
-  },
-  {
-   "player_id": 4433569,
-   "player_name": "Johni Broome",
-   "position": "F",
    "team_id": 12
   },
   {
@@ -2161,6 +2161,12 @@
    "team_id": 3
   },
   {
+   "player_id": 4683742,
+   "player_name": "Julian Reese",
+   "position": "F",
+   "team_id": 3
+  },
+  {
    "player_id": 4431675,
    "player_name": "Trendon Watford",
    "position": "F",
@@ -2439,6 +2445,12 @@
   {
    "player_id": 4065654,
    "player_name": "Jonathan Isaac",
+   "position": "F",
+   "team_id": 19
+  },
+  {
+   "player_id": 4278075,
+   "player_name": "Kevin Knox II",
    "position": "F",
    "team_id": 19
   },
@@ -3379,6 +3391,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-09-24T05:32:47Z",
+ "_generated_utc": "2026-09-25T23:23:21Z",
  "source": "local"
 }
