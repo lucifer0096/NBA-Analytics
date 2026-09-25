@@ -431,29 +431,60 @@ def _court_bucket(raw_pos: str) -> str:
 
 def goat_row_html(row: dict) -> str:
     """One GOAT-ladder row: rank/medal, real headshot (team-logo CSS
-    fallback), career line, race titles won in this repo's races, the three
-    component scores, and the headline GOAT score on the right.
+    fallback), career line, official-honour chips (heaviest first, the order
+    the formula weights them), championship count (display-only), the three
+    component scores -- a dropped component prints as — with its gap named --
+    and the headline GOAT score on the right.
 
     Single logical line -- see race_row_html's docstring."""
     rank = int(row.get("rank") or 0)
     medal = {1: "🥇", 2: "🥈", 3: "🥉"}.get(rank, str(rank))
     name = html.escape(str(row.get("player_name") or "Unknown"))
     team = str(row.get("team_abbrev") or "")
-    titles = row.get("titles") or {}
-    title_bits = [f"{awards.RACE_EMOJI.get(race, '')}×{count}"
-                  for race, count in titles.items() if count]
-    titles_text = " · ".join(title_bits) if title_bits else "no race titles"
-    meta = (f"{team} · {row.get('seasons', 0)} seasons · "
-            f"{row.get('gp', 0)} GP · {row.get('pts', 0):,} PTS · "
-            f"{row.get('ppg', 0)} PPG · {titles_text} · "
-            f"prod {row.get('production', 0)} · awards "
-            f"{row.get('awards_score', 0)} · peak {row.get('peak_score', 0)}")
+    honours = row.get("honours") or {}
+    chips = [f"{html.escape(awards.GOAT_HONOUR_LABELS.get(k, k))}×{int(v)}"
+             for k, v in sorted(
+                 honours.items(),
+                 key=lambda kv: (-awards.GOAT_HONOURS_WEIGHTS.get(kv[0], 0.0),
+                                 kv[0])) if v]
+    if chips:
+        honours_text = " · ".join(chips[:5])
+        if len(chips) > 5:
+            honours_text += f" · +{len(chips) - 5} more"
+    elif row.get("titles"):
+        # Legacy window-only rows carried this repo's race titles instead of
+        # official honours -- keep them readable rather than blanking them.
+        bits = [f"{awards.RACE_EMOJI.get(race, '')}×{count}"
+                for race, count in (row.get("titles") or {}).items() if count]
+        honours_text = " · ".join(bits) if bits else "no race titles"
+    else:
+        honours_text = "no official honours"
+    rings = row.get("championships")
+    rings_text = "🏆 —" if rings is None else f"🏆×{int(rings)}"
+    seasons = row.get("seasons")
+    seasons_text = "—" if seasons is None else str(int(seasons))
+    gaps = row.get("data_gaps") or []
+    gap_text = ""
+    if gaps:
+        labels = {"pts": "PTS", "reb": "REB", "ast": "AST",
+                  "honours": "honours", "peak": "peak"}
+        gap_text = " · no data: " + ", ".join(
+            labels.get(g, g.upper()) for g in gaps)
+    hscore = row.get("honours_score", row.get("awards_score"))
+    pscore = row.get("peak_score")
+    meta = (f"{team} · {seasons_text} seasons · {row.get('gp', 0)} GP · "
+            f"{row.get('pts', 0):,} PTS · {row.get('ppg', 0)} PPG · "
+            f"{rings_text} · {honours_text}")
+    components = (f"prod {row.get('production', 0)} · "
+                  f"honours {hscore if hscore is not None else '—'} · "
+                  f"peak {pscore if pscore is not None else '—'}{gap_text}")
     return (f'<div class="na-race-row">'
             f'<div class="na-rank">{medal}</div>'
             f'{headshot_html(row.get("player_id"), team, 44)}'
             f'<div class="na-rbody">'
             f'<div class="na-rname">{name}{team_logo_html(team, 16)}</div>'
             f'<div class="na-rmeta">{meta}</div>'
+            f'<div class="na-rmeta">{components}</div>'
             f'</div>'
             f'<div class="na-rscore">{row.get("score", 0)}</div>'
             f'</div>')
@@ -686,10 +717,10 @@ def load_awards(season: str = None) -> tuple:
     so the note states the computation stamp rather than implying live.
 
     The committed file carries EVERY collected season under "seasons"
-    (2010-11 -> present); `season` picks one, falling back to the newest
-    season at or before the request (sidebar can select 2026-27 before any
-    games exist) and SAYING so, mirroring load_standings' honesty rule.
-    The legacy single-season envelope (no "seasons" key) still loads."""
+    (2010-11 -> present); `season` picks one. A season with no collected
+    games (2026-27 before tip-off) gets an EMPTY payload and an honest note --
+    never the previous season's races under the new label. The legacy
+    single-season envelope (no "seasons" key) still loads."""
     payload = _read_fallback("dashboard_awards.json")
     seasons = payload.get("seasons")
     if not seasons:
@@ -705,10 +736,12 @@ def load_awards(season: str = None) -> tuple:
         elif not requested:
             actual = max(seasons)
         else:
-            # Nearest season at or before the request (2026-27 before tip-off
-            # -> 2025-26); before the window entirely -> the earliest season.
-            at_or_before = [s for s in seasons if s <= requested]
-            actual = max(at_or_before) if at_or_before else min(seasons)
+            # Nothing collected for the requested season (2026-27 before
+            # tip-off): empty state, no fallback to another season's data.
+            return ({"season": requested, "races": {}, "leaders": {}},
+                    f"{requested} has no collected games yet — award races "
+                    f"appear once the season starts (newest data: "
+                    f"{max(seasons)})")
         data = seasons[actual] or {}
         if not data.get("races"):
             return (data, "No committed award data yet — computed where "
@@ -717,9 +750,6 @@ def load_awards(season: str = None) -> tuple:
     stamp = payload.get("_generated_utc")
     note = (f"Computed from collected box scores — as of {stamp}" if stamp
             else "Computed from collected box scores")
-    if season and actual != season:
-        note = (f"{note} — showing {actual} "
-                f"({season} has no collected games yet)")
     return (data, note)
 
 
@@ -728,14 +758,54 @@ def load_awards_career() -> tuple:
     """(alltime dict, goat dict, window dict, note) -- the cross-season
     sections of the committed awards file: career totals across every
     collected season (2010-11 -> present), the GOAT ladder built from them,
-    and the window descriptor. Same honest stamp-only freshness as
-    load_awards (computed locally, never live)."""
+    and the window descriptor. The note prefers the envelope's own
+    career_note (history.py's verbatim pool/honours description with the
+    ESPN-quirks disclosure) and falls back to the generic stamp."""
     payload = _read_fallback("dashboard_awards.json")
     stamp = payload.get("_generated_utc")
-    note = (f"Computed from collected box scores — as of {stamp}" if stamp
-            else "Computed from collected box scores")
+    note = payload.get("career_note") or (
+        f"Computed from collected box scores — as of {stamp}" if stamp
+        else "Computed from collected box scores")
     return (payload.get("alltime") or {}, payload.get("goat") or {},
             payload.get("window") or {}, note)
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def load_games_by_season() -> dict:
+    """{season label: collected box-score count} from the awards envelope's
+    inventory (refresh_dashboard_fallbacks._games_by_season -- every raw
+    season dir, 0 included, so the upcoming season shows honestly empty)."""
+    payload = _read_fallback("dashboard_awards.json")
+    counts = payload.get("games_by_season")
+    return counts if isinstance(counts, dict) and counts else {}
+
+
+def sidebar_games(counts: dict, options: list) -> None:
+    """Sidebar inventory expander: games collected for EVERY selectable
+    season, so the selector's range is auditable at a glance."""
+    if not counts:
+        return
+    total = sum(int(v or 0) for v in counts.values())
+    with st.expander(f"Games collected · {total:,} total"):
+        for label in options:
+            st.caption(f"{label} · {int(counts.get(label) or 0):,}")
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def load_players() -> tuple:
+    """(players dict keyed by player id, meta, note) -- the Player Profile
+    index data/dashboard_players.json (career lines, per-season logs,
+    official honours, GOAT ranks). Written only after a successful history
+    build, so an absent file is an honest empty, not an error."""
+    payload = _read_fallback("dashboard_players.json")
+    players = payload.get("players") or {}
+    meta = payload.get("meta") or {}
+    stamp = payload.get("_generated_utc")
+    note = (f"ESPN career lines + official honours for "
+            f"{len(players):,} players — as of {stamp}" if stamp
+            else f"ESPN career lines + official honours for "
+                 f"{len(players):,} players")
+    return (players, meta, note)
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
