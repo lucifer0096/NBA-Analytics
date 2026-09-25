@@ -80,7 +80,8 @@ def test_get_json_rotates_header_sets_on_403(monkeypatch):
     def fake_urlopen(req, timeout=None):
         seen.append(dict(req.headers))
         if len(seen) < 3:
-            raise urllib.error.HTTPError(req.full_url, 403, "forbidden", {})
+            raise urllib.error.HTTPError(req.full_url, 403, "forbidden", {},
+                                         None)
         return io.BytesIO(b'{"ok": 1}')
 
     monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
