@@ -752,24 +752,71 @@ def load_standings(season: str) -> tuple:
 
 @st.cache_data(ttl=300, show_spinner=False)
 def load_schedule(season: str) -> tuple:
-    """(games DataFrame, note). Local-first: the committed envelope carries
-    EVERY collected season under "seasons" (final scores included -- the
-    Schedule tab needs previous seasons' results too), refreshed daily by the
-    collector. The legacy single-season file (top-level "games") still loads
-    when it matches the requested season; anything else is an honest empty."""
+    """(games DataFrame, note). Local-first: the selected season's OWN file
+    (data/schedules/{season}.json, final scores included) is parsed directly
+    -- one season's rows instead of the legacy 4.5MB merged envelope, with
+    the file's own generation stamp for an honest freshness caption. Legacy
+    shapes still load (the merged multi-season envelope, then the original
+    single-season file), and anything else is an honest empty."""
+    path = DATA_DIR / "schedules" / f"{season}.json"
+    if path.exists():
+        try:
+            with open(path, encoding="utf-8") as f:
+                payload = json.load(f)
+        except (json.JSONDecodeError, OSError):
+            payload = {}
+        rows = payload.get("games") if isinstance(payload, dict) else None
+        if isinstance(rows, list) and rows:
+            return (pd.DataFrame(rows), data_age_note(payload, False))
     payload = _read_fallback("dashboard_schedule.json")
     seasons = payload.get("seasons")
     if seasons:
-        rows = seasons.get(season)
-        if rows:
-            return (pd.DataFrame(rows), data_age_note(payload, False))
+        entry = seasons.get(season)
+        if isinstance(entry, list) and entry:
+            return (pd.DataFrame(entry), data_age_note(payload, False))
+        if isinstance(entry, dict):
+            # The index knows the season but its per-season file is missing
+            # or corrupt: say that instead of pretending no schedule exists.
+            return (pd.DataFrame(),
+                    f"{season} schedule file unreadable: the index says "
+                    f"{int(entry.get('games') or 0):,} games")
         return (pd.DataFrame(),
-                f"{season} schedule absent: the committed file covers "
+                f"{season} schedule absent: the committed index covers "
                 f"{len(seasons)} seasons")
     games = payload.get("games", [])
     if games and payload.get("season") == season:
         return (pd.DataFrame(games), data_age_note(payload, False))
     return (pd.DataFrame(), data_age_note(payload, False))
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def load_race_history(season: str) -> tuple:
+    """(snapshot list, note) from data/races/{season}.json: the daily race
+    snapshots the Awards Ladder's movement arrows and trend chart read
+    (written by refresh_dashboard_fallbacks._record_race_history). An
+    absent file is a normal, honest state (the season has never been
+    snapshotted, or its races froze after one), never an error."""
+    path = DATA_DIR / "races" / f"{season}.json"
+    if not path.exists():
+        return ([], f"No daily race snapshots yet for {season}: movement "
+                    "and trend appear after refresh_dashboard_fallbacks.py "
+                    "records them")
+    try:
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return ([], f"Race history for {season} is unreadable: the ladder "
+                    "shows without movement")
+    snapshots = payload.get("snapshots") if isinstance(payload, dict) else None
+    if not isinstance(snapshots, list) or not snapshots:
+        return ([], f"Race history for {season} is empty: the ladder shows "
+                    "without movement")
+    dates = [str(s.get("date")) for s in snapshots
+             if isinstance(s, dict) and s.get("date")]
+    note = f"{len(snapshots)} daily snapshot(s)"
+    if dates:
+        note += f", {dates[0]} to {dates[-1]}"
+    return (snapshots, note)
 
 
 @st.cache_data(ttl=60, show_spinner=False)
@@ -936,14 +983,19 @@ def current_season() -> str:
 
 
 def latest_season_with_data() -> str:
-    """Newest season label that has a committed schedule (or collected raw);
-    used as the default season selector value in the offseason, when the
-    'current' season's schedule may not exist yet."""
+    """Newest season label that has a committed schedule (per-season file or
+    legacy envelope); used as the default season selector value in the
+    offseason, when the 'current' season's schedule may not exist yet."""
     current = current_season()
-    if (DATA_DIR / "dashboard_schedule.json").exists():
-        payload = _read_fallback("dashboard_schedule.json")
-        if payload.get("games"):
-            return payload.get("season", current)
+    payload = _read_fallback("dashboard_schedule.json")
+    seasons = payload.get("seasons") or {}
+    with_games = [label for label, entry in seasons.items()
+                  if (int(entry.get("games") or 0) if isinstance(entry, dict)
+                      else len(entry or []))]
+    if with_games:
+        return max(with_games)
+    if payload.get("games"):
+        return payload.get("season", current)
     return current
 
 
