@@ -630,6 +630,9 @@ def _career_row(p: dict) -> dict:
         "ppg": _per_game(p, "pts"),
         "rpg": _per_game(p, "reb"),
         "apg": _per_game(p, "ast"),
+        # Where the career line came from: ESPN's full-career statistics, or
+        # (fetch failed / no history input) the collected window only.
+        "line_source": p.get("line_source") or "window",
     }
     for stat in CAREER_SUM_STATS:
         row[stat] = p.get(stat) or 0
@@ -677,35 +680,32 @@ def alltime_rows(players: list) -> dict:
     return out
 
 
-def goat_rows(players: list, season_payloads: list) -> list:
-    """The GOAT ladder: career production + award-race resume + peak season.
+def goat_rows(players: list, honours: dict = None) -> list:
+    """The GOAT ladder across NBA history: career production + official
+    honours + peak season.
 
-    Production mixes career totals against the window's best (weights in
-    GOAT_PRODUCTION_WEIGHTS); the resume converts every top-{RACE_SIZE}
-    finish in every collected season's races into (RACE_SIZE+1-rank) points
-    weighted by race prestige (GOAT_AWARD_WEIGHTS), counting rank-1 finishes
-    as titles; peak is his best season's per-game impact. Each component is
-    normalized 0-100 against the best player in the window, then mixed with
-    GOAT_WEIGHTS -- the exact text shown on screen is GOAT_FORMULA.
+    Production mixes full-career totals against the best career in the pool
+    (weights in GOAT_PRODUCTION_WEIGHTS); honours scores ESPN's official NBA
+    awards -- each win of each award type worth GOAT_HONOURS_WEIGHTS[name]
+    points, normalised to 0-100 against the richest resume; peak is the best
+    season's per-game impact. The three are mixed with GOAT_WEIGHTS -- the
+    exact on-screen text is GOAT_FORMULA.
 
-    Qualified at ≥GOAT_MIN_CAREER_GP career games so a ten-game hot streak
-    can't be crowned the greatest of the era."""
-    award_points: Counter = Counter()
-    titles: dict = {}
-    for payload in season_payloads:
-        for race, race_rows in (payload.get("races") or {}).items():
-            weight = GOAT_AWARD_WEIGHTS.get(race)
-            if weight is None:
-                continue
-            for row in race_rows:
-                pid = row.get("player_id")
-                rank_ = row.get("rank")
-                if pid is None or not rank_:
-                    continue
-                award_points[pid] += (RACE_SIZE + 1 - int(rank_)) * weight
-                if int(rank_) == 1:
-                    titles.setdefault(pid, Counter())[race] += 1
+    Honest gaps, per player and listed in the row's `data_gaps`:
+    - an impossible zero in a counted career total (PTS/REB/AST == 0 with a
+      full season of games -- e.g. ESPN's broken Wilt rebound line; era
+      zeros like pre-1974 STL/BLK or pre-1980 3PM are deliberately NOT
+      gaps, they're history and the caption says so);
+    - no trusted peak (untrusted ESPN season rows and no collected season);
+    - `honours` input absent entirely (legacy window-only builds).
+    Each drop renormalises over the remaining weights, so no one is punished
+    for data we failed to collect -- the component simply isn't claimed.
 
+    `honours` maps player_id -> {official award name: wins} (history.py).
+    Championships are display-only (counted there, never scored here).
+    Qualified at >=GOAT_MIN_CAREER_GP career games so a ten-game hot streak
+    can't be crowned the greatest ever."""
+    honours = honours or {}
     qualified = [p for p in players if p["gp"] >= GOAT_MIN_CAREER_GP]
     if not qualified:
         return []
@@ -713,22 +713,56 @@ def goat_rows(players: list, season_payloads: list) -> list:
         stat: max((p.get(stat) or 0 for p in qualified), default=0)
         for stat in GOAT_PRODUCTION_WEIGHTS
     }
-    max_awards = max(award_points.values(), default=0) or 1
-    max_peak = max((p.get("peak_impact") or 0 for p in qualified), default=0) or 1
+    honour_points = {
+        p["player_id"]: sum(GOAT_HONOURS_WEIGHTS.get(name, 0.0) * count
+                            for name, count in
+                            (honours.get(p["player_id"]) or {}).items())
+        for p in qualified
+    }
+    max_honours = max(honour_points.values(), default=0)
+    honours_tracked = bool(honours) and bool(max_honours)
+    max_peak = max((p.get("peak_impact") or 0 for p in qualified), default=0)
 
     rows = []
     for p in qualified:
-        production = 100.0 * sum(
-            w * ((p.get(stat) or 0) / max_totals[stat])
-            for stat, w in GOAT_PRODUCTION_WEIGHTS.items()
-            if max_totals[stat]
-        )
-        awards_score = 100.0 * award_points[p["player_id"]] / max_awards
-        peak_score = 100.0 * (p.get("peak_impact") or 0) / max_peak
-        score = (GOAT_WEIGHTS["production"] * production
-                 + GOAT_WEIGHTS["awards"] * awards_score
-                 + GOAT_WEIGHTS["peak"] * peak_score)
-        player_titles = titles.get(p["player_id"]) or {}
+        gaps = []
+        kept = {}
+        for stat, weight in GOAT_PRODUCTION_WEIGHTS.items():
+            impossible = (stat in ("pts", "reb", "ast")
+                          and not (p.get(stat) or 0)
+                          and p["gp"] >= ALLTIME_MIN_GP)
+            if impossible:
+                gaps.append(stat)
+            elif max_totals[stat]:
+                kept[stat] = weight
+        production = (100.0 * sum(
+            weight * ((p.get(stat) or 0) / max_totals[stat])
+            for stat, weight in kept.items()
+        ) / sum(kept.values())) if kept else 0.0
+
+        player_honours = honours.get(p["player_id"]) or {}
+        if honours_tracked:
+            honours_score = (100.0 * honour_points[p["player_id"]]
+                             / max_honours)
+        else:
+            honours_score = None
+            gaps.append("honours")
+        if p.get("peak_impact"):
+            peak_score = 100.0 * p["peak_impact"] / max_peak
+        else:
+            peak_score = None
+            gaps.append("peak")
+
+        available = {"production": production}
+        if honours_score is not None:
+            available["honours"] = honours_score
+        if peak_score is not None:
+            available["peak"] = peak_score
+        total_weight = sum(GOAT_WEIGHTS[c] for c in available)
+        score = (sum(GOAT_WEIGHTS[c] * value
+                     for c, value in available.items()) / total_weight
+                 if total_weight else 0.0)
+
         rows.append({
             "player_id": p["player_id"],
             "player_name": p["player_name"],
@@ -739,14 +773,17 @@ def goat_rows(players: list, season_payloads: list) -> list:
             "reb": p.get("reb") or 0,
             "ast": p.get("ast") or 0,
             "ppg": _per_game(p, "pts"),
-            "award_points": round(award_points[p["player_id"]], 1),
-            "titles": {race: int(player_titles.get(race, 0))
-                       for race in GOAT_AWARD_WEIGHTS},
-            "titles_total": int(sum(player_titles.values())),
+            "line_source": p.get("line_source") or "window",
+            "honours": dict(player_honours),
+            "honour_points": round(honour_points[p["player_id"]], 1),
+            "honours_score": (round(honours_score, 1)
+                              if honours_score is not None else None),
+            "championships": p.get("championships"),  # display-only, may be None
             "production": round(production, 1),
-            "awards_score": round(awards_score, 1),
-            "peak_score": round(peak_score, 1),
+            "honours_total": int(sum(player_honours.values())),
+            "peak_score": round(peak_score, 1) if peak_score is not None else None,
             "peak_impact": round(p.get("peak_impact") or 0.0, 1),
+            "data_gaps": gaps,
             "score": round(score, 1),
         })
     rows.sort(key=lambda r: (-r["score"], -r["production"],
@@ -754,23 +791,93 @@ def goat_rows(players: list, season_payloads: list) -> list:
     return _ranked(rows, GOAT_SIZE)
 
 
-def build_career(season_payloads: list, raw_dir: str = None) -> dict:
+def build_career(season_payloads: list, raw_dir: str = None,
+                 history: dict = None, players: list = None) -> dict:
     """The cross-season half of data/dashboard_awards.json: window metadata,
-    the all-time boards, and the GOAT ladder. `season_payloads` are the
-    build_payload() results for every collected season (their races feed the
-    GOAT resume). Empty dict when no season has collected games."""
-    players = alltime_players(raw_dir=raw_dir)
+    the all-time boards, and the GOAT ladder.
+
+    `history` is history.py's build() output (full-career ESPN lines for the
+    leaders/award-winners/window pool, official honours, champion index,
+    meta/stamp): with it the boards and the ladder span NBA history instead
+    of just the collected window; without it this degrades to the legacy
+    window-only shape (tests and offline builds). History lines supersede
+    window lines per player -- the window entry still supplies the name/team/
+    local peak fallback for fetch failures.
+
+    `players` may pass a precomputed alltime_players() list (the refresh
+    script reuses its box-score scan). `season_payloads` provide window
+    metadata; their race finishes no longer feed the GOAT resume -- official
+    honours do (the homegrown races stay on the Awards Ladder tab).
+
+    Empty dict when no season has collected games."""
+    if players is None:
+        players = alltime_players(raw_dir=raw_dir)
     labels = sorted(p["season"] for p in season_payloads if p.get("season"))
     if not labels or not players:
         return {}
-    return {
+    window_player_count = len(players)
+    if history and history.get("players"):
+        index = {int(p["player_id"]): p for p in players}
+        for entry in history["players"]:
+            merged = dict(index.get(int(entry["player_id"])) or {})
+            merged.update(entry)
+            index[int(entry["player_id"])] = merged
+        players = list(index.values())
+    honours_map = (history or {}).get("honours") or {}
+    stamp = (history or {}).get("stamp")
+    meta = (history or {}).get("meta") or {}
+    as_of = f"as of {stamp}" if stamp else None
+    out = {
         "window": {"first": labels[0], "last": labels[-1],
-                   "seasons": len(labels), "players": len(players)},
+                   "seasons": len(labels), "players": window_player_count},
         "alltime": {"leaders": alltime_rows(players)},
-        "goat": {"rows": goat_rows(players, season_payloads),
+        "goat": {"rows": goat_rows(players, honours_map),
                  "min_career_gp": GOAT_MIN_CAREER_GP,
                  "formula": GOAT_FORMULA},
     }
+    if meta:
+        out["alltime"]["source"] = (
+            f"Career lines for {meta.get('pool', 0)} players from ESPN "
+            f"career statistics (full NBA history: {meta.get('espn_lines', 0)} "
+            f"career lines, {meta.get('window_fallback', 0)} collected-window "
+            f"fallbacks) — not just the {labels[0]}→{labels[-1]} box scores"
+            + (f"; {as_of}" if as_of else "")
+        )
+        out["goat"]["source"] = (
+            f"Production: full-career totals vs the best career among "
+            f"qualified players; honours: {meta.get('honour_wins', 0)} "
+            f"official NBA award wins across {meta.get('award_types', 0)} "
+            f"award types ({meta.get('award_seasons', 0)} award seasons "
+            f"read); peak: best season impact from trusted ESPN season rows "
+            f"or the collected window; championship counts are display-only "
+            f"({meta.get('champion_years', 0)} champion seasons indexed)"
+            + (f"; {as_of}" if as_of else "")
+        )
+        out["career_note"] = (
+            f"All-NBA-history careers for {meta.get('pool', 0)} players "
+            f"(career leaders + official-award winners + "
+            f"{meta.get('window_41', 0)} collected players ≥"
+            f"{ALLTIME_MIN_GP} GP), {meta.get('honour_wins', 0)} official "
+            f"honours across {meta.get('award_types', 0)} award types"
+            + (f"; {as_of}" if as_of else "")
+            + ". ESPN quirks kept as-is and captioned: ABA/NBA totals "
+            "merged (Dr. J 30,026), Wilt's rebound total 0 (he's absent "
+            "from ESPN's rebound leaders), the blocks leader category is "
+            "mislabelled, and some pre-1977 careers have late-starting "
+            "season rows (untrusted → peak/seasons blank)."
+        )
+    else:
+        # Legacy window-only build: no ESPN history input, so say exactly
+        # that -- no career_note key at all (the dashboard falls back to its
+        # generic stamp note).
+        out["alltime"]["source"] = (
+            f"Collected box scores {labels[0]}→{labels[-1]} only — no ESPN "
+            "career fetch (window-only build)")
+        out["goat"]["source"] = (
+            f"Collected window {labels[0]}→{labels[-1]} without official "
+            "honours input — every row's honours component is dropped and "
+            "rescaled (see data_gaps)")
+    return out
 
 
 if __name__ == "__main__":
