@@ -17,6 +17,11 @@ on:
   # dispatch call fails with HTTP 422 "Workflow does not have
   # 'workflow_dispatch' trigger".
   workflow_dispatch:
+  # Weekly run (Mondays 06:00 UTC): catches dependency/environment drift
+  # even in weeks when no code lands on main -- paths-ignore never applies
+  # to scheduled runs, so this always exercises the full suite.
+  schedule:
+    - cron: "0 6 * * 1"
 
 permissions:
   contents: read
@@ -47,5 +52,32 @@ jobs:
         # pytest.ini's testpaths + its `-m "not live"` default make this the
         # deterministic suite (unit tests + the offline dashboard/AppTest
         # render tests). The live ESPN-API checks are marked `live` and run
-        # on demand with `pytest -m live`.
-        run: python -m pytest -q
+        # on demand with `pytest -m live`. The --cov flags keep a coverage
+        # report per run: the XML is uploaded as an artifact and the total
+        # lands in the step summary (information, not a threshold gate --
+        # a floor would reward covering trivial lines, not protecting the
+        # honesty assertions this suite actually pins).
+        run: >-
+          python -m pytest -q
+          --cov=app --cov=src
+          --cov-report=term --cov-report=xml
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.xml
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Coverage in the step summary
+        if: always()
+        run: |
+          [ -f coverage.xml ] || exit 0
+          python - >> "$GITHUB_STEP_SUMMARY" <<'PY'
+          import xml.etree.ElementTree as ET
+          line = ET.parse("coverage.xml").getroot().find("coverage")
+          print("### Coverage")
+          print(f"{float(line.get('line-rate')) * 100:.1f}% lines "
+                f"({line.get('lines-covered')}/{line.get('lines-valid')}) "
+                "-- full report in the coverage-report artifact.")
+          PY

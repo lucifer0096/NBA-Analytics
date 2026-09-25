@@ -57,23 +57,13 @@ jobs:
       - name: Open or update the failure issue
         # A silent dead collector is the worst failure mode (data just goes
         # stale): on ANY failed step, upsert one tracked issue that links the
-        # failing run, so the repo's inbox says so without polling Actions.
+        # failing run (shared script with refresh-history.yml/retrain.yml).
         if: failure()
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          title="Daily collector failing (data going stale)"
-          num=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open \
-                  --json number,title --jq '.[] | "\(.number) \(.title)"' \
-                | grep -F "$title" | awk '{print $1}' | head -1)
-          if [ -n "$num" ]; then
-            gh issue comment "$num" --repo "$GITHUB_REPOSITORY" \
-              --body "Failed again: $run_url"
-          else
-            body=$(printf '%s\n\n%s' \
-              "The scheduled collector failed, so committed data stays at the last successful refresh. Newest failing run: $run_url" \
-              "For ESPN reachability triage, dispatch the ESPN probe workflow and read its log; the fix belongs in src/collector/espn_api.py (_HEADER_SETS).")
-            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" \
-              --body "$body"
-          fi
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: >-
+          bash .github/scripts/upsert_failure_issue.sh
+          "Daily collector failing (data going stale)"
+          "$RUN_URL"
+          "For ESPN reachability triage, dispatch the ESPN probe workflow and read its log; the fix belongs in src/collector/espn_api.py (_HEADER_SETS)."

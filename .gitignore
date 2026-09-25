@@ -18,11 +18,20 @@ data/raw/
 # below, which the deployed app reads directly and Streamlit Cloud has no way
 # to regenerate, plus history_cache.json -- ESPN career/honours data that
 # history.py would otherwise refetch (~10k requests) on every fresh CI clone.
+# historical_games.parquet is the one exception for a different reason: it is
+# the model's training table (7.6MB, regenerable from data/raw/ locally) and
+# the monthly retrain workflow cannot rebuild it without raw/, so committing
+# it is what makes CI retrains possible at all (see retrain.yml).
 # No personal data -- league-wide stats only.
 data/processed/*
 !data/processed/dashboard_leaderboards.json
 !data/processed/history_cache.json
+!data/processed/historical_games.parquet
 !data/processed/.gitkeep
+
+# Coverage output (`pytest --cov` / CI's coverage step) -- regenerated, never
+# committed.
+coverage.xml
 
 # Trained model artifacts: only the model the dashboard actually loads is
 # committed (same pattern as FPL-Analytics' single-stage model), everything

@@ -3,3 +3,7 @@
 # Deliberately separate from requirements.txt so the Streamlit Cloud deploy
 # -- which installs that file verbatim -- doesn't carry linters it never runs.
 ruff==0.16.8
+# Coverage report for CI (`pytest --cov`): the workflow uploads coverage.xml
+# as an artifact and prints the total in the step summary. Dev-only for the
+# same reason as ruff -- the deploy never runs it.
+pytest-cov==7.1.0

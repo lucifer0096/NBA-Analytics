@@ -1,0 +1,66 @@
+name: Monthly retrain guardrail
+
+# train.py is deterministic (seeded LightGBM on the committed feature
+# source), so a monthly run is a real guardrail rather than a coin flip:
+# rebuild features.parquet from the committed historical_games.parquet,
+# retrain, then FAIL if validation MAE regressed beyond tolerance or the
+# model no longer beats its naive baseline (src/model/guardrail.py, unit
+# tested). The committed model/metrics are only overwritten when the fresh
+# numbers pass. historical_games.parquet is committed exactly because
+# data/raw/ is gitignored -- without it a CI checkout cannot rebuild the
+# training table (see .gitignore).
+on:
+  schedule:
+    - cron: "0 5 1 * *"   # 05:00 UTC on the 1st of each month
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: data-refresh   # shared with collector.yml/refresh-history.yml
+  cancel-in-progress: false
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Keep the committed metrics as the baseline
+        run: cp models/metrics.json /tmp/metrics_baseline.json
+      - name: Rebuild features and retrain
+        run: |
+          python src/model/features.py
+          python src/model/train.py
+      - name: Guardrail (fail on validation-MAE regression)
+        run: python src/model/guardrail.py /tmp/metrics_baseline.json models/metrics.json
+      - name: Commit the retrained model
+        run: |
+          git config user.name "retrain-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add models/
+          if git diff --cached --quiet; then
+            echo "Model and metrics unchanged (deterministic retrain)."
+          else
+            git commit -m "models: monthly retrain $(date -u +%F)"
+            git push
+          fi
+      - name: Open or update the failure issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: >-
+          bash .github/scripts/upsert_failure_issue.sh
+          "Monthly retrain guardrail failing"
+          "$RUN_URL"
+          "Check the guardrail step's log: validation MAE must not regress past tolerance (src/model/guardrail.py)."
