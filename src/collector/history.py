@@ -108,7 +108,7 @@ OFFICIAL_CHAMPIONSHIPS = {
     4125: 1,   # Billy Cunningham (1967 76ers)
     4126: 4,   # Bill Sharman
     4127: 2,   # Bill Walton (1977 Blazers, 1986 Celtics)
-    4128: 1,   # Dolph Schayes (1954 Syracuse Nationals)
+    4128: 1,   # Dolph Schayes (1954-55 Syracuse Nationals, 1955 Finals)
     4129: 2,   # Walt Frazier (1970, 1973 Knicks)
     4131: 0,   # George Gervin
     4132: 2,   # Dave Cowens (1974, 1976 Celtics)
