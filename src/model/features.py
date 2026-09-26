@@ -104,9 +104,12 @@ def add_availability_features(df: pd.DataFrame) -> pd.DataFrame:
     # appearances: shift(1) first so this row's own game never enters its
     # own window (the leak the structure above exists to prevent), and a
     # career with no prior game stays NaN rather than claiming 0 of 5.
-    df["games_played_last_5"] = grouped["min"].transform(
-        lambda s: s.shift(1).gt(0).rolling(5, min_periods=1).sum()
-    )
+    def _prior_appearances(s: pd.Series) -> pd.Series:
+        prior = s.shift(1)
+        played = prior.gt(0).astype(float).where(prior.notna())
+        return played.rolling(5, min_periods=1).sum()
+
+    df["games_played_last_5"] = grouped["min"].transform(_prior_appearances)
 
     # Calendar days since this player's previous game (NaN on the first game
     # of a career/season-gap). Computed from real dates, not row gaps --
