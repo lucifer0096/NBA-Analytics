@@ -850,7 +850,11 @@ def build_career(season_payloads: list, raw_dir: str = None,
             f"award types ({meta.get('award_seasons', 0)} award seasons "
             f"read); peak: best season impact from trusted ESPN season rows "
             f"or the collected window; championship counts are display-only "
-            f"({meta.get('champion_years', 0)} champion seasons indexed)"
+            f"({meta.get('champion_years', 0)} champion seasons indexed"
+            + (f"; {meta.get('official_champions', 0)} careers counted from "
+               f"the verified official record where ESPN's index can't reach"
+               if meta.get("official_champions") else "")
+            + ")"
             + (f"; {as_of}" if as_of else "")
         )
         out["career_note"] = (

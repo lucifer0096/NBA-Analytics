@@ -360,6 +360,18 @@ def test_build_career_window_and_honest_empties(tmp_path):
     assert career["goat"]["rows"] == []
     # No season payloads at all -> {} (caller keeps the previous file).
     assert awards.build_career([], raw_dir=str(tmp_path)) == {}
+    # With history meta, the goat source caption says where championship
+    # counts come from: indexed champion seasons plus the official-record
+    # fallback's career count; legacy meta keeps the indexed-only sentence.
+    hist = {"meta": {"champion_years": 57, "official_champions": 33}}
+    src = awards.build_career(season_payloads, raw_dir=str(tmp_path),
+                              history=hist)["goat"]["source"]
+    assert "57 champion seasons indexed" in src
+    assert ("33 careers counted from the verified official record "
+            "where ESPN's index can't reach") in src
+    legacy = awards.build_career(season_payloads, raw_dir=str(tmp_path),
+                                 history={"meta": {"champion_years": 57}})
+    assert "official record" not in legacy["goat"]["source"]
 
 
 def test_build_payload_envelope(tmp_path):

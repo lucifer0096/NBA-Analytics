@@ -50,6 +50,8 @@ here so the dashboard only ever displays what the data supports:
   collected season, else ``None`` (component dropped on the ladder);
 - championships are counted only for trusted careers whose rows start in
   1970+ (champion index begins there) and cover every completed row season;
+  careers outside that rule take the verified official-record count from
+  ``OFFICIAL_CHAMPIONSHIPS`` instead of a blank. Championship counts are
   display-only, never part of any score. Mid-season trades can mislead
   (a row carries one team), which the dashboard captions.
 
@@ -86,6 +88,50 @@ AWARD_TYPE_IDS = (33, 35, 36, 39, 40, 43, 44, 45, 46, 47, 48, 49, 50, 53,
                   77, 217, 218, 297, 377, 378)
 FINALS_MVP_ID = 43
 CHAMPION_FIRST_YEAR = 1970  # 1969's Finals MVP (Jerry West) lost the Finals
+
+# Official NBA championship counts (as a player) for careers the champion
+# index can't vouch for: it starts at CHAMPION_FIRST_YEAR (1970) and ESPN's
+# season rows start late for some legends (Kareem's begin in 1976, after
+# four of his six title seasons), so the derived count returns None. These
+# are the official record, verified against Wikipedia and Basketball-
+# Reference player pages (Sep 2026), keyed by ESPN athlete id; display-only
+# exactly like the derived counts, never part of any score. 0 means the
+# record confirms no titles (so the row can show 0 instead of a blank).
+OFFICIAL_CHAMPIONSHIPS = {
+    3776: 1,   # Moses Malone (1983 76ers)
+    4119: 1,   # Oscar Robertson (1971 Bucks)
+    4120: 8,   # John Havlicek
+    4121: 0,   # Lenny Wilkens
+    4122: 1,   # Rick Barry (1975 Warriors)
+    4123: 1,   # Paul Arizin (1956 Warriors)
+    4124: 2,   # Dave DeBusschere (1970, 1973 Knicks)
+    4125: 1,   # Billy Cunningham (1967 76ers)
+    4126: 4,   # Bill Sharman
+    4127: 2,   # Bill Walton (1977 Blazers, 1986 Celtics)
+    4128: 1,   # Dolph Schayes (1954 Syracuse Nationals)
+    4129: 2,   # Walt Frazier (1970, 1973 Knicks)
+    4131: 0,   # George Gervin
+    4132: 2,   # Dave Cowens (1974, 1976 Celtics)
+    4133: 6,   # Bob Cousy
+    4134: 1,   # Elvin Hayes (1978 Bullets)
+    4135: 0,   # Elgin Baylor
+    4136: 1,   # Earl Monroe (1973 Knicks)
+    4137: 1,   # Jerry Lucas (1973 Knicks)
+    4138: 10,  # Sam Jones
+    4139: 0,   # Nate Thurmond
+    4140: 1,   # Bob Pettit (1958 St. Louis Hawks)
+    4141: 2,   # Willis Reed (1970, 1973 Knicks)
+    4142: 2,   # Wilt Chamberlain (1967 76ers, 1972 Lakers)
+    4143: 1,   # Hal Greer (1967 76ers)
+    4145: 6,   # Kareem Abdul-Jabbar (1971 Bucks; 1980/82/85/87/88 Lakers)
+    4146: 0,   # Dave Bing
+    4147: 5,   # George Mikan (1949 BAA + 1950/52/53/54 NBA)
+    4148: 1,   # Wes Unseld (1978 Bullets)
+    4149: 1,   # Nate Archibald (1981 Celtics)
+    4150: 0,   # Pete Maravich
+    4151: 1,   # Jerry West (1972 Lakers)
+    4152: 11,  # Bill Russell (Celtics 1957, 1959-66, 1968, 1969)
+}
 
 THREADS = 8
 ATHLETE_TTL_DAYS = 7        # active players' career totals move with seasons
@@ -491,12 +537,17 @@ def _peak_from_rows(rows: list) -> float | None:
     return round(best, 1) or None
 
 
-def _championships(entry: dict, champions: dict) -> int | None:
+def _championships(entry: dict, champions: dict,
+                   player_id: int = None) -> int | None:
     """Titles counted by matching a trusted career's season rows against the
-    champion team per year (Finals-MVP team refs, 1970 on). Display-only:
-    returns None rather than a wrong number when the career isn't fully
-    covered -- pre-1970 titles aren't in the index, and mid-season trades can
-    make a row carry the wrong team."""
+    champion team per year (Finals-MVP team refs, 1970 on). Careers the
+    index can't cover -- pre-1970 titles, late-starting rows (Kareem),
+    careers the trust rule rejects -- take their verified official-record
+    count from OFFICIAL_CHAMPIONSHIPS instead of returning None.
+    Display-only: returns None rather than a wrong number when nothing
+    applies, since mid-season trades can make a row carry the wrong team."""
+    if player_id in OFFICIAL_CHAMPIONSHIPS:
+        return OFFICIAL_CHAMPIONSHIPS[player_id]
     rows = entry.get("rows") or []
     if not rows or not champions or not _trusted(entry):
         return None
@@ -588,7 +639,7 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
                            or bundle.get("team"),
             "seasons": seasons,
             "peak_impact": peak,
-            "championships": _championships(bundle, champions),
+            "championships": _championships(bundle, champions, pid),
             "line_source": source,
             "debut": bundle.get("debut"),
         })
@@ -606,6 +657,8 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
         "window_41": len(window_pool),
         "espn_lines": espn_lines,
         "window_fallback": window_fallbacks,
+        "official_champions": sum(1 for p in players
+                                  if p["player_id"] in OFFICIAL_CHAMPIONSHIPS),
         "stamp": stamp,
         **award_meta,
     }

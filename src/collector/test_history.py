@@ -39,3 +39,22 @@ def test_build_offline_from_committed_cache(monkeypatch):
     assert result["honours"], "official honours map is empty"
     assert result["meta"]["stamp"]
     assert result["meta"]["pool"] >= len(result["honours"])
+    # Official-record ring counts land on careers ESPN's champion index
+    # can't vouch for, and meta counts them for the on-screen caption.
+    assert by_pid[4145]["championships"] == 6   # Kareem (rows start 1976)
+    assert by_pid[4152]["championships"] == 11  # Bill Russell (pre-1970)
+    assert result["meta"]["official_champions"] >= 2
+
+
+def test_official_championships_table():
+    """OFFICIAL_CHAMPIONSHIPS answers before any derivation runs: the ids
+    it lists return the verified official-record count even with an empty
+    entry, ids it doesn't list keep the old None behaviour, and the table
+    only ever holds non-negative int counts keyed by int id."""
+    assert history._championships({}, {}, 4145) == 6
+    assert history._championships({"rows": [], "debut": 1969}, {},
+                                  4152) == 11
+    assert history._championships({}, {}, 9999999) is None
+    for pid, count in history.OFFICIAL_CHAMPIONSHIPS.items():
+        assert isinstance(pid, int)
+        assert isinstance(count, int) and count >= 0
