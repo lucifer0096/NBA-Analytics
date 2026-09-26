@@ -921,10 +921,13 @@ def build_career(season_payloads: list, raw_dir: str = None,
             f"{meta.get('window_41', 0)} collected players ≥"
             f"{ALLTIME_MIN_GP} GP), {meta.get('honour_wins', 0)} official "
             f"honours across {meta.get('award_types', 0)} award types"
+            + (f"; rebounds for {meta.get('official_reb_lines', 0)} "
+               "pre-1974 legends patched from the official record "
+               "(career lines and season rows)"
+               if meta.get("official_reb_lines") else "")
             + (f"; {as_of}" if as_of else "")
             + ". ESPN quirks kept as-is and captioned: ABA/NBA totals "
-            "merged (Dr. J 30,026), Wilt's rebound total 0 (he's absent "
-            "from ESPN's rebound leaders), the blocks leader category is "
+            "merged (Dr. J 30,026), the blocks leader category is "
             "mislabelled, and some pre-1977 careers have late-starting "
             "season rows (untrusted → peak/seasons blank)."
         )
