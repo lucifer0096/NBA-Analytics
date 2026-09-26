@@ -48,7 +48,7 @@ never see its own outcome:
 | Feature family | Columns | Notes |
 |---|---|---|
 | Rolling form | `fantasy_points/min/pts/reb/ast_avg_last_{3,5,10}` | shift(1) then rolling, per player, across season boundaries (SEASON_ORDER makes October follow June) |
-| Availability | `minutes_last_game`, `played_last_game` | prior appearance only |
+| Availability | `minutes_last_game`, `played_last_game`, `games_played_last_5` | prior appearance only; the count is the "played 3 of his last 5" signal as a 0-5 number, NaN before a career's second game |
 | Rest | `rest_days` (0 = back-to-back), `back_to_back` | from real calendar dates — All-Star breaks and suspensions are genuine rest |
 | Experience | `season_game_count`, `career_game_count` | cumcount = games strictly before this one |
 | Team form | `team_form_pf`, `team_form_pa` | team's own last-5 scoring/defense, lagged one team-game |

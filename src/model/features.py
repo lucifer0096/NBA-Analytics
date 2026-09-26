@@ -100,6 +100,14 @@ def add_availability_features(df: pd.DataFrame) -> pd.DataFrame:
         df["minutes_last_game"].fillna(0).gt(0).astype(int)
     )
 
+    # "Played 3 of his last 5" availability signal as a 0-5 count of prior
+    # appearances: shift(1) first so this row's own game never enters its
+    # own window (the leak the structure above exists to prevent), and a
+    # career with no prior game stays NaN rather than claiming 0 of 5.
+    df["games_played_last_5"] = grouped["min"].transform(
+        lambda s: s.shift(1).gt(0).rolling(5, min_periods=1).sum()
+    )
+
     # Calendar days since this player's previous game (NaN on the first game
     # of a career/season-gap). Computed from real dates, not row gaps --
     # trade suspensions and All-Star breaks are genuine rest.

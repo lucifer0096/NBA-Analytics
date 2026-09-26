@@ -82,6 +82,13 @@ with st.sidebar:
                 "the baseline, trained on the box-score history inventoried "
                 "above (full validation: models/metrics.json)."
             )
+            st.caption(
+                "Projection caveat: an availability signal (games played "
+                "in the last 5, read only from PRIOR box scores) feeds "
+                "every projection, so a player ramping up or missing "
+                "games carries that context instead of his old form "
+                "unchecked."
+            )
         else:
             st.caption("Model not trained yet: run `python "
                        "src/model/features.py && python "

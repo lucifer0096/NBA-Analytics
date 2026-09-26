@@ -120,6 +120,32 @@ def test_rest_days_and_back_to_back(featured):
     assert b2b == [0, 0, 0, 1]
 
 
+def test_availability_signal_counts_prior_appearances_only(featured):
+    """games_played_last_5 = the 'played N of his last 5' caveat as a
+    0-5 count: NaN on a debut (no prior game to read), then 1 for each
+    prior appearance -- this row's own game never enters its own window."""
+    p1 = featured[featured["player_id"] == 11].sort_values("date")
+    counts = list(p1["games_played_last_5"])
+    assert np.isnan(counts[0])
+    assert counts[1:] == [1.0, 2.0, 3.0]
+    assert "games_played_last_5" in train.FEATURE_COLUMNS
+
+
+def test_availability_signal_skips_games_not_played():
+    """DNP rows (min 0) don't count as appearances, and the row's own game
+    stays outside the window: after the 7th game (a DNP) the count still
+    reads only the prior five games."""
+    df = pd.DataFrame({
+        "player_id": [7] * 7,
+        "season": ["2020-21"] * 7,
+        "date": [f"2021-01-0{i}" for i in range(1, 8)],
+        "min": [30, 0, 30, 0, 30, 30, 0],  # sits out games 2, 4 and 7
+    })
+    counts = list(features.add_availability_features(df)["games_played_last_5"])
+    assert np.isnan(counts[0])
+    assert counts[1:] == [1.0, 1.0, 2.0, 2.0, 3.0, 3.0]
+
+
 def test_team_form_is_lagged_not_same_game(featured):
     """team_form_pf for the FIRST game must be NaN (no prior team game),
     and for the second game it must be game 1's score -- never this game's."""

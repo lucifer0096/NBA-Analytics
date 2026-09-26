@@ -41,7 +41,8 @@ PLAYED_COLUMN = "played"  # derived in load_historical: min > 0
 # Every entry is either a rolling/lagged stat (shifted by 1 in features.py --
 # only information available BEFORE this game) or a pre-game-known fact
 # (rest_days/back_to_back, is_home, opponent identity via opp_form_*,
-# career/season game counts, the league-wide new-player baseline).
+# career/season game counts, the availability count from prior box scores,
+# the league-wide new-player baseline).
 # `position` is deliberately absent: it's current-state data (see
 # load_historical) whose missingness would encode row era.
 FEATURE_COLUMNS = [
@@ -52,6 +53,7 @@ FEATURE_COLUMNS = [
     "career_game_count",
     "played_last_game",
     "minutes_last_game",
+    "games_played_last_5",
     "fantasy_points_avg_last_3",
     "min_avg_last_3",
     "pts_avg_last_3",
