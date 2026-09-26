@@ -433,9 +433,9 @@ def _court_bucket(raw_pos: str) -> str:
 def goat_row_html(row: dict) -> str:
     """One GOAT-ladder row: rank/medal, real headshot (team-logo CSS
     fallback), career line, official-honour chips (heaviest first, the order
-    the formula weights them), championship count (display-only), the three
-    component scores (a dropped component prints as `—` with its gap named)
-    and the headline GOAT score on the right.
+    the formula weights them), championship count, the four component
+    scores (a dropped component prints as `—` with its gap named) and the
+    headline GOAT score on the right.
 
     Single logical line -- see race_row_html's docstring."""
     rank = int(row.get("rank") or 0)
@@ -468,17 +468,21 @@ def goat_row_html(row: dict) -> str:
     gap_text = ""
     if gaps:
         labels = {"pts": "PTS", "reb": "REB", "ast": "AST",
-                  "honours": "honours", "peak": "peak"}
+                  "stl": "STL", "blk": "BLK", "fg3m": "3PM",
+                  "honours": "honours", "peak": "peak",
+                  "championships": "titles"}
         gap_text = " · no data: " + ", ".join(
             labels.get(g, g.upper()) for g in gaps)
     hscore = row.get("honours_score", row.get("awards_score"))
     pscore = row.get("peak_score")
+    tscore = row.get("championships_score")
     meta = (f"{team} · {seasons_text} seasons · {row.get('gp', 0)} GP · "
             f"{row.get('pts', 0):,} PTS · {row.get('ppg', 0)} PPG · "
             f"{rings_text} · {honours_text}")
     components = (f"prod {row.get('production', 0)} · "
                   f"honours {hscore if hscore is not None else '—'} · "
-                  f"peak {pscore if pscore is not None else '—'}{gap_text}")
+                  f"peak {pscore if pscore is not None else '—'} · "
+                  f"titles {tscore if tscore is not None else '—'}{gap_text}")
     return (f'<div class="na-race-row">'
             f'<div class="na-rank">{medal}</div>'
             f'{headshot_html(row.get("player_id"), team, 44)}'

@@ -5,8 +5,8 @@ award honours (src/collector/history.py + awards.py, committed as
 data/dashboard_awards.json) -- every season a player ever played, NOT just
 this repo's 16-season collection window. Transparent homegrown composite:
 the exact formula prints verbatim on screen, every honour weight is listed,
-championships are display-only, and any component ESPN can't support
-prints as `—` with its gap named instead of being silently estimated.
+championships are a bounded component, and any component the data can't
+support prints as `—` with its gap named instead of being silently estimated.
 """
 
 import streamlit as st
@@ -54,11 +54,12 @@ else:
         st.markdown(shared.goat_row_html(row), unsafe_allow_html=True)
     st.caption(
         "Honour chips are ESPN's 20 official award types × wins, heaviest "
-        "first, exactly the weights printed in the formula; 🏆×N is "
-        "display-only (never scored), and `—` means the count can't be "
-        "computed honestly from ESPN's rows (career not fully covered, or "
-        "titles before the champion index starts in 1970). prod/honours/"
-        "peak are the 0-100 component scores behind the headline number; a "
-        "dropped component prints as `—` with its gap named, and the score "
-        "rescales over the weights that ARE available."
+        "first, exactly the weights printed in the formula; 🏆×N feeds the "
+        + f"{awards.GOAT_WEIGHTS['championships']:.0%} championships "
+        "component (champion-season rows plus verified official-record "
+        "counts), and `—` means the count can't be computed honestly. "
+        "prod/honours/peak/titles are the 0-100 component scores behind "
+        "the headline number; a dropped component prints as `—` with its "
+        "gap named, and the score rescales over the weights that ARE "
+        "available."
     )

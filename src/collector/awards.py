@@ -25,13 +25,16 @@ Cross-season sections (built from ALL collected seasons at once):
               module docstring), counting-stat boards + efficiency boards
               behind attempt floors -- i.e. NBA history, not just the window;
               with no history input it degrades to window-only (legacy shape)
-    GOAT      a transparent composite of career production (40%), official
-              NBA honours (35%, ESPN's 20 award types -- GOAT_HONOURS_WEIGHTS
-              prints every per-win weight) and peak season (25%); computed
-              from the same merged pool, with impossible-zero totals or an
-              untrusted peak dropped per player and the remaining weights
-              rescaled (the row says so in data_gaps). Homegrown, explicitly
-              NOT an official NBA ranking.
+    GOAT      a transparent composite of career production (35%, a 50/50
+              blend of career totals and per-game rates vs the best career
+              among qualified players), official NBA honours (30%, ESPN's
+              20 award types -- GOAT_HONOURS_WEIGHTS prints every per-win
+              weight), peak season (25%) and championships (10%, official
+              counts); computed from the same merged pool, with an
+              unavailable component or untracked stat dropped per player
+              and the remaining weights rescaled (the row says so in
+              data_gaps). Homegrown, explicitly NOT an official NBA
+              ranking.
     profile   build_career's `history` input also carries per-season logs and
               honours that refresh_dashboard_fallbacks.py publishes as
               data/dashboard_players.json (Player Profile page).
@@ -84,24 +87,30 @@ ALLTIME_ATTEMPT_FLOORS = {"fgp": ("fga", 5.0), "fg3p": ("fg3a", 2.0),
                           "ftp": ("fta", 1.0), "efg": ("fga", 5.0),
                           "ts": ("fga", 5.0)}
 
-# GOAT ladder: three components, each normalized 0-100 against the best
+# GOAT ladder: four components, each normalized 0-100 against the best
 # qualified player in the merged pool, then mixed with these weights (they
 # MUST match GOAT_FORMULA's text -- test_goat_* asserts the pair stays in
 # sync). Production spans careers over ALL of NBA history when history.py's
-# lines are merged in; honours are the OFFICIAL NBA awards ESPN carries.
+# lines are merged in; honours are the OFFICIAL NBA awards ESPN carries;
+# championships come from champion-team rows plus history.OFFICIAL_
+# CHAMPIONSHIPS (display data, now scored at a bounded 10%).
 GOAT_SIZE = 25
 GOAT_MIN_CAREER_GP = 82
-GOAT_WEIGHTS = {"production": 0.40, "honours": 0.35, "peak": 0.25}
+GOAT_WEIGHTS = {"production": 0.35, "honours": 0.30, "peak": 0.25,
+                "championships": 0.10}
+# Production is a per-stat 50/50 blend of career total and per-game rate,
+# so longevity (more games) and dominance (better rates) both earn credit.
+GOAT_PRODUCTION_BLEND = 0.5
 GOAT_PRODUCTION_WEIGHTS = {"pts": 0.40, "reb": 0.15, "ast": 0.15,
                            "stl": 0.10, "blk": 0.10, "fg3m": 0.10}
 GOAT_PROD_LABELS = {"pts": "PTS", "reb": "REB", "ast": "AST",
                     "stl": "STL", "blk": "BLK", "fg3m": "3PM"}
 # Official NBA honours -> points per win (keys are ESPN's EXACT award names;
 # verified live Sep 2026 against the 20 non-empty award types -- ids 34/37
-# are empty. All-Star game SELECTIONS and team championships are not in
-# ESPN's awards API at all, so they can't be scored here: championships are
-# counted separately from champion-team rows and shown next to the ladder,
-# never inside the score).
+# are empty). All-Star game SELECTIONS aren't in ESPN's awards API at all,
+# so they can't be scored here. Championships are a separate bounded
+# GOAT component (GOAT_WEIGHTS["championships"]), counted from champion-
+# team rows plus history.OFFICIAL_CHAMPIONSHIPS, not part of this table.
 GOAT_HONOURS_WEIGHTS = {
     "MVP": 6.0,
     "Finals MVP": 5.0,
@@ -183,15 +192,22 @@ GOAT_FORMULA = (
     f"{GOAT_WEIGHTS['production']:.0%} career production ("
     + ", ".join(f"{GOAT_PROD_LABELS[s]} {w:.0%}"
                 for s, w in GOAT_PRODUCTION_WEIGHTS.items())
-    + " of the component, each career total vs the best career among "
-    "qualified players) + "
+    + f" of the component; each stat is a "
+    f"{GOAT_PRODUCTION_BLEND:.0%}/{1 - GOAT_PRODUCTION_BLEND:.0%} blend of "
+    "career total and per-game rate vs the best career among qualified "
+    "players, and a stat the career never had (impossible-zero totals, "
+    "pre-1974 STL/BLK, pre-1980 3PM) is dropped from his blend with the "
+    "rest rescaled) + "
     f"{GOAT_WEIGHTS['honours']:.0%} official NBA honours (points per win: "
     + ", ".join(f"{GOAT_HONOUR_LABELS[name]} ×{weight:g}"
                 for name, weight in GOAT_HONOURS_WEIGHTS.items())
-    + f") + {GOAT_WEIGHTS['peak']:.0%} peak (best season's per-game impact), "
-    "each component 0-100 vs the best qualified player; a component with no "
-    "trusted data for a player (impossible-zero career totals, untrusted "
-    "peak, no honours input) is dropped for him and the remaining weights "
+    + f") + {GOAT_WEIGHTS['peak']:.0%} peak (best season's per-game impact)"
+    f" + {GOAT_WEIGHTS['championships']:.0%} championships (title count vs "
+    "the most among qualified players: champion-season rows plus verified "
+    "official-record counts), each component 0-100 vs the best qualified "
+    "player; a component with no data for a player (impossible-zero career "
+    "total, untrusted peak, unknown title count, no honours input) is "
+    "dropped for him and the remaining weights "
     f"rescaled; requires ≥{GOAT_MIN_CAREER_GP} career games."
 )
 
@@ -681,36 +697,49 @@ def alltime_rows(players: list) -> dict:
 
 
 def goat_rows(players: list, honours: dict = None) -> list:
-    """The GOAT ladder across NBA history: career production + official
-    honours + peak season.
+    """The GOAT ladder across NBA history: production + honours + peak +
+    championships.
 
-    Production mixes full-career totals against the best career in the pool
-    (weights in GOAT_PRODUCTION_WEIGHTS); honours scores ESPN's official NBA
-    awards -- each win of each award type worth GOAT_HONOURS_WEIGHTS[name]
-    points, normalised to 0-100 against the richest resume; peak is the best
-    season's per-game impact. The three are mixed with GOAT_WEIGHTS -- the
-    exact on-screen text is GOAT_FORMULA.
+    Production mixes, per stat, a GOAT_PRODUCTION_BLEND blend of the
+    career total and the per-game rate against the best career/rate in the
+    pool (weights in GOAT_PRODUCTION_WEIGHTS); honours scores ESPN's
+    official NBA awards -- each win of each award type worth
+    GOAT_HONOURS_WEIGHTS[name] points, normalised to 0-100 against the
+    richest resume; peak is the best season's per-game impact;
+    championships normalise the title count against the most among
+    qualified players (history.OFFICIAL_CHAMPIONSHIPS covers careers
+    ESPN's index can't verify). The four are mixed with GOAT_WEIGHTS --
+    the exact on-screen text is GOAT_FORMULA.
 
     Honest gaps, per player and listed in the row's `data_gaps`:
-    - an impossible zero in a counted career total (PTS/REB/AST == 0 with a
-      full season of games -- e.g. ESPN's broken Wilt rebound line; era
-      zeros like pre-1974 STL/BLK or pre-1980 3PM are deliberately NOT
-      gaps, they're history and the caption says so);
-    - no trusted peak (untrusted ESPN season rows and no collected season);
+    - an impossible zero in a counted career total (PTS/REB/AST == 0 with
+      a full season of games, e.g. a broken ESPN line);
+    - a stat the career never had (pre-1974 STL/BLK, pre-1980 3PM never
+      attempted): dropped from his blend instead of scoring a zero he
+      could never earn -- tracked zeros (fg3a > 0) stay real zeros;
+    - no trusted peak (untrusted ESPN season rows and no collected
+      season);
+    - unknown championship count (career neither the champion index nor
+      the official record covers);
     - `honours` input absent entirely (legacy window-only builds).
-    Each drop renormalises over the remaining weights, so no one is punished
-    for data we failed to collect -- the component simply isn't claimed.
+    Each drop renormalises over the remaining weights, so no one is
+    punished for data we failed to collect -- the component simply isn't
+    claimed.
 
     `honours` maps player_id -> {official award name: wins} (history.py).
-    Championships are display-only (counted there, never scored here).
-    Qualified at >=GOAT_MIN_CAREER_GP career games so a ten-game hot streak
-    can't be crowned the greatest ever."""
+    Qualified at >=GOAT_MIN_CAREER_GP career games so a ten-game hot
+    streak can't be crowned the greatest ever."""
     honours = honours or {}
     qualified = [p for p in players if p["gp"] >= GOAT_MIN_CAREER_GP]
     if not qualified:
         return []
     max_totals = {
         stat: max((p.get(stat) or 0 for p in qualified), default=0)
+        for stat in GOAT_PRODUCTION_WEIGHTS
+    }
+    max_rates = {  # per-game ceilings for the production blend (gp >= 82)
+        stat: max(((p.get(stat) or 0) / p["gp"] for p in qualified),
+                  default=0)
         for stat in GOAT_PRODUCTION_WEIGHTS
     }
     honour_points = {
@@ -722,23 +751,40 @@ def goat_rows(players: list, honours: dict = None) -> list:
     max_honours = max(honour_points.values(), default=0)
     honours_tracked = bool(honours) and bool(max_honours)
     max_peak = max((p.get("peak_impact") or 0 for p in qualified), default=0)
+    max_titles = max((p.get("championships") for p in qualified
+                      if p.get("championships") is not None), default=0)
+    titles_tracked = bool(max_titles)
 
     rows = []
     for p in qualified:
         gaps = []
         kept = {}
         for stat, weight in GOAT_PRODUCTION_WEIGHTS.items():
-            impossible = (stat in ("pts", "reb", "ast")
-                          and not (p.get(stat) or 0)
+            value = p.get(stat) or 0
+            impossible = (stat in ("pts", "reb", "ast") and not value
                           and p["gp"] >= ALLTIME_MIN_GP)
-            if impossible:
+            # A stat the career never had is dropped, not scored as a zero
+            # he could never earn: untracked era (STL/BLK before 1974,
+            # 3PM before 1980 = never attempted). A tracked zero with
+            # attempts (fg3a > 0, e.g. a career 0-for-N shooter) stays.
+            untracked = (stat in ("stl", "blk", "fg3m") and not value
+                         and p["gp"] >= ALLTIME_MIN_GP
+                         and not (p.get("fg3a") or 0))
+            if impossible or untracked:
                 gaps.append(stat)
-            elif max_totals[stat]:
+            elif max_totals[stat] and max_rates[stat]:
                 kept[stat] = weight
-        production = (100.0 * sum(
-            weight * ((p.get(stat) or 0) / max_totals[stat])
-            for stat, weight in kept.items()
-        ) / sum(kept.values())) if kept else 0.0
+        if kept:
+            production = 100.0 * sum(
+                weight * (
+                    GOAT_PRODUCTION_BLEND
+                    * (p.get(stat) or 0) / max_totals[stat]
+                    + (1 - GOAT_PRODUCTION_BLEND)
+                    * ((p.get(stat) or 0) / p["gp"]) / max_rates[stat])
+                for stat, weight in kept.items()
+            ) / sum(kept.values())
+        else:
+            production = 0.0
 
         player_honours = honours.get(p["player_id"]) or {}
         if honours_tracked:
@@ -753,11 +799,20 @@ def goat_rows(players: list, honours: dict = None) -> list:
             peak_score = None
             gaps.append("peak")
 
+        titles = p.get("championships")
+        if titles_tracked and titles is not None:
+            championships_score = 100.0 * titles / max_titles
+        else:
+            championships_score = None
+            gaps.append("championships")
+
         available = {"production": production}
         if honours_score is not None:
             available["honours"] = honours_score
         if peak_score is not None:
             available["peak"] = peak_score
+        if championships_score is not None:
+            available["championships"] = championships_score
         total_weight = sum(GOAT_WEIGHTS[c] for c in available)
         score = (sum(GOAT_WEIGHTS[c] * value
                      for c, value in available.items()) / total_weight
@@ -778,7 +833,10 @@ def goat_rows(players: list, honours: dict = None) -> list:
             "honour_points": round(honour_points[p["player_id"]], 1),
             "honours_score": (round(honours_score, 1)
                               if honours_score is not None else None),
-            "championships": p.get("championships"),  # display-only, may be None
+            "championships": p.get("championships"),  # None: component dropped
+            "championships_score": (round(championships_score, 1)
+                                    if championships_score is not None
+                                    else None),
             "production": round(production, 1),
             "honours_total": int(sum(player_honours.values())),
             "peak_score": round(peak_score, 1) if peak_score is not None else None,
@@ -849,7 +907,7 @@ def build_career(season_payloads: list, raw_dir: str = None,
             f"official NBA award wins across {meta.get('award_types', 0)} "
             f"award types ({meta.get('award_seasons', 0)} award seasons "
             f"read); peak: best season impact from trusted ESPN season rows "
-            f"or the collected window; championship counts are display-only "
+            f"or the collected window; championship counts "
             f"({meta.get('champion_years', 0)} champion seasons indexed"
             + (f"; {meta.get('official_champions', 0)} careers counted from "
                f"the verified official record where ESPN's index can't reach"

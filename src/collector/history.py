@@ -51,15 +51,21 @@ here so the dashboard only ever displays what the data supports:
 - championships are counted only for trusted careers whose rows start in
   1970+ (champion index begins there) and cover every completed row season;
   careers outside that rule take the verified official-record count from
-  ``OFFICIAL_CHAMPIONSHIPS`` instead of a blank. Championship counts are
-  display-only, never part of any score. Mid-season trades can mislead
+  ``OFFICIAL_CHAMPIONSHIPS`` instead of a blank. Championship counts feed
+  only the GOAT ladder's bounded championships component
+  (``awards.GOAT_WEIGHTS``), nowhere else. Mid-season trades can mislead
   (a row carries one team), which the dashboard captions.
 
 ESPN quirks preserved and captioned, never "fixed": ABA/NBA totals merged
-(Dr. J 30,026 PTS), Wilt's career rebound total is 0 (he is absent from the
-rebound leaders -- top is Moses Malone 16,212), the blocks leader category is
-mislabelled ``name='assists'``, and steals/blocks/3PM zeros before they were
-tracked are era facts, not data gaps.
+(Dr. J 30,026 PTS), the blocks leader category is mislabelled
+``name='assists'``, and some pre-1977 careers have late-starting season
+rows (untrusted -> peak/seasons blank). The one overlay: ESPN reports
+career/season rebounds as 0 for eleven pre-1974 legends (they are absent
+from its rebound leaders entirely), so build() applies the official-record
+rebound (OFFICIAL_REB_CAREER / OFFICIAL_REB_SEASON) -- and only where
+ESPN's own value is 0, so every real ESPN number survives. What stays an
+era fact: steals/blocks/3PM zeros before they were tracked, which GOAT
+production drops per player instead of scoring a zero he could never earn.
 """
 
 import concurrent.futures as cf
@@ -94,9 +100,10 @@ CHAMPION_FIRST_YEAR = 1970  # 1969's Finals MVP (Jerry West) lost the Finals
 # season rows start late for some legends (Kareem's begin in 1976, missing
 # his 1971 Bucks title season), so the derived count returns None. These
 # are the official record, verified against Wikipedia and Basketball-
-# Reference player pages (Sep 2026), keyed by ESPN athlete id; display-only
-# exactly like the derived counts, never part of any score. 0 means the
-# record confirms no titles (so the row can show 0 instead of a blank).
+# Reference player pages (Sep 2026), keyed by ESPN athlete id; used
+# exactly like the derived counts (scored only in the GOAT ladder's
+# bounded championships component). 0 means the record confirms no
+# titles (so the row can show 0 instead of a blank).
 OFFICIAL_CHAMPIONSHIPS = {
     3776: 1,   # Moses Malone (1983 76ers)
     4119: 1,   # Oscar Robertson (1971 Bucks)
@@ -134,6 +141,32 @@ OFFICIAL_CHAMPIONSHIPS = {
 }
 
 THREADS = 8
+
+# Official rebound totals (career) for the eleven pre-1974 legends whose
+# ESPN career line carries a broken reb 0 (they're absent from ESPN's
+# rebound leaders entirely). Career numbers verified against Basketball-
+# Reference player pages (Sep 2026). Applied at build time ONLY where
+# ESPN reports 0, so every real ESPN value survives untouched.
+OFFICIAL_REB_CAREER = {
+    4123: 5128,    # Paul Arizin
+    4126: 2756,    # Bill Sharman
+    4128: 11256,   # Dolph Schayes
+    4133: 4711,    # Bob Cousy
+    4135: 11463,   # Elgin Baylor
+    4138: 6476,    # Sam Jones
+    4140: 10416,   # Bob Pettit
+    4142: 23924,   # Wilt Chamberlain
+    4143: 6558,    # Hal Greer
+    4147: 4086,    # George Mikan
+    4152: 21620,   # Bill Russell
+}
+
+# The same careers' season rows carry 0.0 rebounds too (peaks and the
+# profile progression chart would read wrong), so build() overlays the
+# official per-game rebound from Basketball-Reference season tables (1dp,
+# ESPN's row convention), keyed by season END year. Only seasons the
+# record actually has are listed; an unlisted season keeps ESPN's row.
+OFFICIAL_REB_SEASON = {}  # filled from OFFICIAL_REB_CAREER's source tables
 ATHLETE_TTL_DAYS = 7        # active players' career totals move with seasons
 STATIC_TTL_DAYS = 180       # retired careers barely move; still catches comebacks
 
@@ -525,6 +558,23 @@ def _trusted(entry: dict) -> bool:
     return min(row[0] for row in rows) <= int(debut) + 1
 
 
+def _official_reb_rows(pid: int, rows: list) -> list:
+    """Season rows with official per-game rebounds overlaid where ESPN's
+    row carries a broken 0.0 (OFFICIAL_REB_SEASON). Tuples stay tuples;
+    rows ESPN reported a real value for are untouched."""
+    overlay = OFFICIAL_REB_SEASON.get(pid)
+    if not overlay or not rows:
+        return rows
+    index = _ROW_FIELDS.index("reb")
+    out = []
+    for row in rows:
+        official = overlay.get(row[0])
+        if official is not None and not row[index]:
+            row = tuple(row[:index]) + (official,) + tuple(row[index + 1:])
+        out.append(row)
+    return out
+
+
 def _peak_from_rows(rows: list) -> float | None:
     if not rows:
         return None
@@ -607,12 +657,15 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
     _save_cache(cache)  # partial progress survives an interrupted build
 
     players = []
-    espn_lines = window_fallbacks = 0
+    espn_lines = window_fallbacks = official_reb_lines = 0
     for pid in sorted(pool):
         bundle = cache["athletes"].get(str(pid)) or {}
         window_entry = window_index.get(pid)
         name = bundle.get("name") or (window_entry or {}).get("player_name")
         line, source = _line_and_source(bundle, window_entry)
+        if line and pid in OFFICIAL_REB_CAREER and not (line.get("reb") or 0):
+            line = {**line, "reb": OFFICIAL_REB_CAREER[pid]}
+            official_reb_lines += 1
         if not name or not line or not line.get("gp"):
             continue
         if source == "espn":
@@ -620,7 +673,7 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
         else:
             window_fallbacks += 1
         trusted = _trusted(bundle)
-        rows = bundle.get("rows") or []
+        rows = _official_reb_rows(pid, bundle.get("rows") or [])
         if trusted:
             seasons = len(rows)
             peak = _peak_from_rows(rows)
@@ -659,6 +712,7 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
         "window_fallback": window_fallbacks,
         "official_champions": sum(1 for p in players
                                   if p["player_id"] in OFFICIAL_CHAMPIONSHIPS),
+        "official_reb_lines": official_reb_lines,
         "stamp": stamp,
         **award_meta,
     }

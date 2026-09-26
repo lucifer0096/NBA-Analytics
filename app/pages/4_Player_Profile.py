@@ -100,7 +100,8 @@ with honours_col:
         st.caption(
             "ESPN's 20 official award types at the GOAT formula's weights; "
             "All-Star selections aren't in ESPN's awards API at all, so "
-            "never shown or scored; 🏆 rings are display-only (cards)."
+            "never shown or scored; 🏆 rings come from indexed champion "
+            "seasons or the verified official record."
         )
     else:
         st.caption("No official honours for this selection in ESPN's "
