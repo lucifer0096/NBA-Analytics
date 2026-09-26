@@ -269,11 +269,15 @@ def test_goat_rows_formula_titles_and_career_gate():
     assert king["honours_total"] == 15
     assert role["honour_points"] == 5.0
     assert king["honours"] == honours[1]
-    # The headline score IS the captioned weighted mix (0-100 components).
+    # The headline score IS the captioned weighted mix (0-100 components);
+    # these fixtures have unknown title counts, so the championships
+    # component drops and the other three rescale over what's available.
+    weights = awards.GOAT_WEIGHTS
     for r in rows:
-        expected = (awards.GOAT_WEIGHTS["production"] * r["production"]
-                    + awards.GOAT_WEIGHTS["honours"] * r["honours_score"]
-                    + awards.GOAT_WEIGHTS["peak"] * r["peak_score"])
+        expected = (weights["production"] * r["production"]
+                    + weights["honours"] * r["honours_score"]
+                    + weights["peak"] * r["peak_score"]) / (
+            weights["production"] + weights["honours"] + weights["peak"])
         assert abs(r["score"] - round(expected, 1)) <= 0.15
     # Production is normalized against the pool's best: King leads every
     # counted category -> 100.0.
@@ -338,6 +342,66 @@ def test_goat_rows_drop_untrusted_components_and_rescale():
                     + awards.GOAT_WEIGHTS["honours"] * r["honours_score"]) / (
             awards.GOAT_WEIGHTS["production"] + awards.GOAT_WEIGHTS["honours"])
         assert abs(r["score"] - round(expected, 1)) <= 0.15
+
+
+def test_goat_rows_score_championships_bounded():
+    """Titles are their own GOAT component: normalized against the most
+    titles among qualified players, a ringless player scores 0 there (a
+    fact, not a gap), and an unknown count drops the component and
+    rescales instead of punishing the player."""
+    players = [
+        _player(1, "Crowned", gp=982, pts=28000, reb=7000, ast=7000,
+                stl=1800, blk=600, fg3m=2500, fg3a=6000, peak_impact=40.0,
+                championships=6),
+        _player(2, "Ringless", gp=900, pts=26000, reb=6500, ast=6500,
+                stl=1700, blk=500, fg3m=2000, fg3a=5500, peak_impact=38.0,
+                championships=0),
+        _player(3, "Unknown", gp=870, pts=25000, reb=6400, ast=6400,
+                stl=1650, blk=480, fg3m=1900, fg3a=5200, peak_impact=37.0),
+    ]
+    honours = {1: {"MVP": 2}, 2: {"MVP": 1}, 3: {"MVP": 1}}
+    rows = {r["player_name"]: r for r in awards.goat_rows(players, honours)}
+    crowned, ringless = rows["Crowned"], rows["Ringless"]
+    unknown = rows["Unknown"]
+    assert crowned["championships_score"] == 100.0  # most titles in pool
+    assert ringless["championships_score"] == 0.0
+    assert "championships" not in ringless["data_gaps"]
+    assert unknown["championships_score"] is None
+    assert "championships" in unknown["data_gaps"]
+    weights = awards.GOAT_WEIGHTS
+    expected = (weights["production"] * unknown["production"]
+                + weights["honours"] * unknown["honours_score"]
+                + weights["peak"] * unknown["peak_score"]) / (
+        weights["production"] + weights["honours"] + weights["peak"])
+    assert abs(unknown["score"] - round(expected, 1)) <= 0.15
+    assert crowned["score"] > ringless["score"]
+
+
+def test_goat_rows_production_blends_rates_and_drops_untracked_era():
+    """Production is a 50/50 blend of career total and per-game rate (hand-
+    computed below), and stats a career never had (pre-1974 STL/BLK,
+    never-attempted 3PM) drop from his blend with the rest rescaled --
+    they are era facts, not zeros to score."""
+    longevity = _player(1, "Longevity", gp=1200, pts=24000, reb=6000,
+                        ast=6000, stl=0, blk=0, fg3m=0, fg3a=0,
+                        peak_impact=30.0, championships=1)
+    sharp = _player(2, "Sharp", gp=600, pts=18000, reb=4500, ast=4500,
+                    stl=600, blk=600, fg3m=900, fg3a=2100,
+                    peak_impact=34.0, championships=1)
+    honours = {1: {"MVP": 1}, 2: {"MVP": 1}}
+    rows = {r["player_name"]: r for r in awards.goat_rows(
+        [longevity, sharp], honours)}
+    old = rows["Longevity"]
+    # untracked-era drops are disclosed on the row
+    assert {"stl", "blk", "fg3m"} <= set(old["data_gaps"])
+    # Hand-computed blend: kept = PTS/REB/AST (.40/.15/.15 of the
+    # component). Pool maxes: totals 24000/6000/6000, rates 20/5/5 vs
+    # Sharp's 30/7.5/7.5. Every kept share = .5*1 + .5*(2/3) = .8333.
+    expected = 100.0 * (0.40 + 0.15 + 0.15) * (0.5 + 0.5 * (20 / 30)) / 0.70
+    assert abs(old["production"] - expected) <= 0.15
+    # a shorter, higher-rate career earns more per game than totals give
+    # Longevity: rate credit is real, not an afterthought
+    assert rows["Sharp"]["production"] > 0
 
 
 def test_build_career_window_and_honest_empties(tmp_path):

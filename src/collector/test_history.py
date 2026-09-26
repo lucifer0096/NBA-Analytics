@@ -44,6 +44,14 @@ def test_build_offline_from_committed_cache(monkeypatch):
     assert by_pid[4145]["championships"] == 6   # Kareem (rows start 1976)
     assert by_pid[4152]["championships"] == 11  # Bill Russell (pre-1970)
     assert result["meta"]["official_champions"] >= 2
+    # Official-record rebound overlay: ESPN's broken reb 0 replaced in the
+    # career line, and on the season rows so the peak and the profile
+    # progression chart read real numbers (Russell's rows carried 0.0).
+    assert by_pid[4142]["reb"] == 23924         # Wilt's career rebounds
+    assert result["meta"]["official_reb_lines"] >= 10
+    log = by_pid[4152].get("seasons_log") or []
+    assert log and any(entry["reb"] for entry in log), "reb overlay missed"
+    assert (by_pid[4152].get("peak_impact") or 0) > 40  # was 23.4 at 0 reb
 
 
 def test_official_championships_table():
