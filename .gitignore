@@ -32,6 +32,7 @@ data/processed/*
 # Coverage output (`pytest --cov` / CI's coverage step) -- regenerated, never
 # committed.
 coverage.xml
+.coverage
 
 # Trained model artifacts: only the model the dashboard actually loads is
 # committed (same pattern as FPL-Analytics' single-stage model), everything

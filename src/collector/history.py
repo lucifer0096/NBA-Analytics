@@ -91,8 +91,8 @@ CHAMPION_FIRST_YEAR = 1970  # 1969's Finals MVP (Jerry West) lost the Finals
 
 # Official NBA championship counts (as a player) for careers the champion
 # index can't vouch for: it starts at CHAMPION_FIRST_YEAR (1970) and ESPN's
-# season rows start late for some legends (Kareem's begin in 1976, after
-# four of his six title seasons), so the derived count returns None. These
+# season rows start late for some legends (Kareem's begin in 1976, missing
+# his 1971 Bucks title season), so the derived count returns None. These
 # are the official record, verified against Wikipedia and Basketball-
 # Reference player pages (Sep 2026), keyed by ESPN athlete id; display-only
 # exactly like the derived counts, never part of any score. 0 means the
