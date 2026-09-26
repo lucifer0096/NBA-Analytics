@@ -112,25 +112,35 @@ repo's collection window:
   for the Profile page. The source caption repeats the pool definition
   and the as-of stamp.
 - **Formula** (printed verbatim above the ladder, every weight on
-  screen): **40%** production (career PTS/REB/AST/STL/BLK/3PM totals vs
-  the pool's best), **35%** official honours (ESPN's 20 award types at
+  screen): **35%** production (each of career PTS/REB/AST/STL/BLK/3PM
+  scored as a 50/50 blend of career total and per-game rate vs the
+  pool's best; a stat the career never had (impossible-zero totals,
+  pre-1974 STL/BLK, pre-1980 3PM) is dropped from his blend with the
+  rest rescaled), **30%** official honours (ESPN's 20 award types at
   points per win, MVP 6.0 down to Sixth Man-tier 0.5), **25%** peak
-  (best season's per-game impact). Each component normalizes 0–100
+  (best season's per-game impact), **10%** championships (title count
+  vs the pool's most among qualified players: champion-season rows plus
+  verified official-record counts). Each component normalizes 0–100
   against the best qualified player; qualified at ≥82 career GP.
-- **Honours are ESPN's official award names only.** Championships are
-  displayed (🏆×N) but never scored; All-Star game selections don't exist
-  in ESPN's awards API, so they're never shown or scored either.
+- **Honours are ESPN's official award names only.** Championships
+  score as their own bounded component (🏆×N, normalizing against the
+  pool maximum so Russell's 11 sets the ceiling); a ringless career
+  scores 0 there (a fact, not a gap), and a count no source can confirm
+  drops out with the score rescaling. All-Star game selections don't
+  exist in ESPN's awards API, so they're never shown or scored either.
 - **Honest gaps.** A career ESPN can't fully cover shows `🏆 —` instead
   of a ring count and blanks seasons/peak with the reason (e.g. the
   champion index starts in 1970, or a career's season rows start too late
   to trust); a missing component drops out of the score and the result
   rescales over the weights that are available.
 - Explicitly labeled **not an official NBA ranking**. Each row carries
-  honour chips heaviest-first (top 5, then "+N more") and the three
+  honour chips heaviest-first (top 5, then "+N more") and the four
   component scores behind the headline number. Known ESPN quirks are
-  captioned on the page (ABA/NBA totals merged, Wilt's rebound total
-  absent from ESPN's leaders, the mislabelled blocks category,
-  late-starting pre-1977 season rows).
+  captioned on the page (ABA/NBA totals merged, the mislabelled blocks
+  category, late-starting pre-1977 season rows), and ESPN's missing
+  rebounds for 11 pre-1974 legends are patched from the verified
+  official record on career lines and season rows, counted in the
+  source caption.
 
 ### Player Profile (`app/pages/4_Player_Profile.py`)
 

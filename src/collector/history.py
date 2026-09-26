@@ -144,29 +144,66 @@ THREADS = 8
 
 # Official rebound totals (career) for the eleven pre-1974 legends whose
 # ESPN career line carries a broken reb 0 (they're absent from ESPN's
-# rebound leaders entirely). Career numbers verified against Basketball-
-# Reference player pages (Sep 2026). Applied at build time ONLY where
-# ESPN reports 0, so every real ESPN value survives untouched.
+# rebound leaders entirely). Career numbers = exact sums of the official
+# season totals, read from Basketball-Reference career rows (via the
+# Wayback Machine) and cross-checked on StatMuse (Sep 2026). Applied at
+# build time ONLY where ESPN reports 0, so every real ESPN value
+# survives untouched.
 OFFICIAL_REB_CAREER = {
-    4123: 5128,    # Paul Arizin
-    4126: 2756,    # Bill Sharman
+    4123: 6129,    # Paul Arizin
+    4126: 2793,    # Bill Sharman
     4128: 11256,   # Dolph Schayes
-    4133: 4711,    # Bob Cousy
+    4133: 4786,    # Bob Cousy
     4135: 11463,   # Elgin Baylor
-    4138: 6476,    # Sam Jones
-    4140: 10416,   # Bob Pettit
+    4138: 4305,    # Sam Jones
+    4140: 12849,   # Bob Pettit
     4142: 23924,   # Wilt Chamberlain
-    4143: 6558,    # Hal Greer
-    4147: 4086,    # George Mikan
+    4143: 5665,    # Hal Greer
+    4147: 4167,    # George Mikan
     4152: 21620,   # Bill Russell
 }
 
 # The same careers' season rows carry 0.0 rebounds too (peaks and the
 # profile progression chart would read wrong), so build() overlays the
-# official per-game rebound from Basketball-Reference season tables (1dp,
-# ESPN's row convention), keyed by season END year. Only seasons the
-# record actually has are listed; an unlisted season keeps ESPN's row.
-OFFICIAL_REB_SEASON = {}  # filled from OFFICIAL_REB_CAREER's source tables
+# official per-game rebound (rebounds / games, 1dp = ESPN's row
+# convention) from Basketball-Reference season tables, keyed by season
+# END year; each value was cross-checked identical on StatMuse. Only
+# seasons the record actually has are listed; an unlisted season keeps
+# ESPN's row -- deliberately, so Mikan 1947-48/1948-49/1949-50 and
+# Schayes 1949-50 keep their 0.0: the league recorded no rebounds then
+# (an era fact, not a gap to estimate away).
+OFFICIAL_REB_SEASON = {
+    4123: {1951: 9.8, 1952: 11.3, 1955: 9.4, 1956: 7.5, 1957: 7.9,
+           1958: 7.4, 1959: 9.1, 1960: 8.6, 1961: 8.6, 1962: 6.8},
+    4126: {1951: 3.5, 1952: 3.5, 1953: 4.1, 1954: 3.5, 1955: 4.4,
+           1956: 3.6, 1957: 4.3, 1958: 4.7, 1959: 4.1, 1960: 3.7,
+           1961: 3.7},
+    4128: {1951: 16.4, 1952: 12.3, 1953: 13.0, 1954: 12.1, 1955: 12.3,
+           1956: 12.4, 1957: 14.0, 1958: 14.2, 1959: 13.4, 1960: 12.8,
+           1961: 12.2, 1962: 7.8, 1963: 5.7, 1964: 4.6},
+    4133: {1951: 6.9, 1952: 6.4, 1953: 6.3, 1954: 5.5, 1955: 6.0,
+           1956: 6.8, 1957: 4.8, 1958: 5.0, 1959: 5.5, 1960: 4.7,
+           1961: 4.4, 1962: 3.5, 1963: 2.5, 1970: 0.7},
+    4135: {1959: 15.0, 1960: 16.4, 1961: 19.8, 1962: 18.6, 1963: 14.3,
+           1964: 12.0, 1965: 12.8, 1966: 9.6, 1967: 12.8, 1968: 12.2,
+           1969: 10.6, 1970: 10.4, 1971: 5.5, 1972: 6.3},
+    4138: {1958: 2.9, 1959: 6.0, 1960: 5.1, 1961: 5.4, 1962: 5.9,
+           1963: 5.2, 1964: 4.6, 1965: 5.1, 1966: 5.2, 1967: 4.7,
+           1968: 4.9, 1969: 3.8},
+    4140: {1955: 13.8, 1956: 16.2, 1957: 14.6, 1958: 17.4, 1959: 16.4,
+           1960: 17.0, 1961: 20.3, 1962: 18.7, 1963: 15.1, 1964: 15.3,
+           1965: 12.4},
+    4142: {1960: 27.0, 1961: 27.2, 1962: 25.7, 1963: 24.3, 1964: 22.3,
+           1965: 22.9, 1966: 24.6, 1967: 24.2, 1968: 23.8, 1969: 21.1,
+           1970: 18.4, 1971: 18.2, 1972: 19.2, 1973: 18.6},
+    4143: {1959: 2.9, 1960: 4.3, 1961: 5.8, 1962: 7.4, 1963: 5.7,
+           1964: 6.1, 1965: 5.1, 1966: 5.9, 1967: 5.3, 1968: 5.4,
+           1969: 5.3, 1970: 4.7, 1971: 4.5, 1972: 3.3, 1973: 2.8},
+    4147: {1951: 14.1, 1952: 13.5, 1953: 14.4, 1954: 14.3, 1956: 8.3},
+    4152: {1957: 19.6, 1958: 22.7, 1959: 23.0, 1960: 24.0, 1961: 23.9,
+           1962: 23.6, 1963: 23.6, 1964: 24.7, 1965: 24.1, 1966: 22.8,
+           1967: 21.0, 1968: 18.6, 1969: 19.3},
+}
 ATHLETE_TTL_DAYS = 7        # active players' career totals move with seasons
 STATIC_TTL_DAYS = 180       # retired careers barely move; still catches comebacks
 
