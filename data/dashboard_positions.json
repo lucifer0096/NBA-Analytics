@@ -727,6 +727,12 @@
    "team_id": 6
   },
   {
+   "player_id": 4431775,
+   "player_name": "Seth Lundy",
+   "position": "G",
+   "team_id": 6
+  },
+  {
    "player_id": 4278594,
    "player_name": "Naji Marshall",
    "position": "F",
@@ -1423,12 +1429,6 @@
    "team_id": 12
   },
   {
-   "player_id": 4897696,
-   "player_name": "Jamarion Sharp",
-   "position": "C",
-   "team_id": 12
-  },
-  {
    "player_id": 4065778,
    "player_name": "Max Strus",
    "position": "G",
@@ -1597,6 +1597,12 @@
    "team_id": 29
   },
   {
+   "player_id": 5105589,
+   "player_name": "Brendan Hausen",
+   "position": "F",
+   "team_id": 29
+  },
+  {
    "player_id": 4683750,
    "player_name": "Jordan Hawkins",
    "position": "G",
@@ -1660,12 +1666,6 @@
    "player_id": 4595400,
    "player_name": "Olivier-Maxence Prosper",
    "position": "F",
-   "team_id": 29
-  },
-  {
-   "player_id": 3136776,
-   "player_name": "D'Angelo Russell",
-   "position": "G",
    "team_id": 29
   },
   {
@@ -1816,12 +1816,6 @@
    "player_id": 3059319,
    "player_name": "Andrew Wiggins",
    "position": "F",
-   "team_id": 14
-  },
-  {
-   "player_id": 4433133,
-   "player_name": "Jahmir Young",
-   "position": "G",
    "team_id": 14
   },
   {
@@ -2445,12 +2439,6 @@
   {
    "player_id": 4065654,
    "player_name": "Jonathan Isaac",
-   "position": "F",
-   "team_id": 19
-  },
-  {
-   "player_id": 4278075,
-   "player_name": "Kevin Knox II",
    "position": "F",
    "team_id": 19
   },
@@ -3391,6 +3379,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-09-26T16:24:48Z",
+ "_generated_utc": "2026-09-27T16:59:25Z",
  "source": "local"
 }
