@@ -116,3 +116,22 @@ install set, leaving a half-built venv.
 
 **Guard**: pin corrected to `pyarrow==25.0.1`; `requirements.in` remains the
 re-resolve source of truth.
+
+## 2026-09-28 — ESPN career statistics carry no plus-minus
+
+The athlete statistics endpoint (`site.web.api.espn.com/apis/common/v3/
+sports/basketball/nba/athletes/{id}/stats`, the source for `history.py`'s
+career line and `seasons_log`) answers three categories — averages,
+totals, miscellaneous (DD2, TD3, SC-EFF, …): **108 stat descriptors on
+Jokic, zero containing plus/minus** (verified live Sep 2026). ESPN box
+scores carry a per-game +/- on each line, but no career or per-season
+aggregate exists anywhere to read.
+
+**Guard**: `awards.CAREER_SUM_STATS` lists `plus_minus` while
+`history._LINE_KEYS` excludes it, so an ESPN line can never fabricate a
+0 that would clobber the real window total in `build_career`'s
+history-over-window merge. The value comes only from this repo's
+collected box scores (window-only, 2010-11 → present): uncovered careers
+keep `None`, the All-Time +/- board skips them, and the GOAT production
+blend drops the stat (named in `data_gaps`, remaining weights rescaled)
+instead of scoring a zero.
