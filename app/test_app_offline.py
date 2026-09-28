@@ -3,7 +3,8 @@ fresh-checkout/deploy condition: every live ESPN call forced to fail, no
 data/raw/ needed (committed data/dashboard_* fallbacks only). No network.
 
 Pins the contract that would otherwise rot silently: every page renders,
-its tabs and KPI cards exist, and the fallback-failure path shows an honest
+the two league tabs (NBA | WNBA) each nest the four home sections, the
+KPI cards exist per league, and the fallback-failure path shows an honest
 empty state rather than a stack trace -- including the not-yet-started
 season (2026-27) showing empty states instead of another year's data.
 """
@@ -51,18 +52,22 @@ def _markdown_text(at: AppTest) -> str:
 def test_home_page_renders_offline(offline_espn):
     at = _render("app/app.py", offline_espn)
     assert not at.exception
-    # Title + exactly the four home tabs (All-Time/GOAT/Profile moved to
-    # left-nav pages; Court View moved here from the deleted Model & History
-    # page) even with every live call failing.
+    # Title + the two league tabs, each nesting the four home sections
+    # (All-Time/GOAT/Profile moved to left-nav pages; Court View moved
+    # here from the deleted Model & History page) even with every live
+    # call failing.
     assert any("NBA Analytics" in str(t.value) for t in at.title)
     tab_labels = [str(t.label) for t in at.tabs]
-    assert tab_labels == ["Standings", "Schedule & Scores", "Awards Ladder",
-                          "Court View"]
-    # KPI strip is season-scoped: inventory, tip-off, scoring leader. The
-    # Model (validation) KPI was removed from this page.
+    assert tab_labels == ["NBA", "Standings", "Schedule & Scores",
+                          "Awards Ladder", "Court View",
+                          "WNBA", "Standings", "Schedule & Scores",
+                          "Awards Ladder", "Court View"]
+    # KPI strip is season-scoped: inventory, tip-off, scoring leader -- one
+    # strip per league tab (the Model (validation) KPI was removed from
+    # this page). NBA's three come first, then WNBA's.
     metric_labels = [str(m.label) for m in at.metric]
     assert metric_labels == ["Games collected", "Next tip-off",
-                             "Season scoring leader"]
+                             "Season scoring leader"] * 2
     # Neither "no auth" message survived (sidebar caption and hero extra).
     text = f"{_markdown_text(at)} " + " ".join(
         str(c.value) for c in at.caption)
@@ -72,20 +77,25 @@ def test_home_page_renders_offline(offline_espn):
 def test_home_page_falls_back_to_committed_data(offline_espn):
     """With live calls dead, committed fallbacks still feed the page: the
     freshness caption must say 'Offline fallback', never crash -- and the
-    committed standings table carries its team +/- and L10 columns."""
+    committed standings tables (BOTH leagues) carry their team +/- and L10
+    columns."""
     at = _render("app/app.py", offline_espn)
     captions = " ".join(str(c.value) for c in at.caption)
     assert "Offline fallback" in captions or "fallback" in captions.lower()
     frames = [df.value for df in at.dataframe
               if hasattr(getattr(df, "value", None), "columns")]
-    standings = next((f for f in frames if "Win%" in list(f.columns)), None)
-    assert standings is not None, "committed standings table must render"
-    columns = list(standings.columns)
-    assert "+/-" in columns and "L10" in columns
-    # Signed differential text, not raw floats (a missing stat would be ''
-    # rather than 0.0 -- committed rows carry the live values).
-    diffs = [v for v in standings["+/-"].tolist() if v != ""]
-    assert diffs and all(str(v).startswith(("+", "-")) for v in diffs)
+    standings = [f for f in frames if "Win%" in list(f.columns)]
+    assert standings, "committed standings table must render"
+    # One table per league tab: NBA and WNBA both fall back to their own
+    # committed copy (dashboard_wnba_standings.json carries its own season).
+    assert len(standings) >= 2, "both league tabs must render standings"
+    for table in standings:
+        columns = list(table.columns)
+        assert "+/-" in columns and "L10" in columns
+        # Signed differential text, not raw floats (a missing stat would be
+        # '' rather than 0.0 -- committed rows carry the live values).
+        diffs = [v for v in table["+/-"].tolist() if v != ""]
+        assert diffs and all(str(v).startswith(("+", "-")) for v in diffs)
 
 
 def test_sidebar_mentions_model_and_history(offline_espn):
@@ -103,8 +113,9 @@ def test_sidebar_mentions_model_and_history(offline_espn):
 
 def test_home_awards_tab_shows_races_and_formula_captions(offline_espn):
     """The Awards Ladder must rank its races AND be honest about them: the
-    race label, the 'not official NBA voting' disclaimer, and the MVP's
-    verbatim formula all have to reach the screen (captions or markdown)."""
+    race label, the 'not official league voting' disclaimer (per league:
+    NBA and WNBA each print their own), and the MVP's verbatim formula all
+    have to reach the screen (captions or markdown)."""
     awards_path = REPO_ROOT / "data" / "dashboard_awards.json"
     if not awards_path.exists():
         pytest.skip("dashboard_awards.json not committed yet")
@@ -113,6 +124,8 @@ def test_home_awards_tab_shows_races_and_formula_captions(offline_espn):
     text = f"{_markdown_text(at)} {captions}"
     assert "MVP race" in text
     assert "not official nba voting" in captions.lower()
+    if (REPO_ROOT / "data" / "dashboard_wnba_awards.json").exists():
+        assert "not official wnba voting" in captions.lower()
     assert "Impact per game" in captions
     # The MVP trend either drew a line from >=2 daily snapshots or said
     # exactly what is missing -- both captions mention the snapshots.
@@ -468,18 +481,28 @@ def test_fallback_envelopes_carry_generation_timestamp():
 
 
 def test_sidebar_every_year_leads_with_data_and_honest_empty(offline_espn):
-    """Sidebar offers every season 2010-11 -> upcoming 2026-27 and leads with
-    the newest season that HAS collected games. Selecting the not-yet-started
-    2026-27 shows honest empty states: no loud fallback banner (the old
-    show-2025-26-with-a-warning contract is gone) and the Awards note says
-    the season has no collected games -- never another year's races."""
+    """Sidebar offers a season selector PER LEAGUE: the NBA box offers every
+    season 2010-11 -> upcoming 2026-27 and leads with the newest season
+    that HAS collected games; the WNBA box offers single calendar years
+    (label shapes never collide, so one ?season= param serves both).
+    Selecting the not-yet-started 2026-27 shows honest empty states: no
+    loud fallback banner (the old show-2025-26-with-a-warning contract is
+    gone) and the Awards note says the season has no collected games --
+    never another year's races."""
     at = _render("app/app.py", offline_espn)
-    # Label lookup, not [0]: the Schedule tab's Fixture picker also renders
+    # Label lookup, not [0]: the Schedule tab's Fixture pickers also render
     # (AppTest orders sidebar widgets after main content).
-    box = next(b for b in at.selectbox if str(b.label) == "Season")
+    box = next(b for b in at.selectbox if str(b.label) == "Season (NBA)")
     labels = list(box.options)
     assert "2010-11" in labels and "2025-26" in labels and "2026-27" in labels
     assert box.value == "2025-26"
+    # The WNBA selector is a parallel box with single-year labels: its
+    # defaults come from ITS OWN collected inventory, not the NBA's.
+    wnba_box = next(b for b in at.selectbox
+                    if str(b.label) == "Season (WNBA)")
+    wnba_labels = list(wnba_box.options)
+    assert "2010" in wnba_labels and "2026" in wnba_labels
+    assert all("-" not in str(v) for v in wnba_labels)
     box.select("2026-27").run()
     assert not at.exception
     assert len(at.warning) == 0
@@ -541,8 +564,9 @@ def test_schedule_game_detail_renders_box_and_pbp(offline_espn, monkeypatch):
          "score": "101:99", "scoring": True},
     ]
     monkeypatch.setattr(shared_module, "load_game_summary",
-                        lambda game_id: (meta, rows, plays,
-                                         "Live ESPN summary (15 min cache)"))
+                        lambda game_id, league="nba": (
+                            meta, rows, plays,
+                            "Live ESPN summary (15 min cache)"))
 
     at = _render("app/app.py", offline_espn)
 
@@ -574,8 +598,9 @@ def test_schedule_game_detail_upcoming_shows_fixture_info(
             "date": "2026-10-21T23:30:00Z",
             "venue": "Chase Center", "airings": ["National: ESPN"]}
     monkeypatch.setattr(shared_module, "load_game_summary",
-                        lambda game_id: (meta, [], [],
-                                         "Live ESPN summary (15 min cache)"))
+                        lambda game_id, league="nba": (
+                            meta, [], [],
+                            "Live ESPN summary (15 min cache)"))
 
     at = _render("app/app.py", offline_espn)
 
@@ -592,9 +617,10 @@ def test_schedule_game_detail_upcoming_shows_fixture_info(
 
 def test_schedule_filters_and_csv_downloads_render(offline_espn):
     """Standings and schedule each offer a CSV download of what is shown,
-    and the schedule's team + venue filters scope the results table, the
-    fixture picker and the export together -- a BOS filter never leaves
-    another team's row on screen or in the CSV."""
+    and each league tab's team + venue filters scope THAT tab's results
+    table, fixture picker and export together -- a BOS filter in the NBA
+    tab never leaves another team's row on screen, and the WNBA tab's
+    frame keeps its own teams (the two toolbars are independent)."""
     at = _render("app/app.py", offline_espn)
     assert not at.exception
     labels = [str(b.label) for b in at.download_button]
@@ -604,24 +630,40 @@ def test_schedule_filters_and_csv_downloads_render(offline_espn):
     team_box = next(sb for sb in at.selectbox if str(sb.label) == "Team")
     team_box.set_value("BOS").run()
     assert not at.exception
-    # The fixture picker is scoped with the tables.
-    fixtures = next(sb for sb in at.selectbox if str(sb.label) == "Fixture")
+    # The NBA tab's fixture picker is scoped with its tables; the WNBA
+    # tab's picker is untouched by the NBA filter (its own label list).
+    fixtures = next(sb for sb in at.selectbox
+                    if getattr(sb, "key", "") == "fixture_nba")
     assert fixtures.options, "fixture picker lost its options"
     assert all("BOS" in str(o) for o in fixtures.options)
+    wnba_fixtures = next(sb for sb in at.selectbox
+                         if getattr(sb, "key", "") == "fixture_wnba")
+    assert wnba_fixtures.options
+    assert any("BOS" not in str(o) for o in wnba_fixtures.options)
 
     # Venue options only mean something with a team selected -- Home now
     # appears (relative to BOS) where the all-teams list had none.
-    venue_box = next(sb for sb in at.selectbox if str(sb.label) == "Venue")
+    venue_box = next(sb for sb in at.selectbox
+                     if getattr(sb, "key", "") == "sched_venue_team_nba"
+                     or (str(sb.label) == "Venue"
+                         and "Home" in [str(o) for o in sb.options]))
     venue_box.set_value("Home").run()
     assert not at.exception
     frames = [df.value for df in at.dataframe
               if hasattr(getattr(df, "value", None), "columns")]
     sched = [f for f in frames if {"Date", "Away", "Home"} <= set(f.columns)]
     assert sched, "the schedule results table must render"
-    for frame in sched:
-        assert set(frame["Home"].astype(str)) == {"BOS"}
-        assert all("BOS" in (str(a), str(h))
-                   for a, h in zip(frame["Away"], frame["Home"]))
+    # The NBA frame is exactly BOS-hosted rows (its filter); the WNBA
+    # frame still carries its own league's teams (its toolbar did not
+    # move). Attribution by content: WNBA abbreviations never equal BOS.
+    homes = [set(f["Home"].astype(str)) for f in sched]
+    assert {"BOS"} in homes, "BOS home filter must scope the NBA table"
+    nba_frame = sched[homes.index({"BOS"})]
+    assert set(nba_frame["Home"].astype(str)) == {"BOS"}
+    assert all("BOS" in (str(a), str(h))
+               for a, h in zip(nba_frame["Away"], nba_frame["Home"]))
+    assert any(h - {"BOS"} for h in homes), \
+        "the WNBA tab's table must keep its own league's teams"
     captions = " ".join(str(c.value) for c in at.caption)
     assert "BOS" in captions and "home games" in captions  # filter stated
     assert len(at.warning) == 0
@@ -667,34 +709,65 @@ def test_parse_plays_flattens_and_skips_malformed():
 def test_deep_link_season_preselects_sidebar(offline_espn):
     """?season=NAME opens the home page on that season; an unknown season
     falls back to the honest default instead of crashing or inventing a
-    year's data."""
+    year's data. One param serves both selectors: an NBA-shaped label
+    preselects the NBA box while the WNBA box falls back to ITS default
+    (the label shapes never collide)."""
     at = AppTest.from_file(str(REPO_ROOT / "app/app.py"), default_timeout=30)
     at.query_params["season"] = "2010-11"
     at.run()
     assert not at.exception, f"page raised: {at.exception}"
-    box = next(b for b in at.selectbox if str(b.label) == "Season")
+    box = next(b for b in at.selectbox if str(b.label) == "Season (NBA)")
     assert box.value == "2010-11"
+    wnba_box = next(b for b in at.selectbox
+                    if str(b.label) == "Season (WNBA)")
+    assert wnba_box.value in list(wnba_box.options)
+    assert "-" not in str(wnba_box.value)  # never an NBA-shaped label
 
     bad = AppTest.from_file(str(REPO_ROOT / "app/app.py"), default_timeout=30)
     bad.query_params["season"] = "1999-00"
     bad.run()
     assert not bad.exception, f"page raised: {bad.exception}"
-    fallback = next(b for b in bad.selectbox if str(b.label) == "Season")
+    fallback = next(b for b in bad.selectbox
+                    if str(b.label) == "Season (NBA)")
     assert fallback.value == "2025-26"  # the pinned default, not the typo
 
 
+def test_deep_link_league_reorders_league_tabs(offline_espn):
+    """?league=wnba renders the WNBA league tab FIRST (st.tabs has no
+    programmatic selection) while each tab keeps its own four nested
+    sections in the pinned order -- the label -> element map keeps them
+    matched."""
+    at = AppTest.from_file(str(REPO_ROOT / "app/app.py"), default_timeout=30)
+    at.query_params["league"] = "wnba"
+    at.run()
+    assert not at.exception, f"page raised: {at.exception}"
+    labels = [str(t.label) for t in at.tabs]
+    assert labels == ["WNBA", "Standings", "Schedule & Scores",
+                      "Awards Ladder", "Court View",
+                      "NBA", "Standings", "Schedule & Scores",
+                      "Awards Ladder", "Court View"]
+    # An unknown league label is ignored, not crashed on.
+    plain = AppTest.from_file(str(REPO_ROOT / "app/app.py"),
+                              default_timeout=30)
+    plain.query_params["league"] = "ncaa"
+    plain.run()
+    assert not plain.exception, f"page raised: {plain.exception}"
+    assert [str(t.label) for t in plain.tabs][0] == "NBA"
+
+
 def test_deep_link_tab_reorders_tabs(offline_espn):
-    """?tab= renders the requested tab FIRST (st.tabs has no programmatic
-    selection) while every other tab keeps the pinned default order and its
+    """?tab= renders the requested tab FIRST inside BOTH league panes
+    (st.tabs has no programmatic selection) while the league tabs
+    themselves keep their pinned NBA-first order and every tab keeps its
     own content (the label -> element map keeps them matched)."""
     at = AppTest.from_file(str(REPO_ROOT / "app/app.py"), default_timeout=30)
     at.query_params["tab"] = "Court View"
     at.run()
     assert not at.exception, f"page raised: {at.exception}"
     labels = [str(t.label) for t in at.tabs]
-    assert labels[0] == "Court View"
-    assert set(labels) == {"Standings", "Schedule & Scores",
-                           "Awards Ladder", "Court View"}
+    assert labels == ["NBA", "Court View", "Standings", "Schedule & Scores",
+                      "Awards Ladder", "WNBA", "Court View", "Standings",
+                      "Schedule & Scores", "Awards Ladder"]
 
 
 def test_deep_link_player_opens_profile(offline_espn):

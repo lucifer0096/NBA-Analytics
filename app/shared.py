@@ -30,6 +30,7 @@ sys.path.insert(0, str(REPO_ROOT / "src" / "collector"))
 sys.path.insert(0, str(REPO_ROOT / "src" / "model"))
 
 import espn_api  # noqa: E402
+import leagues  # noqa: E402
 
 # Award display constants (STAT_LABELS/RACE_FORMULAS/...) come from the module
 # that computes them, so the UI can never show a label/formula that disagrees
@@ -270,35 +271,42 @@ def slot_chip(slot: str) -> str:
     return f'<span class="na-slot na-slot--{slot}">{slot}</span>'
 
 
-def team_logo_url(abbrev: str) -> str:
-    """ESPN CDN team logo (verified 200 for upper/lowercase abbrevs). Empty
-    when the abbrev is missing so callers render nothing instead of a URL
-    that is guaranteed to fail."""
+def team_logo_url(abbrev: str, league: str = "nba") -> str:
+    """ESPN CDN team logo (verified 200 for upper/lowercase abbrevs on the
+    NBA; the WNBA's logo files are lowercased -- LV -> lv.png, verified live
+    Sep 2026). Empty when the abbrev is missing so callers render nothing
+    instead of a URL that is guaranteed to fail."""
     if not abbrev:
         return ""
+    slug = leagues.validate(league)
+    if slug == "wnba":
+        return f"https://a.espncdn.com/i/teamlogos/wnba/500/{abbrev.lower()}.png"
     return f"https://a.espncdn.com/i/teamlogos/nba/500/{abbrev}.png"
 
 
-def headshot_url(player_id) -> str:
+def headshot_url(player_id, league: str = "nba") -> str:
     """ESPN CDN player headshot (200 for real ids, 404 for fabricated ones --
-    which is exactly why headshot_html wraps it in the CSS fallback below)."""
+    which is exactly why headshot_html wraps it in the CSS below). Both
+    leagues share the /headshots/{league}/players/full/ shape."""
     if player_id is None or player_id == "":
         return ""
-    return f"https://a.espncdn.com/i/headshots/nba/players/full/{player_id}.png"
+    return (f"https://a.espncdn.com/i/headshots/{leagues.validate(league)}"
+            f"/players/full/{player_id}.png")
 
 
-def team_logo_html(abbrev: str, size: int = 18) -> str:
+def team_logo_html(abbrev: str, size: int = 18, league: str = "nba") -> str:
     """Team logo as a CSS background-image span, deliberately NOT an <img>:
     a 404 then just paints nothing -- no broken-image icon, no alt-text
     oddities. Single logical line (see race_row_html's docstring)."""
-    url = team_logo_url(abbrev)
+    url = team_logo_url(abbrev, league)
     if not url:
         return ""
     return (f'<span class="na-logo" style="width: {size}px; height: {size}px; '
             f'background-image: url({url});"></span>')
 
 
-def headshot_html(player_id, team_abbrev: str, size: int = 44) -> str:
+def headshot_html(player_id, team_abbrev: str, size: int = 44,
+                  league: str = "nba") -> str:
     """Player headshot with FPL-Analytics' proven CSS-only fallback: the
     <img> sits over the team logo drawn as the wrapper's background-image,
     object-fit: contain, and deliberately carries NO alt attribute.
@@ -309,8 +317,9 @@ def headshot_html(player_id, team_abbrev: str, size: int = 44) -> str:
     fallback. A failed <img> has no visible content of its own, so the
     team-logo background shows through instead -- no JS anywhere, and the
     fallback is the player's real team, not a generic gray box."""
-    src = headshot_url(player_id)
-    bg = f"background-image: url({team_logo_url(team_abbrev)}); " if team_abbrev else ""
+    src = headshot_url(player_id, league)
+    bg = (f"background-image: url({team_logo_url(team_abbrev, league)}); "
+          if team_abbrev else "")
     if not src:
         return (f'<span class="na-shot" style="width: {size}px; '
                 f'height: {size}px; {bg}"></span>')
@@ -349,7 +358,8 @@ def race_meta(race: str, row: dict) -> str:
             f"{row.get('gp_prev', 0)} GP last season")
 
 
-def race_row_html(row: dict, race: str, move: int = 0) -> str:
+def race_row_html(row: dict, race: str, move: int = 0,
+                  league: str = "nba") -> str:
     """One award-race ladder row: medal/rank, real headshot (team-logo CSS
     fallback behind it), name + team logo, the race's stat line, the score
     with the rank movement under it when the caller has one (`move` = rank
@@ -377,9 +387,9 @@ def race_row_html(row: dict, race: str, move: int = 0) -> str:
                      f'{abs(int(move))}</span>')
     return (f'<div class="na-race-row">'
             f'<div class="na-rank">{medal}</div>'
-            f'{headshot_html(row.get("player_id"), team, 44)}'
+            f'{headshot_html(row.get("player_id"), team, 44, league)}'
             f'<div class="na-rbody">'
-            f'<div class="na-rname">{name}{team_logo_html(team, 16)}</div>'
+            f'<div class="na-rname">{name}{team_logo_html(team, 16, league)}</div>'
             f'<div class="na-rmeta">{race_meta(race, row)}</div>'
             f'</div>'
             f'<div class="na-rscore">{score_text}{move_html}</div>'
@@ -417,7 +427,7 @@ def _rate_text(stat: str, value) -> str:
     return f"{number}"
 
 
-def leader_row_html(row: dict, stat: str) -> str:
+def leader_row_html(row: dict, stat: str, league: str = "nba") -> str:
     """One stat-leader row: rank, headshot, name + team logo, games + season
     total for context + the shooting splits, headline per-game rate on the
     right. Same single-logical-line rule as race_row_html."""
@@ -432,16 +442,17 @@ def leader_row_html(row: dict, stat: str) -> str:
             f"(season total){_shooting_fragments(row)}")
     return (f'<div class="na-race-row">'
             f'<div class="na-rank">{medal}</div>'
-            f'{headshot_html(row.get("player_id"), team, 44)}'
+            f'{headshot_html(row.get("player_id"), team, 44, league)}'
             f'<div class="na-rbody">'
-            f'<div class="na-rname">{name}{team_logo_html(team, 16)}</div>'
+            f'<div class="na-rname">{name}{team_logo_html(team, 16, league)}</div>'
             f'<div class="na-rmeta">{meta}</div>'
             f'</div>'
             f'<div class="na-rscore">{_rate_text(stat, row.get("per_game"))} {abbr}</div>'
             f'</div>')
 
 
-def court_card_html(row: dict, bucket: str, stat: str) -> str:
+def court_card_html(row: dict, bucket: str, stat: str,
+                    league: str = "nba") -> str:
     """One Court View player card: headshot over team-logo fallback, name,
     team logo + position chip, headline per-game rate, and a CSS-only hover
     tooltip (.na-tip) with the player's full per-game line, shooting splits
@@ -461,13 +472,14 @@ def court_card_html(row: dict, bucket: str, stat: str) -> str:
            f"{_total_text(stat, row.get('total'))} {total_label} total")
     abbr = awards.STAT_ABBR.get(stat, stat.upper())
     profile = ("./4_Player_Profile?player="
-               + quote(str(row.get("player_name") or ""), safe=""))
+               + quote(str(row.get("player_name") or ""), safe="")
+               + f"&league={quote(league, safe='')}")
     return (f'<a class="na-court-link" href="{profile}" title="Open {name} profile">'
             f'<div class="na-court-card">'
             f'<div class="na-tip">{tip}</div>'
-            f'{headshot_html(row.get("player_id"), team, 56)}'
+            f'{headshot_html(row.get("player_id"), team, 56, league)}'
             f'<div class="na-cname">{name}</div>'
-            f'<div class="na-cteam">{team_logo_html(team, 14)}{team}{chip}</div>'
+            f'<div class="na-cteam">{team_logo_html(team, 14, league)}{team}{chip}</div>'
             f'<div class="na-cstat">{_rate_text(stat, row.get("per_game"))} {abbr}</div>'
             f'</div></a>')
 
@@ -486,12 +498,13 @@ def _court_bucket(raw_pos: str) -> str:
     return ""
 
 
-def goat_row_html(row: dict) -> str:
+def goat_row_html(row: dict, league: str = "nba") -> str:
     """One GOAT-ladder row: rank/medal, real headshot (team-logo CSS
     fallback), career line, official-honour chips (heaviest first, the order
     the formula weights them), championship count, the four component
     scores (a dropped component prints as `—` with its gap named) and the
-    headline GOAT score on the right.
+    headline GOAT score on the right. `league` picks the honours table
+    (20 NBA award names vs the WNBA's 15) and the CDN art paths.
 
     Single logical line -- see race_row_html's docstring."""
     rank = int(row.get("rank") or 0)
@@ -499,10 +512,12 @@ def goat_row_html(row: dict) -> str:
     name = html.escape(str(row.get("player_name") or "Unknown"))
     team = str(row.get("team_abbrev") or "")
     honours = row.get("honours") or {}
-    chips = [f"{html.escape(awards.GOAT_HONOUR_LABELS.get(k, k))}×{int(v)}"
+    honour_labels = awards.honour_labels(league)
+    honour_weights = awards.honours_weights(league)
+    chips = [f"{html.escape(honour_labels.get(k, k))}×{int(v)}"
              for k, v in sorted(
                  honours.items(),
-                 key=lambda kv: (-awards.GOAT_HONOURS_WEIGHTS.get(kv[0], 0.0),
+                 key=lambda kv: (-honour_weights.get(kv[0], 0.0),
                                  kv[0])) if v]
     if chips:
         honours_text = " · ".join(chips[:5])
@@ -547,9 +562,9 @@ def goat_row_html(row: dict) -> str:
                   f"titles {tscore if tscore is not None else '—'}{gap_text}")
     return (f'<div class="na-race-row">'
             f'<div class="na-rank">{medal}</div>'
-            f'{headshot_html(row.get("player_id"), team, 44)}'
+            f'{headshot_html(row.get("player_id"), team, 44, league)}'
             f'<div class="na-rbody">'
-            f'<div class="na-rname">{name}{team_logo_html(team, 16)}</div>'
+            f'<div class="na-rname">{name}{team_logo_html(team, 16, league)}</div>'
             f'<div class="na-rmeta">{meta}</div>'
             f'<div class="na-rmeta">{components}</div>'
             f'</div>'
@@ -557,7 +572,7 @@ def goat_row_html(row: dict) -> str:
             f'</div>')
 
 
-def profile_card_html(p: dict) -> str:
+def profile_card_html(p: dict, league: str = "nba") -> str:
     """Player Profile header card: large headshot (team-logo CSS fallback
     behind it), name + team logo, then TWO meta lines instead of one
     140-character wall -- line 1 the career totals (+/- window value),
@@ -591,9 +606,9 @@ def profile_card_html(p: dict) -> str:
                   f"{p.get('ast', 0):,} AST · {pm_text}")
     honours_line = f"{debut_text}{honours_text} · {rings_text}{goat_text}"
     return (f'<div class="na-race-row">'
-            f'{headshot_html(p.get("player_id"), team, 64)}'
+            f'{headshot_html(p.get("player_id"), team, 64, league)}'
             f'<div class="na-rbody">'
-            f'<div class="na-rname">{name}{team_logo_html(team, 18)}</div>'
+            f'<div class="na-rname">{name}{team_logo_html(team, 18, league)}</div>'
             f'<div class="na-rmeta na-rlead">{stats_line}</div>'
             f'<div class="na-rmeta">{honours_line}</div>'
             f'</div>'
@@ -685,7 +700,7 @@ def progression_figure(series: dict, metric: str, mode: str,
 
 
 def render_court(leaders: list, positions, stat: str, min_games: int,
-                 season: str) -> None:
+                 season: str, league: str = "nba") -> None:
     """Draw a stat race's top players on a real hardwood court: rank order
     fills a 2 G / 2 F / 1 C formation from the committed roster map (C row
     first -- the basket is at the top), and everyone else -- formation full,
@@ -717,7 +732,8 @@ def render_court(leaders: list, positions, stat: str, min_games: int,
     for bucket in ("C", "F", "G"):
         if not slots[bucket]:
             continue
-        cards = "".join(court_card_html(r, bucket, stat) for r in slots[bucket])
+        cards = "".join(court_card_html(r, bucket, stat, league)
+                        for r in slots[bucket])
         rows_html += f'<div class="na-court-row">{cards}</div>'
 
     # Court markings, entirely CSS gradients layered under the wood grain
@@ -742,7 +758,8 @@ def render_court(leaders: list, positions, stat: str, min_games: int,
     st.markdown(court, unsafe_allow_html=True)
 
     if bench:
-        bench_cards = "".join(court_card_html(r, b, stat) for r, b in bench)
+        bench_cards = "".join(court_card_html(r, b, stat, league)
+                              for r, b in bench)
         st.markdown(
             f'<div class="na-bench-label">🪑 BENCH · {len(bench)} not slotted '
             f'(formation full or position unmapped)</div>'
@@ -779,8 +796,21 @@ def render_fallback_warnings() -> None:
         st.warning(message)
 
 
-def _read_fallback(name: str) -> dict:
-    path = DATA_DIR / name
+def _league_sub(sub: str, league: str) -> Path:
+    """`data/{sub}` for the NBA, `data/{sub}_{league}` for other leagues --
+    built on THIS module's DATA_DIR (repointable by tests/deployments)
+    while leagues.validate keeps the one validation point."""
+    slug = leagues.validate(league)
+    return DATA_DIR / (sub if slug == "nba" else f"{sub}_{slug}")
+
+
+def _read_fallback(name: str, league: str = "nba") -> dict:
+    """One committed dashboard file for `league`: the NBA keeps the
+    historical name, the WNBA's carry '_wnba' right after 'dashboard_'
+    (leagues.named_path is the single naming rule, shared with the
+    collector that writes these). Reads this module's DATA_DIR so tests and
+    deployments that repoint it keep working."""
+    path = Path(leagues.named_path(str(DATA_DIR), name, league))
     if not path.exists():
         return {}
     try:
@@ -788,7 +818,7 @@ def _read_fallback(name: str) -> dict:
             return json.load(f)
     except (json.JSONDecodeError, OSError):
         _record_fallback_error(
-            f"{name} is unreadable on disk: showing an honest empty state "
+            f"{path.name} is unreadable on disk: showing an honest empty state "
             "(regenerate with `python src/collector/"
             "refresh_dashboard_fallbacks.py`)."
         )
@@ -821,24 +851,25 @@ def standings_have_results(df: pd.DataFrame) -> bool:
 
 
 @st.cache_data(ttl=60, show_spinner=False)
-def load_teams() -> tuple:
+def load_teams(league: str = "nba") -> tuple:
     """(teams DataFrame, note). Live teams endpoint, else committed copy."""
     try:
         import parsing
 
-        raw = espn_api.get_teams()
+        raw = espn_api.get_teams(league)
         rows = parsing.parse_teams(raw)
         if rows:
             return (pd.DataFrame(rows), data_age_note({}, True))
     except Exception:
         pass
-    payload = _read_fallback("dashboard_teams.json")
+    payload = _read_fallback("dashboard_teams.json", league)
     return (pd.DataFrame(payload.get("teams", [])), data_age_note(payload, False))
 
 
 @st.cache_data(ttl=60, show_spinner=False)
-def load_standings(season: str) -> tuple:
-    """(standings DataFrame, note) for one season label like '2025-26'.
+def load_standings(season: str, league: str = "nba") -> tuple:
+    """(standings DataFrame, note) for one season label ('2025-26' NBA,
+    '2026' WNBA).
 
     Honest empty states: a season the live API answers with all-zero rows
     (not started yet) or a fetch failure over a committed copy that carries a
@@ -848,7 +879,8 @@ def load_standings(season: str) -> tuple:
     try:
         import parsing
 
-        raw = espn_api.get_standings(espn_api.season_param(season))
+        raw = espn_api.get_standings(
+            espn_api.season_param(season, league), league)
         rows = parsing.parse_standings(raw)
         if rows:
             live_rows = pd.DataFrame(rows)
@@ -856,7 +888,7 @@ def load_standings(season: str) -> tuple:
             return (live_rows, data_age_note({}, True))
     except Exception:
         pass
-    payload = _read_fallback("dashboard_standings.json")
+    payload = _read_fallback("dashboard_standings.json", league)
     rows = payload.get("standings", [])
     if rows and payload.get("season") == season:
         committed = pd.DataFrame(rows)
@@ -873,29 +905,31 @@ def load_standings(season: str) -> tuple:
 
 
 @st.cache_data(ttl=300, show_spinner=False)
-def load_schedule(season: str) -> tuple:
+def load_schedule(season: str, league: str = "nba") -> tuple:
     """(games DataFrame, note). Local-first: the selected season's OWN file
-    (data/schedules/{season}.json, final scores included) is parsed directly
+    (data/schedules/{season}.json, final scores included -- the WNBA's live
+    under data/schedules_wnba/) is parsed directly
     -- one season's rows instead of the legacy 4.5MB merged envelope, with
     the file's own generation stamp for an honest freshness caption. Legacy
     shapes still load (the merged multi-season envelope, then the original
     single-season file), and anything else is an honest empty."""
-    path = DATA_DIR / "schedules" / f"{season}.json"
+    schedule_dir = _league_sub("schedules", league)
+    path = schedule_dir / f"{season}.json"
     if path.exists():
         try:
             with open(path, encoding="utf-8") as f:
                 payload = json.load(f)
         except (json.JSONDecodeError, OSError):
             _record_fallback_error(
-                f"schedules/{season}.json is unreadable: falling back to the "
-                "committed schedule index (regenerate with `python "
+                f"{schedule_dir.name}/{season}.json is unreadable: falling "
+                "back to the committed schedule index (regenerate with `python "
                 "src/collector/refresh_dashboard_fallbacks.py`)."
             )
             payload = {}
         rows = payload.get("games") if isinstance(payload, dict) else None
         if isinstance(rows, list) and rows:
             return (pd.DataFrame(rows), data_age_note(payload, False))
-    payload = _read_fallback("dashboard_schedule.json")
+    payload = _read_fallback("dashboard_schedule.json", league)
     seasons = payload.get("seasons")
     if seasons:
         entry = seasons.get(season)
@@ -945,13 +979,15 @@ def filter_schedule_games(games: pd.DataFrame, team: str,
 
 
 @st.cache_data(ttl=300, show_spinner=False)
-def load_race_history(season: str) -> tuple:
-    """(snapshot list, note) from data/races/{season}.json: the daily race
+def load_race_history(season: str, league: str = "nba") -> tuple:
+    """(snapshot list, note) from data/races/{season}.json (the WNBA's
+    under data/races_wnba/): the daily race
     snapshots the Awards Ladder's movement arrows and trend chart read
     (written by refresh_dashboard_fallbacks._record_race_history). An
     absent file is a normal, honest state (the season has never been
     snapshotted, or its races froze after one), never an error."""
-    path = DATA_DIR / "races" / f"{season}.json"
+    race_dir = _league_sub("races", league)
+    path = race_dir / f"{season}.json"
     if not path.exists():
         return ([], f"No daily race snapshots yet for {season}: movement "
                     "and trend appear after refresh_dashboard_fallbacks.py "
@@ -961,8 +997,8 @@ def load_race_history(season: str) -> tuple:
             payload = json.load(f)
     except (json.JSONDecodeError, OSError):
         _record_fallback_error(
-            f"races/{season}.json is unreadable: the ladder shows without "
-            "movement until the next refresh rewrites it."
+            f"{race_dir.name}/{season}.json is unreadable: the ladder shows "
+            "without movement until the next refresh rewrites it."
         )
         return ([], f"Race history for {season} is unreadable: the ladder "
                     "shows without movement")
@@ -1054,12 +1090,12 @@ def race_trend_figure(snapshots: list, race: str = "mvp",
 
 
 @st.cache_data(ttl=60, show_spinner=False)
-def load_scoreboard(dates: str) -> tuple:
+def load_scoreboard(dates: str, league: str = "nba") -> tuple:
     """(scoreboard events DataFrame, note) for a YYYYMMDD date -- genuinely
     live ESPN call, used for 'games today'; empty (not an error) when there
-    are none, which is the normal offseason state."""
+    are none, which is the normal offseason state (either league's)."""
     try:
-        payload = espn_api.get_scoreboard(dates)
+        payload = espn_api.get_scoreboard(dates, league)
         events = payload.get("events") or []
         rows = []
         for event in events:
@@ -1200,9 +1236,11 @@ def render_box_sides(rows: pd.DataFrame, meta: dict) -> None:
             st.dataframe(table, hide_index=True, width="stretch")
 
 
-def render_play_by_play(plays: list) -> None:
+def render_play_by_play(plays: list, league: str = "nba") -> None:
     """The full play-by-play with period and scoring filters (the NBA app's
-    PBP view): every event with its clock and the running away:home score."""
+    PBP view): every event with its clock and the running away:home score.
+    Widget keys are league-suffixed -- both league tabs render their game
+    detail in one script run."""
     st.markdown("**Play-by-play**")
     if not plays:
         st.caption("No play-by-play in ESPN's summary for this game "
@@ -1212,8 +1250,10 @@ def render_play_by_play(plays: list) -> None:
     raw_periods = table["period"].tolist() if "period" in table.columns else []
     periods = [p for p in dict.fromkeys(raw_periods) if isinstance(p, str)]
     pcol, scol = st.columns([1, 1])
-    period = pcol.selectbox("Period", ["All", *periods], key="pbp_period")
-    scoring_only = scol.checkbox("Scoring plays only", key="pbp_scoring")
+    period = pcol.selectbox("Period", ["All", *periods],
+                            key=f"pbp_period_{league}")
+    scoring_only = scol.checkbox("Scoring plays only",
+                                 key=f"pbp_scoring_{league}")
     view = table if period == "All" else table[table["period"] == period]
     if scoring_only:
         view = view[view["scoring"]]
@@ -1228,7 +1268,7 @@ def render_play_by_play(plays: list) -> None:
 
 
 @st.cache_data(ttl=900, show_spinner=False)
-def load_game_summary(game_id) -> tuple:
+def load_game_summary(game_id, league: str = "nba") -> tuple:
     """(meta dict, player rows, play-by-play rows, note) for ONE game: the
     fixture detail behind the Schedule tab's game picker.
 
@@ -1242,8 +1282,8 @@ def load_game_summary(game_id) -> tuple:
     try:
         import parsing
 
-        payload = espn_api.get_event_summary(game_id)
-        meta, rows = parsing.parse_summary(payload)
+        payload = espn_api.get_event_summary(game_id, league)
+        meta, rows = parsing.parse_summary(payload, league)
     except Exception:
         return ({}, [], [], f"Live game detail for game {game_id} "
                             "unavailable: ESPN unreachable from this session")
@@ -1258,25 +1298,27 @@ def load_game_summary(game_id) -> tuple:
 
 
 @st.cache_data(ttl=300, show_spinner=False)
-def load_positions() -> pd.DataFrame:
+def load_positions(league: str = "nba") -> pd.DataFrame:
     """Current player -> position map (optimizer pool + Court View formation)."""
-    payload = _read_fallback("dashboard_positions.json")
+    payload = _read_fallback("dashboard_positions.json", league)
     return pd.DataFrame(payload.get("players", []))
 
 
 @st.cache_data(ttl=300, show_spinner=False)
-def load_awards(season: str = None) -> tuple:
+def load_awards(season: str = None, league: str = "nba") -> tuple:
     """(season payload, note) -- award races + stat leaders computed LOCALLY
     from the collected box scores (src/collector/awards.py) and committed as
-    data/dashboard_awards.json. There is deliberately no live API for these,
+    data/dashboard_awards.json (the WNBA's as data/dashboard_wnba_awards.json).
+    There is deliberately no live API for these,
     so the note states the computation stamp rather than implying live.
 
     The committed file carries EVERY collected season under "seasons"
-    (2010-11 -> present); `season` picks one. A season with no collected
+    (2010-11 -> present NBA; 2010 -> present WNBA); `season` picks one. A
+    season with no collected
     games (2026-27 before tip-off) gets an EMPTY payload and an honest note --
     never the previous season's races under the new label. The legacy
     single-season envelope (no "seasons" key) still loads."""
-    payload = _read_fallback("dashboard_awards.json")
+    payload = _read_fallback("dashboard_awards.json", league)
     seasons = payload.get("seasons")
     if not seasons:
         if not payload.get("races"):
@@ -1309,14 +1351,15 @@ def load_awards(season: str = None) -> tuple:
 
 
 @st.cache_data(ttl=300, show_spinner=False)
-def load_awards_career() -> tuple:
+def load_awards_career(league: str = "nba") -> tuple:
     """(alltime dict, goat dict, window dict, note) -- the cross-season
-    sections of the committed awards file: career totals across every
-    collected season (2010-11 -> present), the GOAT ladder built from them,
+    sections of the committed awards file (per league): career totals across
+    every collected season (2010-11 -> present NBA, 2010 -> present WNBA),
+    the GOAT ladder built from them,
     and the window descriptor. The note prefers the envelope's own
     career_note (history.py's verbatim pool/honours description with the
     ESPN-quirks disclosure) and falls back to the generic stamp."""
-    payload = _read_fallback("dashboard_awards.json")
+    payload = _read_fallback("dashboard_awards.json", league)
     stamp = payload.get("_generated_utc")
     note = payload.get("career_note") or (
         f"Computed from collected box scores, as of {stamp}" if stamp
@@ -1326,33 +1369,35 @@ def load_awards_career() -> tuple:
 
 
 @st.cache_data(ttl=300, show_spinner=False)
-def load_games_by_season() -> dict:
+def load_games_by_season(league: str = "nba") -> dict:
     """{season label: collected box-score count} from the awards envelope's
     inventory (refresh_dashboard_fallbacks._games_by_season -- every raw
     season dir, 0 included, so the upcoming season shows honestly empty)."""
-    payload = _read_fallback("dashboard_awards.json")
+    payload = _read_fallback("dashboard_awards.json", league)
     counts = payload.get("games_by_season")
     return counts if isinstance(counts, dict) and counts else {}
 
 
-def sidebar_games(counts: dict, options: list) -> None:
+def sidebar_games(counts: dict, options: list, league: str = "nba") -> None:
     """Sidebar inventory expander: games collected for EVERY selectable
-    season, so the selector's range is auditable at a glance."""
+    season, so the selector's range is auditable at a glance. The league is
+    named in the title because each page shows one expander per league."""
     if not counts:
         return
     total = sum(int(v or 0) for v in counts.values())
-    with st.expander(f"Games collected · {total:,} total"):
-        for label in options:
-            st.caption(f"{label} · {int(counts.get(label) or 0):,}")
+    label = leagues.display(league)
+    with st.expander(f"Games collected ({label}) · {total:,} total"):
+        for option in options:
+            st.caption(f"{option} · {int(counts.get(option) or 0):,}")
 
 
 @st.cache_data(ttl=300, show_spinner=False)
-def load_players() -> tuple:
+def load_players(league: str = "nba") -> tuple:
     """(players dict keyed by player id, meta, note) -- the Player Profile
     index data/dashboard_players.json (career lines, per-season logs,
     official honours, GOAT ranks). Written only after a successful history
     build, so an absent file is an honest empty, not an error."""
-    payload = _read_fallback("dashboard_players.json")
+    payload = _read_fallback("dashboard_players.json", league)
     players = payload.get("players") or {}
     meta = payload.get("meta") or {}
     stamp = payload.get("_generated_utc")
@@ -1380,9 +1425,11 @@ def load_metrics() -> dict:
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
-def load_leaderboards() -> tuple:
-    """(leaders DataFrame, note) -- last completed season's per-player totals."""
-    path = PROCESSED_DIR / "dashboard_leaderboards.json"
+def load_leaderboards(league: str = "nba") -> tuple:
+    """(leaders DataFrame, note) -- last completed season's per-player totals
+    from data/processed/dashboard[_wnba]_leaderboards.json."""
+    path = Path(leagues.named_path(
+        str(DATA_DIR / "processed"), "dashboard_leaderboards.json", league))
     if not path.exists():
         return (pd.DataFrame(), "")
     # The file is a JSON object envelope (season/leaders/source/_generated_utc).
@@ -1391,7 +1438,7 @@ def load_leaderboards() -> tuple:
             envelope = json.load(f)
     except (json.JSONDecodeError, OSError):
         _record_fallback_error(
-            "processed/dashboard_leaderboards.json is unreadable: no "
+            f"{path.name} is unreadable: no "
             "leaderboard to show until the next refresh rewrites it."
         )
         return (pd.DataFrame(), "")
@@ -1401,16 +1448,16 @@ def load_leaderboards() -> tuple:
     return (pd.DataFrame(envelope.get("leaders", [])), note)
 
 
-def current_season() -> str:
-    return espn_api.current_season_label()
+def current_season(league: str = "nba") -> str:
+    return espn_api.current_season_label(league=league)
 
 
-def latest_season_with_data() -> str:
+def latest_season_with_data(league: str = "nba") -> str:
     """Newest season label that has a committed schedule (per-season file or
     legacy envelope); used as the default season selector value in the
     offseason, when the 'current' season's schedule may not exist yet."""
-    current = current_season()
-    payload = _read_fallback("dashboard_schedule.json")
+    current = current_season(league)
+    payload = _read_fallback("dashboard_schedule.json", league)
     seasons = payload.get("seasons") or {}
     with_games = [label for label, entry in seasons.items()
                   if (int(entry.get("games") or 0) if isinstance(entry, dict)
@@ -1422,47 +1469,56 @@ def latest_season_with_data() -> str:
     return current
 
 
-def season_options() -> list:
+def season_options(league: str = "nba") -> list:
     """Selectable seasons for the sidebar: every season from the project's
-    first collected year (2010-11) through the current one -- the upcoming
-    2026-27 included -- unioned with whatever the committed files and raw
-    dirs actually carry, newest first. The contiguous range is generated so
-    the full list shows even on a deploy without data/raw/ (Streamlit
-    Cloud), which previously only offered the two committed fallback
-    seasons."""
+    first collected year (2010-11 NBA / 2010 WNBA) through the current one --
+    the upcoming season included -- unioned with whatever the committed files
+    and raw dirs actually carry, newest first. The contiguous range is
+    generated so the full list shows even on a deploy without data/raw/
+    (Streamlit Cloud), which previously only offered the two committed
+    fallback seasons. Label shapes never collide across leagues ('2025-26'
+    vs '2026'), so one selector per league can share a deep link."""
     labels = set()
     for name in ("dashboard_schedule.json", "dashboard_standings.json",
                  "dashboard_awards.json"):
-        payload = _read_fallback(name)
+        payload = _read_fallback(name, league)
         if payload.get("season"):
-            labels.add(payload["season"])
+            labels.add(str(payload["season"]))
         for key in (payload.get("seasons") or {}):
-            labels.add(key)
-    raw_dir = DATA_DIR / "raw"
+            labels.add(str(key))
+    raw_dir = _league_sub("raw", league)
+    pattern = leagues.season_dir_re(league)
     if raw_dir.exists():
         for entry in raw_dir.iterdir():
-            if entry.is_dir() and "-" in entry.name and entry.name[:4].isdigit():
+            if entry.is_dir() and pattern.fullmatch(entry.name):
                 labels.add(entry.name)
-    current = current_season()
+    current = current_season(league)
     if current:
-        labels.add(current)
+        labels.add(str(current))
     try:
         last_end = min(int(str(current)[:4]), 2100)
     except (TypeError, ValueError):
         last_end = 0
-    for end_year in range(2011, max(last_end, 2010) + 1):
-        labels.add(f"{end_year - 1}-{str(end_year)[2:]}")
+    first = int(str(leagues.first_season(league))[:4])
+    if league == "wnba":
+        # Single calendar-year labels: 2010 -> current.
+        for year in range(first, max(last_end, first) + 1):
+            labels.add(str(year))
+    else:
+        # End-year labels: 2010-11 -> current.
+        for end_year in range(first + 1, max(last_end, first) + 1):
+            labels.add(f"{end_year - 1}-{str(end_year)[2:]}")
     return sorted(labels, reverse=True)
 
 
-def default_season_index(options: list) -> int:
+def default_season_index(options: list, league: str = "nba") -> int:
     """Index of the newest season with COLLECTED games (awards file keys);
     0 when unknown. The upcoming season stays selectable but never leads
     the app -- until its games are actually collected, every panel would
     otherwise open on a fallback."""
     if not options:
         return 0
-    payload = _read_fallback("dashboard_awards.json")
+    payload = _read_fallback("dashboard_awards.json", league)
     collected = [s for s in (payload.get("seasons") or {}) if s in options]
     if collected:
         return options.index(max(collected))
