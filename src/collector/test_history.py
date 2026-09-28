@@ -54,6 +54,23 @@ def test_build_offline_from_committed_cache(monkeypatch):
     assert (by_pid[4152].get("peak_impact") or 0) > 40  # was 23.4 at 0 reb
 
 
+def test_line_keys_exclude_window_only_plus_minus():
+    """ESPN's career statistics carry no +/- split (verified Sep 2026):
+    _LINE_KEYS must exclude it or _parse_line would fabricate a 0 on every
+    ESPN line, and build_career's history-over-window merge would clobber
+    the real collected-window total with that zero."""
+    import awards
+
+    assert "plus_minus" in awards.CAREER_SUM_STATS   # summed from box scores
+    assert "plus_minus" not in history._LINE_KEYS    # never from ESPN lines
+    line = history._parse_line({"splits": {"categories": [{"stats": [
+        {"name": "gamesPlayed", "value": 82},
+        {"name": "points", "value": 1000}]}]}})
+    assert line is not None
+    assert line["gp"] == 82 and line["pts"] == 1000
+    assert "plus_minus" not in line
+
+
 def test_official_championships_table():
     """OFFICIAL_CHAMPIONSHIPS answers before any derivation runs: the ids
     it lists return the verified official-record count even with an empty

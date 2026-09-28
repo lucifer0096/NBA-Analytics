@@ -382,6 +382,23 @@ def _shooting_fragments(row: dict) -> str:
     return "".join(bits)
 
 
+def _total_text(stat: str, value) -> str:
+    """Season/career total for the dashboard: thousands-separated, always
+    signed for +/- (the stat's convention); -0 folds to 0."""
+    number = (value if value is not None else 0) + 0.0
+    if stat == "plus_minus":
+        return f"{int(round(number)):+,}"
+    return f"{int(number):,}"
+
+
+def _rate_text(stat: str, value) -> str:
+    """Per-game headline: signed for +/-, plain otherwise; -0.0 folds to 0."""
+    number = (value if value is not None else 0) + 0.0
+    if stat == "plus_minus":
+        return f"{number:+g}"
+    return f"{number}"
+
+
 def leader_row_html(row: dict, stat: str) -> str:
     """One stat-leader row: rank, headshot, name + team logo, games + season
     total for context + the shooting splits, headline per-game rate on the
@@ -390,10 +407,10 @@ def leader_row_html(row: dict, stat: str) -> str:
     medal = {1: "🥇", 2: "🥈", 3: "🥉"}.get(rank, str(rank))
     name = html.escape(str(row.get("player_name") or "Unknown"))
     team = str(row.get("team_abbrev") or "")
-    total = int(row.get("total") or 0)
     label = awards.STAT_LABELS.get(stat, stat)
     abbr = awards.STAT_ABBR.get(stat, stat.upper())
-    meta = (f"{team} · {row.get('gp', 0)} GP · {total:,} {label.lower()} "
+    meta = (f"{team} · {row.get('gp', 0)} GP · "
+            f"{_total_text(stat, row.get('total'))} {label.lower()} "
             f"(season total){_shooting_fragments(row)}")
     return (f'<div class="na-race-row">'
             f'<div class="na-rank">{medal}</div>'
@@ -402,7 +419,7 @@ def leader_row_html(row: dict, stat: str) -> str:
             f'<div class="na-rname">{name}{team_logo_html(team, 16)}</div>'
             f'<div class="na-rmeta">{meta}</div>'
             f'</div>'
-            f'<div class="na-rscore">{row.get("per_game", 0)} {abbr}</div>'
+            f'<div class="na-rscore">{_rate_text(stat, row.get("per_game"))} {abbr}</div>'
             f'</div>')
 
 
@@ -418,13 +435,12 @@ def court_card_html(row: dict, bucket: str, stat: str) -> str:
     name = html.escape(str(row.get("player_name") or "Unknown"))
     team = str(row.get("team_abbrev") or "")
     chip = slot_chip(bucket) if bucket else ""
-    total = int(row.get("total") or 0)
     total_label = awards.STAT_LABELS.get(stat, stat).lower()
     tip = (f"{row.get('gp', 0)} GP · {row.get('mpg', 0)} MIN · "
            f"{row.get('ppg', 0)} PTS · {row.get('rpg', 0)} REB · "
            f"{row.get('apg', 0)} AST · {row.get('spg', 0)} STL · "
            f"{row.get('bpg', 0)} BLK{_shooting_fragments(row)} · "
-           f"{total:,} {total_label} total")
+           f"{_total_text(stat, row.get('total'))} {total_label} total")
     abbr = awards.STAT_ABBR.get(stat, stat.upper())
     profile = ("./4_Player_Profile?player="
                + quote(str(row.get("player_name") or ""), safe=""))
@@ -434,7 +450,7 @@ def court_card_html(row: dict, bucket: str, stat: str) -> str:
             f'{headshot_html(row.get("player_id"), team, 56)}'
             f'<div class="na-cname">{name}</div>'
             f'<div class="na-cteam">{team_logo_html(team, 14)}{team}{chip}</div>'
-            f'<div class="na-cstat">{row.get("per_game", 0)} {abbr}</div>'
+            f'<div class="na-cstat">{_rate_text(stat, row.get("per_game"))} {abbr}</div>'
             f'</div></a>')
 
 
@@ -491,6 +507,7 @@ def goat_row_html(row: dict) -> str:
     if gaps:
         labels = {"pts": "PTS", "reb": "REB", "ast": "AST",
                   "stl": "STL", "blk": "BLK", "fg3m": "3PM",
+                  "plus_minus": "+/-",
                   "honours": "honours", "peak": "peak",
                   "championships": "titles"}
         gap_text = " · no data: " + ", ".join(
@@ -498,8 +515,13 @@ def goat_row_html(row: dict) -> str:
     hscore = row.get("honours_score", row.get("awards_score"))
     pscore = row.get("peak_score")
     tscore = row.get("championships_score")
+    # Window-only career +/-: shown when the collected box scores cover the
+    # career (a missing one is already disclosed in the gaps line).
+    plus_minus = row.get("plus_minus")
+    pm_text = ("" if plus_minus is None
+               else f" · +/- {int(round(plus_minus)):+,}")
     meta = (f"{team} · {seasons_text} seasons · {row.get('gp', 0)} GP · "
-            f"{row.get('pts', 0):,} PTS · {row.get('ppg', 0)} PPG · "
+            f"{row.get('pts', 0):,} PTS · {row.get('ppg', 0)} PPG{pm_text} · "
             f"{rings_text} · {honours_text}")
     components = (f"prod {row.get('production', 0)} · "
                   f"honours {hscore if hscore is not None else '—'} · "
@@ -538,10 +560,15 @@ def profile_card_html(p: dict) -> str:
     rank = p.get("goat_rank")
     goat_text = (f" · GOAT #{int(rank)} ({p.get('goat_score')})"
                  if rank else "")
+    # Career +/- exists only where collected box scores do (ESPN's career
+    # statistics carry none): a real number, or an honest dash.
+    plus_minus = p.get("plus_minus")
+    pm_text = ("+/- —" if plus_minus is None
+               else f"+/- {int(round(plus_minus)):+,}")
     meta = (f"{seasons_text} seasons · {p.get('gp', 0):,} GP · "
             f"{p.get('pts', 0):,} PTS · {p.get('reb', 0):,} REB · "
-            f"{p.get('ast', 0):,} AST{debut_text} · {honours_text} · "
-            f"{rings_text}{goat_text}")
+            f"{p.get('ast', 0):,} AST · {pm_text}{debut_text} · "
+            f"{honours_text} · {rings_text}{goat_text}")
     return (f'<div class="na-race-row">'
             f'{headshot_html(p.get("player_id"), team, 64)}'
             f'<div class="na-rbody">'
@@ -1020,6 +1047,11 @@ def render_box_sides(rows: pd.DataFrame, meta: dict) -> None:
                 if col_name in table.columns:
                     table[col_name] = pd.to_numeric(
                         table[col_name], errors="coerce").astype("Int64")
+            if "plus_minus" in side.columns:
+                # +/- sits after the shooting splits (ESPN's own box order):
+                # DNP and missing values stay blank, never a fabricated 0.
+                table["+/-"] = pd.to_numeric(
+                    side["plus_minus"], errors="coerce").astype("Int64")
             st.dataframe(table, hide_index=True, width="stretch")
 
 

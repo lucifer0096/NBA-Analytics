@@ -22,7 +22,9 @@ team row (parse_teams):
 
 standing row (parse_standings):
     team_id, team, conference, wins, losses, win_percent,
-    playoff_seed, games_behind, streak, avg_points_for, avg_points_against
+    playoff_seed, games_behind, streak, avg_points_for, avg_points_against,
+    last_ten, differential -- the last two only when ESPN returns the stat
+    (absent keys, never zeros, otherwise)
 
 roster row (parse_roster):
     player_id, player_name, position, team_id
@@ -58,6 +60,10 @@ _STANDING_STATS = {
     "streak": ("streak", str),
     "avgPointsFor": ("avg_points_for", float),
     "avgPointsAgainst": ("avg_points_against", float),
+    # L10 form ("8-2") and per-game point differential ("+8.2", the team's
+    # +/-): verified live Sep 2026 against the standings endpoint.
+    "Last Ten Games": ("last_ten", str),
+    "differential": ("differential", float),
 }
 
 

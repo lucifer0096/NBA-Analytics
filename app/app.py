@@ -215,6 +215,15 @@ with tabs["Standings"]:
                 + table["losses"].astype("Int64").astype(str)
             )
             table["zone"] = table["playoff_seed"].map(_zone)
+            # Team +/- (per-game point differential) and last-ten form:
+            # signed text for the differential, blanks when ESPN omitted the
+            # stat -- never a fabricated zero.
+            if "differential" in table.columns:
+                table["+/-"] = table["differential"].map(
+                    lambda v: "" if v is None or pd.isna(v) else f"{v:+.1f}")
+            if "last_ten" in table.columns:
+                table["L10"] = table["last_ten"].map(
+                    lambda v: "" if v is None or pd.isna(v) else str(v))
             table.index = table.index + 1
             display = table.rename(columns={
                 "team": "Team", "win_percent": "Win%", "playoff_seed": "Seed",
@@ -222,7 +231,7 @@ with tabs["Standings"]:
                 "avg_points_against": "PA/g",
             })
             keep = ["zone", "Team", "record", "Win%", "Seed", "Streak",
-                    "PF/g", "PA/g"]
+                    "PF/g", "PA/g", "+/-", "L10"]
             display = display[[c for c in keep if c in display.columns]]
             st.dataframe(
                 display,
@@ -233,7 +242,8 @@ with tabs["Standings"]:
                     "record": st.column_config.TextColumn("W-L", width="small"),
                 },
             )
-        st.caption("🟢 top-6 (playoff) · 🟡 play-in (7–10)")
+        st.caption("🟢 top-6 (playoff) · 🟡 play-in (7–10) · "
+                   "+/- point differential per game · L10 last ten games")
 
 # ---------------------------------------------------------------------------
 # Schedule & Scores: today live + the selected season's results with scores

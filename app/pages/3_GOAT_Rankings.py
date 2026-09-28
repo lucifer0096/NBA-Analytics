@@ -44,7 +44,8 @@ else:
         f"honours, covering every season, not just this repo's "
         f"{window.get('seasons', 16)}-season collection window "
         f"({window.get('first', '2010-11')} → {window.get('last', '—')}, "
-        "which still supplies peak-season context). Qualified at "
+        "which still supplies peak-season context and the window-only "
+        "+/- inputs). Qualified at "
         f"≥{goat.get('min_career_gp', awards.GOAT_MIN_CAREER_GP)} career GP; "
         "career boards elsewhere additionally require ≥41 GP."
     )

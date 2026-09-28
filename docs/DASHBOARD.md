@@ -46,7 +46,10 @@ pages; dark theme ships in `.streamlit/config.toml`.
    season-aware help when no games are collected). The old Model
    validation KPI moved to the sidebar expander.
 3. **Standings**: conference tables, W-L combined, Win%, seed, streak,
-   PF/g, PA/g; playoff (🟢) and play-in (🟡) zone glyphs appear only when
+   PF/g, PA/g, team **+/-** (signed per-game point differential) and
+   **L10** (last-ten record) -- both parsed only when ESPN returns the
+   stat, so a missing value renders blank, never a fabricated zero;
+   playoff (🟢) and play-in (🟡) zone glyphs appear only when
    the table has real records (preseason all-zero tables get no marks). A
    season that hasn't tipped off says so; a failed live fetch over a
    mismatched committed copy shows no table at all, just a note naming
@@ -64,14 +67,15 @@ pages; dark theme ships in `.streamlit/config.toml`.
    sits the **Game detail: box score & play-by-play** picker (the
    NBA-app-style view): any fixture of the season, finished or upcoming,
    resolves live from ESPN's summary endpoint (cached 15 minutes) into
-   both teams' box-score lines with DNP rows marked plus a
+   both teams' box-score lines (the basic line through the **+/-**
+   column, DNP rows marked) plus a
    period/scoring-filterable play-by-play, while a not-yet-played fixture
    shows tip-off, status, venue and TV instead of pretending a box score
    exists. Unreachable ESPN degrades to a caption saying why -- the
    committed schedule carries scores, never per-player lines or PBP.
 5. **Awards Ladder**: the selected season's MVP / DPOY / 6th Man / MIP
    races in two columns, then a stat-leaders strip behind a
-   PTS/REB/AST/STL/BLK/**3PM** radio (top-10 per-game rates, each row
+   PTS/REB/AST/STL/BLK/**3PM**/**+/-** radio (top-10 per-game rates, each row
    carrying the FG/3P made-attempt splits + FG%). Every row is a real
    headshot over a team-logo CSS fallback with the race's stat line and
    score. Computed locally from the collected box scores
@@ -100,12 +104,15 @@ pages; dark theme ships in `.streamlit/config.toml`.
 Career totals across **all** collected seasons (2010-11 → 2025-26, the
 window stated honestly: the collector starts at 2010-11, so this is not
 full NBA history) behind a rank-by radio over counting boards
-(PTS/REB/AST/STL/BLK/3PM) and efficiency boards
+(PTS/REB/AST/STL/BLK/3PM/+/-) and efficiency boards
 (FG%/3P%/FT%/eFG%/TS%). The table shows the full parameter set: GP, MIN,
-PTS, REB/ORB/DREB, AST, STL, BLK, TO, FG/3P/FT made-attempt splits, and
-all five percentages. Qualified at ≥41 career GP; % boards additionally
-require an attempts floor (≥5 FGA/g, 3P ≥2 3PA/g, FT ≥1 FTA/g) so a 1-1
-shooter can't top FG%.
+PTS, REB/ORB/DREB, AST, STL, BLK, TO, +/-, FG/3P/FT made-attempt
+splits, and all five percentages. The +/- board and column sum only the
+collected box scores (ESPN's career statistics carry no +/- at all): a
+career the window never covered is left off that board and shows a
+blank cell, never an invented zero. Qualified at ≥41 career GP; %
+boards additionally require an attempts floor (≥5 FGA/g, 3P ≥2 3PA/g,
+FT ≥1 FTA/g) so a 1-1 shooter can't top FG%.
 
 ### GOAT Rankings (`app/pages/3_GOAT_Rankings.py`)
 
@@ -120,11 +127,15 @@ repo's collection window:
   for the Profile page. The source caption repeats the pool definition
   and the as-of stamp.
 - **Formula** (printed verbatim above the ladder, every weight on
-  screen): **35%** production (each of career PTS/REB/AST/STL/BLK/3PM
-  scored as a 50/50 blend of career total and per-game rate vs the
-  pool's best; a stat the career never had (impossible-zero totals,
-  pre-1974 STL/BLK, pre-1980 3PM) is dropped from his blend with the
-  rest rescaled), **30%** official honours (ESPN's 20 award types at
+  screen): **35%** production (each of career PTS/REB/AST/STL/BLK/3PM/+/-
+  at its printed share, scored as a 50/50 blend of career total and
+  per-game rate vs the pool's best; a stat the career never had
+  (impossible-zero totals, pre-1974 STL/BLK, pre-1980 3PM, no
+  collected-box-score game for +/-) is dropped from his blend with the
+  rest rescaled; +/- comes only from this repo's collected box scores
+  because ESPN's career statistics carry none -- so it starts with the
+  2010-11 window and a negative career +/- scores zero, never negative
+  credit), **30%** official honours (ESPN's 20 award types at
   points per win, MVP 6.0 down to Sixth Man-tier 0.5), **25%** peak
   (best season's per-game impact), **10%** championships (title count
   vs the pool's most among qualified players: champion-season rows plus
@@ -139,8 +150,10 @@ repo's collection window:
 - **Honest gaps.** A career ESPN can't fully cover shows `🏆 —` instead
   of a ring count and blanks seasons/peak with the reason (e.g. the
   champion index starts in 1970, or a career's season rows start too late
-  to trust); a missing component drops out of the score and the result
-  rescales over the weights that are available.
+  to trust); a career the collector's window never covered drops the +/-
+  input from the production blend (named in the row's "no data" line);
+  a missing component drops out of the score and the result rescales
+  over the weights that are available.
 - Explicitly labeled **not an official NBA ranking**. Each row carries
   honour chips heaviest-first (top 5, then "+N more") and the four
   component scores behind the headline number. Known ESPN quirks are

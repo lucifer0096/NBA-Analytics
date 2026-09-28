@@ -208,7 +208,8 @@ ATHLETE_TTL_DAYS = 7        # active players' career totals move with seasons
 STATIC_TTL_DAYS = 180       # retired careers barely move; still catches comebacks
 
 # ESPN career-split stat name -> our career-line key (awards.CAREER_SUM_STATS
-# plus gp/starts, which _career_row / _per_game / _impact read).
+# minus the window-only plus_minus, plus gp/starts, which _career_row /
+# _per_game / _impact read: ESPN's statistics/0 split has no +/- at all).
 _STAT_KEY = {
     "gamesPlayed": "gp",
     "gamesStarted": "starts",
@@ -228,7 +229,12 @@ _STAT_KEY = {
     "freeThrowsMade": "ftm",
     "freeThrowsAttempted": "fta",
 }
-_LINE_KEYS = ("gp", "starts", "minutes") + tuple(awards.CAREER_SUM_STATS)
+# Career-line keys. plus_minus is EXCLUDED even though awards.CAREER_SUM_STATS
+# carries it: ESPN's career statistics have no +/- (verified Sep 2026), so
+# including it would fabricate a 0 on EVERY ESPN line and -- via build_career's
+# history-over-window dict merge -- clobber the real collected-window total.
+_LINE_KEYS = ("gp", "starts", "minutes") + tuple(
+    key for key in awards.CAREER_SUM_STATS if key != "plus_minus")
 
 # Per-season log columns (compact arrays inside the cache/profile file):
 # year, team id, team abbrev, gp, min, pts, reb, ast, stl, blk, fg%, 3P%.
@@ -671,7 +677,8 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
     >=ALLTIME_MIN_GP. Returns:
 
     {"players": [career entries shaped like awards.alltime_players() rows,
-                 plus championships/seasons_log/line_source/debut],
+                 plus championships/seasons_log/line_source/debut and the
+                 collected-window +/- when he has one],
      "honours": {pid: {official award name: wins}},
      "champions": {end year: championship team id},
      "meta": counts for the caption, "stamp": ISO UTC}
@@ -700,6 +707,11 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
         window_entry = window_index.get(pid)
         name = bundle.get("name") or (window_entry or {}).get("player_name")
         line, source = _line_and_source(bundle, window_entry)
+        if line and window_entry and window_entry.get("plus_minus") is not None:
+            # ESPN lines never carry +/- (see _LINE_KEYS): keep the collected
+            # window's total on the entry so the profile cards and the GOAT
+            # merge read the same number the box scores produced.
+            line = {**line, "plus_minus": window_entry["plus_minus"]}
         if line and pid in OFFICIAL_REB_CAREER and not (line.get("reb") or 0):
             line = {**line, "reb": OFFICIAL_REB_CAREER[pid]}
             official_reb_lines += 1

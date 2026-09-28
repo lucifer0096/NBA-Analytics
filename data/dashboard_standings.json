@@ -7,12 +7,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 109.6,
    "avg_points_for": 117.8,
+   "differential": 8.2,
    "games_behind": "-",
    "losses": 22,
    "playoff_seed": 1,
    "streak": "W3",
    "win_percent": ".732",
-   "wins": 60
+   "wins": 60,
+   "last_ten": "8-2"
   },
   {
    "team_id": 1,
@@ -20,12 +22,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 116.0,
    "avg_points_for": 118.5,
+   "differential": 2.5,
    "games_behind": "14",
    "losses": 36,
    "playoff_seed": 6,
    "streak": "L1",
    "win_percent": ".561",
-   "wins": 46
+   "wins": 46,
+   "last_ten": "6-4"
   },
   {
    "team_id": 2,
@@ -33,12 +37,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 107.2,
    "avg_points_for": 114.9,
+   "differential": 7.7,
    "games_behind": "4",
    "losses": 26,
    "playoff_seed": 2,
    "streak": "W2",
    "win_percent": ".683",
-   "wins": 56
+   "wins": 56,
+   "last_ten": "8-2"
   },
   {
    "team_id": 20,
@@ -46,12 +52,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 116.1,
    "avg_points_for": 115.9,
+   "differential": -0.2,
    "games_behind": "15",
    "losses": 37,
    "playoff_seed": 7,
    "streak": "W2",
    "win_percent": ".549",
-   "wins": 45
+   "wins": 45,
+   "last_ten": "6-4"
   },
   {
    "team_id": 19,
@@ -59,12 +67,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 115.1,
    "avg_points_for": 115.7,
+   "differential": 0.6,
    "games_behind": "15",
    "losses": 37,
    "playoff_seed": 8,
    "streak": "L1",
    "win_percent": ".549",
-   "wins": 45
+   "wins": 45,
+   "last_ten": "7-3"
   },
   {
    "team_id": 28,
@@ -72,12 +82,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 111.8,
    "avg_points_for": 114.6,
+   "differential": 2.8,
    "games_behind": "14",
    "losses": 36,
    "playoff_seed": 5,
    "streak": "W1",
    "win_percent": ".561",
-   "wins": 46
+   "wins": 46,
+   "last_ten": "6-4"
   },
   {
    "team_id": 5,
@@ -85,12 +97,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 115.4,
    "avg_points_for": 119.5,
+   "differential": 4.1,
    "games_behind": "8",
    "losses": 30,
    "playoff_seed": 4,
    "streak": "W1",
    "win_percent": ".634",
-   "wins": 52
+   "wins": 52,
+   "last_ten": "7-3"
   },
   {
    "team_id": 18,
@@ -98,12 +112,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 110.1,
    "avg_points_for": 116.5,
+   "differential": 6.4,
    "games_behind": "7",
    "losses": 29,
    "playoff_seed": 3,
    "streak": "L1",
    "win_percent": ".646",
-   "wins": 53
+   "wins": 53,
+   "last_ten": "6-4"
   },
   {
    "team_id": 14,
@@ -111,12 +127,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 118.5,
    "avg_points_for": 120.9,
+   "differential": 2.4,
    "games_behind": "17",
    "losses": 39,
    "playoff_seed": 10,
    "streak": "W2",
    "win_percent": ".524",
-   "wins": 43
+   "wins": 43,
+   "last_ten": "5-5"
   },
   {
    "team_id": 30,
@@ -124,12 +142,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 111.2,
    "avg_points_for": 116.0,
+   "differential": 4.8,
    "games_behind": "16",
    "losses": 38,
    "playoff_seed": 9,
    "streak": "W1",
    "win_percent": ".537",
-   "wins": 44
+   "wins": 44,
+   "last_ten": "6-4"
   },
   {
    "team_id": 27,
@@ -137,12 +157,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 124.9,
    "avg_points_for": 112.9,
+   "differential": -12.0,
    "games_behind": "43",
    "losses": 65,
    "playoff_seed": 15,
    "streak": "L10",
    "win_percent": ".207",
-   "wins": 17
+   "wins": 17,
+   "last_ten": "0-10"
   },
   {
    "team_id": 11,
@@ -150,12 +172,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 120.4,
    "avg_points_for": 112.4,
+   "differential": -8.0,
    "games_behind": "41",
    "losses": 63,
    "playoff_seed": 14,
    "streak": "L2",
    "win_percent": ".232",
-   "wins": 19
+   "wins": 19,
+   "last_ten": "3-7"
   },
   {
    "team_id": 17,
@@ -163,12 +187,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 115.9,
    "avg_points_for": 105.9,
+   "differential": -10.0,
    "games_behind": "40",
    "losses": 62,
    "playoff_seed": 13,
    "streak": "L3",
    "win_percent": ".244",
-   "wins": 20
+   "wins": 20,
+   "last_ten": "3-7"
   },
   {
    "team_id": 4,
@@ -176,12 +202,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 121.5,
    "avg_points_for": 116.3,
+   "differential": -5.2,
    "games_behind": "29",
    "losses": 51,
    "playoff_seed": 12,
    "streak": "L2",
    "win_percent": ".378",
-   "wins": 31
+   "wins": 31,
+   "last_ten": "2-8"
   },
   {
    "team_id": 15,
@@ -189,12 +217,14 @@
    "conference": "Eastern Conference",
    "avg_points_against": 116.8,
    "avg_points_for": 110.6,
+   "differential": -6.2,
    "games_behind": "28",
    "losses": 50,
    "playoff_seed": 11,
    "streak": "L1",
    "win_percent": ".390",
-   "wins": 32
+   "wins": 32,
+   "last_ten": "3-7"
   },
   {
    "team_id": 13,
@@ -202,12 +232,14 @@
    "conference": "Western Conference",
    "avg_points_against": 114.6,
    "avg_points_for": 116.3,
+   "differential": 1.7,
    "games_behind": "11",
    "losses": 29,
    "playoff_seed": 4,
    "streak": "W3",
    "win_percent": ".646",
-   "wins": 53
+   "wins": 53,
+   "last_ten": "7-3"
   },
   {
    "team_id": 24,
@@ -215,12 +247,14 @@
    "conference": "Western Conference",
    "avg_points_against": 111.5,
    "avg_points_for": 119.8,
+   "differential": 8.3,
    "games_behind": "2",
    "losses": 20,
    "playoff_seed": 2,
    "streak": "L1",
    "win_percent": ".756",
-   "wins": 62
+   "wins": 62,
+   "last_ten": "8-2"
   },
   {
    "team_id": 22,
@@ -228,12 +262,14 @@
    "conference": "Western Conference",
    "avg_points_against": 115.8,
    "avg_points_for": 115.5,
+   "differential": -0.3,
    "games_behind": "22",
    "losses": 40,
    "playoff_seed": 7,
    "streak": "W2",
    "win_percent": ".512",
-   "wins": 42
+   "wins": 42,
+   "last_ten": "7-3"
   },
   {
    "team_id": 21,
@@ -241,12 +277,14 @@
    "conference": "Western Conference",
    "avg_points_against": 111.1,
    "avg_points_for": 112.6,
+   "differential": 1.5,
    "games_behind": "19",
    "losses": 37,
    "playoff_seed": 8,
    "streak": "W1",
    "win_percent": ".549",
-   "wins": 45
+   "wins": 45,
+   "last_ten": "5-5"
   },
   {
    "team_id": 16,
@@ -254,12 +292,14 @@
    "conference": "Western Conference",
    "avg_points_against": 114.6,
    "avg_points_for": 118.0,
+   "differential": 3.4,
    "games_behind": "15",
    "losses": 33,
    "playoff_seed": 6,
    "streak": "W2",
    "win_percent": ".598",
-   "wins": 49
+   "wins": 49,
+   "last_ten": "5-5"
   },
   {
    "team_id": 10,
@@ -267,12 +307,14 @@
    "conference": "Western Conference",
    "avg_points_against": 110.0,
    "avg_points_for": 115.2,
+   "differential": 5.2,
    "games_behind": "12",
    "losses": 30,
    "playoff_seed": 5,
    "streak": "W1",
    "win_percent": ".634",
-   "wins": 52
+   "wins": 52,
+   "last_ten": "9-1"
   },
   {
    "team_id": 7,
@@ -280,12 +322,14 @@
    "conference": "Western Conference",
    "avg_points_against": 116.9,
    "avg_points_for": 122.1,
+   "differential": 5.2,
    "games_behind": "10",
    "losses": 28,
    "playoff_seed": 3,
    "streak": "W12",
    "win_percent": ".659",
-   "wins": 54
+   "wins": 54,
+   "last_ten": "10-0"
   },
   {
    "team_id": 9,
@@ -293,12 +337,14 @@
    "conference": "Western Conference",
    "avg_points_against": 115.2,
    "avg_points_for": 114.6,
+   "differential": -0.6,
    "games_behind": "27",
    "losses": 45,
    "playoff_seed": 10,
    "streak": "L3",
    "win_percent": ".451",
-   "wins": 37
+   "wins": 37,
+   "last_ten": "3-7"
   },
   {
    "team_id": 12,
@@ -306,12 +352,14 @@
    "conference": "Western Conference",
    "avg_points_against": 112.6,
    "avg_points_for": 113.8,
+   "differential": 1.2,
    "games_behind": "22",
    "losses": 40,
    "playoff_seed": 9,
    "streak": "W1",
    "win_percent": ".512",
-   "wins": 42
+   "wins": 42,
+   "last_ten": "6-4"
   },
   {
    "team_id": 23,
@@ -319,12 +367,14 @@
    "conference": "Western Conference",
    "avg_points_against": 121.0,
    "avg_points_for": 111.0,
+   "differential": -10.0,
    "games_behind": "42",
    "losses": 60,
    "playoff_seed": 14,
    "streak": "L1",
    "win_percent": ".268",
-   "wins": 22
+   "wins": 22,
+   "last_ten": "3-7"
   },
   {
    "team_id": 26,
@@ -332,12 +382,14 @@
    "conference": "Western Conference",
    "avg_points_against": 126.0,
    "avg_points_for": 117.6,
+   "differential": -8.4,
    "games_behind": "42",
    "losses": 60,
    "playoff_seed": 15,
    "streak": "L1",
    "win_percent": ".268",
-   "wins": 22
+   "wins": 22,
+   "last_ten": "1-9"
   },
   {
    "team_id": 29,
@@ -345,12 +397,14 @@
    "conference": "Western Conference",
    "avg_points_against": 120.7,
    "avg_points_for": 114.7,
+   "differential": -6.0,
    "games_behind": "39",
    "losses": 57,
    "playoff_seed": 13,
    "streak": "L8",
    "win_percent": ".305",
-   "wins": 25
+   "wins": 25,
+   "last_ten": "1-9"
   },
   {
    "team_id": 3,
@@ -358,12 +412,14 @@
    "conference": "Western Conference",
    "avg_points_against": 120.0,
    "avg_points_for": 115.5,
+   "differential": -4.5,
    "games_behind": "38",
    "losses": 56,
    "playoff_seed": 11,
    "streak": "L2",
    "win_percent": ".317",
-   "wins": 26
+   "wins": 26,
+   "last_ten": "1-9"
   },
   {
    "team_id": 6,
@@ -371,12 +427,14 @@
    "conference": "Western Conference",
    "avg_points_against": 119.6,
    "avg_points_for": 114.1,
+   "differential": -5.5,
    "games_behind": "38",
    "losses": 56,
    "playoff_seed": 12,
    "streak": "W1",
    "win_percent": ".317",
-   "wins": 26
+   "wins": 26,
+   "last_ten": "3-7"
   },
   {
    "team_id": 25,
@@ -384,14 +442,16 @@
    "conference": "Western Conference",
    "avg_points_against": 107.9,
    "avg_points_for": 119.0,
+   "differential": 11.1,
    "games_behind": "-",
    "losses": 18,
    "playoff_seed": 1,
    "streak": "L2",
    "win_percent": ".780",
-   "wins": 64
+   "wins": 64,
+   "last_ten": "7-3"
   }
  ],
- "_generated_utc": "2026-09-28T04:03:05Z",
+ "_generated_utc": "2026-09-28T06:08:03Z",
  "source": "espn"
 }

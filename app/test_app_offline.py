@@ -71,10 +71,21 @@ def test_home_page_renders_offline(offline_espn):
 
 def test_home_page_falls_back_to_committed_data(offline_espn):
     """With live calls dead, committed fallbacks still feed the page: the
-    freshness caption must say 'Offline fallback', never crash."""
+    freshness caption must say 'Offline fallback', never crash -- and the
+    committed standings table carries its team +/- and L10 columns."""
     at = _render("app/app.py", offline_espn)
     captions = " ".join(str(c.value) for c in at.caption)
     assert "Offline fallback" in captions or "fallback" in captions.lower()
+    frames = [df.value for df in at.dataframe
+              if hasattr(getattr(df, "value", None), "columns")]
+    standings = next((f for f in frames if "Win%" in list(f.columns)), None)
+    assert standings is not None, "committed standings table must render"
+    columns = list(standings.columns)
+    assert "+/-" in columns and "L10" in columns
+    # Signed differential text, not raw floats (a missing stat would be ''
+    # rather than 0.0 -- committed rows carry the live values).
+    diffs = [v for v in standings["+/-"].tolist() if v != ""]
+    assert diffs and all(str(v).startswith(("+", "-")) for v in diffs)
 
 
 def test_sidebar_mentions_model_and_history(offline_espn):
@@ -131,6 +142,18 @@ def test_alltime_page_shows_career_board_and_honesty(offline_espn):
     name = str(pts_rows[0].get("player_name") or "")
     frames = " ".join(str(getattr(df, "value", "")) for df in at.dataframe)
     assert name and name in frames
+    # The window-only +/- board is selectable and ranks its covered
+    # careers (blank/absent otherwise, never a fabricated zero board).
+    pm_rows = (((payload.get("alltime") or {}).get("leaders") or {})
+               .get("plus_minus") or [])
+    if not pm_rows:
+        pytest.skip("no +/- board in the committed payload yet")
+    at.radio[0].set_value("plus_minus").run()
+    assert not at.exception
+    captions = " ".join(str(c.value) for c in at.caption)
+    assert "collected box scores" in captions  # window-only explanation
+    frames = " ".join(str(getattr(df, "value", "")) for df in at.dataframe)
+    assert str(pm_rows[0].get("player_name") or "") in frames
 
 
 def test_goat_page_shows_ladder_and_verbatim_formula(offline_espn):
@@ -146,6 +169,8 @@ def test_goat_page_shows_ladder_and_verbatim_formula(offline_espn):
     assert "GOAT score =" in text
     assert "not an official nba ranking" in captions.lower()
     assert str(goat_rows[0].get("player_name") or "") in text
+    # The committed formula is the CURRENT one (weighted +/- included).
+    assert "+/-" in captions
 
 
 def test_profile_page_renders_cards_accolades_and_chart(offline_espn):
@@ -167,6 +192,10 @@ def test_profile_page_renders_cards_accolades_and_chart(offline_espn):
         str(c.value) for c in at.caption)
     assert "Official accolades" in text
     assert "Career progression" in text
+    # The profile card shows career +/- when the history entries carry the
+    # collected-window total (the window-only stat's second pipeline).
+    if any(v.get("plus_minus") is not None for v in players.values()):
+        assert "+/-" in text
     top = [p for p in players.values() if p.get("goat_rank") == 1]
     if top:
         assert str(top[0].get("player_name")) in text
@@ -377,11 +406,13 @@ def test_schedule_game_detail_renders_box_and_pbp(offline_espn, monkeypatch):
         {"game_id": 1, "team_id": 2, "player_id": 10,
          "player_name": "Star Guy", "did_not_play": False, "min": 36,
          "pts": 30, "reb": 8, "ast": 5, "stl": 1, "blk": 0, "to": 2,
+         "plus_minus": 12,
          "fgm": 11, "fga": 20, "fg3m": 4, "fg3a": 10, "ftm": 4, "fta": 5},
         {"game_id": 1, "team_id": 7, "player_id": 11,
          "player_name": "Bench Guy", "did_not_play": True, "min": None,
          "pts": None, "reb": None, "ast": None, "stl": None, "blk": None,
-         "to": None, "fgm": None, "fga": None, "fg3m": None, "fg3a": None,
+         "to": None, "plus_minus": None,
+         "fgm": None, "fga": None, "fg3m": None, "fg3a": None,
          "ftm": None, "fta": None},
     ]
     plays = [
@@ -403,6 +434,12 @@ def test_schedule_game_detail_renders_box_and_pbp(offline_espn, monkeypatch):
     assert "Period" in select_labels  # PBP period filter reached the screen
     assert len(list(getattr(at, "dataframe", []))) >= 3  # 2 box + PBP
     assert len(at.warning) == 0
+    # The box tables carry the +/- column (a MIN column scopes them apart
+    # from the standings frame, which has its own team +/-).
+    frames = [df.value for df in at.dataframe
+              if hasattr(getattr(df, "value", None), "columns")]
+    assert any("+/-" in list(f.columns) and "MIN" in list(f.columns)
+               for f in frames)
 
 
 def test_schedule_game_detail_upcoming_shows_fixture_info(

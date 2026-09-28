@@ -177,6 +177,29 @@ def test_parse_standings_2024_25_fixture():
     assert len(ids) == len(set(ids))
 
 
+def test_parse_standings_last_ten_and_differential():
+    """L10 form and the team's +/- (per-game point differential) parse
+    under ESPN's exact stat names, verified live Sep 2026. The minimal
+    committed fixture predates both stats, so absent stats stay ABSENT --
+    the row carries no fabricated zeros."""
+    rows = parsing.parse_standings(_load("standings_2024-25.json"))
+    assert all("last_ten" not in r and "differential" not in r
+               for r in rows)
+    entry = {
+        "team": {"id": 5, "displayName": "Cleveland Cavaliers"},
+        "stats": [
+            {"name": "wins", "displayValue": "64"},
+            {"name": "Last Ten Games", "displayValue": "8-2"},
+            {"name": "differential", "displayValue": "+8.2"},
+            {"name": "streak", "displayValue": "W3"},
+        ],
+    }
+    row = parsing._parse_standing_entry(entry, "Eastern Conference")
+    assert row["wins"] == 64 and row["streak"] == "W3"
+    assert row["last_ten"] == "8-2"
+    assert row["differential"] == 8.2
+
+
 # ---------------------------------------------------------------------------
 # roster
 # ---------------------------------------------------------------------------

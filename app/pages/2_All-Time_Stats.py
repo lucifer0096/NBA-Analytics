@@ -48,6 +48,15 @@ else:
         format_func=lambda k: (f"{awards.STAT_LABELS.get(k, k)} "
                                f"({awards.STAT_ABBR.get(k, k)})"),
     )
+    if stat == "plus_minus":
+        st.caption(
+            "Career +/- sums only the collected box scores "
+            f"({window.get('first', '2010-11')} → "
+            f"{window.get('last', '—')}); ESPN's career statistics carry "
+            "no +/-, so careers outside the collector's window aren't "
+            "ranked here (blanks in other boards' +/- column mean the "
+            "same thing)."
+        )
     frame = pd.DataFrame(career_leaders.get(stat) or [])
     if frame.empty:
         st.caption(
@@ -57,6 +66,10 @@ else:
     else:
         for col in ("fgp", "fg3p", "ftp", "efg", "ts"):
             frame[col] = pd.to_numeric(frame[col], errors="coerce")
+        if "plus_minus" in frame.columns:
+            # None (career outside the window) stays blank, never 0.
+            frame["plus_minus"] = pd.to_numeric(
+                frame["plus_minus"], errors="coerce").astype("Int64")
         frame["FG"] = (frame["fgm"].astype(int).astype(str) + "-"
                        + frame["fga"].astype(int).astype(str))
         frame["3P"] = (frame["fg3m"].astype(int).astype(str) + "-"
@@ -68,11 +81,12 @@ else:
             "seasons": "Seas", "gp": "GP", "minutes": "MIN",
             "pts": "PTS", "reb": "REB", "oreb": "ORB", "dreb": "DREB",
             "ast": "AST", "stl": "STL", "blk": "BLK", "to": "TO",
+            "plus_minus": "+/-",
             "fgp": "FG%", "fg3p": "3P%", "ftp": "FT%",
             "efg": "eFG%", "ts": "TS%",
         })
         keep = ["", "Player", "Team", "Seas", "GP", "MIN", "PTS", "REB",
-                "ORB", "DREB", "AST", "STL", "BLK", "TO", "FG", "FG%",
+                "ORB", "DREB", "AST", "STL", "BLK", "TO", "+/-", "FG", "FG%",
                 "3P", "3P%", "FT", "FT%", "eFG%", "TS%"]
         st.dataframe(
             display[[c for c in keep if c in display.columns]],

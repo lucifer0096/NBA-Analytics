@@ -261,8 +261,20 @@ def test_alltime_rows_boards_and_qualifiers():
     assert fgp_names == ["Efficient", "Volume"]
     # Every row carries the full parameter set for the dashboard table.
     row = boards["pts"][0]
-    for field in ("oreb", "dreb", "to", "ftm", "fta", "minutes", "efg", "ts"):
+    for field in ("oreb", "dreb", "to", "ftm", "fta", "minutes", "efg", "ts",
+                  "plus_minus"):
         assert field in row
+    # Window-only stat: the fixtures never played a collected game, so the
+    # column is None -- NOT a fabricated zero the board could rank by.
+    assert row["plus_minus"] is None
+    assert boards["plus_minus"] == []
+    # With a real collected total the board ranks it; careers without one
+    # stay off it entirely (same alltime_rows call, one player covered).
+    covered = players + [_player(5, "Window", "GSW", gp=82, pts=1000,
+                                 plus_minus=150)]
+    pm_board = awards.alltime_rows(covered)["plus_minus"]
+    assert [r["player_name"] for r in pm_board] == ["Window"]
+    assert pm_board[0]["plus_minus"] == 150
 
 
 def test_goat_rows_formula_titles_and_career_gate():
@@ -321,6 +333,47 @@ def test_goat_formula_prints_every_weight_verbatim():
     assert len(awards.GOAT_HONOURS_WEIGHTS) == 20
     assert "rescaled" in formula
     assert f"≥{awards.GOAT_MIN_CAREER_GP} career games" in formula
+    # Production weights are shares of one component: they must sum to 100%
+    # or the printed percentages would not describe the math.
+    assert abs(sum(awards.GOAT_PRODUCTION_WEIGHTS.values()) - 1.0) < 1e-9
+    # The window-only nature of +/- and its zero floor are on screen too.
+    assert "collected box scores" in formula
+    assert "negative credit" in formula
+
+
+def test_goat_rows_plus_minus_is_weighted_floored_and_gapped():
+    """+/- is a weighted production stat with two honest rules: a positive
+    career total earns credit against the pool's best, a negative one
+    floors at zero (never negative credit), and a career with no collected
+    box-score game drops the stat -- named in data_gaps -- instead of
+    being scored a zero it never earned."""
+    star = _player(1, "Star", "BOS", gp=164, pts=4000, reb=1000, ast=1000,
+                   plus_minus=800)
+    sink = _player(2, "Sink", "DET", gp=164, pts=4000, reb=1000, ast=1000,
+                   plus_minus=-400)
+    outsider = _player(3, "Outsider", "MIA", gp=164, pts=4000, reb=1000,
+                       ast=1000)
+    rows = {r["player_name"]: r for r in awards.goat_rows(
+        [star, sink, outsider])}
+    # Identical PTS/REB/AST, only the window +/- differs.
+    w = awards.GOAT_PRODUCTION_WEIGHTS
+    assert rows["Star"]["production"] == 100.0
+    # Sink's negative career floors at 0 on that stat: the other kept
+    # weights (.35+.15+.15) over his kept total (.75) decide his score.
+    expected_sink = 100.0 * (w["pts"] + w["reb"] + w["ast"]) / (
+        w["pts"] + w["reb"] + w["ast"] + w["plus_minus"])
+    assert abs(rows["Sink"]["production"] - expected_sink) <= 0.15
+    assert rows["Sink"]["production"] < rows["Star"]["production"]
+    # The outsider's gap drops + rescales over what he has: no punishment
+    # for careers this repo's window never covered.
+    assert rows["Outsider"]["production"] == rows["Star"]["production"]
+    assert "plus_minus" in rows["Outsider"]["data_gaps"]
+    assert "plus_minus" not in rows["Star"]["data_gaps"]
+    # A real negative total is data, not a gap -- it floors, it doesn't hide.
+    assert "plus_minus" not in rows["Sink"]["data_gaps"]
+    assert rows["Star"]["plus_minus"] == 800
+    assert rows["Sink"]["plus_minus"] == -400
+    assert rows["Outsider"]["plus_minus"] is None
 
 
 def test_goat_rows_drop_untrusted_components_and_rescale():
@@ -410,12 +463,15 @@ def test_goat_rows_production_blends_rates_and_drops_untracked_era():
     rows = {r["player_name"]: r for r in awards.goat_rows(
         [longevity, sharp], honours)}
     old = rows["Longevity"]
-    # untracked-era drops are disclosed on the row
+    # untracked-era drops are disclosed on the row -- and so is the
+    # window-only +/- the fixtures never earned (no collected game).
     assert {"stl", "blk", "fg3m"} <= set(old["data_gaps"])
-    # Hand-computed blend: kept = PTS/REB/AST (.40/.15/.15 of the
-    # component). Pool maxes: totals 24000/6000/6000, rates 20/5/5 vs
+    assert "plus_minus" in old["data_gaps"]
+    # Hand-computed blend: kept = PTS/REB/AST (.35/.15/.15 of the
+    # component; +/- dropped as a gap, stl/blk/3pm untracked-era).
+    # Pool maxes: totals 24000/6000/6000, rates 20/5/5 vs
     # Sharp's 30/7.5/7.5. Every kept share = .5*1 + .5*(2/3) = .8333.
-    expected = 100.0 * (0.40 + 0.15 + 0.15) * (0.5 + 0.5 * (20 / 30)) / 0.70
+    expected = 100.0 * (0.35 + 0.15 + 0.15) * (0.5 + 0.5 * (20 / 30)) / 0.65
     assert abs(old["production"] - expected) <= 0.15
     # a shorter, higher-rate career earns more per game than totals give
     # Longevity: rate credit is real, not an afterthought
