@@ -179,11 +179,19 @@ repo's collection window:
 
 ### Player Profile (`app/pages/4_Player_Profile.py`)
 
-Up to four players (defaults to the GOAT top four) on **one screen**:
+Up to four players (defaults to the GOAT top four), each section at full
+width so nothing is squeezed or hidden:
 
-- **Career cards** in a 2×2 grid beside a height-capped **Official
-  accolades** table (wins per ESPN award type × the GOAT formula's
-  honour weight, with the "not in ESPN's API" honesty caption).
+- **Career cards** in a 2×2 grid, two meta lines each (career totals +
+  window +/- on the lead line, then debut / honours with points / rings
+  / GOAT rank) instead of one 140-character line that wrapped into
+  unreadable micro-text.
+- **Official accolades** as a pivot: one row per ESPN award type at the
+  GOAT formula's honour weight (sorted heaviest first), one column per
+  selected player, cells = that player's wins with BLANK where he never
+  won it (never a zero), and the height sized to the rows so every
+  honour is visible -- no scrollbar hiding rows -- plus the "not in
+  ESPN's API" honesty caption.
 - **Career progression**: an interactive plotly chart with metrics
   PTS/REB/AST/STL/BLK/MIN/FG%/3P%, per-game or season totals
   (percentages ignore the toggle). The x-axis is a **categorical season

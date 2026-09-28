@@ -134,6 +134,9 @@ div[data-testid="stMetric"] {
 .na-race-row .na-rmeta {
   opacity: 0.7; font-size: 0.8rem; margin-top: 2px;
 }
+.na-race-row .na-rmeta.na-rlead {
+  opacity: 0.92; font-size: 0.85rem; font-weight: 600;
+}
 .na-race-row .na-rscore {
   margin-left: auto; font-weight: 800; font-size: 1.05rem;
   color: var(--na-gold); white-space: nowrap;
@@ -556,8 +559,11 @@ def goat_row_html(row: dict) -> str:
 
 def profile_card_html(p: dict) -> str:
     """Player Profile header card: large headshot (team-logo CSS fallback
-    behind it), name + team logo, career line, official-honour tally with
-    points, championship count and -- if he made the ladder -- GOAT rank.
+    behind it), name + team logo, then TWO meta lines instead of one
+    140-character wall -- line 1 the career totals (+/- window value),
+    line 2 debut, official-honour tally with points, championships and
+    the GOAT rank if he made the ladder. Each line is ~60-70 chars so it
+    fits a half-width card without wrapping into unreadable micro-text.
 
     Single logical line -- see race_row_html's docstring."""
     name = html.escape(str(p.get("player_name") or "Unknown"))
@@ -566,7 +572,7 @@ def profile_card_html(p: dict) -> str:
     rings_text = "🏆 —" if rings is None else f"🏆×{int(rings)}"
     seasons = p.get("seasons")
     seasons_text = "—" if seasons is None else str(int(seasons))
-    debut_text = f" · debut {p['debut']}" if p.get("debut") else ""
+    debut_text = f"debut {p['debut']} · " if p.get("debut") else ""
     honours = p.get("honours") or {}
     honour_count = int(sum(honours.values()))
     honours_text = (f"{honour_count} official honours "
@@ -580,15 +586,16 @@ def profile_card_html(p: dict) -> str:
     plus_minus = p.get("plus_minus")
     pm_text = ("+/- —" if plus_minus is None
                else f"+/- {int(round(plus_minus)):+,}")
-    meta = (f"{seasons_text} seasons · {p.get('gp', 0):,} GP · "
-            f"{p.get('pts', 0):,} PTS · {p.get('reb', 0):,} REB · "
-            f"{p.get('ast', 0):,} AST · {pm_text}{debut_text} · "
-            f"{honours_text} · {rings_text}{goat_text}")
+    stats_line = (f"{seasons_text} seasons · {p.get('gp', 0):,} GP · "
+                  f"{p.get('pts', 0):,} PTS · {p.get('reb', 0):,} REB · "
+                  f"{p.get('ast', 0):,} AST · {pm_text}")
+    honours_line = f"{debut_text}{honours_text} · {rings_text}{goat_text}"
     return (f'<div class="na-race-row">'
             f'{headshot_html(p.get("player_id"), team, 64)}'
             f'<div class="na-rbody">'
             f'<div class="na-rname">{name}{team_logo_html(team, 18)}</div>'
-            f'<div class="na-rmeta">{meta}</div>'
+            f'<div class="na-rmeta na-rlead">{stats_line}</div>'
+            f'<div class="na-rmeta">{honours_line}</div>'
             f'</div>'
             f'</div>')
 

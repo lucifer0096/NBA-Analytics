@@ -1,9 +1,12 @@
 """NBA Analytics -- Player Profile page.
 
-Everything fits on ONE screen: pick up to four players, then career cards
-(2 x 2 grid) sit BESIDE the official-accolades table, and the interactive
-career-progression chart closes the page with its metric/scale controls in
-a single row.
+Pick up to four players, then the career cards (2 x 2 grid) and the
+official-accolades table each get the FULL page width: cards so the two
+meta lines fit without wrapping into micro-text, the table as a pivot
+(one row per ESPN award type, one column per player) tall enough for
+EVERY row -- the old half-width, height-capped table hid most of its
+rows behind a scrollbar. The interactive career-progression chart closes
+the page with its metric/scale controls in a single row.
 
 The chart's x-axis is a categorical season axis (plotly would otherwise
 parse '2003-04' as a date and tick every 3 months instead of once per
@@ -72,47 +75,52 @@ if not selected:
     shared.render_fallback_warnings()
     st.stop()
 
-# Cards and accolades share one row so the chart stays above the fold.
-cards_col, honours_col = st.columns(2, gap="large")
-with cards_col:
-    shared.section("Career cards")
-    grid = [st.columns(2) for _ in range((len(selected) + 1) // 2)]
-    for i, name in enumerate(selected):
-        with grid[i // 2][i % 2]:
-            st.markdown(shared.profile_card_html(by_name[name]),
-                        unsafe_allow_html=True)
+# Cards and the accolades pivot each take the FULL page width: the card's
+# two meta lines only read well with ~430px of text box, and the old
+# half-width, height-capped table showed 8 of its 40 rows behind a
+# scrollbar. One row per award type bounds the pivot at ESPN's 20 types.
+shared.section("Career cards")
+grid = [st.columns(2) for _ in range((len(selected) + 1) // 2)]
+for i, name in enumerate(selected):
+    with grid[i // 2][i % 2]:
+        st.markdown(shared.profile_card_html(by_name[name]),
+                    unsafe_allow_html=True)
 
-with honours_col:
-    shared.section("Official accolades")
-    accolade_rows = []
+shared.section("Official accolades")
+honours_by_award: dict = {}
+for name in selected:
+    for award_name, count in (by_name[name].get("honours") or {}).items():
+        honours_by_award.setdefault(award_name, {})[name] = int(count)
+if honours_by_award:
+    award_keys = sorted(
+        honours_by_award,
+        key=lambda k: (-awards.GOAT_HONOURS_WEIGHTS.get(k, 0.0),
+                       awards.GOAT_HONOUR_LABELS.get(k, k)))
+    rows = []
+    for award_name in award_keys:
+        row = {"Honour": awards.GOAT_HONOUR_LABELS.get(award_name,
+                                                       award_name),
+               "Pts each": awards.GOAT_HONOURS_WEIGHTS.get(award_name, 0.0)}
+        for name in selected:
+            row[name] = honours_by_award[award_name].get(name)
+        rows.append(row)
+    table = pd.DataFrame(rows)
     for name in selected:
-        honours = by_name[name].get("honours") or {}
-        for award_name, count in sorted(
-                honours.items(),
-                key=lambda kv: (-awards.GOAT_HONOURS_WEIGHTS.get(kv[0], 0.0),
-                                kv[0])):
-            weight = awards.GOAT_HONOURS_WEIGHTS.get(award_name, 0.0)
-            accolade_rows.append({
-                "Player": name,
-                "Honour": awards.GOAT_HONOUR_LABELS.get(award_name,
-                                                         award_name),
-                "Wins": int(count),
-                "Pts each": weight,
-                "Pts total": round(weight * count, 2),
-            })
-    if accolade_rows:
-        st.dataframe(pd.DataFrame(accolade_rows), width="stretch",
-                     height=min(40 + 36 * len(accolade_rows), 300),
-                     hide_index=True)
-        st.caption(
-            "ESPN's 20 official award types at the GOAT formula's weights; "
-            "All-Star selections aren't in ESPN's awards API at all, so "
-            "never shown or scored; 🏆 rings come from indexed champion "
-            "seasons or the verified official record."
-        )
-    else:
-        st.caption("No official honours for this selection in ESPN's "
-                   "awards API.")
+        # An award the player never won stays BLANK (pd.NA), never a 0.
+        table[name] = table[name].astype("Int64")
+    st.dataframe(table, width="stretch",
+                 height=40 + 36 * len(table), hide_index=True)
+    st.caption(
+        "Cell = that player's wins of the award; points are Pts each × "
+        "wins (blank where ESPN's API returned no award, never a zero). "
+        "ESPN's 20 official award types at the GOAT formula's weights; "
+        "All-Star selections aren't in ESPN's awards API at all, so "
+        "never shown or scored; 🏆 rings come from indexed champion "
+        "seasons or the verified official record."
+    )
+else:
+    st.caption("No official honours for this selection in ESPN's "
+               "awards API.")
 
 shared.section("Career progression")
 metric_col, scale_col, axis_col = st.columns([3, 1, 1])

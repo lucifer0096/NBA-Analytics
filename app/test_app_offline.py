@@ -202,6 +202,24 @@ def test_profile_page_renders_cards_accolades_and_chart(offline_espn):
     top = [p for p in players.values() if p.get("goat_rank") == 1]
     if top:
         assert str(top[0].get("player_name")) in text
+    # Each card carries TWO meta lines (career totals, then debut/honours/
+    # rings/rank) instead of one 140-character wall of micro-text.
+    card_html = [str(m.value) for m in at.markdown
+                 if '<div class="na-rmeta' in str(getattr(m, "value", ""))]
+    assert card_html, "career cards missing"
+    assert all(c.count("na-rmeta") == 2 for c in card_html)
+    # The accolades table is a pivot: one row per award type, a column
+    # per selected player, and an award a player never won renders BLANK
+    # -- never a fabricated zero.
+    frames = [df.value for df in at.dataframe
+              if hasattr(getattr(df, "value", None), "columns")]
+    pivot = next((f for f in frames if "Honour" in f.columns), None)
+    assert pivot is not None, "accolades pivot missing"
+    assert "Pts each" in pivot.columns
+    picks = list(box.value)
+    assert all(p in pivot.columns for p in picks)
+    cells = pivot[picks]
+    assert not (cells == 0).any().any()
 
 
 def test_progression_chart_ticks_once_per_season():
