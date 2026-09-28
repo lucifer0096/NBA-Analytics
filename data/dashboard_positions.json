@@ -109,6 +109,12 @@
    "team_id": 1
   },
   {
+   "player_id": 4433188,
+   "player_name": "Devin Carter",
+   "position": "G",
+   "team_id": 2
+  },
+  {
    "player_id": 5142621,
    "player_name": "Chris Cenac Jr.",
    "position": "F",
@@ -118,6 +124,12 @@
    "player_id": 3195,
    "player_name": "Mike Conley",
    "position": "G",
+   "team_id": 2
+  },
+  {
+   "player_id": 4837238,
+   "player_name": "Tucker DeVries",
+   "position": "F",
    "team_id": 2
   },
   {
@@ -139,6 +151,12 @@
    "team_id": 2
   },
   {
+   "player_id": 5176420,
+   "player_name": "Hayden Gray",
+   "position": "G",
+   "team_id": 2
+  },
+  {
    "player_id": 4397251,
    "player_name": "Ron Harper Jr.",
    "position": "G",
@@ -147,6 +165,12 @@
   {
    "player_id": 4065804,
    "player_name": "Sam Hauser",
+   "position": "F",
+   "team_id": 2
+  },
+  {
+   "player_id": 4398356,
+   "player_name": "Gabe McGlothan",
    "position": "F",
    "team_id": 2
   },
@@ -184,6 +208,12 @@
    "player_id": 4065648,
    "player_name": "Jayson Tatum",
    "position": "F",
+   "team_id": 2
+  },
+  {
+   "player_id": 5106272,
+   "player_name": "Milos Uzan",
+   "position": "G",
    "team_id": 2
   },
   {
@@ -349,15 +379,15 @@
    "team_id": 30
   },
   {
-   "player_id": 4701225,
-   "player_name": "PJ Hall",
-   "position": "C",
+   "player_id": 4684275,
+   "player_name": "Rob Dillingham",
+   "position": "G",
    "team_id": 30
   },
   {
-   "player_id": 2990984,
-   "player_name": "Buddy Hield",
-   "position": "G",
+   "player_id": 4701225,
+   "player_name": "PJ Hall",
+   "position": "C",
    "team_id": 30
   },
   {
@@ -445,6 +475,12 @@
    "team_id": 4
   },
   {
+   "player_id": 4432162,
+   "player_name": "Brandon Boston Jr.",
+   "position": "G",
+   "team_id": 4
+  },
+  {
    "player_id": 4711294,
    "player_name": "Matas Buzelis",
    "position": "F",
@@ -463,12 +499,6 @@
    "team_id": 4
   },
   {
-   "player_id": 4684275,
-   "player_name": "Rob Dillingham",
-   "position": "G",
-   "team_id": 4
-  },
-  {
    "player_id": 5242496,
    "player_name": "Noa Essengue",
    "position": "F",
@@ -481,14 +511,14 @@
    "team_id": 4
   },
   {
-   "player_id": 4395626,
-   "player_name": "Tre Jones",
+   "player_id": 2990984,
+   "player_name": "Buddy Hield",
    "position": "G",
    "team_id": 4
   },
   {
-   "player_id": 4397071,
-   "player_name": "Mac McClung",
+   "player_id": 4395626,
+   "player_name": "Tre Jones",
    "position": "G",
    "team_id": 4
   },
@@ -505,14 +535,38 @@
    "team_id": 4
   },
   {
+   "player_id": 4397689,
+   "player_name": "Drew Peterson",
+   "position": "F",
+   "team_id": 4
+  },
+  {
    "player_id": 2595516,
    "player_name": "Norman Powell",
    "position": "G",
    "team_id": 4
   },
   {
+   "player_id": 4593049,
+   "player_name": "Orlando Robinson",
+   "position": "C",
+   "team_id": 4
+  },
+  {
    "player_id": 4397189,
    "player_name": "Jalen Smith",
+   "position": "F",
+   "team_id": 4
+  },
+  {
+   "player_id": 5106674,
+   "player_name": "Peter Suder",
+   "position": "G",
+   "team_id": 4
+  },
+  {
+   "player_id": 5107264,
+   "player_name": "Marquel Sutton",
    "position": "F",
    "team_id": 4
   },
@@ -535,15 +589,21 @@
    "team_id": 4
   },
   {
-   "player_id": 4017844,
-   "player_name": "Guerschon Yabusele",
+   "player_id": 4593815,
+   "player_name": "Rashaun Agee",
    "position": "F",
-   "team_id": 4
+   "team_id": 5
   },
   {
    "player_id": 4066328,
    "player_name": "Jarrett Allen",
    "position": "C",
+   "team_id": 5
+  },
+  {
+   "player_id": 4702099,
+   "player_name": "Zack Austin",
+   "position": "F",
    "team_id": 5
   },
   {
@@ -574,6 +634,12 @@
    "player_id": 2995706,
    "player_name": "Mario Hezonja",
    "position": "F",
+   "team_id": 5
+  },
+  {
+   "player_id": 4898369,
+   "player_name": "Curtis Jones",
+   "position": "G",
    "team_id": 5
   },
   {
@@ -613,9 +679,9 @@
    "team_id": 5
   },
   {
-   "player_id": 4278046,
-   "player_name": "Olivier Sarr",
-   "position": "F",
+   "player_id": 4701845,
+   "player_name": "Kadary Richmond",
+   "position": "G",
    "team_id": 5
   },
   {
@@ -699,12 +765,6 @@
   {
    "player_id": 6442,
    "player_name": "Kyrie Irving",
-   "position": "G",
-   "team_id": 6
-  },
-  {
-   "player_id": 5358755,
-   "player_name": "Vsevolod Ishchenko",
    "position": "G",
    "team_id": 6
   },
@@ -1765,12 +1825,6 @@
    "team_id": 14
   },
   {
-   "player_id": 4432645,
-   "player_name": "Trevor Keels",
-   "position": "G",
-   "team_id": 14
-  },
-  {
    "player_id": 4601025,
    "player_name": "Pelle Larsson",
    "position": "G",
@@ -1977,7 +2031,7 @@
   {
    "player_id": 5061585,
    "player_name": "Isaiah Evans",
-   "position": "G",
+   "position": "F",
    "team_id": 16
   },
   {
@@ -1999,18 +2053,6 @@
    "team_id": 16
   },
   {
-   "player_id": 4897438,
-   "player_name": "Trey Kaufman-Renn",
-   "position": "F",
-   "team_id": 16
-  },
-  {
-   "player_id": 3134932,
-   "player_name": "John Konchar",
-   "position": "G",
-   "team_id": 16
-  },
-  {
    "player_id": 4433247,
    "player_name": "Jonathan Kuminga",
    "position": "F",
@@ -2023,14 +2065,20 @@
    "team_id": 16
   },
   {
+   "player_id": 4431828,
+   "player_name": "KJ Martin",
+   "position": "F",
+   "team_id": 16
+  },
+  {
    "player_id": 4431671,
    "player_name": "Jaden McDaniels",
    "position": "F",
    "team_id": 16
   },
   {
-   "player_id": 5105553,
-   "player_name": "Julian Phillips",
+   "player_id": 4702134,
+   "player_name": "Norchad Omier",
    "position": "F",
    "team_id": 16
   },
@@ -2041,9 +2089,21 @@
    "team_id": 16
   },
   {
+   "player_id": 4592686,
+   "player_name": "Antonio Reeves",
+   "position": "G",
+   "team_id": 16
+  },
+  {
    "player_id": 4432847,
    "player_name": "Terrence Shannon Jr.",
    "position": "G",
+   "team_id": 16
+  },
+  {
+   "player_id": 4431695,
+   "player_name": "Drew Timme",
+   "position": "F",
    "team_id": 16
   },
   {
@@ -2065,6 +2125,12 @@
    "team_id": 3
   },
   {
+   "player_id": 4683736,
+   "player_name": "Kobe Bufkin",
+   "position": "G",
+   "team_id": 3
+  },
+  {
    "player_id": 4712862,
    "player_name": "Malik Dia",
    "position": "F",
@@ -2074,6 +2140,12 @@
    "player_id": 5144091,
    "player_name": "Jeremiah Fears",
    "position": "G",
+   "team_id": 3
+  },
+  {
+   "player_id": 4433623,
+   "player_name": "Caleb Houstan",
+   "position": "F",
    "team_id": 3
   },
   {
@@ -2091,6 +2163,12 @@
   {
    "player_id": 3442,
    "player_name": "DeAndre Jordan",
+   "position": "C",
+   "team_id": 3
+  },
+  {
+   "player_id": 4431778,
+   "player_name": "Christian Koloko",
    "position": "C",
    "team_id": 3
   },
@@ -2128,12 +2206,6 @@
    "player_id": 3907497,
    "player_name": "Dejounte Murray",
    "position": "G",
-   "team_id": 3
-  },
-  {
-   "player_id": 4432068,
-   "player_name": "Josh Oduro",
-   "position": "C",
    "team_id": 3
   },
   {
@@ -2235,6 +2307,12 @@
   {
    "player_id": 4433225,
    "player_name": "Tyler Kolek",
+   "position": "G",
+   "team_id": 18
+  },
+  {
+   "player_id": 3134932,
+   "player_name": "John Konchar",
    "position": "G",
    "team_id": 18
   },
@@ -2983,12 +3061,6 @@
    "team_id": 24
   },
   {
-   "player_id": 4433618,
-   "player_name": "Harrison Ingram",
-   "position": "F",
-   "team_id": 24
-  },
-  {
    "player_id": 4395723,
    "player_name": "Keldon Johnson",
    "position": "F",
@@ -3157,6 +3229,12 @@
    "team_id": 28
   },
   {
+   "player_id": 4684682,
+   "player_name": "Jonas Aidoo",
+   "position": "C",
+   "team_id": 26
+  },
+  {
    "player_id": 4433268,
    "player_name": "Trey Alexander",
    "position": "G",
@@ -3217,6 +3295,12 @@
    "team_id": 26
   },
   {
+   "player_id": 4433618,
+   "player_name": "Harrison Ingram",
+   "position": "F",
+   "team_id": 26
+  },
+  {
    "player_id": 4277961,
    "player_name": "Jaren Jackson Jr.",
    "position": "F",
@@ -3259,15 +3343,15 @@
    "team_id": 26
   },
   {
-   "player_id": 4432827,
-   "player_name": "Oscar Tshiebwe",
-   "position": "C",
-   "team_id": 26
-  },
-  {
    "player_id": 4278129,
    "player_name": "Deandre Ayton",
    "position": "C",
+   "team_id": 27
+  },
+  {
+   "player_id": 4432187,
+   "player_name": "Reece Beekman",
+   "position": "G",
    "team_id": 27
   },
   {
@@ -3280,12 +3364,6 @@
    "player_id": 4432907,
    "player_name": "Justin Champagnie",
    "position": "F",
-   "team_id": 27
-  },
-  {
-   "player_id": 4432173,
-   "player_name": "Sharife Cooper",
-   "position": "G",
    "team_id": 27
   },
   {
@@ -3331,6 +3409,18 @@
    "team_id": 27
   },
   {
+   "player_id": 4432645,
+   "player_name": "Trevor Keels",
+   "position": "G",
+   "team_id": 27
+  },
+  {
+   "player_id": 4433622,
+   "player_name": "Chris Livingston",
+   "position": "F",
+   "team_id": 27
+  },
+  {
    "player_id": 4432819,
    "player_name": "Tre Mann",
    "position": "G",
@@ -3361,6 +3451,12 @@
    "team_id": 27
   },
   {
+   "player_id": 4704043,
+   "player_name": "Steve Settle III",
+   "position": "F",
+   "team_id": 27
+  },
+  {
    "player_id": 4997537,
    "player_name": "Tristan Vukcevic",
    "position": "F",
@@ -3379,6 +3475,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-09-27T16:59:25Z",
+ "_generated_utc": "2026-09-28T04:03:05Z",
  "source": "local"
 }
