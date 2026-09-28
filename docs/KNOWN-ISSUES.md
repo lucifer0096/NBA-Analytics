@@ -187,3 +187,23 @@ for the WNBA (the NBA table is empty -- its refs are complete);
 refs always win where they exist and the pin only fills the six gaps.
 Championship counts beyond the overlay stay honest `None`s rather than
 borrowing a number. Pinned by `test_leagues.py`.
+
+## 2026-09-28 — actions/checkout pins the dispatch-time SHA, so queued data runs push against a moved ref
+
+`actions/checkout@v4` defaults to `${{ github.sha }}`, and for both
+`schedule` and `workflow_dispatch` events that SHA is resolved when the
+run is **created**. The data workflows (collector, refresh-history,
+retrain) share the `data-refresh` concurrency group, so a run that
+queues behind another one -- each of which finishes by pushing to
+`main` -- starts on a stale commit: it refreshes, commits, and its final
+`git push` is rejected (`! [rejected] main -> main (fetch first)`,
+exit 1) with the refreshed work stranded. Hit live on Sep 2026:
+history queued behind the collector (run 36415413941, opening issue
+#2), and it explains the earlier scheduled-run failures that looked
+flaky.
+
+**Guard**: all three pushing workflows now check out `ref: main` (the
+branch tip at job start, which the group lock guarantees to be stable
+until this run's own push). Any other bot job that pushes at the end of
+its run needs the same `ref:` -- `${{ github.sha }}` is only safe when
+the run neither queues nor races a human push.
