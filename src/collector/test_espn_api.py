@@ -39,6 +39,31 @@ def test_season_label_round_trips():
     assert espn_api.season_label(espn_api.season_param("2026-27")) == "2026-27"
 
 
+def test_get_schedule_season_type_selects_the_phase():
+    """seasontype is THE phase selector on the team-schedule endpoint:
+    2 = regular season (default, byte-identical URL to before), 3 =
+    postseason. Everything downstream (snapshot.py's two-phase collection)
+    hangs off this one parameter."""
+    seen: list = []
+
+    def fake_get_json(url):
+        seen.append(url)
+        return {"events": []}
+
+    original = espn_api._get_json
+    espn_api._get_json = fake_get_json
+    try:
+        espn_api.get_schedule(2026, 14, "nba")
+        espn_api.get_schedule(2026, 14, "nba", season_type=3)
+        espn_api.get_schedule(2026, 14, "wnba", season_type=3)
+    finally:
+        espn_api._get_json = original
+    assert seen[0].endswith("/teams/14/schedule?season=2026&seasontype=2")
+    assert seen[1].endswith("/teams/14/schedule?season=2026&seasontype=3")
+    assert seen[2].endswith("/teams/14/schedule?season=2026&seasontype=3")
+    assert "/basketball/wnba/" in seen[2]
+
+
 def test_current_season_label_follows_nba_calendar_transition():
     import datetime
 

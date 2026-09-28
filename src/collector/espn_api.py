@@ -184,11 +184,16 @@ def get_teams(league: str = "nba") -> dict:
     return _get_json(f"{site_api(league)}/teams")
 
 
-def get_schedule(season: int, team_id: int, league: str = "nba") -> dict:
+def get_schedule(season: int, team_id: int, league: str = "nba",
+                 season_type: int = 2) -> dict:
     """One team's schedule for the season ENDING in `season` (NBA) / the
-    season `season` (WNBA) -- see season_param."""
+    season `season` (WNBA) -- see season_param. `season_type` picks the
+    phase ESPN serves: 2 = regular season (the frame every computed view
+    reads), 3 = postseason (playoffs; play-in games answer under NEITHER
+    type -- snapshot.py's gap probe collects those from the scoreboard)."""
     return _get_json(
-        f"{site_api(league)}/teams/{team_id}/schedule?season={season}&seasontype=2"
+        f"{site_api(league)}/teams/{team_id}/schedule"
+        f"?season={season}&seasontype={season_type}"
     )
 
 

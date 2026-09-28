@@ -964,6 +964,38 @@ def load_schedule(season: str, league: str = "nba") -> tuple:
     return (pd.DataFrame(), data_age_note(payload, False))
 
 
+@st.cache_data(ttl=300, show_spinner=False)
+def load_postseason_schedule(season: str, league: str = "nba") -> tuple:
+    """(postseason games DataFrame, note) from the selected season's OWN
+    committed file (data/postseason/{season}.json; the WNBA's under
+    data/postseason_wnba/) -- playoffs + play-in rows that live in their
+    own tree precisely so schedules/ (standings, leaders, GOAT, the model)
+    stays regular-season-only. Local file like load_schedule, no live call:
+    the collector workflow refreshes it daily in-season. Honest empty with
+    the reason when the file is absent (the bracket doesn't exist yet, or
+    the collector never reached this season) or unreadable."""
+    post_dir = _league_sub("postseason", league)
+    path = post_dir / f"{season}.json"
+    if not path.exists():
+        return (pd.DataFrame(),
+                f"No postseason schedule committed for {season}")
+    try:
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        _record_fallback_error(
+            f"{post_dir.name}/{season}.json is unreadable: showing an honest "
+            "empty state (regenerate with `python src/collector/"
+            "refresh_dashboard_fallbacks.py`)."
+        )
+        return (pd.DataFrame(), "")
+    rows = payload.get("games") if isinstance(payload, dict) else None
+    if isinstance(rows, list) and rows:
+        return (pd.DataFrame(rows), data_age_note(payload, False))
+    return (pd.DataFrame(),
+            f"{season}'s postseason file carries no games")
+
+
 def filter_schedule_games(games: pd.DataFrame, team: str,
                           venue: str) -> pd.DataFrame:
     """Schedule-tab row filter: the team first ('All teams' keeps every

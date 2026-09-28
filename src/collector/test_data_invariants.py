@@ -65,6 +65,44 @@ def test_schedule_rows_belong_to_their_season_and_scores_are_honest():
                 assert home in ("", "0") and away in ("", "0"), (label, row)
 
 
+def test_postseason_files_are_honest_and_in_their_own_tree():
+    """Postseason payloads carry the same row honesty as schedules/ (file
+    name = season label, finals with digit scores) AND live in their OWN
+    trees -- data/postseason/ and data/postseason_wnba/ -- so schedules/,
+    the frame standings/leaders/GOAT/training read, never gains a playoff
+    row. The two trees must not overlap."""
+    regular = {p.stem for p in (DATA_DIR / "schedules").glob("*.json")}
+    for sub in ("postseason", "postseason_wnba"):
+        files = sorted((DATA_DIR / sub).glob("*.json"))
+        assert files, f"committed {sub} files expected"
+        for path in files:
+            payload = _load(path)
+            label = path.stem
+            assert payload["season"] == label, (sub, label)
+            assert payload.get("_generated_utc"), (sub, label)
+            assert payload.get("source") == "local", (sub, label)
+            rows = payload["games"]
+            assert rows, (sub, label)
+            for row in rows:
+                assert {"game_id", "date", "season", "status"} <= set(row), \
+                    (sub, label, row)
+                assert row["season"] == label, (sub, label, row["game_id"])
+                status = row["status"]
+                home = str(row.get("home_score", ""))
+                away = str(row.get("away_score", ""))
+                if status == "STATUS_FINAL":
+                    assert home.isdigit() and away.isdigit(), (sub, label, row)
+                elif status == "STATUS_SCHEDULED":
+                    assert not home and not away, (sub, label, row)
+                elif status in ("STATUS_POSTPONED", "STATUS_CANCELED"):
+                    assert home in ("", "0") and away in ("", "0"), \
+                        (sub, label, row)
+    # Every NBA postseason season's regular schedule exists too (the gap
+    # probe needs it), but the file names never collide across trees.
+    nba_post = {p.stem for p in (DATA_DIR / "postseason").glob("*.json")}
+    assert nba_post <= regular
+
+
 def test_every_awards_season_is_backed_by_collected_games():
     """No race payload without box scores behind it: every season the
     awards envelope publishes has a games-collected count >= 1 in the same

@@ -1,11 +1,10 @@
 {
-  "last_run_utc": "2026-09-28T11:35:03Z",
+  "last_run_utc": "2026-09-28T13:38:31Z",
   "seasons": [
     {
       "season": "2026",
       "final_games": 331,
-      "stored": 0,
-      "failures": 0
+      "pending": 0
     }
   ]
 }

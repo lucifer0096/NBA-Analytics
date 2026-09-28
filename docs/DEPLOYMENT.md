@@ -28,8 +28,8 @@ SSH remote (`git@github.com:<your-user>/NBA-Analytics.git`).
 
 | Works | Needs a data machine |
 |---|---|
-| Standings (live ESPN → committed fallback) | `data/raw*/` history (both leagues' raw dirs are gitignored, regenerate via `snapshot.py --backfill`, add `--league wnba` for the WNBA) |
-| Schedule & Scores (committed per-season `data/schedules*/*.json` + live scoreboard) | Retraining (`features.py` + `train.py`) |
+| Standings (live ESPN → committed fallback) | `data/raw*/` history (the NBA's `data/raw/` is gitignored, regenerate via `snapshot.py --backfill`; the WNBA's `data/raw_wnba/` ships with the repo) |
+| Schedule & Scores (committed per-season `data/schedules*/*.json` + the labeled Postseason tables from `data/postseason*/*.json` + live scoreboard) | Retraining (`features.py` + `train.py`) |
 | Awards Ladder + Court View, movement arrows + MVP trend (committed `dashboard_awards.json` for every collected season, plus the `data/races/*.json` snapshots) | Nothing |
 | All-Time Stats + GOAT Rankings (career sections of the same file) | Nothing |
 | Player Profile (committed `dashboard_players.json`) | Nothing |
@@ -40,6 +40,7 @@ in `leagues.named_path`), so a deployed instance renders both league
 tabs fully offline.
 
 The daily workflow (`.github/workflows/collector.yml`) keeps every committed
-fallback fresh **for both leagues in one pass** (schedule, standings, positions, leaderboards, award races
+fallback fresh **for both leagues in one pass** (schedules + the
+postseason tables, standings, positions, leaderboards, award races
 and their daily snapshots, and, once `models/proj_model.txt` exists, a
 rolling 21-day projection window), so the deployed app stays current without access to raw data.

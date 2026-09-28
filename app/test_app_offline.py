@@ -681,6 +681,78 @@ def test_schedule_filters_and_csv_downloads_render(offline_espn):
     assert len(at.warning) == 0
 
 
+def test_postseason_section_renders_labeled_scoped_and_exportable(
+        offline_espn):
+    """Schedule tab's Postseason block: a section of its OWN carrying the
+    collected playoff rows (the Status column distinguishes it from the
+    regular tables), its own CSV button, the honesty caption keeping it
+    out of every computed view, and (PO)-marked playoff fixtures in the
+    game-detail picker."""
+    at = _render("app/app.py", offline_espn)
+    assert not at.exception
+
+    assert "postseason" in _markdown_text(at).lower()
+    labels = [str(b.label) for b in at.download_button]
+    assert "Download postseason CSV" in labels
+    captions = " ".join(str(c.value) for c in at.caption)
+    assert "regular-season-only" in captions
+
+    frames = [df.value for df in at.dataframe
+              if hasattr(getattr(df, "value", None), "columns")]
+    post = [f for f in frames
+            if {"Date", "Away", "Home", "Status"} <= set(f.columns)]
+    assert post, "the collected season's postseason table must render"
+    assert sum(int((f["Status"] == "Final").sum()) for f in post) > 0, \
+        "real playoff scores, not just fixtures"
+
+    fixtures = next(sb for sb in at.selectbox
+                    if getattr(sb, "key", "") == "fixture_nba")
+    assert any("(PO)" in str(o) for o in fixtures.options)
+
+
+def test_postseason_section_follows_the_team_filter(offline_espn):
+    """The toolbar's team filter scopes the postseason table with every
+    other frame: pick a team that made the bracket and every row of the
+    NBA tab's postseason table involves it (the WNBA tab's toolbar stays
+    independent, exactly like the regular tables)."""
+    at = _render("app/app.py", offline_espn)
+    assert not at.exception
+    frames = [df.value for df in at.dataframe
+              if hasattr(getattr(df, "value", None), "columns")]
+    post = [f for f in frames
+            if {"Date", "Away", "Home", "Status"} <= set(f.columns)]
+    assert post, "NBA tab renders first: its postseason table leads"
+    team = str(post[0]["Home"].iloc[0])  # a team that made the bracket
+
+    team_box = next(sb for sb in at.selectbox if str(sb.label) == "Team")
+    team_box.set_value(team).run()
+    assert not at.exception
+
+    frames = [df.value for df in at.dataframe
+              if hasattr(getattr(df, "value", None), "columns")]
+    post = [f for f in frames
+            if {"Date", "Away", "Home", "Status"} <= set(f.columns)]
+    assert post, "the filtered postseason table must still render"
+    nba_frame = post[0]  # NBA tab's frames render first
+    involved = list(zip(nba_frame["Away"].astype(str),
+                        nba_frame["Home"].astype(str)))
+    assert involved and all(team in row for row in involved)
+
+
+def test_postseason_empty_state_is_honest_for_a_new_season(offline_espn):
+    """2026-27 has no bracket: the section says why (not determined yet,
+    or not collected -- with the command that collects it) instead of
+    re-showing last season's playoffs under the new season's header."""
+    at = _render("app/app.py", offline_espn)
+    box = next(b for b in at.selectbox if str(b.label) == "Season (NBA)")
+    box.select("2026-27").run()
+    assert not at.exception
+    captions = " ".join(str(c.value) for c in at.caption)
+    assert "No postseason schedule for 2026-27" in captions
+    assert "bracket does not exist" in captions
+    assert len(at.warning) == 0
+
+
 def test_parse_plays_flattens_and_skips_malformed():
     """The PBP parser turns ESPN's live `plays` into flat table rows and
     degrades on malformed entries (non-dict plays, junk period) instead of

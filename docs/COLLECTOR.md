@@ -16,10 +16,11 @@ exists at `data/raw/{season}/games/{game_id}.json` is simply never refetched.
 |---|---|---|
 | Teams | `site.api.espn.com/.../nba/teams` | 1 call, team-id list for everything else |
 | Season schedule | `site.api.espn.com/.../nba/teams/{id}/schedule?season={end_year}&seasontype=2` | 30 calls/season; **no season-wide schedule endpoint exists** (verified 404) |
+| Postseason schedule | same path with `seasontype=3` | same 30 calls, phase-separated into `postseason.csv`; a team outside the bracket answers 0 games (skipped, never a failure) |
 | Game box score | `site.api.espn.com/.../nba/summary?event={id}` | per-game; verified back to **1995-96**; includes DNP rows |
 | Standings | `site.web.api.espn.com/apis/v2/.../nba/standings?season={end_year}` | the `site.api` standings path only returns a link stub (verified) |
 | Player positions | `site.web.api.espn.com/apis/common/v3/.../nba/teams/{id}/roster?season={end_year}` | **season param ignored**, always current roster (verified: 2011/2026/2027 identical) |
-| Day's games | `site.api.espn.com/.../nba/scoreboard?dates=YYYYMMDD` | works for historical dates too |
+| Day's games | `site.api.espn.com/.../nba/scoreboard?dates=YYYYMMDD` | works for historical dates too; also the **only** home of play-in games -- they answer on no seasontype at all (verified Apr 2026 across all 30 teams), so `snapshot_gap_games` probes just the days between the regular season's last game and round one |
 
 Every path above is league-parameterized: the `nba` slug swaps for `wnba`
 (the core API's `sports.core.api.espn.com/v2/sports/basketball/leagues/wnba`
@@ -46,8 +47,9 @@ returned 200). `espn_api._HEADERS` is the one place this is encoded.
 ```
 data/raw/{season}/              # the WNBA's tree mirrors under data/raw_wnba/{year}/
 ├── schedule.csv        # every regular-season game: id, date, teams, scores, status
+├── postseason.csv      # playoffs + play-in (seasons with a bracket only; a bracketless season writes no file at all)
 └── games/
-    └── {game_id}.json  # {"game": meta, "players": [...]}, PARSED rows, one file per FINAL game
+    └── {game_id}.json  # {"game": meta, "players": [...]}, PARSED rows, one file per FINAL REGULAR-SEASON game
 data/raw/                # per league: data/raw/ and data/raw_wnba/
 ├── player_positions.json  # ONE global file: current player → G/F/C (roster endpoint is current-only)
 └── collector_state.json   # last run: season, counts, timestamps (--check-only feeds from this)
@@ -57,12 +59,21 @@ Box-score files store the **parsed form** (the raw payload is multi-MB with
 plays/winprobability we never read), ~5–8 KB per game, about 120 MB for the
 full 2010-11+ backfill.
 
-Regular season only (`seasontype=2`) **in both leagues**: standings,
-per-game leaders and the model's training frame are all built on the
-regular season, and the WNBA's schedule endpoint answers the same season
-type (its collected counts -- 204 games in the 12-team era, 331 in 2026
--- are regular seasons with no playoff rows). Playoffs are deliberately
-excluded, not overlooked.
+Regular-season-only **math** in both leagues: standings, per-game leaders
+and the model's training frame are all built on regular-season box scores
+(`seasontype=2`), and the WNBA's schedule endpoint answers the same
+season type (its collected counts -- 204 games in the 12-team era, 331 in
+2026 -- are regular seasons).
+
+The postseason is collected **in the same run, into its own file**:
+`seasontype=3` writes `postseason.csv` (playoff rounds; a team outside the
+bracket answers 0 games, skipped without a failure), the play-in gap probe
+merges the games ESPN files under no seasontype at all, and refresh copies
+the rows to their own committed trees (`data/postseason/`,
+`data/postseason_wnba/`). Box scores stay regular-season-only by design --
+no computed view reads a per-player postseason line, so playoff rows can
+never enter a frame that says regular season. The Schedule tab's labeled
+Postseason section is the one consumer.
 
 ## Commands
 
@@ -71,7 +82,7 @@ python src/collector/snapshot.py                    # current season, incrementa
 python src/collector/snapshot.py --backfill         # 2010-11 → latest completed, NEWEST FIRST
 python src/collector/snapshot.py --from 2018-19 --to 2020-21   # explicit range
 python src/collector/snapshot.py --season 2012-13   # one season
-python src/collector/snapshot.py --schedule-only    # schedules/positions, no box scores
+python src/collector/snapshot.py --schedule-only    # schedules (regular + postseason + play-in probe)/positions, no box scores
 python src/collector/snapshot.py --check-only       # report pending work; exit 1 if any
 python src/collector/snapshot.py --backfill --league wnba   # the WNBA (labels are plain years: 2010, 2011, ...)
 python src/collector/refresh_dashboard_fallbacks.py --league nba wnba  # both leagues in one pass
@@ -89,6 +100,14 @@ python src/collector/refresh_dashboard_fallbacks.py --league nba wnba  # both le
   can't kill a 19.1k-game backfill.
 - **Offseason guard**: a schedule refresh that returns 0 games will not
   clobber an existing good `schedule.csv` (warning instead).
+- **Postseason phase**: `snapshot_schedule(..., phase="postseason")` runs in
+  the same pass against `seasontype=3` (0 games = missed playoffs, skipped
+  without a failure; a bracketless season writes no file rather than a
+  header-only one), then `snapshot_gap_games` hits `scoreboard?dates=` for
+  only the days between the regular season's last game and round one,
+  merging new `game_id`s -- idempotent, and the probe converges to zero
+  calls once the play-in games close the gap. The regular-season contracts
+  above are untouched: `schedule.csv` and its guards are byte-identical.
 
 ## Automated collection
 
@@ -97,11 +116,13 @@ games finish; GitHub's batched scheduler often fires hours later, so the
 data commits typically land later in the day), for **each league in turn**:
 
 1. `snapshot.py --season current` (NBA, then `--league wnba`): schedule
-   refresh + newly-final box scores, each league through its own state
+   refresh (regular + postseason + the play-in gap probe) + newly-final
+   box scores, each league through its own state
    file (`data/raw/`, `data/raw_wnba/`)
 2. `refresh_dashboard_fallbacks.py --league nba wnba`: rewrites both
    leagues' committed `data/dashboard_*` (+ `dashboard_wnba_*`)
-   fallbacks and the two leaderboards artifacts under `data/processed/`
+   fallbacks, the per-season schedule + postseason files, and the two
+   leaderboards artifacts under `data/processed/`
 3. commits any data changes back to `main`
 
 CI (`.github/workflows/ci.yml`) skips pushes where **every** changed file is
@@ -112,17 +133,21 @@ rewritten identically, fallbacks re-stamped.
 
 ## Dashboard fallback files
 
-Streamlit Cloud cannot run the collector and `data/raw*/` is gitignored, so
-`refresh_dashboard_fallbacks.py` commits small stable copies with honest
-`_generated_utc` + `source` stamps. Every file exists once per league --
+Streamlit Cloud cannot run the collector (`data/raw/` is gitignored) and no
+view can regenerate history itself, so `refresh_dashboard_fallbacks.py`
+commits small stable copies with honest `_generated_utc` + `source` stamps.
+Every file exists once per league --
 the WNBA's carry `_wnba` by `leagues.named_path`'s one rule
-(`dashboard_teams.json` → `dashboard_wnba_teams.json`):
+(`dashboard_teams.json` → `dashboard_wnba_teams.json`), except the two
+per-season trees, whose FOLDER carries the suffix
+(`data/schedules_wnba/`, `data/postseason_wnba/`):
 
 | File | Content | Source |
 |---|---|---|
 | `data/dashboard_teams.json` | team list | live ESPN |
 | `data/dashboard_standings.json` | the current season once it has real records, else the newest with them (zero-record preseason tables skipped: `season_candidates()` stays completed-first for consumers wanting the last complete table, `standings_candidates()` leads with current because that is the season the app defaults to; verified 2026-27 arrives all-zeros in Sep) | live ESPN |
 | `data/schedules/{season}.json` | one season's full schedule from `data/raw*/schedule.csv`, with its own generation stamp, rewritten only when rows change (NBA: 17 files / 20,394 games, 19,194 with final scores; the WNBA's under `data/schedules_wnba/`: 17 files / 3,693; a committed season missing locally is preserved) | local |
+| `data/postseason/{season}.json` | one season's POSTSEASON schedule (playoffs + play-in) from `data/raw*/postseason.csv`: same clean/preserve/rewrite-only-on-change contracts, own stamp, **no index** -- the Schedule tab reads the selected season's file directly and shows an honest empty when it's absent (NBA: 16 files / 1,384 games -- the bracketless 2026-27 has no file; the WNBA's under `data/postseason_wnba/`: 17 files / 307, live bracket included). The one consumer; nothing in `schedules/`, `processed/` or the model ever reads this tree | local |
 | `data/dashboard_schedule.json` | thin season index (labels, per-season game counts, current season) behind the sidebar's default season and the schedule tab's honest "index says N games" fallback messages | local |
 | `data/dashboard_positions.json` | current player → position map | local/live |
 | `data/dashboard_awards.json` | **every collected season's** MVP/DPOY/6th-Man/MIP races + per-game stat leaders (incl. 3PM, +/-, FG/3P splits), plus the cross-season all-time boards and the all-history GOAT ladder (`awards.py` + `history.py`, both leagues with their own formulas and honours tables) | local (collected box scores + cached ESPN history) |

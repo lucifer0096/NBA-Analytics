@@ -64,6 +64,7 @@ RAW_DIR = os.path.join(REPO_ROOT, "data", "raw")
 DATA_DIR = os.path.join(REPO_ROOT, "data")
 PROCESSED_DIR = os.path.join(DATA_DIR, "processed")
 SCHEDULES_DIR = os.path.join(DATA_DIR, "schedules")
+POSTSEASON_DIR = os.path.join(DATA_DIR, "postseason")
 RACES_DIR = os.path.join(DATA_DIR, "races")
 SEASON_DIR_RE = re.compile(r"^\d{4}-\d{2}$")
 
@@ -82,10 +83,11 @@ RACE_SNAPSHOT_TOP = 25  # players kept per race (ladders render far fewer)
 def set_league(league: str) -> str:
     """Switch this pass to `league`: rebind LEAGUE plus every module path and
     season convention derived from it. Returns the league name."""
-    global LEAGUE, RAW_DIR, SCHEDULES_DIR, RACES_DIR, SEASON_DIR_RE
+    global LEAGUE, RAW_DIR, SCHEDULES_DIR, POSTSEASON_DIR, RACES_DIR, SEASON_DIR_RE
     LEAGUE = leagues.validate(league)
     RAW_DIR = leagues.raw_dir(LEAGUE)
     SCHEDULES_DIR = leagues.schedules_dir(LEAGUE)
+    POSTSEASON_DIR = leagues.postseason_dir(LEAGUE)
     RACES_DIR = leagues.races_dir(LEAGUE)
     SEASON_DIR_RE = leagues.season_dir_re(LEAGUE)
     return LEAGUE
@@ -253,16 +255,21 @@ def refresh_standings(seasons_to_try: list) -> dict:
     return {}
 
 
-def _write_season_file(label: str, rows: list, stamp: str = None) -> None:
+def _write_season_file(label: str, rows: list, stamp: str = None,
+                       directory: str = None) -> None:
     """One season's schedule file under data/schedules/ (compact JSON, own
-    stamp). `stamp` lets the legacy migration keep the old envelope's
-    timestamp instead of inventing a new one."""
+    stamp) -- or under `directory` for the postseason tree, which has the
+    same shape but no index. `stamp` lets the legacy migration keep the old
+    envelope's timestamp instead of inventing a new one. The default
+    directory resolves at CALL time (None) because set_league rebinds
+    SCHEDULES_DIR per league pass."""
     payload = {"season": label, "games": rows,
                "_generated_utc": stamp or time.strftime("%Y-%m-%dT%H:%M:%SZ",
                                                         time.gmtime()),
                "source": "local"}
-    os.makedirs(SCHEDULES_DIR, exist_ok=True)
-    with open(os.path.join(SCHEDULES_DIR, f"{label}.json"), "w",
+    target = directory or SCHEDULES_DIR
+    os.makedirs(target, exist_ok=True)
+    with open(os.path.join(target, f"{label}.json"), "w",
               encoding="utf-8") as f:
         json.dump(payload, f, separators=(",", ":"))
 
@@ -353,6 +360,63 @@ def refresh_schedule(season: str) -> dict:
           f"{sum(len(g) for g in seasons_rows.values())} games, "
           f"{changed} season file(s) updated)")
     return index
+
+
+def refresh_postseason_schedule() -> dict:
+    """Postseason schedule (playoffs + play-in) as ONE file per season under
+    data/postseason/ (data/postseason_wnba/ for the WNBA) -- a tree
+    deliberately separate from schedules/, so every computed view reading
+    schedules/ (standings, leaders, GOAT, training) keeps its regular-
+    season-only frame while the Schedule tab shows playoff scores under
+    their own label.
+
+    Same contracts as refresh_schedule minus the index (the app reads the
+    selected season's file directly and shows an honest empty when it is
+    absent): committed seasons absent locally are PRESERVED (a CI checkout's
+    raw/ holds the current season only), a file is rewritten only when its
+    rows actually CHANGED so daily runs don't churn stamps or git, and
+    scores are normalised "94.0" -> "94"."""
+    import csv
+
+    os.makedirs(POSTSEASON_DIR, exist_ok=True)
+    seasons_rows: dict = {}
+
+    # 1. Committed per-season files (the preservation path).
+    for fname in sorted(os.listdir(POSTSEASON_DIR)):
+        if not fname.endswith(".json"):
+            continue
+        payload = _read_json(os.path.join(POSTSEASON_DIR, fname), {})
+        rows = payload.get("games")
+        if isinstance(rows, list) and rows:
+            seasons_rows[payload.get("season") or fname[:-5]] = rows
+
+    # 2. Local raw postseason.csv files win -- but only rewrite seasons
+    #    whose rows changed (identical content keeps its stamp).
+    changed = 0
+    for name in _available_raw_seasons():
+        csv_path = os.path.join(RAW_DIR, name, "postseason.csv")
+        if not os.path.isfile(csv_path):
+            continue
+        with open(csv_path, newline="", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        if not rows:
+            continue  # header-only file must not erase a committed season
+        for row in rows:
+            row["home_score"] = _clean_score(row.get("home_score"))
+            row["away_score"] = _clean_score(row.get("away_score"))
+        if seasons_rows.get(name) == rows:
+            continue
+        _write_season_file(name, rows, directory=POSTSEASON_DIR)
+        seasons_rows[name] = rows
+        changed += 1
+
+    if not seasons_rows:
+        print("  no postseason.csv anywhere -- skipping postseason fallback")
+        return {}
+    print(f"  wrote postseason files ({len(seasons_rows)} seasons, "
+          f"{sum(len(g) for g in seasons_rows.values())} games, "
+          f"{changed} season file(s) updated)")
+    return {label: len(rows) for label, rows in sorted(seasons_rows.items())}
 
 
 def _clean_score(value) -> str:
@@ -804,6 +868,7 @@ def main(argv=None) -> None:
         refresh_teams()
         refresh_standings(standings_candidates())
         refresh_schedule(current)
+        refresh_postseason_schedule()
         refresh_positions()
         refresh_leaderboards(candidates)
         refresh_awards(candidates)

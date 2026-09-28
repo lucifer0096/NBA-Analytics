@@ -74,6 +74,11 @@ def test_data_paths_never_collide_and_nba_keeps_historical_names():
     assert leagues.races_dir("wnba").endswith("/data/races_wnba")
     assert leagues.schedules_dir("nba").endswith("/data/schedules")
     assert leagues.schedules_dir("wnba").endswith("/data/schedules_wnba")
+    # Postseason keeps the same folder rule -- and its OWN tree, so every
+    # computed view reading schedules/ stays regular-season-only.
+    assert leagues.postseason_dir("nba").endswith("/data/postseason")
+    assert leagues.postseason_dir("wnba").endswith("/data/postseason_wnba")
+    assert leagues.postseason_dir("nba") != leagues.schedules_dir("nba")
     assert leagues.history_cache_path("nba").endswith(
         "/data/processed/history_cache.json")
     assert leagues.history_cache_path("wnba").endswith(

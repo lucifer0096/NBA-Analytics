@@ -9,13 +9,20 @@ What one season run does:
   1. teams (1 call) -- the team-id list every other call needs
   2. schedule: 30 team-schedule calls -> data/raw/{season}/schedule.csv
      (every game appears in both of its teams' schedules; deduped on game_id)
+     plus the postseason phase: seasontype=3 -> data/raw/{season}/postseason.csv
+     (playoff rounds; a team outside the playoffs answers with no games), then
+     a scoreboard gap probe for the days between the regular season's last
+     game and the playoffs' first -- play-in games answer on NO seasontype at
+     all, they only surface there (verified Apr 2026 across all 30 teams)
   3. player positions: 30 current-roster calls (cached 7 days) ->
      data/raw/player_positions.json -- ONE global file, because ESPN's
      roster endpoint ignores its season parameter (see
      snapshot_player_positions docstring)
   4. box scores: one summary call per not-yet-fetched FINAL game ->
      data/raw/{season}/games/{game_id}.json (parsed rows, not the raw
-     multi-MB payload -- load_historical only ever needs the parsed form)
+     multi-MB payload -- load_historical only ever needs the parsed form;
+     REGULAR SEASON only -- postseason games are schedule rows, and no
+     computed view reads per-player postseason lines)
 
 Usage:
     python src/collector/snapshot.py                    # current season, incremental
@@ -57,6 +64,7 @@ import sys
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import date, timedelta
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import espn_api
@@ -161,28 +169,41 @@ def _schedule_row_quality(row: dict) -> tuple:
     return (int(final), int(scores), int(bool(row.get("date"))))
 
 
-def snapshot_schedule(season: str, team_ids: list, limiter: RateLimiter) -> str:
-    """Fetch every team's schedule, dedupe on game_id, write schedule.csv.
+def snapshot_schedule(season: str, team_ids: list, limiter: RateLimiter,
+                      phase: str = "regular") -> str:
+    """Fetch every team's schedule, dedupe on game_id, write the phase's CSV
+    (schedule.csv for 'regular', postseason.csv for 'postseason').
 
     One team's schedule call failing (a transient ESPN 500/403) must not kill
     the run: every game appears in BOTH of its teams' schedules, so a single
     missing team loses nothing (its games arrive via the opponents). Failed
     calls are counted and reported, and if the collected set would SHRINK the
     existing CSV while calls failed, the existing file wins instead of being
-    overwritten with a thinner schedule."""
+    overwritten with a thinner schedule.
+
+    `phase` picks what ESPN serves: 2 = regular season (a team's regular
+    schedule is never empty, so 0 games counts as a failed 200) vs 3 =
+    postseason (a team outside the playoffs legitimately has NO games --
+    that answer is skipped, never recorded as a failure)."""
+    season_type = 3 if phase == "postseason" else 2
     by_id: dict = {}
     failures: list = []
     for team_id in team_ids:
         limiter.wait()
         try:
             payload = espn_api.get_schedule(season_param(season, LEAGUE),
-                                            team_id, LEAGUE)
+                                            team_id, LEAGUE,
+                                            season_type=season_type)
             parsed = parsing.parse_schedule(payload, season=season,
                                             league=LEAGUE)
         except Exception as e:  # noqa: BLE001 -- recorded, tolerated per team
             failures.append((team_id, f"{type(e).__name__}: {e}"))
             continue
         if not parsed:
+            if phase == "postseason":
+                # Outside the playoffs: no postseason games for this team
+                # is the normal answer, not a failure.
+                continue
             # A real team schedule is never empty (seasontype=2 = the full
             # regular season), so an empty answer is a failed call that
             # happened to return 200.
@@ -196,7 +217,8 @@ def snapshot_schedule(season: str, team_ids: list, limiter: RateLimiter) -> str:
 
     out_dir = os.path.join(RAW_DIR, season)
     os.makedirs(out_dir, exist_ok=True)
-    out_path = os.path.join(out_dir, "schedule.csv")
+    out_path = os.path.join(out_dir, "postseason.csv"
+                            if phase == "postseason" else "schedule.csv")
 
     if failures:
         team_id, detail = failures[0]
@@ -208,9 +230,16 @@ def snapshot_schedule(season: str, team_ids: list, limiter: RateLimiter) -> str:
         # Offseason/lockout guard: a schedule endpoint answering with zero
         # games (or failing open) must not silently wipe a good CSV that a
         # previous run wrote -- keep the old file and say so.
-        print(f"  WARNING [{season}]: schedule endpoints returned 0 games -- "
+        print(f"  WARNING [{season}]: {phase} endpoints returned 0 games -- "
               f"keeping existing {out_path}")
         return out_path
+
+    if not by_id and phase == "postseason":
+        # Playoffs not scheduled yet (season not started) and no file from
+        # a previous run: don't create a header-only CSV that would read
+        # as "postseason collected, zero games".
+        print(f"  {phase}: 0 games for {season} -- no file written")
+        return ""
 
     if failures and os.path.exists(out_path) and _csv_game_count(out_path) > len(by_id):
         # Partial failure AND fewer games than last time: overwriting would
@@ -229,8 +258,86 @@ def snapshot_schedule(season: str, team_ids: list, limiter: RateLimiter) -> str:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
-    print(f"  schedule: {len(rows)} unique games -> {out_path}")
+    print(f"  {'schedule' if phase == 'regular' else phase}: "
+          f"{len(rows)} unique games -> {out_path}")
     return out_path
+
+
+def snapshot_gap_games(season: str, limiter: RateLimiter) -> int:
+    """Collect the games ESPN's team-schedule endpoint does not serve on ANY
+    seasontype: play-in games. Verified Apr 2026 across all 30 teams --
+    MIA/CHA/PHX's play-in games answer on scoreboard?dates= but appear in
+    neither seasontype 2 (regular, ends with the last regular-season day)
+    nor 3 (playoffs, starts with round one) nor 4 (empty).
+
+    Those games live in the calendar GAP between the regular season's last
+    game and the playoffs' first game, so probe scoreboard?dates= for each
+    day in between (capped at 7, a play-in window is 3-4 days) and merge
+    anything not already in postseason.csv. Returns games added.
+
+    A season with no gap, no postseason file or no playoff schedule does
+    nothing (zero calls); per-day failures are counted and tolerated (same
+    fault isolation as the schedule calls -- a lost day retries next run),
+    and re-running never duplicates a game_id."""
+    regular = load_schedule(season)
+    postseason = load_postseason(season)
+    if not regular or not postseason:
+        return 0
+    reg_dates = sorted(str(r.get("date") or "")[:10] for r in regular
+                       if r.get("date"))
+    post_dates = sorted(str(r.get("date") or "")[:10] for r in postseason
+                        if r.get("date"))
+    if not reg_dates or not post_dates:
+        return 0
+    try:
+        day = date.fromisoformat(reg_dates[-1]) + timedelta(days=1)
+        end = date.fromisoformat(post_dates[0])
+    except ValueError:
+        # Corrupt date in one of the CSVs: no probe rather than a run that
+        # dies on parsing (the schedule collectors print their own views).
+        return 0
+    gap = []
+    while day < end and len(gap) < 7:
+        gap.append(day)
+        day += timedelta(days=1)
+    if not gap:
+        return 0
+
+    known = {str(r.get("game_id")) for r in postseason}
+    added: list = []
+    for day in gap:
+        limiter.wait()
+        try:
+            payload = espn_api.get_scoreboard(day.strftime("%Y%m%d"), LEAGUE)
+            parsed = parsing.parse_schedule(payload, season=season,
+                                            league=LEAGUE)
+        except Exception as e:  # noqa: BLE001 -- a lost day retries next run
+            print(f"  WARNING [{season}]: gap scoreboard {day} failed "
+                  f"({type(e).__name__}: {e}) -- retried next run")
+            continue
+        for row in parsed:
+            game_id = str(row.get("game_id"))
+            if game_id not in known:
+                known.add(game_id)
+                added.append(row)
+    if not added:
+        return 0
+
+    out_path = os.path.join(RAW_DIR, season, "postseason.csv")
+    with open(out_path, newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        existing = list(reader)
+        fieldnames = reader.fieldnames or list(added[0].keys())
+    merged = existing + added
+    merged.sort(key=lambda r: (str(r.get("date") or ""),
+                               str(r.get("game_id"))))
+    with open(out_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(merged)
+    print(f"  gap probe: {len(added)} game(s) outside every seasontype "
+          f"(play-in window {gap[0]}..{gap[-1]}) -> {out_path}")
+    return len(added)
 
 
 def _csv_game_count(path: str) -> int:
@@ -243,6 +350,17 @@ def _csv_game_count(path: str) -> int:
 
 def load_schedule(season: str) -> list:
     path = os.path.join(RAW_DIR, season, "schedule.csv")
+    if not os.path.exists(path):
+        return []
+    with open(path, newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
+
+
+def load_postseason(season: str) -> list:
+    """The season's postseason.csv rows (playoffs + play-in), or [] when
+    this season's postseason was never collected (playoffs not scheduled
+    yet is the common case)."""
+    path = os.path.join(RAW_DIR, season, "postseason.csv")
     if not os.path.exists(path):
         return []
     with open(path, newline="", encoding="utf-8") as f:
@@ -427,6 +545,12 @@ def run_season(season: str, args, limiter: RateLimiter, team_ids: list) -> dict:
     print(f"[{season}] refreshing schedule (espn season="
           f"{season_param(season, LEAGUE)})...")
     snapshot_schedule(season, team_ids, limiter)
+    # Postseason phase in the SAME schedule refresh: playoffs (seasontype=3,
+    # skipped outright for seasons without a bracket) plus the scoreboard
+    # gap probe that is the only way play-in games come home. Both are
+    # schedule-only rows -- box scores stay regular-season-only by design.
+    snapshot_schedule(season, team_ids, limiter, phase="postseason")
+    snapshot_gap_games(season, limiter)
     games = load_schedule(season)
     pending = pending_box_scores(season, games)
     final_count = sum(1 for g in games if g.get("status") == "STATUS_FINAL")

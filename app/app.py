@@ -470,19 +470,88 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                     + (f": {len(stale):,} postponed/canceled rows only."
                        if not stale.empty else "."))
 
-            # NBA-app-style fixture detail: pick ANY game of the season (final
-            # or upcoming) for its box score + full play-by-play, or the
-            # tip-off/TV/venue of a game not played yet -- fetched live from
-            # ESPN's summary endpoint (cached 15 min), because the committed
-            # schedule carries scores but not per-player lines or PBP.
+            # -----------------------------------------------------------------
+            # Postseason: playoffs + play-in, clearly labeled and sourced from
+            # data/postseason*/ (its OWN tree, separate from schedules/) so
+            # standings, leaders, GOAT and the model stay regular-season-only.
+            # Same team/venue filters as the results above, its own CSV, and
+            # an honest empty state for a bracket that doesn't exist yet.
+            # -----------------------------------------------------------------
+            shared.section(f"{season} postseason")
+            post, post_note = shared.load_postseason_schedule(season, league)
+            post_view = shared.filter_schedule_games(post, team_pick,
+                                                     venue_pick)
+            post_finals = (post_view[post_view["status"] == "STATUS_FINAL"]
+                           if not post_view.empty else post_view)
+            post_upcoming = (post_view[post_view["status"] != "STATUS_FINAL"]
+                             if not post_view.empty else post_view)
+            if post.empty:
+                st.caption(
+                    f"No postseason schedule for {season}: the bracket does "
+                    "not exist until the regular season ends, or it has not "
+                    f"been collected yet (`{snapshot_cmd}`).")
+            elif post_view.empty:
+                st.caption(f"No postseason games match {filter_desc} "
+                           f"in {season}.")
+            else:
+                st.caption(f"Source: {post_note}")
+                table = post_view.copy().sort_values("date")
+                table["Date"] = table["date"].astype(str).str[:10]
+                table["Status"] = (table["status"].astype(str)
+                                   .str.replace("STATUS_", "", regex=False)
+                                   .str.title())
+                table = table.rename(columns={
+                    "away_abbrev": "Away", "away_score": "Away pts",
+                    "home_abbrev": "Home", "home_score": "Home pts",
+                })
+                st.dataframe(
+                    table[["Date", "Status", "Away", "Away pts",
+                           "Home", "Home pts"]],
+                    width="stretch", hide_index=True,
+                )
+                post_export = post_view.rename(columns={
+                    "date": "Date", "status": "Status", "neutral": "Neutral",
+                    "away_abbrev": "Away", "away_score": "Away pts",
+                    "home_abbrev": "Home", "home_score": "Home pts",
+                })
+                post_export = post_export[[
+                    c for c in ("Date", "Status", "Neutral", "Away",
+                                "Away pts", "Home", "Home pts")
+                    if c in post_export.columns]]
+                st.download_button(
+                    "Download postseason CSV",
+                    post_export.to_csv(index=False).encode("utf-8"),
+                    file_name=f"{season}_postseason.csv", mime="text/csv",
+                    key=f"postseason_csv_{league}",
+                    help="Playoffs and play-in fixtures the filters above "
+                         "select, with their scores and status.",
+                )
+                st.caption(
+                    f"{len(post_finals):,} final · {len(post_upcoming):,} "
+                    f"upcoming ({post_view['game_id'].nunique():,} total) · "
+                    "playoffs + play-in: not part of standings, leaders, "
+                    "GOAT or the projection model, which stay "
+                    "regular-season-only.")
+
+            # NBA-app-style fixture detail: pick ANY game of the season
+            # (regular or postseason, final or upcoming) for its box score +
+            # full play-by-play, or the tip-off/TV/venue of a game not played
+            # yet -- fetched live from ESPN's summary endpoint (cached 15
+            # min), because the committed schedule carries scores but not
+            # per-player lines or PBP. Postseason labels carry a (PO) mark.
             shared.section("Game detail: box score & play-by-play")
             labels: list = []
             game_ids: list = []
             seen: set = set()
-            for frame, is_final in ((finals.sort_values("date",
-                                                         ascending=False), True),
-                                    (upcoming.sort_values("date"), False)):
-                for row in frame.itertuples():
+            detail_frames = ((finals, True, False),
+                             (post_finals, True, True),
+                             (upcoming, False, False),
+                             (post_upcoming, False, True))
+            for frame, is_final, is_post in detail_frames:
+                if frame.empty:  # also skips a season with no postseason file
+                    continue
+                for row in frame.sort_values(
+                        "date", ascending=not is_final).itertuples():
                     day = str(row.date)[:10]
                     if is_final:
                         label = (f"{day}  {row.away_abbrev} {row.away_score}"
@@ -490,6 +559,8 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                     else:
                         when = str(row.date)[:16].replace("T", " ")
                         label = f"{when}  {row.away_abbrev} @ {row.home_abbrev}"
+                    if is_post:
+                        label += " (PO)"
                     if label in seen:
                         label = f"{label} · {row.game_id}"
                     seen.add(label)

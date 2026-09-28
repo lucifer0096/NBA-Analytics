@@ -98,7 +98,20 @@ per league, with that league's season and data.
    the game-detail picker and the export together, with a **Download
    schedule CSV** button taking exactly the selected rows and their
    statuses -- and zero matches says so plainly instead of an empty
-   table. Below the tables
+   table. Immediately below sits the labeled **{season} postseason**
+   section: that season's playoff and play-in rows from their own
+   committed tree (`data/postseason/`, `data/postseason_wnba/`), an
+   identical chronological table with a **Status** column (Final /
+   Scheduled / Postponed, title-cased), scoped by the same Team/Venue
+   toolbar, with its own **Download postseason CSV** button and a caption
+   stating these rows are display-only -- standings, leaders, GOAT and
+   the projection model stay regular-season-only. A season without a
+   bracket (or without collected rows) says exactly that
+   (`No postseason schedule for 2026-27: the bracket does not exist until
+   the regular season ends, or it has not been collected yet`) instead of
+   reusing another season's games. Playoff fixtures also join the
+   game-detail picker below with a **(PO)** mark, since any event id
+   resolves live from the same summary endpoint. Below the tables
    sits the **Game detail: box score & play-by-play** picker (the
    NBA-app-style view): any fixture of the season, finished or upcoming,
    resolves live from ESPN's summary endpoint (cached 15 minutes) into
@@ -274,7 +287,8 @@ names, the WNBA's insert `_wnba` right after a `dashboard_` prefix
 extension when there is none (`history_cache.json` →
 `history_cache_wnba.json`) -- one rule, `leagues.named_path()`, shared by
 the collector that writes them and the loaders that read them (the
-`data/races_wnba/` and `data/schedules_wnba/` directories are the same
+`data/races_wnba/`, `data/schedules_wnba/` and `data/postseason_wnba/`
+directories are the same
 rule applied to whole folders).
 
 | File | Written by | Read by |
@@ -282,6 +296,7 @@ rule applied to whole folders).
 | `data/dashboard_teams.json` | `refresh_dashboard_fallbacks.py` (live) | Teams-source hero note, team labels |
 | `data/dashboard_standings.json` | same (live, zero-record gated) | Standings tab |
 | `data/schedules/{season}.json` | same (local `schedule.csv` files, one per season across all 17; the WNBA's under `data/schedules_wnba/`) | Schedule tab, KPI next tip-off |
+| `data/postseason/{season}.json` | same (local `postseason.csv` files: playoffs + play-in, one per season with a bracket; the WNBA's under `data/postseason_wnba/`) | Schedule tab's Postseason section (its one consumer) |
 | `data/dashboard_schedule.json` | same (thin season index: labels + game counts + current season) | Sidebar default season, schedule fallback messages |
 | `data/dashboard_positions.json` | same (local position map) | Court View formation |
 | `data/dashboard_awards.json` | same (local award math: every collected season's races/leaders, all-time boards, all-history GOAT ladder) | KPI scoring leader, Awards Ladder, Court View, All-Time Stats, GOAT Rankings |

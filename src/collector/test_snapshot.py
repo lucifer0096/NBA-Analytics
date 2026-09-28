@@ -159,7 +159,7 @@ def test_rate_limiter_disabled_when_zero():
 def test_snapshot_schedule_tolerates_one_teams_failure(tmp_path, monkeypatch):
     monkeypatch.setattr(snapshot, "RAW_DIR", str(tmp_path / "raw"))
 
-    def get_schedule(season, team_id, league="nba"):
+    def get_schedule(season, team_id, league="nba", season_type=2):
         if team_id == 15:
             raise RuntimeError("HTTP Error 500: Internal Server Error")
         return {"team_id": team_id}
@@ -186,7 +186,7 @@ def test_snapshot_schedule_keeps_existing_when_partial_would_shrink(
     _write_schedule(tmp_path, monkeypatch, [
         _game(1, "STATUS_FINAL"), _game(2, "STATUS_FINAL")])
 
-    def get_schedule(season, team_id, league="nba"):
+    def get_schedule(season, team_id, league="nba", season_type=2):
         if team_id in (15, 16):
             raise RuntimeError("HTTP Error 500: Internal Server Error")
         return {"team_id": team_id}
@@ -204,6 +204,156 @@ def test_snapshot_schedule_keeps_existing_when_partial_would_shrink(
     with open(out, newline="", encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
     assert [r["game_id"] for r in rows] == ["1", "2"]  # existing kept
+
+
+# ---------------------------------------------------------------------------
+# Postseason phase + the play-in gap probe: the only path to games ESPN's
+# team-schedule endpoint omits entirely (seasontype=3 serves the playoff
+# rounds; play-in answers on NO seasontype -- see snapshot_gap_games)
+# ---------------------------------------------------------------------------
+
+def test_postseason_phase_skips_non_playoff_teams_without_failure(
+        tmp_path, monkeypatch):
+    """A team outside the playoffs answers with NO postseason games: the
+    normal answer, never a failure -- and the rows land in postseason.csv,
+    the tree refresh copies to its own committed tree."""
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    monkeypatch.setattr(snapshot, "RAW_DIR", str(raw))
+
+    def get_schedule(season, team_id, league="nba", season_type=2):
+        assert season_type == 3  # the phase selector reaches the endpoint
+        return {"team_id": team_id}
+
+    monkeypatch.setattr(snapshot.espn_api, "get_schedule", get_schedule)
+    # Teams 11 and 17 made the bracket; 16 went home after the regular
+    # season (empty parse, not an exception, not a failed call).
+    monkeypatch.setattr(snapshot.parsing, "parse_schedule",
+                        lambda payload, season, league="nba": (
+                            [{"game_id": f"{payload['team_id']}-po",
+                              "date": "2013-04-20", "status": "STATUS_FINAL",
+                              "home_score": "100", "away_score": "90"}]
+                            if payload["team_id"] in (11, 17) else []))
+
+    out = snapshot.snapshot_schedule("2012-13", [11, 16, 17],
+                                     snapshot.RateLimiter(0),
+                                     phase="postseason")
+
+    assert out.endswith("postseason.csv")
+    with open(out, newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    assert sorted(r["game_id"] for r in rows) == ["11-po", "17-po"]
+
+
+def test_postseason_writes_nothing_without_a_bracket_and_keeps_old_files(
+        tmp_path, monkeypatch, capsys):
+    """Season whose playoffs don't exist yet: no header-only CSV that
+    would read as 'postseason collected, zero games' -- and a file a
+    previous run wrote survives the zero-game answer untouched (the same
+    offseason guard the regular schedule has)."""
+    raw = tmp_path / "raw"
+    (raw / "2012-13").mkdir(parents=True)
+    monkeypatch.setattr(snapshot, "RAW_DIR", str(raw))
+    monkeypatch.setattr(snapshot.espn_api, "get_schedule",
+                        lambda season, team_id, league="nba", season_type=2:
+                        {"team_id": team_id})
+    monkeypatch.setattr(snapshot.parsing, "parse_schedule",
+                        lambda payload, season, league="nba": [])
+
+    out = snapshot.snapshot_schedule("2012-13", [11, 17],
+                                     snapshot.RateLimiter(0),
+                                     phase="postseason")
+    assert out == ""
+    assert not (raw / "2012-13" / "postseason.csv").exists()
+
+    kept = raw / "2012-13" / "postseason.csv"
+    kept.write_text("game_id,date\n9,2013-04-20\n", encoding="utf-8")
+    out = snapshot.snapshot_schedule("2012-13", [11, 17],
+                                     snapshot.RateLimiter(0),
+                                     phase="postseason")
+    assert out.endswith("postseason.csv")
+    assert kept.read_text(encoding="utf-8") == "game_id,date\n9,2013-04-20\n"
+    assert "keeping existing" in capsys.readouterr().out
+
+
+def test_gap_probe_collects_playin_games_no_seasontype_serves(
+        tmp_path, monkeypatch):
+    """Play-in games live in the calendar gap between the regular season's
+    last day and the playoffs' first game, reachable only via the
+    scoreboard: probe ONLY those days (never a whole month), merge real
+    parse_schedule rows deduped on game_id, and stay idempotent across
+    runs (probing again, adding nothing)."""
+    raw = _write_schedule(tmp_path, monkeypatch, [
+        {"game_id": "1", "date": "2013-01-05", "status": "STATUS_FINAL"}])
+    post = raw / "2012-13" / "postseason.csv"
+    fields = ["game_id", "date", "season", "home_id", "home_abbrev",
+              "home_score", "away_id", "away_abbrev", "away_score",
+              "status", "neutral"]
+    with open(post, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        writer.writerow({"game_id": "2", "date": "2013-01-08",
+                         "season": "2012-13", "home_id": "4",
+                         "home_abbrev": "CHI", "home_score": "95",
+                         "away_id": "2", "away_abbrev": "BOS",
+                         "away_score": "91", "status": "STATUS_FINAL",
+                         "neutral": "False"})
+
+    asked: list = []
+
+    def get_scoreboard(dates, league="nba"):
+        asked.append(dates)
+        if dates != "20130106":
+            return {"events": []}
+        return {"events": [{
+            "id": "77", "date": "2013-01-06T00:00Z",
+            "competitions": [{
+                "status": {"type": {"name": "STATUS_FINAL"}},
+                "competitors": [
+                    {"homeAway": "home",
+                     "team": {"id": "5", "abbreviation": "CLE"},
+                     "score": {"displayValue": "94"}},
+                    {"homeAway": "away",
+                     "team": {"id": "9", "abbreviation": "TOR"},
+                     "score": {"displayValue": "90"}},
+                ],
+            }],
+        }]}
+
+    monkeypatch.setattr(snapshot.espn_api, "get_scoreboard", get_scoreboard)
+
+    added = snapshot.snapshot_gap_games("2012-13", snapshot.RateLimiter(0))
+
+    assert added == 1
+    assert asked == ["20130106", "20130107"]  # only the gap days
+    rows = snapshot.load_postseason("2012-13")
+    # date-sorted merge: the Jan 6 play-in lands before the Jan 8 playoff
+    # game already on disk; the real parser produced the full row shape.
+    assert [r["game_id"] for r in rows] == ["77", "2"]
+    assert rows[0]["home_abbrev"] == "CLE"
+    assert rows[0]["status"] == "STATUS_FINAL"
+
+    asked.clear()
+    # The collected Jan 6 play-in now FLANKS the boundary (last regular
+    # Jan 5 -> first postseason Jan 6): the gap is closed, so a second run
+    # probes nothing and adds nothing -- idempotent AND converged.
+    assert snapshot.snapshot_gap_games("2012-13",
+                                       snapshot.RateLimiter(0)) == 0
+    assert asked == []
+    assert len(snapshot.load_postseason("2012-13")) == 2  # not re-added
+
+
+def test_gap_probe_is_a_noop_without_a_postseason_file(tmp_path, monkeypatch):
+    """A season with no bracket (2026-27 pre-tip-off) or no regular
+    schedule makes ZERO scoreboard calls: nothing to probe between."""
+    raw = _write_schedule(tmp_path, monkeypatch, [
+        {"game_id": "1", "date": "2013-01-05", "status": "STATUS_FINAL"}])
+    monkeypatch.setattr(snapshot.espn_api, "get_scoreboard",
+                        lambda *a, **k: (_ for _ in ()).throw(
+                            AssertionError("no call expected")))
+    assert snapshot.snapshot_gap_games("2012-13",
+                                       snapshot.RateLimiter(0)) == 0
+    assert not (raw / "2012-13" / "postseason.csv").exists()
 
 
 def test_player_positions_partial_failure_keeps_existing_rows(

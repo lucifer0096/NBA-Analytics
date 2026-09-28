@@ -44,6 +44,8 @@ def isolated(tmp_path, monkeypatch):
     monkeypatch.setattr(refresh, "DATA_DIR", str(data))
     monkeypatch.setattr(refresh, "PROCESSED_DIR", str(data / "processed"))
     monkeypatch.setattr(refresh, "SCHEDULES_DIR", str(data / "schedules"))
+    monkeypatch.setattr(refresh, "POSTSEASON_DIR",
+                        str(data / "postseason"))
     monkeypatch.setattr(refresh, "RACES_DIR", str(data / "races"))
     return {"raw": raw, "data": data}
 
@@ -73,13 +75,14 @@ def test_set_league_rebinds_paths_and_writes_wnba_names(monkeypatch):
     together and _in_dir gives the WNBA's committed files their '_wnba'
     names while the NBA keeps the historical ones."""
     saved = {name: getattr(refresh, name) for name in
-             ("LEAGUE", "RAW_DIR", "SCHEDULES_DIR", "RACES_DIR",
-              "SEASON_DIR_RE")}
+             ("LEAGUE", "RAW_DIR", "SCHEDULES_DIR", "POSTSEASON_DIR",
+              "RACES_DIR", "SEASON_DIR_RE")}
     try:
         refresh.set_league("wnba")
         assert refresh.LEAGUE == "wnba"
         assert refresh.RAW_DIR.endswith("raw_wnba")
         assert refresh.SCHEDULES_DIR.endswith("schedules_wnba")
+        assert refresh.POSTSEASON_DIR.endswith("postseason_wnba")
         assert refresh.RACES_DIR.endswith("races_wnba")
         assert refresh.SEASON_DIR_RE.fullmatch("2026")
         assert not refresh.SEASON_DIR_RE.fullmatch("2010-11")
@@ -109,8 +112,8 @@ def test_wnba_season_candidates_are_single_year_labels(monkeypatch):
     """The candidate list for the WNBA never carries an NBA two-year label
     (the completed/current seasons are plain calendar years)."""
     saved = {name: getattr(refresh, name) for name in
-             ("LEAGUE", "RAW_DIR", "SCHEDULES_DIR", "RACES_DIR",
-              "SEASON_DIR_RE")}
+             ("LEAGUE", "RAW_DIR", "SCHEDULES_DIR", "POSTSEASON_DIR",
+              "RACES_DIR", "SEASON_DIR_RE")}
     try:
         refresh.set_league("wnba")
         candidates = refresh.season_candidates()
@@ -219,6 +222,72 @@ def test_refresh_schedule_keeps_committed_seasons_absent_locally(isolated):
     kept = json.loads((isolated["data"] / "schedules" / "2010-11.json")
                       .read_text(encoding="utf-8"))
     assert kept == committed
+
+
+# ---------------------------------------------------------------------------
+# refresh_postseason_schedule: the separate postseason tree, same contracts
+# ---------------------------------------------------------------------------
+
+def test_refresh_postseason_schedule_writes_cleans_and_preserves(isolated):
+    """Postseason rows land under data/postseason/ with refresh_schedule's
+    contracts: scores cleaned "94.0" -> "94", scheduled rows keep their
+    blanks, committed seasons absent locally preserved, unchanged content
+    never rewritten (byte-identical stamps), and NO index file -- the app
+    reads the selected season's file directly."""
+    (isolated["data"] / "postseason").mkdir()
+    committed = {"season": "2015-16",
+                 "games": [_row("1", "2015-16", home_score="94",
+                                away_score="88")],
+                 "_generated_utc": "2026-09-24T00:00:00Z", "source": "local"}
+    (isolated["data"] / "postseason" / "2015-16.json").write_text(
+        json.dumps(committed), encoding="utf-8")
+    _write_csv(isolated["raw"] / "2026-27" / "postseason.csv",
+               [_row("5", "2026-27"),
+                _row("6", "2026-27", "STATUS_SCHEDULED", "", "")])
+
+    counts = refresh.refresh_postseason_schedule()
+
+    assert counts == {"2015-16": 1, "2026-27": 2}
+    old = json.loads((isolated["data"] / "postseason" / "2015-16.json")
+                     .read_text(encoding="utf-8"))
+    assert old == committed  # untouched: raw for it doesn't exist locally
+    new = json.loads((isolated["data"] / "postseason" / "2026-27.json")
+                     .read_text(encoding="utf-8"))
+    assert new["season"] == "2026-27"
+    assert new["games"][0]["home_score"] == "94"  # "94.0" cleaned
+    assert new["games"][0]["away_score"] == "88"
+    assert new["games"][1]["home_score"] == ""    # scheduled stays empty
+    assert not (isolated["data"] / "dashboard_postseason.json").exists()
+    assert not (isolated["data"] / "dashboard_schedule.json").exists()
+
+    # Idempotent: a second run rewrites nothing (stamp included).
+    before = (isolated["data"] / "postseason" / "2026-27.json").read_text(
+        encoding="utf-8")
+    refresh.refresh_postseason_schedule()
+    assert (isolated["data"] / "postseason" / "2026-27.json").read_text(
+        encoding="utf-8") == before
+
+
+def test_refresh_postseason_schedule_never_touches_the_regular_tree(
+        isolated):
+    """The two trees never bleed: a postseason refresh writes files ONLY
+    under data/postseason/ -- schedules/ and its index stay byte-identical
+    (that separation is what keeps every computed view regular-season)."""
+    (isolated["data"] / "schedules").mkdir(parents=True)
+    regular = {"season": "2026-27", "games": [_row("1", "2026-27")],
+               "_generated_utc": "2026-09-24T00:00:00Z", "source": "local"}
+    (isolated["data"] / "schedules" / "2026-27.json").write_text(
+        json.dumps(regular), encoding="utf-8")
+    _write_csv(isolated["raw"] / "2026-27" / "schedule.csv",
+               [_row("9", "2026-27")])
+    _write_csv(isolated["raw"] / "2026-27" / "postseason.csv",
+               [_row("5", "2026-27")])
+
+    refresh.refresh_postseason_schedule()
+
+    kept = json.loads((isolated["data"] / "schedules" / "2026-27.json")
+                      .read_text(encoding="utf-8"))
+    assert kept == regular  # regular tree never saw this pass
 
 
 # ---------------------------------------------------------------------------

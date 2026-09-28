@@ -241,6 +241,17 @@ def schedules_dir(league: str = DEFAULT_LEAGUE) -> str:
             if league == "nba" else os.path.join(DATA_DIR, "schedules_wnba"))
 
 
+def postseason_dir(league: str = DEFAULT_LEAGUE) -> str:
+    """Committed postseason schedule files (one JSON per season): a tree
+    deliberately SEPARATE from schedules/, so standings, leaders, GOAT and
+    the model's training frame -- all readers of schedules/ -- stay
+    regular-season-only while the Schedule tab can show playoff scores
+    under their own label. The folder rule matches races/schedules: the
+    NBA's historical name, '_wnba' for the other league."""
+    return (os.path.join(DATA_DIR, "postseason")
+            if league == "nba" else os.path.join(DATA_DIR, "postseason_wnba"))
+
+
 def named_path(directory: str, name: str,
                league: str = DEFAULT_LEAGUE) -> str:
     """`name` inside `directory` with THE league naming rule: the NBA keeps

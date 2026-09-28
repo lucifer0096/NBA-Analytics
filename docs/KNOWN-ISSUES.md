@@ -207,3 +207,23 @@ branch tip at job start, which the group lock guarantees to be stable
 until this run's own push). Any other bot job that pushes at the end of
 its run needs the same `ref:` -- `${{ github.sha }}` is only safe when
 the run neither queues nor races a human push.
+
+## 2026-09-29 -- play-in games answer on NO `seasontype`
+
+The team-schedule endpoint's `seasontype` selector has no value for the
+play-in round: probing all 30 NBA teams over the Apr 14-17, 2026 window
+(the MIA/CHA/PHX play-in) returned those games under **neither**
+`seasontype=2` (the regular file ends Apr 13, the true last
+regular-season day) nor `seasontype=3` (round one starts Apr 18) nor
+`seasontype=4` (zero events) -- while `scoreboard?dates=20260414`
+serves MIA 126 @ CHA 127 and POR 114 @ PHX 110, `20260417` both
+play-in finals, with the same `events[].competitions[]` schema
+`parse_schedule` already reads (float scores and all).
+
+**Guard**: `snapshot_schedule(..., phase="postseason")` collects
+`seasontype=3` into `postseason.csv`, then `snapshot_gap_games` probes
+`scoreboard?dates=` for only the days strictly between the regular
+season's last game and the playoffs' first (capped at 7), merging
+deduped `game_id`s -- idempotent, converging to zero calls once the
+play-in games close the gap, and a no-op for any season whose
+postseason file doesn't exist yet (bracketless seasons included).
