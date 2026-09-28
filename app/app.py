@@ -305,6 +305,64 @@ with tabs[1]:
                 f"{extra}: chronological; click a column header to sort."
             )
 
+        # NBA-app-style fixture detail: pick ANY game of the season (final
+        # or upcoming) for its box score + full play-by-play, or the
+        # tip-off/TV/venue of a game not played yet -- fetched live from
+        # ESPN's summary endpoint (cached 15 min), because the committed
+        # schedule carries scores but not per-player lines or PBP.
+        shared.section("Game detail: box score & play-by-play")
+        labels: list = []
+        game_ids: list = []
+        seen: set = set()
+        for frame, is_final in ((finals.sort_values("date", ascending=False),
+                                 True),
+                                (upcoming.sort_values("date"), False)):
+            for row in frame.itertuples():
+                day = str(row.date)[:10]
+                if is_final:
+                    label = (f"{day}  {row.away_abbrev} {row.away_score}"
+                             f" @ {row.home_abbrev} {row.home_score}")
+                else:
+                    when = str(row.date)[:16].replace("T", " ")
+                    label = f"{when}  {row.away_abbrev} @ {row.home_abbrev}"
+                if label in seen:
+                    label = f"{label} · {row.game_id}"
+                seen.add(label)
+                labels.append(label)
+                game_ids.append(str(row.game_id))
+        if not labels:
+            st.caption("No fixtures listed for this season yet.")
+        else:
+            pick = st.selectbox(
+                "Fixture", labels, index=0,
+                help="Box score and play-by-play (final), tip-off, TV and "
+                     "venue (upcoming). Live from ESPN, cached 15 minutes.")
+            meta, box_rows, plays, note = shared.load_game_summary(
+                game_ids[labels.index(pick)])
+            st.caption(f"Source: {note}")
+            if meta:
+                away = meta.get("away_abbrev") or "?"
+                home = meta.get("home_abbrev") or "?"
+                if meta.get("status") == "STATUS_FINAL":
+                    st.markdown(
+                        f"**{away} {shared.fmt_score(meta.get('away_score'))}"
+                        f" @ {home} "
+                        f"{shared.fmt_score(meta.get('home_score'))}**")
+                    shared.render_box_sides(pd.DataFrame(box_rows), meta)
+                    shared.render_play_by_play(plays)
+                else:
+                    when = str(meta.get("date") or "")[:16].replace("T", " ")
+                    status = (str(meta.get("status") or "")
+                              .replace("STATUS_", "").replace("_", " ")
+                              .title())
+                    parts = [f"**{away} @ {home}**", when, status]
+                    if meta.get("venue"):
+                        parts.append(str(meta["venue"]))
+                    parts.extend(meta.get("airings") or [])
+                    st.markdown(" · ".join(p for p in parts if p))
+                    st.caption("No box score until this game is played: "
+                               "the collector stores it as a final result.")
+
 # ---------------------------------------------------------------------------
 # Awards Ladder: MVP / DPOY / 6th Man / MIP races + season stat leaders
 # ---------------------------------------------------------------------------

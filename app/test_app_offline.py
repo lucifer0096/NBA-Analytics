@@ -325,7 +325,9 @@ def test_sidebar_every_year_leads_with_data_and_honest_empty(offline_espn):
     show-2025-26-with-a-warning contract is gone) and the Awards note says
     the season has no collected games -- never another year's races."""
     at = _render("app/app.py", offline_espn)
-    box = at.selectbox[0]
+    # Label lookup, not [0]: the Schedule tab's Fixture picker also renders
+    # (AppTest orders sidebar widgets after main content).
+    box = next(b for b in at.selectbox if str(b.label) == "Season")
     labels = list(box.options)
     assert "2010-11" in labels and "2025-26" in labels and "2026-27" in labels
     assert box.value == "2025-26"
@@ -339,3 +341,123 @@ def test_sidebar_every_year_leads_with_data_and_honest_empty(offline_espn):
     # under the 2026-27 header).
     infos = " ".join(str(i.value) for i in at.info)
     assert "No standings available for 2026-27" in infos
+
+
+# ---------------------------------------------------------------------------
+# Schedule tab: NBA-app-style fixture detail (box score + play-by-play)
+# ---------------------------------------------------------------------------
+
+def test_schedule_game_detail_is_honest_offline(offline_espn):
+    """The fixture picker exists over the committed schedule, and with ESPN
+    unreachable the selected game says WHY there is no box score instead of
+    raising or faking content."""
+    at = _render("app/app.py", offline_espn)
+    fixture = next((b for b in at.selectbox if str(b.label) == "Fixture"),
+                   None)
+    assert fixture is not None, "fixture picker missing from Schedule tab"
+    assert len(fixture.options) > 0
+    assert not at.exception
+    assert len(at.warning) == 0
+    captions = " ".join(str(c.value) for c in at.caption)
+    assert "Live game detail" in captions
+    assert "unavailable" in captions
+
+
+def test_schedule_game_detail_renders_box_and_pbp(offline_espn, monkeypatch):
+    """With a summary in hand, a FINAL fixture shows the matchup line, both
+    sides' box-score tables and the period-filterable play-by-play."""
+    import shared as shared_module
+
+    meta = {"game_id": 1, "status": "STATUS_FINAL",
+            "away_abbrev": "BOS", "home_abbrev": "NYK",
+            "away_score": 101, "home_score": 99,
+            "away_id": 2, "home_id": 7,
+            "venue": "Madison Square Garden", "airings": ["National: ESPN"]}
+    rows = [
+        {"game_id": 1, "team_id": 2, "player_id": 10,
+         "player_name": "Star Guy", "did_not_play": False, "min": 36,
+         "pts": 30, "reb": 8, "ast": 5, "stl": 1, "blk": 0, "to": 2,
+         "fgm": 11, "fga": 20, "fg3m": 4, "fg3a": 10, "ftm": 4, "fta": 5},
+        {"game_id": 1, "team_id": 7, "player_id": 11,
+         "player_name": "Bench Guy", "did_not_play": True, "min": None,
+         "pts": None, "reb": None, "ast": None, "stl": None, "blk": None,
+         "to": None, "fgm": None, "fga": None, "fg3m": None, "fg3a": None,
+         "ftm": None, "fta": None},
+    ]
+    plays = [
+        {"period": "4th Quarter", "clock": "0:03",
+         "description": "Star Guy 26' driving layup",
+         "score": "101:99", "scoring": True},
+    ]
+    monkeypatch.setattr(shared_module, "load_game_summary",
+                        lambda game_id: (meta, rows, plays,
+                                         "Live ESPN summary (15 min cache)"))
+
+    at = _render("app/app.py", offline_espn)
+
+    assert not at.exception
+    text = _markdown_text(at)
+    assert "**BOS 101 @ NYK 99**" in text
+    assert "**Play-by-play**" in text
+    select_labels = [str(b.label) for b in at.selectbox]
+    assert "Period" in select_labels  # PBP period filter reached the screen
+    assert len(list(getattr(at, "dataframe", []))) >= 3  # 2 box + PBP
+    assert len(at.warning) == 0
+
+
+def test_schedule_game_detail_upcoming_shows_fixture_info(
+        offline_espn, monkeypatch):
+    """An UPCOMING fixture has no box score (said honestly), but tip-off,
+    status, venue and TV still reach the screen from the live summary."""
+    import shared as shared_module
+
+    meta = {"game_id": 401610401, "status": "STATUS_SCHEDULED",
+            "away_abbrev": "LAL", "home_abbrev": "GSW",
+            "away_score": 0, "home_score": 0, "away_id": 13, "home_id": 9,
+            "date": "2026-10-21T23:30:00Z",
+            "venue": "Chase Center", "airings": ["National: ESPN"]}
+    monkeypatch.setattr(shared_module, "load_game_summary",
+                        lambda game_id: (meta, [], [],
+                                         "Live ESPN summary (15 min cache)"))
+
+    at = _render("app/app.py", offline_espn)
+
+    assert not at.exception
+    text = _markdown_text(at)
+    assert "**LAL @ GSW**" in text
+    assert "2026-10-21 23:30" in text
+    assert "Scheduled" in text
+    assert "Chase Center" in text and "National: ESPN" in text
+    captions = " ".join(str(c.value) for c in at.caption)
+    assert "No box score until this game is played" in captions
+    assert len(at.warning) == 0
+
+
+def test_parse_plays_flattens_and_skips_malformed():
+    """The PBP parser turns ESPN's live `plays` into flat table rows and
+    degrades on malformed entries (non-dict plays, junk period) instead of
+    raising inside the page."""
+    import shared as shared_module
+
+    plays = [
+        {"text": "Star Guy 26' stepback 3PT",
+         "period": {"displayValue": "4th Quarter"},
+         "clock": {"displayValue": "0:03"},
+         "awayScore": 3, "homeScore": 1, "scoringPlay": True},
+        {"shortDescription": "Jumpball", "period": "weird"},
+        "not-a-dict",
+        {"clock": {"displayValue": "11:00"}},  # no description -> skipped
+        42,
+    ]
+
+    rows = shared_module._parse_plays(plays)
+
+    assert [r["description"] for r in rows] == [
+        "Star Guy 26' stepback 3PT", "Jumpball"]
+    assert rows[0]["scoring"] is True
+    assert rows[0]["score"] == "3:1"
+    assert rows[0]["period"] == "4th Quarter"
+    assert rows[0]["clock"] == "0:03"
+    assert rows[1]["period"] is None  # junk period degrades, never raises
+    assert shared_module._parse_plays("not-a-list") == []
+    assert shared_module._parse_plays(None) == []

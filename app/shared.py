@@ -852,6 +852,176 @@ def load_scoreboard(dates: str) -> tuple:
         return (pd.DataFrame(), "Offline fallback")
 
 
+# ---------------------------------------------------------------------------
+# Fixture game detail: box score + play-by-play (NBA-app-style), live
+# ---------------------------------------------------------------------------
+
+def _broadcast_lines(raw) -> list:
+    """ESPN `broadcasts` -> ['National: ESPN', 'Home: BlazerVision']."""
+    if not isinstance(raw, list):
+        return []
+    lines = []
+    for entry in raw:
+        if not isinstance(entry, dict):
+            continue
+        station = entry.get("station")
+        if not station and isinstance(entry.get("media"), dict):
+            station = (entry["media"].get("callLetters")
+                       or entry["media"].get("name"))
+        if not station:
+            continue
+        market = entry.get("market")
+        market = market.get("type") if isinstance(market, dict) else None
+        lines.append(f"{market}: {station}" if market else str(station))
+    return lines
+
+
+def _parse_plays(raw) -> list:
+    """ESPN summary `plays` -> flat play-by-play rows: period, clock, the
+    description, the running away:home score and a scoring flag (the NBA
+    app's play-by-play core). Malformed entries are skipped, never raised --
+    this renders live third-party JSON straight to a table."""
+    if not isinstance(raw, list):
+        return []
+    rows = []
+    for play in raw:
+        if not isinstance(play, dict):
+            continue
+        text = play.get("text") or play.get("shortDescription") or ""
+        if not isinstance(text, str) or not text.strip():
+            continue
+        period = play.get("period")
+        clock = play.get("clock")
+        rows.append({
+            "period": (period.get("displayValue")
+                       if isinstance(period, dict) else None),
+            "clock": (clock.get("displayValue")
+                      if isinstance(clock, dict) else None),
+            "description": text.strip(),
+            "score": f"{play.get('awayScore', '')}:{play.get('homeScore', '')}",
+            "scoring": bool(play.get("scoringPlay")),
+        })
+    return rows
+
+
+def _fmt_split(made, att) -> str:
+    """'10-20' for a shooting split; blank when nothing was recorded (a DNP
+    row is blank, never an invented 0-0)."""
+    if pd.isna(made) and pd.isna(att):
+        return ""
+    made = 0 if pd.isna(made) else int(float(made))
+    att = 0 if pd.isna(att) else int(float(att))
+    return f"{made}-{att}"
+
+
+def fmt_score(value) -> str:
+    """Final score for the matchup line: '110' for ESPN's 110.0, '' when
+    genuinely missing -- a blank never pretends to be a zero."""
+    if value is None or (not isinstance(value, str) and pd.isna(value)):
+        return ""
+    try:
+        return f"{float(value):g}"
+    except (TypeError, ValueError):
+        return str(value)
+
+
+def render_box_sides(rows: pd.DataFrame, meta: dict) -> None:
+    """Both teams' box-score lines side by side (the NBA app's two-column
+    game box): starters then bench in ESPN's order, splits as made-attempted,
+    DNP rows kept with a (DNP) marker -- absence is a real outcome."""
+    if rows is None or rows.empty or "team_id" not in rows.columns:
+        st.caption("No player lines in the summary payload for this game.")
+        return
+    left, right = st.columns(2)
+    sides = ((left, meta.get("away_id"), meta.get("away_abbrev")),
+             (right, meta.get("home_id"), meta.get("home_abbrev")))
+    for col, team_id, abbrev in sides:
+        with col:
+            st.markdown(f"**{abbrev or 'Team'}**")
+            side = rows[rows["team_id"] == team_id].copy()
+            if side.empty:
+                st.caption("No player lines for this team.")
+                continue
+            dnp = side.get("did_not_play")
+            side["Player"] = side["player_name"].astype(str) + (
+                dnp.map(lambda flag: " (DNP)" if flag else "")
+                if dnp is not None else "")
+            order = ["Player", "min", "pts", "reb", "ast", "stl", "blk", "to"]
+            table = side[[c for c in order if c in side.columns]]
+            for made, att, label in (("fgm", "fga", "FG"),
+                                     ("fg3m", "fg3a", "3P"),
+                                     ("ftm", "fta", "FT")):
+                if made in side.columns and att in side.columns:
+                    table[label] = [_fmt_split(m, a)
+                                    for m, a in zip(side[made], side[att])]
+            table = table.rename(columns={
+                "min": "MIN", "pts": "PTS", "reb": "REB", "ast": "AST",
+                "stl": "STL", "blk": "BLK", "to": "TO",
+            })
+            for col_name in ("MIN", "PTS", "REB", "AST", "STL", "BLK", "TO"):
+                if col_name in table.columns:
+                    table[col_name] = pd.to_numeric(
+                        table[col_name], errors="coerce").astype("Int64")
+            st.dataframe(table, hide_index=True, width="stretch")
+
+
+def render_play_by_play(plays: list) -> None:
+    """The full play-by-play with period and scoring filters (the NBA app's
+    PBP view): every event with its clock and the running away:home score."""
+    st.markdown("**Play-by-play**")
+    if not plays:
+        st.caption("No play-by-play in ESPN's summary for this game "
+                   "(not tipped off yet, or unavailable for this event).")
+        return
+    table = pd.DataFrame(plays)
+    raw_periods = table["period"].tolist() if "period" in table.columns else []
+    periods = [p for p in dict.fromkeys(raw_periods) if isinstance(p, str)]
+    pcol, scol = st.columns([1, 1])
+    period = pcol.selectbox("Period", ["All", *periods], key="pbp_period")
+    scoring_only = scol.checkbox("Scoring plays only", key="pbp_scoring")
+    view = table if period == "All" else table[table["period"] == period]
+    if scoring_only:
+        view = view[view["scoring"]]
+    view = view.rename(columns={"period": "Period", "clock": "Clock",
+                                "description": "Play", "score": "Score"})
+    view = view[[c for c in ("Period", "Clock", "Play", "Score")
+                 if c in view.columns]]
+    if view.empty:
+        st.caption("No matching plays for these filters.")
+        return
+    st.dataframe(view, hide_index=True, width="stretch", height=360)
+
+
+@st.cache_data(ttl=900, show_spinner=False)
+def load_game_summary(game_id) -> tuple:
+    """(meta dict, player rows, play-by-play rows, note) for ONE game: the
+    fixture detail behind the Schedule tab's game picker.
+
+    Fetched LIVE from ESPN's public summary endpoint -- the same payload the
+    collector stores box scores from (free, unauthenticated, cached 15
+    minutes) -- so the detail exists for every season with a schedule:
+    previous seasons' finished games AND upcoming fixtures (tip-off, TV,
+    venue), with no local box-score file required. Honest failure: an
+    unreachable endpoint or a payload that is not THIS game returns empty
+    content with a note saying why, never another game's data."""
+    try:
+        import parsing
+
+        payload = espn_api.get_event_summary(game_id)
+        meta, rows = parsing.parse_summary(payload)
+    except Exception:
+        return ({}, [], [], f"Live game detail for game {game_id} "
+                            "unavailable: ESPN unreachable from this session")
+    if not meta or str(meta.get("game_id")) != str(game_id):
+        return ({}, [], [], f"No usable summary on ESPN for game {game_id}")
+    info = payload.get("gameInfo") or {}
+    venue = info.get("venue") if isinstance(info.get("venue"), dict) else {}
+    meta["venue"] = venue.get("fullName")
+    meta["airings"] = _broadcast_lines(payload.get("broadcasts"))
+    return meta, rows, _parse_plays(payload.get("plays")), \
+        "Live ESPN summary (15 min cache)"
+
+
 @st.cache_data(ttl=300, show_spinner=False)
 def load_positions() -> pd.DataFrame:
     """Current player -> position map (optimizer pool + Court View formation)."""

@@ -60,7 +60,15 @@ pages; dark theme ships in `.streamlit/config.toml`.
    shows the 15 most recent results (day, matchup, final score) and the
    next 25 fixtures, plus a count of past-dated postponed/canceled rows
    excluded from both. A finished season renders the full chronological
-   table of every completed game with its final score.
+   table of every completed game with its final score. Below the tables
+   sits the **Game detail: box score & play-by-play** picker (the
+   NBA-app-style view): any fixture of the season, finished or upcoming,
+   resolves live from ESPN's summary endpoint (cached 15 minutes) into
+   both teams' box-score lines with DNP rows marked plus a
+   period/scoring-filterable play-by-play, while a not-yet-played fixture
+   shows tip-off, status, venue and TV instead of pretending a box score
+   exists. Unreachable ESPN degrades to a caption saying why -- the
+   committed schedule carries scores, never per-player lines or PBP.
 5. **Awards Ladder**: the selected season's MVP / DPOY / 6th Man / MIP
    races in two columns, then a stat-leaders strip behind a
    PTS/REB/AST/STL/BLK/**3PM** radio (top-10 per-game rates, each row
