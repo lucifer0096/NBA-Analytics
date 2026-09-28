@@ -115,7 +115,7 @@ with honours_col:
                    "awards API.")
 
 shared.section("Career progression")
-metric_col, scale_col = st.columns([3, 1])
+metric_col, scale_col, axis_col = st.columns([3, 1, 1])
 with metric_col:
     metric = st.radio(
         "Metric", list(shared.PROGRESSION_METRICS), horizontal=True,
@@ -127,9 +127,17 @@ with scale_col:
                     key="profile_scale",
                     help="Totals = that season's per-game rate × GP. "
                          "Percentages are rates and ignore the toggle.")
+with axis_col:
+    axis = st.radio(
+        "Axis", ["Season", "Career year"], horizontal=True,
+        key="profile_axis",
+        help="Career year numbers each player's seasons 1, 2, 3 ... from "
+             "his first, so careers from different eras line up on one "
+             "grid instead of sitting in non-overlapping decades.")
 series = {name: (by_name[name].get("seasons_log") or [])
           for name in selected}
-figure = shared.progression_figure(series, metric, mode, height=400)
+figure = shared.progression_figure(series, metric, mode, height=400,
+                                   axis=axis)
 if figure.data:
     st.plotly_chart(figure, width="stretch")
     missing = [n for n, rows in series.items() if not rows]
@@ -142,6 +150,9 @@ if figure.data:
         "player at once; click the legend to toggle a player; drag to zoom, "
         "double-click to reset."
     )
+    if axis == "Career year":
+        note_bits += (" Career year counts each player's seasons from his "
+                      "first; hover carries the calendar season.")
     if metric in shared.PROGRESSION_PCT:
         note_bits += (" Percentages are rates; the totals toggle applies "
                       "to counting stats only.")

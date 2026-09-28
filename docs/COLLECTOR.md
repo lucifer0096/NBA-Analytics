@@ -102,5 +102,6 @@ Streamlit Cloud cannot run the collector and `data/raw/` is gitignored, so
 | `data/dashboard_positions.json` | current player → position map | local/live |
 | `data/dashboard_awards.json` | **every collected season's** MVP/DPOY/6th-Man/MIP races + per-game stat leaders (incl. 3PM, +/-, FG/3P splits), plus the cross-season all-time boards and the all-NBA-history GOAT ladder (`awards.py` + `history.py`) | local (collected box scores + cached ESPN history) |
 | `data/dashboard_players.json` | all-history player index for the Player Profile page: career line, per-season rows, official honours, GOAT score/rank (`history.py`) | local |
+| `data/races/{season}.json` | daily race snapshots (top rows' rank + score) behind the ladder's movement arrows and MVP trend: one per UTC day, written only while a race moves, same-day replaced, capped | local (the same award math) |
 | `data/dashboard_projections.json` | upcoming-game model projections | computed where raw data + model exist |
 | `data/processed/dashboard_leaderboards.json` | last completed season's per-player totals (counting stats incl. the collected-window +/-) + shooting splits (FG/3P/FT counts, FG%, eFG%, TS%) + fantasy points; kept as a committed artifact (no page reads it since Season Leaders was removed) | local |

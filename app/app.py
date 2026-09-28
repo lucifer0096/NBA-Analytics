@@ -201,35 +201,40 @@ with tabs["Standings"]:
                 return "🟡 "
             return ""
 
+        # Row decoration for the WHOLE table at once: both conference views
+        # and the CSV export draw the same columns, so nothing can drift.
+        full = standings.copy()
+        full["record"] = (
+            full["wins"].astype("Int64").astype(str)
+            + "-"
+            + full["losses"].astype("Int64").astype(str)
+        )
+        full["zone"] = full["playoff_seed"].map(_zone)
+        # Team +/- (per-game point differential) and last-ten form:
+        # signed text for the differential, blanks when ESPN omitted the
+        # stat -- never a fabricated zero.
+        if "differential" in full.columns:
+            full["+/-"] = full["differential"].map(
+                lambda v: "" if v is None or pd.isna(v) else f"{v:+.1f}")
+        if "last_ten" in full.columns:
+            full["L10"] = full["last_ten"].map(
+                lambda v: "" if v is None or pd.isna(v) else str(v))
+        renames = {
+            "team": "Team", "win_percent": "Win%", "playoff_seed": "Seed",
+            "streak": "Streak", "avg_points_for": "PF/g",
+            "avg_points_against": "PA/g", "games_behind": "GB",
+        }
+
         for conference in ("Eastern Conference", "Western Conference"):
-            table = standings[standings["conference"] == conference].copy()
+            table = full[full["conference"] == conference].copy()
             if table.empty:
                 continue
             shared.section(conference)
             table = table.sort_values(
                 "playoff_seed", na_position="last"
             ).reset_index(drop=True)
-            table["record"] = (
-                table["wins"].astype("Int64").astype(str)
-                + "-"
-                + table["losses"].astype("Int64").astype(str)
-            )
-            table["zone"] = table["playoff_seed"].map(_zone)
-            # Team +/- (per-game point differential) and last-ten form:
-            # signed text for the differential, blanks when ESPN omitted the
-            # stat -- never a fabricated zero.
-            if "differential" in table.columns:
-                table["+/-"] = table["differential"].map(
-                    lambda v: "" if v is None or pd.isna(v) else f"{v:+.1f}")
-            if "last_ten" in table.columns:
-                table["L10"] = table["last_ten"].map(
-                    lambda v: "" if v is None or pd.isna(v) else str(v))
             table.index = table.index + 1
-            display = table.rename(columns={
-                "team": "Team", "win_percent": "Win%", "playoff_seed": "Seed",
-                "streak": "Streak", "avg_points_for": "PF/g",
-                "avg_points_against": "PA/g",
-            })
+            display = table.rename(columns=renames)
             keep = ["zone", "Team", "record", "Win%", "Seed", "Streak",
                     "PF/g", "PA/g", "+/-", "L10"]
             display = display[[c for c in keep if c in display.columns]]
@@ -244,6 +249,19 @@ with tabs["Standings"]:
             )
         st.caption("🟢 top-6 (playoff) · 🟡 play-in (7–10) · "
                    "+/- point differential per game · L10 last ten games")
+        # CSV of both conferences: the same decorated columns the tables
+        # show (Conference kept so a spreadsheet can filter), blanks where
+        # ESPN omitted a stat -- exactly what is on screen, never zeros.
+        csv = full.rename(columns=renames).rename(
+            columns={"conference": "Conference"})
+        csv_cols = ["Conference", "Team", "record", "Win%", "Seed", "GB",
+                    "Streak", "PF/g", "PA/g", "+/-", "L10"]
+        csv = csv[[c for c in csv_cols if c in csv.columns]]
+        st.download_button(
+            "Download standings CSV", csv.to_csv(index=False).encode("utf-8"),
+            file_name=f"standings_{season}.csv", mime="text/csv",
+            help="Both conferences with the columns shown above.",
+        )
 
 # ---------------------------------------------------------------------------
 # Schedule & Scores: today live + the selected season's results with scores
@@ -274,6 +292,64 @@ with tabs["Schedule & Scores"]:
                 f"(`python src/collector/snapshot.py --season {season}`).")
     else:
         st.caption(f"Source: {sched_note}")
+        # Toolbar: team + venue filters plus a CSV of whatever they pick.
+        # Venue options depend on the team (home/away only mean something
+        # relative to one), so the two selectboxes use separate keys --
+        # each keeps a valid option list when the team flips back and
+        # forth instead of stranding a stale value.
+        f_team_c, f_venue_c, f_csv_c = st.columns([2, 2, 2])
+        team_pool = set()
+        for col in ("home_abbrev", "away_abbrev"):
+            if col in games.columns:
+                team_pool |= set(games[col].dropna().astype(str))
+        team_pick = f_team_c.selectbox(
+            "Team", ["All teams"] + sorted(team_pool), key="sched_team",
+            help="Shows only that team's fixtures (home or away).")
+        if team_pick == "All teams":
+            venue_pick = f_venue_c.selectbox(
+                "Venue", ["All", "Neutral"], key="sched_venue_all",
+                help="Neutral-site games only (international / relocated "
+                     "arenas). Pick a team first for home/away filters.")
+        else:
+            venue_pick = f_venue_c.selectbox(
+                "Venue", ["All", "Home", "Away", "Neutral"],
+                key="sched_venue_team",
+                help=f"Relative to {team_pick}: his home games, away "
+                     "games, or neutral-site games.")
+        view = shared.filter_schedule_games(games, team_pick, venue_pick)
+        # The filters scope the results, fixtures and the game-detail
+        # picker below (same three frames, re-derived); the KPI strip
+        # above already took its numbers from the unfiltered ones.
+        finals = view[view["status"] == "STATUS_FINAL"].sort_values("date")
+        _rest_view = view[view["status"] != "STATUS_FINAL"]
+        upcoming = _rest_view[
+            _rest_view["date"].astype(str).str[:10] >= _today
+        ].sort_values("date")
+        stale = _rest_view[
+            _rest_view["date"].astype(str).str[:10] < _today
+        ]
+        _venue_words = {"Home": "home", "Away": "away",
+                        "Neutral": "neutral-site"}
+        _filter_bits = ([] if team_pick == "All teams" else [team_pick]) + (
+            [] if venue_pick == "All"
+            else [f"{_venue_words[venue_pick]} games"])
+        filter_desc = " · ".join(_filter_bits)
+        if filter_desc:
+            st.caption(f"{len(view):,} of {len(games):,} games · "
+                       f"{filter_desc}")
+        export = view.rename(columns={
+            "date": "Date", "status": "Status", "neutral": "Neutral",
+            "away_abbrev": "Away", "away_score": "Away pts",
+            "home_abbrev": "Home", "home_score": "Home pts",
+        })
+        export_cols = ["Date", "Status", "Neutral", "Away", "Away pts",
+                       "Home", "Home pts"]
+        export = export[[c for c in export_cols if c in export.columns]]
+        f_csv_c.download_button(
+            "Download schedule CSV", export.to_csv(index=False).encode("utf-8"),
+            file_name=f"{season}_schedule.csv", mime="text/csv",
+            help="Every fixture the filters above select, with its status.",
+        )
         if not upcoming.empty:
             # Season in progress (or not started): scores of what's played
             # plus the next fixtures. Historical leftovers (postponed rows
@@ -309,10 +385,10 @@ with tabs["Schedule & Scores"]:
                      if not stale.empty else "")
             st.caption(
                 f"{len(finals):,} final · {len(upcoming):,} upcoming "
-                f"({games['game_id'].nunique():,} total){extra}: showing the "
+                f"({view['game_id'].nunique():,} total){extra}: showing the "
                 "15 most recent results and the next 25 fixtures."
             )
-        else:
+        elif not finals.empty:
             # Finished season: the full schedule, every completed game with
             # its score (chronological; the dataframe header sorts too).
             table = finals.copy()
@@ -332,6 +408,13 @@ with tabs["Schedule & Scores"]:
                 f"{len(finals):,} games, all final ({season} complete)"
                 f"{extra}: chronological; click a column header to sort."
             )
+        elif filter_desc:
+            st.caption(f"No games match {filter_desc} in {season}.")
+        else:
+            st.caption(
+                f"No completed or upcoming games in {season}"
+                + (f": {len(stale):,} postponed/canceled rows only."
+                   if not stale.empty else "."))
 
         # NBA-app-style fixture detail: pick ANY game of the season (final
         # or upcoming) for its box score + full play-by-play, or the
@@ -359,7 +442,9 @@ with tabs["Schedule & Scores"]:
                 labels.append(label)
                 game_ids.append(str(row.game_id))
         if not labels:
-            st.caption("No fixtures listed for this season yet.")
+            st.caption(f"No fixtures match {filter_desc} for {season}."
+                       if filter_desc else
+                       "No fixtures listed for this season yet.")
         else:
             pick = st.selectbox(
                 "Fixture", labels, index=0,
@@ -415,6 +500,10 @@ with tabs["Awards Ladder"]:
             "race's caption states the exact formula it ranks by."
         )
         races = awards_payload.get("races") or {}
+        # Daily race snapshots feed the ladders' movement arrows (rank
+        # delta between the last two snapshots) and the MVP trend below.
+        snapshots, race_note = shared.load_race_history(season)
+        moves = {key: shared.race_movement(snapshots, key) for key in races}
         col_l, col_r = st.columns(2)
 
         def _race(key: str) -> None:
@@ -437,8 +526,11 @@ with tabs["Awards Ladder"]:
                         f"{awards_payload.get('min_games', '?')} GP."
                     )
             for row in rows:
-                st.markdown(shared.race_row_html(row, key),
-                            unsafe_allow_html=True)
+                pid = int(row.get("player_id") or 0)
+                st.markdown(
+                    shared.race_row_html(row, key,
+                                         (moves.get(key) or {}).get(pid, 0)),
+                    unsafe_allow_html=True)
             st.caption(
                 f"{awards.RACE_LABELS.get(key, key)} is homegrown math, not "
                 f"official NBA voting: {awards.RACE_FORMULAS.get(key, '')}"
@@ -450,6 +542,24 @@ with tabs["Awards Ladder"]:
         with col_r:
             _race("dpoy")
             _race("mip")
+
+        # MVP score across the daily snapshots: one line per current
+        # leader. With fewer than two snapshots there is no line to draw --
+        # the caption says what is missing instead of a one-point chart.
+        trend = shared.race_trend_figure(snapshots, "mvp")
+        if trend.data:
+            shared.section("MVP race trend")
+            st.plotly_chart(trend, width="stretch")
+            st.caption(
+                f"MVP score across {race_note}: the top "
+                f"{shared.RACE_TREND_TOP} of the latest snapshot, and the "
+                "ladder arrows compare its last two. "
+                "refresh_dashboard_fallbacks.py records one snapshot per "
+                "daily run.")
+        else:
+            st.caption(
+                f"MVP race trend: {race_note} -- a line and the ladders' "
+                "rank arrows need at least two snapshots.")
 
         shared.section("📈 Season stat leaders")
         leaders_by_stat = awards_payload.get("leaders") or {}

@@ -138,6 +138,11 @@ div[data-testid="stMetric"] {
   margin-left: auto; font-weight: 800; font-size: 1.05rem;
   color: var(--na-gold); white-space: nowrap;
 }
+.na-race-row .na-mv {
+  display: block; font-size: 0.68rem; font-weight: 700;
+}
+.na-race-row .na-up { color: #7FE0A8; }
+.na-race-row .na-down { color: #FF4B2B; }
 
 /* Real photos: headshot <img> over a team-logo CSS background. The fallback
    shows through when the CDN 404s -- no JS (Streamlit sanitizes onerror
@@ -341,9 +346,13 @@ def race_meta(race: str, row: dict) -> str:
             f"{row.get('gp_prev', 0)} GP last season")
 
 
-def race_row_html(row: dict, race: str) -> str:
+def race_row_html(row: dict, race: str, move: int = 0) -> str:
     """One award-race ladder row: medal/rank, real headshot (team-logo CSS
-    fallback behind it), name + team logo, the race's stat line, the score.
+    fallback behind it), name + team logo, the race's stat line, the score
+    with the rank movement under it when the caller has one (`move` = rank
+    delta between the last two daily snapshots: >0 climbed (green ▲), <0
+    fell (red ▼), 0/None no arrow -- nothing invented for players absent
+    from the earlier snapshot).
 
     IMPORTANT: single logical line, no leading indentation anywhere in the
     string -- this goes through st.markdown(unsafe_allow_html=True), which
@@ -357,6 +366,12 @@ def race_row_html(row: dict, race: str) -> str:
     team = str(row.get("team_abbrev") or "")
     score = float(row.get("score") or 0)
     score_text = f"{score:+.1f}" if race == "mip" else f"{score:.1f}"
+    move_html = ""
+    if move:
+        move_html = (f'<span class="na-mv '
+                     f'{"na-up" if int(move) > 0 else "na-down"}">'
+                     f'{"▲" if int(move) > 0 else "▼"}'
+                     f'{abs(int(move))}</span>')
     return (f'<div class="na-race-row">'
             f'<div class="na-rank">{medal}</div>'
             f'{headshot_html(row.get("player_id"), team, 44)}'
@@ -364,7 +379,7 @@ def race_row_html(row: dict, race: str) -> str:
             f'<div class="na-rname">{name}{team_logo_html(team, 16)}</div>'
             f'<div class="na-rmeta">{race_meta(race, row)}</div>'
             f'</div>'
-            f'<div class="na-rscore">{score_text}</div>'
+            f'<div class="na-rscore">{score_text}{move_html}</div>'
             f'</div>')
 
 
@@ -588,17 +603,21 @@ PROGRESSION_PCT = ("fg_pct", "fg3_pct")
 
 
 def progression_figure(series: dict, metric: str, mode: str,
-                       height: int = 430) -> go.Figure:
+                       height: int = 430, axis: str = "Season") -> go.Figure:
     """Interactive career-progression chart: one line per player across his
     seasons (x = season label, y = the chosen metric), hover carrying the
     season, team, GP and exact value, legend toggling players on/off, zoom/
     pan native to plotly.
 
-    The x-axis is forced to a CATEGORICAL season axis: plotly otherwise
-    parses '2003-04' as a date and ticks every 3 months instead of once
-    per season. Seasons are ordered chronologically (string sort of the
-    'YYYY-YY' label) so every selected player's arc lines up on the same
-    season grid.
+    The x-axis is forced to a CATEGORICAL axis: plotly otherwise parses
+    '2003-04' as a date and ticks every 3 months instead of once per
+    season. `axis` picks that grid: "Season" (default) is the calendar
+    season label in chronological string order, so every player's arc
+    lines up on the same season grid; "Career year" numbers each player's
+    seasons 1, 2, 3 ... from his first (rows sorted chronologically, only
+    plottable rows counted), so careers from different eras compare on one
+    grid instead of sitting in non-overlapping calendar decades. The
+    category array matches the mode: seasons, or 1..longest career shown.
 
     `series` maps player name -> seasons_log rows (history.py's per-season
     ESPN averages); `mode` is "Per game" or "Totals" -- totals multiply the
@@ -606,23 +625,36 @@ def progression_figure(series: dict, metric: str, mode: str,
     % metrics ignore the toggle (percentages don't sum)."""
     fig = go.Figure()
     pct = metric in PROGRESSION_PCT
+    career = axis == "Career year"
     seasons = set()
+    career_max = 0
     for name, rows in series.items():
         xs, ys, hover = [], [], []
-        for r in rows or []:
+        kept = [r for r in (rows or []) if r.get(metric) is not None
+                and r.get("season")]
+        if career:
+            kept = sorted(kept, key=lambda r: str(r.get("season")))
+        career_i = 0
+        for r in kept:
             value = r.get(metric)
-            season = r.get("season")
-            if value is None or not season:
-                continue
+            season = str(r.get("season"))
             if mode == "Totals" and not pct:
                 gp = r.get("gp")
                 if not gp:
-                    continue
+                    continue  # skipped rows never burn a career index
                 value = round(value * gp)
-            xs.append(str(season))
-            seasons.add(str(season))
+            if career:
+                career_i += 1
+                xs.append(str(career_i))
+                career_max = max(career_max, career_i)
+                where = f"{season} · "
+            else:
+                xs.append(season)
+                seasons.add(season)
+                where = ""
             ys.append(value)
-            hover.append(f"{r.get('team') or ''} · {r.get('gp', 0)} GP")
+            hover.append(f"{where}{r.get('team') or ''} · "
+                         f"{r.get('gp', 0)} GP")
         if not xs:
             continue
         fmt = "%{y:.1f}%" if pct else "%{y:,.1f}"
@@ -633,12 +665,15 @@ def progression_figure(series: dict, metric: str, mode: str,
     label = PROGRESSION_METRICS.get(metric, metric)
     ytitle = label if pct else f"{label} ({'totals' if mode == 'Totals' else 'per game'})"
     fig.update_layout(
-        xaxis_title="Season", yaxis_title=ytitle, hovermode="x unified",
+        xaxis_title=("Career year" if career else "Season"),
+        yaxis_title=ytitle, hovermode="x unified",
         margin=dict(l=10, r=10, t=24, b=10), height=height,
         legend_title_text="")
     fig.update_xaxes(
         type="category", categoryorder="array",
-        categoryarray=sorted(seasons), tickangle=-45)
+        categoryarray=(sorted(seasons) if not career
+                       else [str(n) for n in range(1, career_max + 1)]),
+        tickangle=-45)
     return fig
 
 
@@ -874,6 +909,34 @@ def load_schedule(season: str) -> tuple:
     return (pd.DataFrame(), data_age_note(payload, False))
 
 
+def filter_schedule_games(games: pd.DataFrame, team: str,
+                          venue: str) -> pd.DataFrame:
+    """Schedule-tab row filter: the team first ('All teams' keeps every
+    game), then the venue -- 'Home'/'Away' relative to that team (never
+    offered without one, and a no-op with all teams anyway: every
+    non-neutral game is home for somebody), 'Neutral' only neutral-site
+    games (international / relocated arenas). The neutral flag comes back
+    from JSON as the strings 'True'/'False', so it parses case-
+    insensitively and a schedule without the column matches no neutral
+    games rather than crashing. An empty result is the caller's honest
+    empty state -- never zeros, never another team's rows."""
+    view = games
+    has_team_cols = {"home_abbrev", "away_abbrev"} <= set(view.columns)
+    if team and team != "All teams" and has_team_cols:
+        view = view[(view["home_abbrev"] == team)
+                    | (view["away_abbrev"] == team)]
+    if venue == "Neutral":
+        if "neutral" in view.columns:
+            view = view[view["neutral"].astype(str).str.lower() == "true"]
+        else:
+            view = view.iloc[0:0]
+    elif venue == "Home" and team and team != "All teams" and has_team_cols:
+        view = view[view["home_abbrev"] == team]
+    elif venue == "Away" and team and team != "All teams" and has_team_cols:
+        view = view[view["away_abbrev"] == team]
+    return view
+
+
 @st.cache_data(ttl=300, show_spinner=False)
 def load_race_history(season: str) -> tuple:
     """(snapshot list, note) from data/races/{season}.json: the daily race
@@ -906,6 +969,81 @@ def load_race_history(season: str) -> tuple:
     if dates:
         note += f", {dates[0]} to {dates[-1]}"
     return (snapshots, note)
+
+
+RACE_TREND_TOP = 6  # players the MVP trend figure tracks (latest top N)
+
+
+def race_movement(snapshots: list, race: str) -> dict:
+    """{player_id: rank delta} for one race between the LAST TWO daily
+    snapshots -- positive = climbed, negative = fell. Fewer than two
+    snapshots, or a race missing from the earlier one, yields {} so rows
+    render plain: there is no movement to show, and inventing 'no change'
+    would claim a comparison that never happened. A player absent from the
+    earlier snapshot (new entrant) gets no arrow either."""
+    if len(snapshots) < 2:
+        return {}
+
+    def _ranks(snapshot) -> dict:
+        if not isinstance(snapshot, dict):
+            return {}
+        rows = ((snapshot.get("races") or {}).get(race) or [])
+        return {int(r.get("player_id") or 0): int(r.get("rank") or 0)
+                for r in rows if isinstance(r, dict) and r.get("player_id")}
+
+    previous = _ranks(snapshots[-2])
+    if not previous:
+        return {}
+    moves = {}
+    for pid, rank in _ranks(snapshots[-1]).items():
+        if pid in previous:
+            moves[pid] = previous[pid] - rank
+    return moves
+
+
+def race_trend_figure(snapshots: list, race: str = "mvp",
+                      top_n: int = RACE_TREND_TOP) -> go.Figure:
+    """Score-over-time line chart for one award race: x = snapshot date,
+    y = the race's score, one trace per player -- the top `top_n` names of
+    the LATEST snapshot, so the chart follows whoever leads now rather
+    than names that dropped out. A player missing from an earlier snapshot
+    starts with a gap there (None), never a fabricated 0. Returns an empty
+    figure when fewer than two snapshots carry the race; the caller says
+    so with an honest caption instead of drawing a one-point line."""
+    fig = go.Figure()
+    usable = [s for s in snapshots if isinstance(s, dict)
+              and ((s.get("races") or {}).get(race))]
+    if len(usable) < 2:
+        return fig
+    latest = (usable[-1].get("races") or {}).get(race) or []
+    names = [str(r.get("player_name") or "") for r in latest[:top_n]
+             if isinstance(r, dict)]
+    names = [n for n in names if n]
+    if not names:
+        return fig
+    series = {name: [] for name in names}
+    dates = []
+    for snapshot in usable:
+        rows = (snapshot.get("races") or {}).get(race) or []
+        by_name = {str(r.get("player_name") or ""): r for r in rows}
+        dates.append(str(snapshot.get("date") or ""))
+        for name in names:
+            row = by_name.get(name)
+            score = row.get("score") if isinstance(row, dict) else None
+            series[name].append(None if score is None
+                                else round(float(score), 2))
+    for name in names:
+        fig.add_trace(go.Scatter(
+            x=dates, y=series[name], mode="lines+markers", name=name,
+            connectgaps=False,
+            hovertemplate="%{x}<br>score %{y:.1f}"
+                          f"<extra>{html.escape(name)}</extra>"))
+    fig.update_layout(
+        height=360, margin=dict(l=10, r=10, t=24, b=10),
+        legend_title_text="", hovermode="x unified")
+    fig.update_xaxes(title_text="Snapshot date")
+    fig.update_yaxes(title_text=f"{race.upper()} score")
+    return fig
 
 
 @st.cache_data(ttl=60, show_spinner=False)

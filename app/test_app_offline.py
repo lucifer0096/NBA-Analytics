@@ -114,6 +114,9 @@ def test_home_awards_tab_shows_races_and_formula_captions(offline_espn):
     assert "MVP race" in text
     assert "not official nba voting" in captions.lower()
     assert "Impact per game" in captions
+    # The MVP trend either drew a line from >=2 daily snapshots or said
+    # exactly what is missing -- both captions mention the snapshots.
+    assert "snapshot" in captions
 
 
 def _committed_awards() -> dict:
@@ -204,7 +207,9 @@ def test_profile_page_renders_cards_accolades_and_chart(offline_espn):
 def test_progression_chart_ticks_once_per_season():
     """plotly parses '2003-04' as a DATE and ticks every 3 months; the
     profile chart must force a chronological CATEGORICAL season axis so the
-    scale reads per season."""
+    scale reads per season. The Career year axis numbers each player's
+    seasons 1, 2, 3 ... from his first -- by CHRONOLOGY, not the row order
+    ESPN returned -- so eras compare on one grid."""
     import shared as shared_module
 
     rows = [
@@ -216,6 +221,103 @@ def test_progression_chart_ticks_once_per_season():
     xaxis = fig.layout.xaxis
     assert str(xaxis.type) == "category"
     assert list(xaxis.categoryarray) == ["2003-04", "2004-05"]
+
+    career = shared_module.progression_figure({"LeBron James": rows}, "pts",
+                                              "Per game",
+                                              axis="Career year")
+    caxis = career.layout.xaxis
+    assert str(caxis.type) == "category"
+    assert list(caxis.categoryarray) == ["1", "2"]
+    assert caxis.title.text == "Career year"
+    # The unsorted rows still map 2003-04 to career year 1 (chronology
+    # wins over row order), and hover keeps the calendar season.
+    assert list(career.data[0].x) == ["1", "2"]
+    assert str(career.data[0].text[0]).startswith("2003-04")
+
+
+def test_filter_schedule_games_team_and_venue():
+    """The schedule toolbar filters rows without inventing any: the team
+    first ('All teams' keeps everything), then the venue -- home/away
+    relative to that team, neutral from JSON's string flags (case-
+    insensitive), and a team with no games is an honest empty."""
+    import pandas as pd
+
+    import shared as shared_module
+
+    games = pd.DataFrame({
+        "home_abbrev": ["BOS", "LAL", "BOS", "NYK"],
+        "away_abbrev": ["LAL", "BOS", "NYK", "BOS"],
+        "neutral": ["False", "False", "True", "False"],
+        "status": ["STATUS_FINAL"] * 4,
+    })
+    everything = shared_module.filter_schedule_games(games, "All teams",
+                                                     "All")
+    assert len(everything) == 4
+    # BOS touches all four rows (twice home, twice away).
+    assert len(shared_module.filter_schedule_games(games, "BOS",
+                                                   "All")) == 4
+    home = shared_module.filter_schedule_games(games, "BOS", "Home")
+    assert list(home["home_abbrev"]) == ["BOS", "BOS"]
+    away = shared_module.filter_schedule_games(games, "BOS", "Away")
+    assert list(away["away_abbrev"]) == ["BOS", "BOS"]
+    neutral = shared_module.filter_schedule_games(games, "All teams",
+                                                  "Neutral")
+    assert list(neutral["away_abbrev"]) == ["NYK"]
+    # Home/away with all teams is a documented no-op (the UI never offers
+    # it): every non-neutral game is home for somebody.
+    assert len(shared_module.filter_schedule_games(games, "All teams",
+                                                   "Home")) == 4
+    assert shared_module.filter_schedule_games(games, "GSW", "All").empty
+
+
+def test_race_movement_and_mvp_trend_chart():
+    """Arrows compare the LAST TWO daily snapshots: climbers get +n,
+    fallers -n, a player new to the snapshot gets nothing (there is no
+    earlier rank to compare), and fewer than two snapshots yields no
+    movement at all rather than a fake 'unchanged'. The MVP trend chart
+    tracks the latest top names and keeps absent scores as gaps (None),
+    never zeros, refusing to draw a one-point line."""
+    import shared as shared_module
+
+    snaps = [
+        {"date": "2026-10-20", "races": {"mvp": [
+            {"player_id": 1, "player_name": "A", "rank": 1, "score": 41.0},
+            {"player_id": 2, "player_name": "B", "rank": 2, "score": 40.0},
+        ]}},
+        {"date": "2026-10-21", "races": {"mvp": [
+            {"player_id": 2, "player_name": "B", "rank": 1, "score": 42.0},
+            {"player_id": 1, "player_name": "A", "rank": 2, "score": 39.0},
+            {"player_id": 3, "player_name": "C", "rank": 3, "score": 30.0},
+        ]}},
+    ]
+    moves = shared_module.race_movement(snaps, "mvp")
+    assert moves == {2: 1, 1: -1}
+    assert shared_module.race_movement(snaps[:1], "mvp") == {}
+    assert shared_module.race_movement([], "mvp") == {}
+    # A race neither snapshot recorded has no movement to report.
+    assert shared_module.race_movement(snaps, "dpoy") == {}
+
+    fig = shared_module.race_trend_figure(snaps, "mvp")
+    assert [t.name for t in fig.data] == ["B", "A", "C"]  # latest top N
+    assert list(fig.data[0].y) == [40.0, 42.0]
+    assert list(fig.data[2].y) == [None, 30.0]  # C absent earlier: gap
+    assert shared_module.race_trend_figure(snaps[:1], "mvp").data == ()
+
+
+def test_race_row_html_movement_arrows():
+    """Rank movement rides under the score: +n with a green up arrow, -n
+    with a red down arrow, and no span at all for 0/None -- a single
+    snapshot must never claim a change happened."""
+    import shared as shared_module
+
+    row = {"rank": 2, "player_name": "A", "player_id": 1, "score": 40.5}
+    up = shared_module.race_row_html(row, "mvp", 3)
+    assert "na-mv" in up and "na-up" in up and "▲3" in up
+    down = shared_module.race_row_html(row, "mvp", -1)
+    assert "na-mv" in down and "na-down" in down and "▼1" in down
+    plain = shared_module.race_row_html(row, "mvp")
+    assert "na-mv" not in plain
+    assert shared_module.race_row_html(row, "mvp", 0) == plain
 
 
 def test_load_schedule_serves_every_committed_season():
@@ -467,6 +569,43 @@ def test_schedule_game_detail_upcoming_shows_fixture_info(
     assert "Chase Center" in text and "National: ESPN" in text
     captions = " ".join(str(c.value) for c in at.caption)
     assert "No box score until this game is played" in captions
+    assert len(at.warning) == 0
+
+
+def test_schedule_filters_and_csv_downloads_render(offline_espn):
+    """Standings and schedule each offer a CSV download of what is shown,
+    and the schedule's team + venue filters scope the results table, the
+    fixture picker and the export together -- a BOS filter never leaves
+    another team's row on screen or in the CSV."""
+    at = _render("app/app.py", offline_espn)
+    assert not at.exception
+    labels = [str(b.label) for b in at.download_button]
+    assert "Download standings CSV" in labels
+    assert "Download schedule CSV" in labels
+
+    team_box = next(sb for sb in at.selectbox if str(sb.label) == "Team")
+    team_box.set_value("BOS").run()
+    assert not at.exception
+    # The fixture picker is scoped with the tables.
+    fixtures = next(sb for sb in at.selectbox if str(sb.label) == "Fixture")
+    assert fixtures.options, "fixture picker lost its options"
+    assert all("BOS" in str(o) for o in fixtures.options)
+
+    # Venue options only mean something with a team selected -- Home now
+    # appears (relative to BOS) where the all-teams list had none.
+    venue_box = next(sb for sb in at.selectbox if str(sb.label) == "Venue")
+    venue_box.set_value("Home").run()
+    assert not at.exception
+    frames = [df.value for df in at.dataframe
+              if hasattr(getattr(df, "value", None), "columns")]
+    sched = [f for f in frames if {"Date", "Away", "Home"} <= set(f.columns)]
+    assert sched, "the schedule results table must render"
+    for frame in sched:
+        assert set(frame["Home"].astype(str)) == {"BOS"}
+        assert all("BOS" in (str(a), str(h))
+                   for a, h in zip(frame["Away"], frame["Home"]))
+    captions = " ".join(str(c.value) for c in at.caption)
+    assert "BOS" in captions and "home games" in captions  # filter stated
     assert len(at.warning) == 0
 
 

@@ -53,7 +53,9 @@ pages; dark theme ships in `.streamlit/config.toml`.
    the table has real records (preseason all-zero tables get no marks). A
    season that hasn't tipped off says so; a failed live fetch over a
    mismatched committed copy shows no table at all, just a note naming
-   both seasons.
+   both seasons. A **Download standings CSV** button exports both
+   conferences with exactly the columns on screen (blanks where ESPN
+   omitted a stat, never zeros).
 4. **Schedule & Scores**: live scoreboard for *today* (empty + explanatory
    caption in the offseason, the normal Oct–Jun-less state), then the
    selected season from the committed **multi-season envelope**
@@ -63,7 +65,14 @@ pages; dark theme ships in `.streamlit/config.toml`.
    shows the 15 most recent results (day, matchup, final score) and the
    next 25 fixtures, plus a count of past-dated postponed/canceled rows
    excluded from both. A finished season renders the full chronological
-   table of every completed game with its final score. Below the tables
+   table of every completed game with its final score. A toolbar above
+   the tables filters the whole tab: **Team** (any club's fixtures, home
+   or away) and **Venue** (home/away relative to that team once one is
+   picked, or neutral-site games only) scoping the results, the fixtures,
+   the game-detail picker and the export together, with a **Download
+   schedule CSV** button taking exactly the selected rows and their
+   statuses -- and zero matches says so plainly instead of an empty
+   table. Below the tables
    sits the **Game detail: box score & play-by-play** picker (the
    NBA-app-style view): any fixture of the season, finished or upcoming,
    resolves live from ESPN's summary endpoint (cached 15 minutes) into
@@ -85,7 +94,12 @@ pages; dark theme ships in `.streamlit/config.toml`.
    official NBA voting" disclaimer. An empty race names the missing prior
    season instead of inventing a winner, and a season with no collected
    games gets a "no collected games yet" note instead of substituted
-   races.
+   races. Ladder rows carry a **rank-movement arrow** (green ▲ / red ▼
+   with the places gained or lost) comparing the last two daily race
+   snapshots, and an **MVP race trend** chart draws the current leaders'
+   scores across those snapshots (top 6 of the latest, absent scores
+   left as gaps). With fewer than two snapshots both degrade to a caption
+   saying exactly that -- movement and trends are never invented.
 6. **Court View** (fourth tab, moved here from the deleted Model &
    History page): the selected stat's leaders on a CSS-only hardwood court
    (gradient markings, no images). Rank order fills a 2 G / 2 F / 1 C
@@ -174,9 +188,14 @@ Up to four players (defaults to the GOAT top four) on **one screen**:
   PTS/REB/AST/STL/BLK/MIN/FG%/3P%, per-game or season totals
   (percentages ignore the toggle). The x-axis is a **categorical season
   axis** (plotly would otherwise parse `2003-04` as a date and tick every
-  3 months), so every selected player's arc lines up per season. Hover
-  carries season, team, GP and value for every player at once; the
-  legend toggles players off and on; drag to zoom, double-click to reset.
+  3 months), so every selected player's arc lines up per season. An
+  **Axis** toggle switches that grid to **Career year**: each player's
+  seasons numbered 1, 2, 3 ... from his first (by chronology, never the
+  row order ESPN returned), so careers from different eras compare on one
+  chart instead of sitting in non-overlapping decades. Hover carries
+  season, team, GP and value for every player at once (the calendar
+  season stays in the hover on the career grid); the legend toggles
+  players off and on; drag to zoom, double-click to reset.
 - Per-season rows come from ESPN's athlete statistics (`seasons_log` in
   `data/dashboard_players.json`); seasons ESPN doesn't cover draw no
   point, and a caption names the affected players instead of
@@ -207,5 +226,6 @@ All styling is one CSS block in `shared.inject_css()`, CSS-only with no JS:
 | `data/dashboard_positions.json` | same (local position map) | Court View formation |
 | `data/dashboard_awards.json` | same (local award math: every collected season's races/leaders, all-time boards, all-history GOAT ladder) | KPI scoring leader, Awards Ladder, Court View, All-Time Stats, GOAT Rankings |
 | `data/dashboard_players.json` | same (`history.py` all-history index: careers, honours, GOAT ranks) | Player Profile |
+| `data/races/{season}.json` | same (daily race snapshots: one per UTC day, written only while a race moves; a finished season freezes after its first) | Ladder movement arrows, MVP race trend |
 | `data/processed/dashboard_leaderboards.json` | same (local totals + shooting splits) | committed artifact only; no page reads it since Season Leaders was removed |
 | `models/metrics.json`, `models/proj_model.txt` | `train.py` | Sidebar Model & History mention (headline) |
