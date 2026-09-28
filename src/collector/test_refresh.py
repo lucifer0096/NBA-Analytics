@@ -339,3 +339,134 @@ def test_refresh_awards_window_metadata_spans_merged_seasons(
         (isolated["data"] / "dashboard_players.json").read_text(
             encoding="utf-8"))
     assert set(written["players"]) == {str(p["player_id"]) for p in sample}
+
+
+# ---------------------------------------------------------------------------
+# Fault isolation: transient ESPN failures and corrupt local files must
+# degrade to the committed fallbacks instead of killing the refresh run
+# (the Sep 2026 weekly-refresh failure opened issue #1).
+# ---------------------------------------------------------------------------
+
+def _raise(message="HTTP Error 500: Internal Server Error"):
+    def raiser(*args, **kwargs):
+        raise RuntimeError(message)
+    return raiser
+
+
+def test_refresh_teams_keeps_committed_on_fetch_failure(isolated, monkeypatch):
+    committed = {"teams": [{"team_id": 1, "abbrev": "ATL"}],
+                 "_generated_utc": "2026-09-20T00:00:00Z", "source": "espn"}
+    (isolated["data"] / "dashboard_teams.json").write_text(
+        json.dumps(committed), encoding="utf-8")
+    monkeypatch.setattr(refresh.espn_api, "get_teams", _raise())
+
+    assert refresh.refresh_teams() == committed
+    on_disk = json.loads((isolated["data"] / "dashboard_teams.json")
+                         .read_text(encoding="utf-8"))
+    assert on_disk == committed  # untouched, nothing raised
+
+
+def test_refresh_positions_corrupt_raw_and_failed_fetch_keeps_committed(
+        isolated, monkeypatch):
+    committed = {"players": [{"player_id": 7, "position": "G"}],
+                 "_generated_utc": "2026-09-20T00:00:00Z", "source": "espn"}
+    (isolated["data"] / "dashboard_positions.json").write_text(
+        json.dumps(committed), encoding="utf-8")
+    (isolated["raw"] / "player_positions.json").write_text(
+        "{broken json", encoding="utf-8")
+    monkeypatch.setattr(refresh.espn_api, "get_teams", _raise())
+
+    assert refresh.refresh_positions() == committed
+
+
+def test_refresh_positions_partial_fetch_writes_what_arrived(
+        isolated, monkeypatch):
+    """One team's roster 500: the other team's rows still land (the failed
+    team's players show honest missing positions until a later run)."""
+    monkeypatch.setattr(refresh.espn_api, "get_teams", lambda: {})
+    monkeypatch.setattr(refresh.parsing, "parse_teams",
+                        lambda payload: [{"team_id": 1}, {"team_id": 2}])
+
+    def get_roster(team_id, season):
+        if team_id == 1:
+            raise RuntimeError("HTTP Error 500: Internal Server Error")
+        return {}
+
+    monkeypatch.setattr(refresh.espn_api, "get_roster", get_roster)
+    monkeypatch.setattr(refresh.parsing, "parse_roster",
+                        lambda payload, team_id: [{"player_id": 9,
+                                                   "team_id": team_id,
+                                                   "position": "G"}])
+
+    assert refresh.refresh_positions() == {
+        "players": [{"player_id": 9, "team_id": 2, "position": "G"}]}
+
+
+def test_refresh_leaderboards_skips_corrupt_box_file(isolated):
+    games = isolated["raw"] / "2024-25" / "games"
+    games.mkdir(parents=True)
+    good = {"players": [{"player_id": 1, "player_name": "Good",
+                         "team_abbrev": "BOS", "did_not_play": False,
+                         "min": 30, "pts": 20}]}
+    (games / "1.json").write_text(json.dumps(good), encoding="utf-8")
+    (games / "2.json").write_text("{truncated", encoding="utf-8")
+
+    out = refresh.refresh_leaderboards(["2024-25", "2010-11"])
+
+    assert out["season"] == "2024-25"
+    assert [row["player_name"] for row in out["leaders"]] == ["Good"]
+
+
+def test_refresh_leaderboards_all_corrupt_keeps_committed(isolated):
+    committed = {"season": "2024-25", "leaders": [{"player_id": 1}],
+                 "_generated_utc": "2026-09-20T00:00:00Z", "source": "local"}
+    out_path = isolated["data"] / "processed" / "dashboard_leaderboards.json"
+    out_path.write_text(json.dumps(committed), encoding="utf-8")
+    games = isolated["raw"] / "2024-25" / "games"
+    games.mkdir(parents=True)
+    (games / "1.json").write_text("{truncated", encoding="utf-8")
+
+    assert refresh.refresh_leaderboards(["2024-25"]) == {}
+    assert json.loads(out_path.read_text(encoding="utf-8")) == committed
+
+
+def test_refresh_awards_survives_one_seasons_build_failure(
+        isolated, partial_raw_env, monkeypatch):
+    """A corrupt box file raising inside build_payload for the local season:
+    both seasons keep their committed payloads verbatim and the run lives."""
+    import awards
+    import history
+
+    monkeypatch.setattr(awards, "build_payload", _raise("corrupt box score"))
+    monkeypatch.setattr(history, "build", _raise("offline"))
+
+    envelope = refresh.refresh_awards(["2024-25", "2010-11"])
+
+    assert envelope["seasons"] == partial_raw_env["prior"]["seasons"]
+    assert envelope["goat"] == partial_raw_env["prior"]["goat"]
+
+
+def test_refresh_awards_career_build_failure_keeps_previous_career(
+        isolated, partial_raw_env, monkeypatch):
+    import awards
+    import history
+
+    monkeypatch.setattr(awards, "build_payload",
+                        lambda season, raw_dir=None: _fresh_payload(season))
+    real_players = json.loads(
+        (REPO_ROOT / "data" / "dashboard_players.json").read_text(
+            encoding="utf-8"))
+    sample = [dict(p) for p in list(real_players["players"].values())[:2]]
+    monkeypatch.setattr(
+        history, "build",
+        lambda window_players, cache=None, live=True: {
+            "players": sample, "honours": {}, "champions": {},
+            "meta": {"pool": len(window_players)}, "stamp": "x"})
+    monkeypatch.setattr(awards, "build_career", _raise("boom"))
+
+    envelope = refresh.refresh_awards(["2024-25", "2026-27"])
+
+    # Fresh races still landed; the career half stays the committed one.
+    assert envelope["seasons"]["2024-25"]["races"]["mvp"][0]["player_id"] == 9
+    assert envelope["goat"] == partial_raw_env["prior"]["goat"]
+    assert envelope["career_note"] == partial_raw_env["prior"]["career_note"]

@@ -185,6 +185,24 @@ def test_aggregate_players_sums_shooting_splits(tmp_path):
     assert (p["oreb"], p["dreb"]) == (1, 9)
 
 
+def test_aggregate_players_skips_corrupt_box_score(tmp_path, capsys):
+    """One truncated or wrong-shaped game file must not kill the awards
+    build forever: it is skipped with a warning and the next snapshot run
+    re-fetches it (pending_box_scores treats unreadable files as pending)."""
+    _write_games(tmp_path, "2018-19", {
+        1: [_box(1, "Star", "BOS", pts=25)],
+    })
+    gdir = tmp_path / "2018-19" / "games"
+    (gdir / "2.json").write_text('{"players": [{"player_id": 3, ',
+                                 encoding="utf-8")  # truncated JSON
+    (gdir / "3.json").write_text('[1, 2]', encoding="utf-8")  # wrong shape
+
+    players = awards.aggregate_players("2018-19", raw_dir=str(tmp_path))
+
+    assert [(p["player_id"], p["gp"]) for p in players] == [(1, 1)]
+    assert "skipped 2 unreadable box score" in capsys.readouterr().out
+
+
 def test_leader_rows_carry_shooting_splits_and_3pm_board():
     players = [_player(1, "Sniper", "BOS", gp=10, pts=100, fgm=40, fga=80,
                        fg3m=20, fg3a=50, minutes=300),

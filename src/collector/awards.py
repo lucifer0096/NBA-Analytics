@@ -230,9 +230,14 @@ def aggregate_players(season: str, raw_dir: str = None) -> list:
     """Per-player season aggregates from every stored box score.
 
     Games where the player was flagged did_not_play don't count toward games
-    or starts (same semantics as refresh_leaderboards' `games`). A traded
-    player's team is the one he appeared for in the most games; ties go to
-    whichever comes first in sorted game-id order (deterministic).
+    or starts (same semantics as refresh_dashboard_fallbacks' `games`). A
+    traded player's team is the one he appeared for in the most games; ties
+    go to whichever comes first in sorted game-id order (deterministic).
+
+    A corrupt/partial box-score file is SKIPPED with a warning instead of
+    raising (one bad file must not kill the awards build forever):
+    pending_box_scores treats unreadable files as pending, so the next
+    snapshot run re-fetches and heals it.
     """
     raw = raw_dir or RAW_DIR
     files = sorted(glob.glob(os.path.join(raw, season, "games", "*.json")))
@@ -240,31 +245,44 @@ def aggregate_players(season: str, raw_dir: str = None) -> list:
         return []
 
     players: dict = {}
+    skipped = 0
     for path in files:
-        with open(path, encoding="utf-8") as f:
-            payload = json.load(f)
-        for row in payload.get("players") or []:
-            if row.get("did_not_play"):
-                continue
-            entry = players.get(row["player_id"])
-            if entry is None:
-                entry = players[row["player_id"]] = {
-                    "player_id": row["player_id"],
-                    "player_name": row.get("player_name"),
-                    "team_abbrev": None,
-                    "_team_counts": Counter(),
-                    "gp": 0, "starts": 0, "minutes": 0,
-                }
+        try:
+            with open(path, encoding="utf-8") as f:
+                payload = json.load(f)
+            rows = payload.get("players") or []
+            if not isinstance(rows, list):
+                raise ValueError("players field is not a list")
+            for row in rows:
+                if row.get("did_not_play"):
+                    continue
+                entry = players.get(row["player_id"])
+                if entry is None:
+                    entry = players[row["player_id"]] = {
+                        "player_id": row["player_id"],
+                        "player_name": row.get("player_name"),
+                        "team_abbrev": None,
+                        "_team_counts": Counter(),
+                        "gp": 0, "starts": 0, "minutes": 0,
+                    }
+                    for stat in CAREER_SUM_STATS:
+                        entry[stat] = 0
+                entry["gp"] += 1
+                if row.get("starter"):
+                    entry["starts"] += 1
+                entry["minutes"] += row.get("min") or 0
                 for stat in CAREER_SUM_STATS:
-                    entry[stat] = 0
-            entry["gp"] += 1
-            if row.get("starter"):
-                entry["starts"] += 1
-            entry["minutes"] += row.get("min") or 0
-            for stat in CAREER_SUM_STATS:
-                entry[stat] += row.get(stat) or 0
-            if row.get("team_abbrev"):
-                entry["_team_counts"][row["team_abbrev"]] += 1
+                    entry[stat] += row.get(stat) or 0
+                if row.get("team_abbrev"):
+                    entry["_team_counts"][row["team_abbrev"]] += 1
+        except (OSError, ValueError, TypeError, KeyError, AttributeError,
+                json.JSONDecodeError):
+            skipped += 1
+            continue
+
+    if skipped:
+        print(f"  WARNING [{season}]: skipped {skipped} unreadable box "
+              "score file(s) -- re-fetched by the next snapshot run")
 
     out = []
     for entry in players.values():

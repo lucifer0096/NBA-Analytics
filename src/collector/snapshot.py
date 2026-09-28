@@ -25,6 +25,14 @@ Usage:
     python src/collector/snapshot.py --schedule-only    # skip box scores entirely
     python src/collector/snapshot.py --check-only       # report pending work, fetch nothing
 
+Fault tolerance: every per-item network call (team schedules, rosters, box
+scores) is isolated -- a transient 500 on ONE call is counted, reported as a
+WARNING line and retried next run instead of killing the whole run (the
+Sep 2026 weekly-refresh failure was exactly one team's roster 500 aborting
+everything). Genuine outages still fail loudly: no teams list at all, or a
+whole season's hard failure after every season had its turn, exits non-zero
+so the workflow's failure issue fires.
+
 Why newest-first for --backfill: the model's validation season (2024-25) and
 the seasons around it are what training needs first -- walking backward from
 there means a usable training set exists long before the 2010s tail finishes,
@@ -119,12 +127,31 @@ def _schedule_row_quality(row: dict) -> tuple:
 
 
 def snapshot_schedule(season: str, team_ids: list, limiter: RateLimiter) -> str:
-    """Fetch every team's schedule, dedupe on game_id, write schedule.csv."""
+    """Fetch every team's schedule, dedupe on game_id, write schedule.csv.
+
+    One team's schedule call failing (a transient ESPN 500/403) must not kill
+    the run: every game appears in BOTH of its teams' schedules, so a single
+    missing team loses nothing (its games arrive via the opponents). Failed
+    calls are counted and reported, and if the collected set would SHRINK the
+    existing CSV while calls failed, the existing file wins instead of being
+    overwritten with a thinner schedule."""
     by_id: dict = {}
+    failures: list = []
     for team_id in team_ids:
         limiter.wait()
-        payload = espn_api.get_schedule(season_param(season), team_id)
-        for row in parsing.parse_schedule(payload, season=season):
+        try:
+            payload = espn_api.get_schedule(season_param(season), team_id)
+            parsed = parsing.parse_schedule(payload, season=season)
+        except Exception as e:  # noqa: BLE001 -- recorded, tolerated per team
+            failures.append((team_id, f"{type(e).__name__}: {e}"))
+            continue
+        if not parsed:
+            # A real team schedule is never empty (seasontype=2 = the full
+            # regular season), so an empty answer is a failed call that
+            # happened to return 200.
+            failures.append((team_id, "0 games returned"))
+            continue
+        for row in parsed:
             game_id = row["game_id"]
             previous = by_id.get(game_id)
             if previous is None or _schedule_row_quality(row) > _schedule_row_quality(previous):
@@ -134,12 +161,26 @@ def snapshot_schedule(season: str, team_ids: list, limiter: RateLimiter) -> str:
     os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, "schedule.csv")
 
+    if failures:
+        team_id, detail = failures[0]
+        print(f"  WARNING [{season}]: {len(failures)}/{len(team_ids)} schedule "
+              f"calls failed (first: team {team_id}: {detail}) -- games are "
+              "deduped from both teams' schedules, so losses are partial")
+
     if not by_id and os.path.exists(out_path):
         # Offseason/lockout guard: a schedule endpoint answering with zero
         # games (or failing open) must not silently wipe a good CSV that a
         # previous run wrote -- keep the old file and say so.
         print(f"  WARNING [{season}]: schedule endpoints returned 0 games -- "
               f"keeping existing {out_path}")
+        return out_path
+
+    if failures and os.path.exists(out_path) and _csv_game_count(out_path) > len(by_id):
+        # Partial failure AND fewer games than last time: overwriting would
+        # shrink a previously complete schedule, so keep the old file.
+        print(f"  WARNING [{season}]: collected {len(by_id)} games but existing "
+              f"{out_path} has more while {len(failures)} call(s) failed -- "
+              "keeping the existing schedule")
         return out_path
 
     rows = sorted(by_id.values(), key=lambda r: (r["date"] or "", r["game_id"]))
@@ -153,6 +194,14 @@ def snapshot_schedule(season: str, team_ids: list, limiter: RateLimiter) -> str:
         writer.writerows(rows)
     print(f"  schedule: {len(rows)} unique games -> {out_path}")
     return out_path
+
+
+def _csv_game_count(path: str) -> int:
+    try:
+        with open(path, newline="", encoding="utf-8") as f:
+            return sum(1 for _ in csv.DictReader(f))
+    except OSError:
+        return 0
 
 
 def load_schedule(season: str) -> list:
@@ -175,18 +224,56 @@ def snapshot_player_positions(team_ids: list, limiter: RateLimiter,
     lie. What the endpoint actually gives is today's player->position map,
     refreshed on a max_age_days cadence since NBA rosters DO change during a
     season (signings/waivers). Historical players who've since retired simply
-    won't be in this file; see load_historical.py for how that's handled."""
+    won't be in this file; see load_historical.py for how that's handled.
+
+    Fault isolation: an ESPN 500 on ONE team's roster call (the Sep 2026
+    incident that used to kill the whole run) never raises. That team's rows
+    are kept from the existing file instead (positions are current-state
+    facts, so a days-old row beats a missing one), and only when EVERY team
+    fails is the existing file left untouched so the next run retries."""
     out_path = os.path.join(RAW_DIR, "player_positions.json")
     if not force and os.path.exists(out_path):
         age_days = time.time() - os.path.getmtime(out_path)
         if age_days < max_age_days * 86400:
             return out_path
 
+    existing_rows = []
+    if os.path.exists(out_path):
+        try:
+            with open(out_path, encoding="utf-8") as f:
+                existing = json.load(f)
+            existing_rows = existing.get("players") or []
+            if not isinstance(existing_rows, list):
+                existing_rows = []
+        except (OSError, ValueError, TypeError, AttributeError):
+            existing_rows = []  # unreadable old file: nothing to keep from it
+
     rows = []
+    failures = []
     for team_id in team_ids:
         limiter.wait()
-        payload = espn_api.get_roster(team_id, season_param(current_season_label()))
-        rows.extend(parsing.parse_roster(payload, team_id=team_id))
+        try:
+            payload = espn_api.get_roster(team_id, season_param(current_season_label()))
+            rows.extend(parsing.parse_roster(payload, team_id=team_id))
+        except Exception as e:  # noqa: BLE001 -- tolerated per team
+            failures.append((team_id, f"{type(e).__name__}: {e}"))
+
+    if failures and len(failures) == len(team_ids) and team_ids:
+        team_id, detail = failures[0]
+        print(f"  WARNING: all {len(team_ids)} roster calls failed "
+              f"(first: team {team_id}: {detail}) -- keeping the existing "
+              "position map untouched, retried next run")
+        return out_path
+
+    if failures:
+        failed_ids = {team_id for team_id, _ in failures}
+        kept = [r for r in existing_rows if r.get("team_id") in failed_ids]
+        rows.extend(kept)
+        team_id, detail = failures[0]
+        print(f"  WARNING: {len(failures)}/{len(team_ids)} roster calls failed "
+              f"(first: team {team_id}: {detail}) -- kept {len(kept)} existing "
+              "row(s) for those teams")
+
     os.makedirs(RAW_DIR, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump({"updated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
@@ -381,11 +468,25 @@ def main() -> None:
         snapshot_player_positions(team_ids, limiter, force=args.force_rosters)
 
     results = []
+    season_failures = []
     for season in seasons:
-        results.append(run_season(season, args, limiter, team_ids))
+        try:
+            results.append(run_season(season, args, limiter, team_ids))
+        except Exception as exc:  # noqa: BLE001 -- one season must not waste the rest
+            season_failures.append(f"{season}: {type(exc).__name__}: {exc}")
+            print(f"  WARNING [{season}]: {type(exc).__name__}: {exc} -- "
+                  "continuing with the remaining seasons")
 
     if not args.check_only:
         _save_state(results)
+
+    if season_failures:
+        # Still a failed RUN (the workflow's failure issue must fire for a
+        # genuine problem) -- but only after every season had its chance.
+        print("Season failures:")
+        for line in season_failures:
+            print(f"  {line}")
+        sys.exit(1)
 
     if args.check_only:
         pending_total = sum(r.get("pending", 0) for r in results)

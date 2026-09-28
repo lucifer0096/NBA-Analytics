@@ -137,8 +137,23 @@ def _stamp(payload: dict, source: str) -> dict:
 
 
 def refresh_teams() -> dict:
-    rows = parsing.parse_teams(espn_api.get_teams())
+    """Team list from ESPN. A failed fetch keeps the committed
+    dashboard_teams.json (the franchise list is stable; killing the whole
+    refresh over one bad call would block standings/schedule/awards too) and
+    only warns -- the snapshot CLI's load_team_ids remains the hard alarm
+    for a genuinely dead teams endpoint."""
     path = os.path.join(DATA_DIR, "dashboard_teams.json")
+    try:
+        rows = parsing.parse_teams(espn_api.get_teams())
+    except Exception as e:  # noqa: BLE001 -- tolerate, keep the committed list
+        kept = _read_json(path, {})
+        if kept.get("teams"):
+            print(f"  WARNING: team fetch failed ({type(e).__name__}: {e}) "
+                  "-- keeping the committed team list")
+            return kept
+        print(f"  WARNING: team fetch failed ({type(e).__name__}: {e}) and no "
+              "committed team list exists -- retried next run")
+        return {}
     _write(path, _stamp({"teams": rows}, "espn"))
     return {"teams": rows}
 
@@ -294,22 +309,51 @@ def _clean_score(value) -> str:
 
 
 def refresh_positions() -> dict:
-    """Copy the collector's current position map (or fetch it if missing)."""
-    path_in = os.path.join(RAW_DIR, "player_positions.json")
-    if os.path.exists(path_in):
-        with open(path_in, encoding="utf-8") as f:
-            payload = json.load(f)
-        players = payload.get("players", payload if isinstance(payload, list) else [])
-        source = "local"
-    else:
-        team_ids = [t["team_id"] for t in parsing.parse_teams(espn_api.get_teams())]
-        players = []
-        for team_id in team_ids:
-            players.extend(parsing.parse_roster(
-                espn_api.get_roster(team_id, espn_api.season_param(
-                    espn_api.current_season_label())), team_id=team_id))
-        source = "espn"
+    """Copy the collector's current position map (or fetch it if missing).
+
+    Never kills the run: a corrupt raw map is refetched, a failing roster
+    call is tolerated per team (the same fault isolation snapshot.py has),
+    and when NOTHING could be fetched the committed dashboard_positions.json
+    is kept instead of being overwritten with an empty map."""
     path = os.path.join(DATA_DIR, "dashboard_positions.json")
+    path_in = os.path.join(RAW_DIR, "player_positions.json")
+    players: list = []
+    source = "local"
+    raw_payload = _read_json(path_in, None)
+    if isinstance(raw_payload, dict) and isinstance(raw_payload.get("players"),
+                                                     list):
+        players = raw_payload["players"]
+    else:
+        if raw_payload is not None:
+            print("  WARNING: raw player_positions.json unreadable -- refetching")
+        source = "espn"
+        failures = []
+        try:
+            team_ids = [t["team_id"] for t in parsing.parse_teams(espn_api.get_teams())]
+        except Exception as e:  # noqa: BLE001 -- tolerate, fall through below
+            print(f"  WARNING: team fetch failed for positions ({type(e).__name__}: {e})")
+            team_ids = []
+        for team_id in team_ids:
+            try:
+                players.extend(parsing.parse_roster(
+                    espn_api.get_roster(team_id, espn_api.season_param(
+                        espn_api.current_season_label())), team_id=team_id))
+            except Exception as e:  # noqa: BLE001 -- tolerated per team
+                failures.append(team_id)
+                print(f"  WARNING: roster fetch failed for team {team_id} "
+                      f"({type(e).__name__}: {e})")
+        if failures:
+            print(f"  WARNING: {len(failures)}/{len(team_ids)} roster calls "
+                  "failed -- writing the rows that arrived")
+    if not players:
+        kept = _read_json(path, {})
+        if kept.get("players"):
+            print("  WARNING: no position rows fetched -- keeping the "
+                  "committed dashboard_positions.json")
+            return kept
+        print("  WARNING: no position rows fetched and no committed file -- "
+              "the app shows an honest empty state until the next run")
+        return {}
     _write(path, _stamp({"players": players}, source))
     return {"players": players}
 
@@ -331,11 +375,17 @@ def refresh_leaderboards(seasons_to_try: list) -> dict:
         if not files:
             continue
         chosen = season
+        skipped = 0
         for path in files:
-            with open(path, encoding="utf-8") as f:
-                payload = json.load(f)
-            for row in payload.get("players") or []:
-                if not row.get("did_not_play"):
+            try:
+                with open(path, encoding="utf-8") as f:
+                    payload = json.load(f)
+                rows = payload.get("players") or []
+                if not isinstance(rows, list):
+                    raise ValueError("players field is not a list")
+                for row in rows:
+                    if row.get("did_not_play"):
+                        continue
                     entry = rows_by_player.setdefault(row["player_id"], {
                         "player_id": row["player_id"],
                         "player_name": row["player_name"],
@@ -346,9 +396,20 @@ def refresh_leaderboards(seasons_to_try: list) -> dict:
                     entry["minutes"] += row.get("min") or 0
                     for stat in awards.CAREER_SUM_STATS:
                         entry[stat] = (entry.get(stat) or 0) + (row.get(stat) or 0)
+            except (OSError, ValueError, TypeError, KeyError, AttributeError,
+                    json.JSONDecodeError):
+                skipped += 1  # corrupt/partial file: healed by the next run
+                continue
+        if skipped:
+            print(f"  WARNING [{season}]: skipped {skipped} unreadable box "
+                  "score file(s) -- re-fetched by the next snapshot run")
         break  # ONE season only (the newest available in the try-order)
     if chosen is None:
         print("  no collected games for any candidate season -- skipping leaderboards")
+        return {}
+    if not rows_by_player:
+        print("  no READABLE box scores in the collected season -- keeping "
+              "the committed leaderboards")
         return {}
 
     # Score fantasy points (same default weights the model trains under).
@@ -502,7 +563,12 @@ def refresh_awards(seasons_to_try: list) -> dict:
 
     season_payloads = []
     for season in labels:
-        payload = awards.build_payload(season)
+        try:
+            payload = awards.build_payload(season)
+        except Exception as exc:  # noqa: BLE001 -- one bad season must not kill the build
+            print(f"  WARNING [{season}]: awards build failed "
+                  f"({type(exc).__name__}: {exc}) -- keeping its previous payload")
+            continue
         if payload:
             season_payloads.append(payload)
     rebuilt = {p["season"]: p for p in season_payloads}
@@ -543,8 +609,13 @@ def refresh_awards(seasons_to_try: list) -> dict:
                 if key not in ("seasons", "games_by_season",
                                "_generated_utc", "source")}
     if hist and window_players:
-        career = awards.build_career(list(merged_seasons.values()),
-                                     players=window_players, history=hist)
+        career = None
+        try:
+            career = awards.build_career(list(merged_seasons.values()),
+                                         players=window_players, history=hist)
+        except Exception as exc:  # noqa: BLE001 -- keep the previous career half
+            print(f"  WARNING: career build failed ({type(exc).__name__}: "
+                  f"{exc}) -- keeping the previous career sections")
         if career:
             envelope.update(career)
         else:
