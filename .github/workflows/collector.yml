@@ -30,6 +30,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # Branch tip, not the default ${{ github.sha }}: for schedule and
+          # workflow_dispatch runs that SHA is pinned when the run is
+          # CREATED, so a run queued behind another push (this workflow
+          # shares the data-refresh concurrency group with the collector)
+          # starts stale and its final `git push` gets rejected -- the run
+          # fails with its refreshed work stranded. Taking main at job
+          # start removes that race.
+          ref: main
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
