@@ -1,0 +1,126 @@
+{
+ "teams": [
+  {
+   "team_id": 20,
+   "abbrev": "ATL",
+   "display_name": "Atlanta Dream",
+   "location": "Atlanta",
+   "name": "Dream",
+   "slug": "atlanta-dream"
+  },
+  {
+   "team_id": 19,
+   "abbrev": "CHI",
+   "display_name": "Chicago Sky",
+   "location": "Chicago",
+   "name": "Sky",
+   "slug": "chicago-sky"
+  },
+  {
+   "team_id": 18,
+   "abbrev": "CON",
+   "display_name": "Connecticut Sun",
+   "location": "Connecticut",
+   "name": "Sun",
+   "slug": "connecticut-sun"
+  },
+  {
+   "team_id": 3,
+   "abbrev": "DAL",
+   "display_name": "Dallas Wings",
+   "location": "Dallas",
+   "name": "Wings",
+   "slug": "dallas-wings"
+  },
+  {
+   "team_id": 129689,
+   "abbrev": "GS",
+   "display_name": "Golden State Valkyries",
+   "location": "Golden State",
+   "name": "Valkyries",
+   "slug": "golden-state-valkyries"
+  },
+  {
+   "team_id": 5,
+   "abbrev": "IND",
+   "display_name": "Indiana Fever",
+   "location": "Indiana",
+   "name": "Fever",
+   "slug": "indiana-fever"
+  },
+  {
+   "team_id": 17,
+   "abbrev": "LV",
+   "display_name": "Las Vegas Aces",
+   "location": "Las Vegas",
+   "name": "Aces",
+   "slug": "las-vegas-aces"
+  },
+  {
+   "team_id": 6,
+   "abbrev": "LA",
+   "display_name": "Los Angeles Sparks",
+   "location": "Los Angeles",
+   "name": "Sparks",
+   "slug": "los-angeles-sparks"
+  },
+  {
+   "team_id": 8,
+   "abbrev": "MIN",
+   "display_name": "Minnesota Lynx",
+   "location": "Minnesota",
+   "name": "Lynx",
+   "slug": "minnesota-lynx"
+  },
+  {
+   "team_id": 9,
+   "abbrev": "NY",
+   "display_name": "New York Liberty",
+   "location": "New York",
+   "name": "Liberty",
+   "slug": "new-york-liberty"
+  },
+  {
+   "team_id": 11,
+   "abbrev": "PHX",
+   "display_name": "Phoenix Mercury",
+   "location": "Phoenix",
+   "name": "Mercury",
+   "slug": "phoenix-mercury"
+  },
+  {
+   "team_id": 132052,
+   "abbrev": "POR",
+   "display_name": "Portland Fire",
+   "location": "Portland",
+   "name": "Fire",
+   "slug": "portland-fire"
+  },
+  {
+   "team_id": 14,
+   "abbrev": "SEA",
+   "display_name": "Seattle Storm",
+   "location": "Seattle",
+   "name": "Storm",
+   "slug": "seattle-storm"
+  },
+  {
+   "team_id": 131935,
+   "abbrev": "TOR",
+   "display_name": "Toronto Tempo",
+   "location": "Toronto",
+   "name": "Tempo",
+   "slug": "toronto-tempo"
+  },
+  {
+   "team_id": 16,
+   "abbrev": "WSH",
+   "display_name": "Washington Mystics",
+   "location": "Washington",
+   "name": "Mystics",
+   "slug": "washington-mystics"
+  }
+ ],
+ "_generated_utc": "2026-09-28T09:53:59Z",
+ "source": "espn"
+}

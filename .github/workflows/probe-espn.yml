@@ -33,6 +33,8 @@ jobs:
           probe "site.web.api/browser-ua"         "https://site.web.api.espn.com/apis/site/v2/sports/basketball/nba/teams" -A "$UA" -H "Accept: application/json" -H "Referer: https://www.nba.com/"
           probe "site.web.api/default-ua"         "https://site.web.api.espn.com/apis/site/v2/sports/basketball/nba/teams"
           probe "sports.core.api/browser-ua"      "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba/teams" -A "$UA" -H "Accept: application/json" -H "Referer: https://www.nba.com/"
+          probe "site.api/wnba"                   "https://site.api.espn.com/apis/site/v2/sports/basketball/wnba/teams"
+          probe "sports.core.api/wnba"            "https://sports.core.api.espn.com/v2/sports/basketball/leagues/wnba/teams" -A "$UA" -H "Accept: application/json" -H "Referer: https://www.wnba.com/"
       - name: Probe ESPN with every project header set
         run: |
           python - <<'PY'

@@ -214,6 +214,103 @@ def test_parse_roster_fixture():
 
 
 # ---------------------------------------------------------------------------
+# WNBA: same shapes, single-calendar-year season labels (leagues.py)
+# ---------------------------------------------------------------------------
+
+def test_wnba_season_label_is_the_param():
+    """A WNBA season IS its calendar year (May -> October): the label, the
+    ESPN season param and the round-trip all stay single-year, unlike the
+    NBA's ending-year arithmetic."""
+    assert espn_api.season_param("2026", "wnba") == 2026
+    assert espn_api.season_param("2010", "wnba") == 2010
+    assert espn_api.season_label(2026, "wnba") == "2026"
+    assert espn_api.season_label(espn_api.season_param("2010", "wnba"),
+                                 "wnba") == "2010"
+    # NBA defaults unchanged.
+    assert espn_api.season_param("2010-11") == 2011
+    assert espn_api.season_label(2011) == "2010-11"
+
+
+def test_wnba_current_season_label_follows_may_october_calendar():
+    """WNBA seasons run May -> October: Jan-Oct the calendar year is the
+    season (in progress or not yet tipped off), Nov-Dec the off-season
+    jumps to the next year -- mirroring how the NBA side jumps from July."""
+    from datetime import date
+
+    assert espn_api.current_season_label(date(2026, 5, 10), "wnba") == "2026"
+    assert espn_api.current_season_label(date(2026, 9, 28), "wnba") == "2026"
+    assert espn_api.current_season_label(date(2026, 10, 31), "wnba") == "2026"
+    assert espn_api.current_season_label(date(2026, 11, 1), "wnba") == "2027"
+    assert espn_api.current_season_label(date(2026, 12, 31), "wnba") == "2027"
+    assert espn_api.current_season_label(date(2027, 4, 1), "wnba") == "2027"
+    # NBA behavior untouched.
+    assert espn_api.current_season_label(date(2026, 1, 15)) == "2025-26"
+    assert espn_api.current_season_label(date(2026, 7, 1)) == "2026-27"
+
+
+def test_wnba_date_derivation_is_the_calendar_year():
+    """A May WNBA game belongs to that calendar year (the NBA rule would
+    wrongly file it under the previous year's season)."""
+    assert parsing.season_label_from_date("2026-05-10", "wnba") == "2026"
+    assert parsing.season_label_from_date("2026-10-05", "wnba") == "2026"
+    assert parsing.season_label_from_date("2019-07-01", "wnba") == "2019"
+    # NBA rule unchanged.
+    assert parsing.season_label_from_date("2026-05-10") == "2025-26"
+    assert parsing.season_label_from_date("2026-01-15") == "2025-26"
+
+
+def test_league_url_builders_swap_the_slug():
+    assert "/basketball/wnba" in espn_api.site_api("wnba")
+    assert "/basketball/wnba" in espn_api.web_api_v2("wnba")
+    assert "/basketball/wnba" in espn_api.web_api_common("wnba")
+    assert espn_api.site_api("nba") == espn_api.SITE_API
+    with pytest.raises(ValueError):
+        espn_api.site_api("nbaall")
+
+
+def test_parse_wnba_summary_fixture_maps_the_same_labels():
+    """Live-captured Sep 2026: the WNBA's box score carries ESPN's exact
+    stat labels, so parse_summary works with league='wnba' (which only
+    picks the date->season rule: a May 2026 game files under '2026')."""
+    meta, rows = parsing.parse_summary(
+        _load("wnba_summary_2026_final.json"), league="wnba")
+    assert meta["status"] == "STATUS_FINAL"
+    assert meta["season"] == "2026"
+    assert meta["home_abbrev"] and meta["away_abbrev"]
+    played = [r for r in rows if not r["did_not_play"]]
+    assert played, "no player lines parsed"
+    scorers = [r for r in played if r["pts"]]
+    assert scorers, "label mapping failed to score anyone"
+    assert any(r.get("plus_minus") is not None for r in played)
+    # NBA fixture still parses with the default league.
+    _, nba_rows = parsing.parse_summary(_load("summary_1995-96_bulls_hornets.json"))
+    assert nba_rows
+
+
+def test_parse_wnba_standings_fixture():
+    """Live-captured Sep 2026: the WNBA's standings tree has the same
+    East/West children with entries, so the NBA parser walks it unchanged."""
+    rows = parsing.parse_standings(_load("wnba_standings_2026.json"))
+    assert len(rows) == 15  # 15 franchises in 2026
+    conferences = {r["conference"] for r in rows}
+    assert conferences == {"Eastern Conference", "Western Conference"}
+    assert all(r["wins"] + r["losses"] >= 0 for r in rows)
+    ids = [r["team_id"] for r in rows]
+    assert len(ids) == len(set(ids))
+
+
+def test_parse_wnba_roster_fixture_reads_positions_off_athletes():
+    """Live-captured Sep 2026: the WNBA's roster groups carry a null
+    group-level position (like the NBA's) while each athlete carries its
+    own -- parse_roster reads the athlete first, so rows get real G/F/C."""
+    rows = parsing.parse_roster(_load("wnba_roster_atl_2026.json"))
+    assert len(rows) == 14
+    assert {r["position"] for r in rows} <= {"G", "F", "C"}
+    assert {r["position"] for r in rows} & {"G", "F"}
+    assert all(r["team_id"] == 20 for r in rows)
+
+
+# ---------------------------------------------------------------------------
 # live API (opt-in: pytest -m live)
 # ---------------------------------------------------------------------------
 

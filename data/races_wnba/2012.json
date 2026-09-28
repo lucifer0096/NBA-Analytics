@@ -1,0 +1,258 @@
+{
+ "season": "2012",
+ "snapshots": [
+  {
+   "date": "2026-09-28",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 918,
+      "player_name": "Tina Charles",
+      "rank": 1,
+      "score": 24.21
+     },
+     {
+      "player_id": 812,
+      "player_name": "Candace Parker",
+      "rank": 2,
+      "score": 23.98
+     },
+     {
+      "player_id": 956,
+      "player_name": "Maya Moore",
+      "rank": 3,
+      "score": 22.56
+     },
+     {
+      "player_id": 125,
+      "player_name": "Tamika Catchings",
+      "rank": 4,
+      "score": 22.49
+     },
+     {
+      "player_id": 856,
+      "player_name": "Kristi Toliver",
+      "rank": 5,
+      "score": 21.87
+     },
+     {
+      "player_id": 685,
+      "player_name": "Cappie Pondexter",
+      "rank": 6,
+      "score": 21.8
+     },
+     {
+      "player_id": 680,
+      "player_name": "Sophia Young-Malcolm",
+      "rank": 7,
+      "score": 20.14
+     },
+     {
+      "player_id": 869,
+      "player_name": "DeWanna Bonner",
+      "rank": 8,
+      "score": 19.27
+     },
+     {
+      "player_id": 485,
+      "player_name": "Kara Lawson",
+      "rank": 9,
+      "score": 19.13
+     },
+     {
+      "player_id": 14,
+      "player_name": "Becky Hammon",
+      "rank": 10,
+      "score": 18.57
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 125,
+      "player_name": "Tamika Catchings",
+      "rank": 1,
+      "score": 2.81
+     },
+     {
+      "player_id": 812,
+      "player_name": "Candace Parker",
+      "rank": 2,
+      "score": 2.8
+     },
+     {
+      "player_id": 609,
+      "player_name": "Sancho Lyttle",
+      "rank": 3,
+      "score": 2.78
+     },
+     {
+      "player_id": 872,
+      "player_name": "Angel McCoughtry",
+      "rank": 4,
+      "score": 2.3
+     },
+     {
+      "player_id": 680,
+      "player_name": "Sophia Young-Malcolm",
+      "rank": 5,
+      "score": 2.2
+     },
+     {
+      "player_id": 286,
+      "player_name": "Taj McWilliams-Franklin",
+      "rank": 6,
+      "score": 2.1
+     },
+     {
+      "player_id": 766,
+      "player_name": "Sylvia Fowles",
+      "rank": 7,
+      "score": 2.03
+     },
+     {
+      "player_id": 956,
+      "player_name": "Maya Moore",
+      "rank": 8,
+      "score": 1.84
+     },
+     {
+      "player_id": 1053,
+      "player_name": "Glory Johnson",
+      "rank": 9,
+      "score": 1.82
+     },
+     {
+      "player_id": 156,
+      "player_name": "Katie Douglas",
+      "rank": 10,
+      "score": 1.75
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 1016,
+      "player_name": "Danielle Adams",
+      "rank": 1,
+      "score": 13.48
+     },
+     {
+      "player_id": 865,
+      "player_name": "Renee Montgomery",
+      "rank": 2,
+      "score": 13.09
+     },
+     {
+      "player_id": 537,
+      "player_name": "Jia Perkins",
+      "rank": 3,
+      "score": 12.3
+     },
+     {
+      "player_id": 1049,
+      "player_name": "Riquna Williams",
+      "rank": 4,
+      "score": 11.75
+     },
+     {
+      "player_id": 881,
+      "player_name": "Monica Wright",
+      "rank": 5,
+      "score": 10.19
+     },
+     {
+      "player_id": 1110,
+      "player_name": "Shekinna Stricklen",
+      "rank": 6,
+      "score": 9.26
+     },
+     {
+      "player_id": 660,
+      "player_name": "Mistie McCray Bass",
+      "rank": 7,
+      "score": 8.62
+     },
+     {
+      "player_id": 775,
+      "player_name": "Candice Wiggins",
+      "rank": 8,
+      "score": 8.35
+     },
+     {
+      "player_id": 394,
+      "player_name": "Tina Thompson",
+      "rank": 9,
+      "score": 8.29
+     },
+     {
+      "player_id": 735,
+      "player_name": "Shay Murphy",
+      "rank": 10,
+      "score": 8.25
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 581,
+      "player_name": "Alana Beard",
+      "rank": 1,
+      "score": 15.8
+     },
+     {
+      "player_id": 651,
+      "player_name": "Monique Currie",
+      "rank": 2,
+      "score": 14.47
+     },
+     {
+      "player_id": 812,
+      "player_name": "Candace Parker",
+      "rank": 3,
+      "score": 13.34
+     },
+     {
+      "player_id": 869,
+      "player_name": "DeWanna Bonner",
+      "rank": 4,
+      "score": 11.45
+     },
+     {
+      "player_id": 1011,
+      "player_name": "Krystal Thomas",
+      "rank": 5,
+      "score": 11.3
+     },
+     {
+      "player_id": 860,
+      "player_name": "Briann January",
+      "rank": 6,
+      "score": 11.18
+     },
+     {
+      "player_id": 856,
+      "player_name": "Kristi Toliver",
+      "rank": 7,
+      "score": 10.21
+     },
+     {
+      "player_id": 828,
+      "player_name": "Alexis Hornbuckle",
+      "rank": 8,
+      "score": 9.52
+     },
+     {
+      "player_id": 609,
+      "player_name": "Sancho Lyttle",
+      "rank": 9,
+      "score": 9.38
+     },
+     {
+      "player_id": 773,
+      "player_name": "Charde Houston",
+      "rank": 10,
+      "score": 9.19
+     }
+    ]
+   }
+  }
+ ]
+}

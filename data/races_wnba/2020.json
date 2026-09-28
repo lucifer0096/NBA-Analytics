@@ -1,0 +1,258 @@
+{
+ "season": "2020",
+ "snapshots": [
+  {
+   "date": "2026-09-28",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 2998928,
+      "player_name": "Breanna Stewart",
+      "rank": 1,
+      "score": 27.34
+     },
+     {
+      "player_id": 3149391,
+      "player_name": "A'ja Wilson",
+      "rank": 2,
+      "score": 26.8
+     },
+     {
+      "player_id": 812,
+      "player_name": "Candace Parker",
+      "rank": 3,
+      "score": 23.23
+     },
+     {
+      "player_id": 3917450,
+      "player_name": "Napheesa Collier",
+      "rank": 4,
+      "score": 22.42
+     },
+     {
+      "player_id": 869,
+      "player_name": "DeWanna Bonner",
+      "rank": 5,
+      "score": 22.32
+     },
+     {
+      "player_id": 585,
+      "player_name": "Diana Taurasi",
+      "rank": 6,
+      "score": 22.07
+     },
+     {
+      "player_id": 2490553,
+      "player_name": "Brittney Griner",
+      "rank": 7,
+      "score": 21.99
+     },
+     {
+      "player_id": 981,
+      "player_name": "Courtney Vandersloot",
+      "rank": 8,
+      "score": 21.48
+     },
+     {
+      "player_id": 2529140,
+      "player_name": "Alyssa Thomas",
+      "rank": 9,
+      "score": 21.17
+     },
+     {
+      "player_id": 3904577,
+      "player_name": "Arike Ogunbowale",
+      "rank": 10,
+      "score": 21.07
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 3149391,
+      "player_name": "A'ja Wilson",
+      "rank": 1,
+      "score": 3.01
+     },
+     {
+      "player_id": 2998928,
+      "player_name": "Breanna Stewart",
+      "rank": 2,
+      "score": 2.95
+     },
+     {
+      "player_id": 3917450,
+      "player_name": "Napheesa Collier",
+      "rank": 3,
+      "score": 2.68
+     },
+     {
+      "player_id": 3142086,
+      "player_name": "Brianna Turner",
+      "rank": 4,
+      "score": 2.44
+     },
+     {
+      "player_id": 2529130,
+      "player_name": "Natasha Howard",
+      "rank": 5,
+      "score": 2.36
+     },
+     {
+      "player_id": 2529140,
+      "player_name": "Alyssa Thomas",
+      "rank": 6,
+      "score": 2.21
+     },
+     {
+      "player_id": 812,
+      "player_name": "Candace Parker",
+      "rank": 7,
+      "score": 2.17
+     },
+     {
+      "player_id": 3058895,
+      "player_name": "Brionna Jones",
+      "rank": 8,
+      "score": 2.15
+     },
+     {
+      "player_id": 869,
+      "player_name": "DeWanna Bonner",
+      "rank": 9,
+      "score": 2.15
+     },
+     {
+      "player_id": 3142010,
+      "player_name": "Azura Stevens",
+      "rank": 10,
+      "score": 2.12
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 2529185,
+      "player_name": "Bria Hartley",
+      "rank": 1,
+      "score": 17.58
+     },
+     {
+      "player_id": 2566106,
+      "player_name": "Dearica Hamby",
+      "rank": 2,
+      "score": 16.15
+     },
+     {
+      "player_id": 4065870,
+      "player_name": "Jackie Young",
+      "rank": 3,
+      "score": 13.56
+     },
+     {
+      "player_id": 4065850,
+      "player_name": "Jazmine Jones",
+      "rank": 4,
+      "score": 12.94
+     },
+     {
+      "player_id": 1049,
+      "player_name": "Riquna Williams",
+      "rank": 5,
+      "score": 11.71
+     },
+     {
+      "player_id": 2490514,
+      "player_name": "Tianna Hawkins",
+      "rank": 6,
+      "score": 9.91
+     },
+     {
+      "player_id": 3142328,
+      "player_name": "Gabby Williams",
+      "rank": 7,
+      "score": 9.73
+     },
+     {
+      "player_id": 887,
+      "player_name": "Sami Whitcomb",
+      "rank": 8,
+      "score": 9.66
+     },
+     {
+      "player_id": 1014,
+      "player_name": "Danielle Robinson",
+      "rank": 9,
+      "score": 9.65
+     },
+     {
+      "player_id": 4065760,
+      "player_name": "Tyasha Harris",
+      "rank": 10,
+      "score": 8.5
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 3142055,
+      "player_name": "Myisha Hines-Allen",
+      "rank": 1,
+      "score": 21.41
+     },
+     {
+      "player_id": 2593770,
+      "player_name": "Betnijah Laney-Hamilton",
+      "rank": 2,
+      "score": 14.25
+     },
+     {
+      "player_id": 2998938,
+      "player_name": "Kahleah Copper",
+      "rank": 3,
+      "score": 12.07
+     },
+     {
+      "player_id": 3058895,
+      "player_name": "Brionna Jones",
+      "rank": 4,
+      "score": 10.21
+     },
+     {
+      "player_id": 2569047,
+      "player_name": "Blake Dietrick",
+      "rank": 5,
+      "score": 8.76
+     },
+     {
+      "player_id": 3904576,
+      "player_name": "Marina Mabrey",
+      "rank": 6,
+      "score": 8.67
+     },
+     {
+      "player_id": 3142086,
+      "player_name": "Brianna Turner",
+      "rank": 7,
+      "score": 8.09
+     },
+     {
+      "player_id": 3913881,
+      "player_name": "Alanna Smith",
+      "rank": 8,
+      "score": 7.3
+     },
+     {
+      "player_id": 812,
+      "player_name": "Candace Parker",
+      "rank": 9,
+      "score": 7.16
+     },
+     {
+      "player_id": 2529140,
+      "player_name": "Alyssa Thomas",
+      "rank": 10,
+      "score": 6.51
+     }
+    ]
+   }
+  }
+ ]
+}

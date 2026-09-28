@@ -67,15 +67,21 @@ _STANDING_STATS = {
 }
 
 
-def season_label_from_date(date_str: str) -> str:
-    """Derive the NBA season label from a game date.
+def season_label_from_date(date_str: str, league: str = "nba") -> str:
+    """Derive the season label from a game date.
 
-    Games Oct-Dec belong to the season starting that year; Jan-Jun (regular
-    season end + playoffs) to the one that started the previous year.
+    NBA: games Oct-Dec belong to the season starting that year; Jan-Jun
+    (regular season end + playoffs) to the one that started the previous
+    year. WNBA: seasons are a single calendar year (May -> October), so the
+    label IS the game's calendar year -- same rule as ESPN's season param
+    (see espn_api.season_label).
+
     Deliberately derived from the game's own date rather than trusting a
     season field, so a mislabelled API field can't silently shift a whole
     block of rows into the wrong training season."""
     d = datetime.fromisoformat(str(date_str).replace("Z", "+00:00")).date()
+    if league == "wnba":
+        return str(d.year)
     start = d.year if d.month >= 8 else d.year - 1
     # (Aug-Sep only ever appears as preseason -- still part of the season that
     # starts in October of that year; the NBA's regular-season calendar
@@ -187,13 +193,16 @@ def parse_teams(payload: dict) -> list:
 # schedule
 # ---------------------------------------------------------------------------
 
-def parse_schedule(payload: dict, season: str | None = None) -> list:
+def parse_schedule(payload: dict, season: str | None = None,
+                   league: str = "nba") -> list:
     """One team's schedule payload -> game rows (dedup on game_id happens in
     snapshot.py, since every game appears in both teams' schedules).
 
-    `season` (label like '2010-11') overrides the date-derived season label;
-    normally the two agree -- the override exists so a partial fetch can't
-    misfile a game whose date field is missing."""
+    `season` (label like '2010-11', or the WNBA's single-year '2026')
+    overrides the date-derived season label; normally the two agree -- the
+    override exists so a partial fetch can't misfile a game whose date field
+    is missing. `league` picks the date-derivation rule when no override
+    was passed."""
     rows = []
     for event in payload.get("events") or []:
         comps = event.get("competitions") or []
@@ -209,7 +218,7 @@ def parse_schedule(payload: dict, season: str | None = None) -> list:
         rows.append({
             "game_id": int(event["id"]),
             "date": date_str,
-            "season": season or season_label_from_date(date_str),
+            "season": season or season_label_from_date(date_str, league),
             "home_id": int(home["team"]["id"]),
             "home_abbrev": home["team"].get("abbreviation"),
             "home_score": _score_value(home.get("score")),
@@ -226,7 +235,7 @@ def parse_schedule(payload: dict, season: str | None = None) -> list:
 # summary (box score)
 # ---------------------------------------------------------------------------
 
-def parse_summary(payload: dict) -> tuple:
+def parse_summary(payload: dict, league: str = "nba") -> tuple:
     """One game summary payload -> (game_meta dict, player-game rows list).
 
     The game's header carries the competitors' home/away assignment, final
@@ -234,7 +243,9 @@ def parse_summary(payload: dict) -> tuple:
     team's player lines. Every scheduled player appears, including
     did-not-play rows (stats empty, did_not_play=True) -- those are real
     fantasy outcomes (a 0) and the model's availability signal, not junk to
-    drop."""
+    drop. Stat columns are matched by ESPN's own label names
+    (MIN/PTS/FG/.../+/-), which the WNBA's box scores carry identically
+    (verified live Sep 2026); `league` only picks the date->season rule."""
     header = payload.get("header") or {}
     comps = header.get("competitions") or []
     if not comps:
@@ -249,7 +260,7 @@ def parse_summary(payload: dict) -> tuple:
     meta = {
         "game_id": int(comp["id"]),
         "date": game_date,
-        "season": season_label_from_date(game_date),
+        "season": season_label_from_date(game_date, league),
         "status": ((comp.get("status") or {}).get("type") or {}).get("name"),
         "home_id": int(by_side["home"]["team"]["id"]),
         "home_abbrev": by_side["home"]["team"].get("abbreviation"),

@@ -18,6 +18,176 @@ sys.path.insert(0, str(REPO_ROOT / "src" / "collector"))
 import history  # noqa: E402
 
 
+def test_set_league_rebinds_endpoints_and_cache(monkeypatch):
+    """set_league() switches the whole career pipeline together: endpoint
+    slug, ESPN award-type ids (15 WNBA honours incl. Finals MVP 257), the
+    1997 champion-index start and the per-league cache file -- then the NBA
+    configuration survives a round trip so runs can't mix honours tables."""
+    saved = {name: getattr(history, name) for name in
+             ("LEAGUE", "BASE", "WEB_STATS_URL", "CACHE_PATH",
+              "AWARD_TYPE_IDS", "FINALS_MVP_ID", "CHAMPION_FIRST_YEAR")}
+    try:
+        history.set_league("wnba")
+        assert history.LEAGUE == "wnba"
+        assert history.BASE.endswith("/leagues/wnba")
+        assert "/wnba" in history.WEB_STATS_URL
+        assert history.CACHE_PATH.endswith("history_cache_wnba.json")
+        assert history.FINALS_MVP_ID == 257
+        assert history.CHAMPION_FIRST_YEAR == 1997
+        assert len(history.AWARD_TYPE_IDS) == 15
+        assert 257 in history.AWARD_TYPE_IDS
+        assert 43 not in history.AWARD_TYPE_IDS  # NBA Finals MVP
+        with pytest.raises(ValueError):
+            history.set_league("euroleague")
+    finally:
+        for name, value in saved.items():
+            setattr(history, name, value)
+    assert history.LEAGUE == "nba"
+    assert history.FINALS_MVP_ID == 43
+    assert history.CACHE_PATH.endswith("history_cache.json")
+
+
+def test_honours_wnba_verified_champion_overlay_fills_espn_gaps(monkeypatch):
+    """ESPN's WNBA Finals-MVP detail omits the winner's team ref for
+    1997-2002 (verified live Sep 2026): the verified six-season overlay
+    fills ONLY those gaps, and ESPN's own team refs still win where they
+    exist -- so the champion index covers every season from 1997."""
+    saved = {name: getattr(history, name) for name in
+             ("LEAGUE", "BASE", "WEB_STATS_URL", "CACHE_PATH",
+              "AWARD_TYPE_IDS", "FINALS_MVP_ID", "CHAMPION_FIRST_YEAR")}
+    try:
+        history.set_league("wnba")
+        base = ("https://sports.core.api.espn.com/v2/sports/basketball/"
+                "leagues/wnba/seasons/{}/awards/257?lang=en&region=us")
+        cache = {
+            "listings": {"257": [base.format(1997), base.format(2005)]},
+            "awards": {
+                # ESPN gap year: winner carries no team ref.
+                "257-1997": {"name": "Finals MVP", "athletes": [141],
+                             "champion": None,
+                             "fetched": "2026-01-01T00:00:00Z"},
+                # ESPN ref present: 2005 champion = team 8 (Seattle).
+                "257-2005": {"name": "Finals MVP", "athletes": [7],
+                             "champion": 8,
+                             "fetched": "2026-01-01T00:00:00Z"},
+            },
+        }
+        by_player, champions, meta = history.honours(cache, live=False)
+        assert champions[1997] == 4   # overlay (Houston Comets)
+        assert champions[2005] == 8   # ESPN's own ref wins
+        # The six gap years are league record, present even when this
+        # fixture's index doesn't list them, plus the ESPN-ref season.
+        assert set(champions) >= {1997, 1998, 1999, 2000, 2001, 2002, 2005}
+        assert meta["champion_years"] == len(champions)
+        assert by_player.get(141) == {"Finals MVP": 1}
+    finally:
+        for name, value in saved.items():
+            setattr(history, name, value)
+
+
+def test_fetch_athlete_debut_fallback_wnba_vs_nba(monkeypatch):
+    """ESPN gives WNBA athletes no debutYear (verified Sep 2026): the debut
+    derives from the first row year, so the trust rule can run at all; the
+    NBA path is untouched -- no marker, no debut, honestly untrusted."""
+    rows = [[2019, 1, "ATL", 30], [2020, 1, "ATL", 32],
+            [2021, 2, "NYL", 28]]
+    monkeypatch.setattr(history, "_get",
+                        lambda url: {"displayName": "Test Player"})
+    monkeypatch.setattr(history, "_parse_line", lambda payload: {"gp": 90})
+    monkeypatch.setattr(history, "_parse_rows",
+                        lambda payload: (list(rows), "NYL"))
+    now = history._now()
+    saved = {name: getattr(history, name) for name in
+             ("LEAGUE", "BASE", "WEB_STATS_URL", "CACHE_PATH",
+              "AWARD_TYPE_IDS", "FINALS_MVP_ID", "CHAMPION_FIRST_YEAR")}
+    try:
+        history.set_league("wnba")
+        entry = history._fetch_athlete(1, now)
+        assert entry["debut"] == 2019          # first row year
+        assert entry["complete"] is True
+        assert history._trusted(entry)          # 2019 <= 2019 + 1
+        # The trade-split third row doesn't confuse min().
+        assert len(entry["rows"]) == 3
+    finally:
+        for name, value in saved.items():
+            setattr(history, name, value)
+    nba_entry = history._fetch_athlete(1, now)
+    assert nba_entry["debut"] is None           # NBA: no marker, no invention
+    assert not history._trusted(nba_entry)
+
+
+def test_entry_age_ok_refetches_pre_debut_wnba_bundles(monkeypatch):
+    """Pre-upgrade WNBA bundles (complete but debut-less) refetch once so
+    the trust rule can run; fresh NBA bundles with a debut stay cached."""
+    now = history._now()
+    stamp = history._iso(now)
+    fresh = {"complete": True, "debut": 2019, "fetched": stamp,
+             "rows": [[2019, 1, "ATL", 30]]}
+    saved = {name: getattr(history, name) for name in
+             ("LEAGUE", "BASE", "WEB_STATS_URL", "CACHE_PATH",
+              "AWARD_TYPE_IDS", "FINALS_MVP_ID", "CHAMPION_FIRST_YEAR")}
+    try:
+        history.set_league("wnba")
+        debutless = dict(fresh)
+        debutless["debut"] = None
+        assert not history._entry_age_ok(debutless, now)   # refetch trigger
+        assert history._entry_age_ok(fresh, now)           # resolved stays
+    finally:
+        for name, value in saved.items():
+            setattr(history, name, value)
+    assert history._entry_age_ok(fresh, now)               # NBA path unchanged
+
+
+def test_championships_wnba_counts_via_overlay_and_blank_honest_gaps(monkeypatch):
+    """End of the chain: a trusted WNBA career's titles count against the
+    champion index (ESPN refs + verified 1997-2002 overlay); a career the
+    index can't cover, or an untrusted one, stays an honest blank -- never
+    a wrong number."""
+    saved = {name: getattr(history, name) for name in
+             ("LEAGUE", "BASE", "WEB_STATS_URL", "CACHE_PATH",
+              "AWARD_TYPE_IDS", "FINALS_MVP_ID", "CHAMPION_FIRST_YEAR")}
+    try:
+        history.set_league("wnba")
+        champions = {2001: 6, 2002: 6, 2005: 8}
+        title_holder = {"debut": 2001,
+                        "rows": [[2001, 6, "LOS", 30], [2002, 6, "LOS", 30],
+                                 [2005, 8, "SEA", 30]]}
+        assert history._championships(title_holder, champions, 1) == 3
+        # 2003 not in the index -> None (gap years stay blank, not guessed).
+        gap_span = {"debut": 2002,
+                    "rows": [[2002, 6, "LOS", 30], [2003, 6, "LOS", 30]]}
+        assert history._championships(gap_span, champions, 1) is None
+        # No debut -> untrusted -> None.
+        assert history._championships(
+            {"debut": None, "rows": [[2001, 6, "LOS", 30]]},
+            champions, 1) is None
+    finally:
+        for name, value in saved.items():
+            setattr(history, name, value)
+
+
+def test_leader_ids_wnba_empty_without_leaders_endpoint(monkeypatch):
+    """ESPN's core API exposes no WNBA leaders endpoint (verified live Sep
+    2026): the seed set is empty instead of raising -- the pool comes from
+    the honours index + collected-window players. The NBA path keeps its
+    live-or-cached requirement."""
+    saved = {name: getattr(history, name) for name in
+             ("LEAGUE", "BASE", "WEB_STATS_URL", "CACHE_PATH",
+              "AWARD_TYPE_IDS", "FINALS_MVP_ID", "CHAMPION_FIRST_YEAR")}
+    try:
+        history.set_league("wnba")
+        # Even an empty cache must not raise for the WNBA.
+        assert history.leader_ids({"leaders": {}}, live=False) == set()
+        # Live is equally empty -- no endpoint is ever asked for.
+        assert history.leader_ids({}, live=True) == set()
+    finally:
+        for name, value in saved.items():
+            setattr(history, name, value)
+    # NBA: no live fetch and no cache still raises (single-league invariant).
+    with pytest.raises(RuntimeError, match="career leaders"):
+        history.leader_ids({"leaders": {}}, live=False)
+
+
 def test_build_offline_from_committed_cache(monkeypatch):
     """The all-history build assembles real career entries from the
     committed cache: LeBron's full career (>=20 seasons, an ESPN career

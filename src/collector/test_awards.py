@@ -10,6 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 import awards  # noqa: E402
+import leagues  # noqa: E402
 
 
 def _player(pid, name="Player", team="BOS", gp=10, starts=0, **stats):
@@ -67,6 +68,39 @@ def test_previous_season_century_wrap():
     assert awards.previous_season("2025-26") == "2024-25"
     # The two-digit suffix must roll 00 -> the previous century, not 25-26.
     assert awards.previous_season("2000-01") == "1999-00"
+    # The WNBA's single-year labels subtract a plain year.
+    assert awards.previous_season("2026", "wnba") == "2025"
+    assert awards.previous_season("2001", "wnba") == "2000"
+
+
+def test_goat_formula_per_league_prints_every_weight():
+    """Each league's formula text must print every component weight and every
+    honour-point weight it actually computes with, name its league, and keep
+    the NBA's string byte-identical to the original constant."""
+    assert awards.goat_formula("nba") == awards.GOAT_FORMULA
+    for league in ("nba", "wnba"):
+        formula = awards.goat_formula(league)
+        for w in awards.GOAT_WEIGHTS.values():
+            assert f"{w:.0%}" in formula
+        for stat, w in awards.GOAT_PRODUCTION_WEIGHTS.items():
+            assert f"{awards.GOAT_PROD_LABELS[stat]} {w:.0%}" in formula
+        weights = awards.honours_weights(league)
+        labels = awards.honour_labels(league)
+        for name, w in weights.items():
+            assert f"{labels[name]} ×{w:g}" in formula
+        assert f"official {leagues.display(league)} honours" in formula
+        assert "rescaled" in formula
+        assert f"≥{awards.GOAT_MIN_CAREER_GP} career games" in formula
+        # The window start shown on screen is that league's first season.
+        assert leagues.first_season(league) in formula
+        # One label per weight, no orphan keys.
+        assert set(labels) == set(weights)
+    # The WNBA text carries the WNBA table, not the NBA's award names.
+    wnba = awards.goat_formula("wnba")
+    assert "All-WNBA 1st" in wnba and "All-NBA 1st" not in wnba
+    assert "Sixth Player" not in wnba  # short label used instead
+    assert "6MOY ×1.5" in wnba
+    assert len(awards.honours_weights("wnba")) == 15
 
 
 def test_min_games_floor():

@@ -35,10 +35,12 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
-      - name: Snapshot the current season (schedule + newly-final games)
-        run: python src/collector/snapshot.py --season current
-      - name: Refresh dashboard fallbacks (incl. all-history)
-        run: python src/collector/refresh_dashboard_fallbacks.py
+      - name: Snapshot the current seasons (schedule + newly-final games)
+        run: |
+          python src/collector/snapshot.py --season current
+          python src/collector/snapshot.py --league wnba --season current
+      - name: Refresh dashboard fallbacks (both leagues, incl. all-history)
+        run: python src/collector/refresh_dashboard_fallbacks.py --league nba wnba
       - name: Commit refreshed data
         run: |
           git config user.name "collector-bot"

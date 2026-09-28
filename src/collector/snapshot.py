@@ -24,6 +24,12 @@ Usage:
     python src/collector/snapshot.py --from 2010-11 --to 2025-26
     python src/collector/snapshot.py --schedule-only    # skip box scores entirely
     python src/collector/snapshot.py --check-only       # report pending work, fetch nothing
+    python src/collector/snapshot.py --league wnba --backfill   # WNBA 2010..latest (data/raw_wnba)
+    python src/collector/snapshot.py --league wnba              # WNBA current season
+
+Leagues: --league switches ESPN's league slug, the season-label convention
+(NBA '2010-11' two-year labels vs the WNBA's single calendar year '2026')
+and the data root (data/raw vs data/raw_wnba) -- see leagues.py.
 
 Fault tolerance: every per-item network call (team schedules, rosters, box
 scores) is isolated -- a transient 500 on ONE call is counted, reported as a
@@ -55,15 +61,33 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import espn_api
 from espn_api import current_season_label, season_param
+import leagues
 import parsing
 
+# Current league for this run (set by --league in main()). One league per
+# process: every data path and season convention below is rebound by
+# set_league() so the WNBA's single-year labels ('2010', '2026') and
+# data/raw_wnba/ tree never mix with the NBA's two-year ones.
+LEAGUE = "nba"
 RAW_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data", "raw")
 STATE_PATH = os.path.join(RAW_DIR, "collector_state.json")
-
 # The deliberate modeling window (see README): pre-2010 data exists in the
 # API (verified -- the 1995-96 fixture in fixtures/ proves it) but is not
-# backfilled by default; --from/--to can still reach it explicitly.
+# backfilled by default; --from/--to can still reach it explicitly. The
+# WNBA's equivalent first season is '2010' (same window policy, one label).
 BACKFILL_FIRST_SEASON = "2010-11"
+
+
+def set_league(league: str) -> str:
+    """Switch the collector to `league`: rebind LEAGUE plus every module
+    path/season constant derived from it (the WNBA's data lives under
+    data/raw_wnba with single-year season labels). Returns the league name."""
+    global LEAGUE, RAW_DIR, STATE_PATH, BACKFILL_FIRST_SEASON
+    LEAGUE = leagues.validate(league)
+    RAW_DIR = leagues.raw_dir(LEAGUE)
+    STATE_PATH = os.path.join(RAW_DIR, "collector_state.json")
+    BACKFILL_FIRST_SEASON = leagues.first_season(LEAGUE)
+    return LEAGUE
 
 
 class RateLimiter:
@@ -85,36 +109,47 @@ class RateLimiter:
             time.sleep(pause)
 
 
-def latest_completed_season(today=None) -> str:
+def latest_completed_season(today=None, league: str = None) -> str:
     """The most recent season whose games can all be considered complete.
 
-    Year-round this is simply the season that ENDED this calendar year before
-    July, i.e. 'the season labelled {y-1}-{y}' -- during Jan-Jun the label
-    still refers to the in-progress season (whose finished games we DO want;
-    STATUS_FINAL gating in pending_box_scores handles anything still to come),
-    and from Jul onward it correctly points at the season that just ended
-    while current_season_label() has already moved on to the next one."""
+    NBA: year-round this is simply the season that ENDED this calendar year
+    before July, i.e. 'the season labelled {y-1}-{y}' -- during Jan-Jun the
+    label still refers to the in-progress season (whose finished games we DO
+    want; STATUS_FINAL gating in pending_box_scores handles anything still to
+    come), and from Jul onward it correctly points at the season that just
+    ended while current_season_label() has already moved on to the next one.
+
+    WNBA: the season ends in October, so Nov-Dec the year that just finished
+    is the latest completed one and Jan-Oct it is {y-1} (the current year's
+    season is still running or has not tipped off yet)."""
     import datetime
 
     today = today or datetime.date.today()
+    league = league or LEAGUE
+    if league == "wnba":
+        return str(today.year if today.month >= 11 else today.year - 1)
     return f"{today.year - 1}-{str(today.year)[2:]}"
 
 
 def _season_range(first: str, last: str) -> list:
-    """Inclusive season labels, newest first ('2012-13' before '2011-12')."""
+    """Inclusive season labels, newest first ('2012-13' before '2011-12';
+    WNBA: '2012' before '2011')."""
     start_first, start_last = int(first[:4]), int(last[:4])
     if start_first > start_last:
         start_first, start_last = start_last, start_first
+    if LEAGUE == "wnba":
+        return [str(y) for y in range(start_last, start_first - 1, -1)]
     return [f"{y}-{str(y + 1)[2:]}" for y in range(start_last, start_first - 1, -1)]
 
 
 def load_team_ids() -> list:
-    teams = parsing.parse_teams(espn_api.get_teams())
+    teams = parsing.parse_teams(espn_api.get_teams(LEAGUE))
     team_ids = [t["team_id"] for t in teams]
-    if len(set(team_ids)) < 30:
+    minimum = leagues.cfg(LEAGUE)["min_unique_teams"]
+    if len(set(team_ids)) < minimum:
         raise RuntimeError(
             f"teams endpoint returned only {len(set(team_ids))} unique teams "
-            "-- refusing to build a partial snapshot"
+            f"for {LEAGUE} -- refusing to build a partial snapshot"
         )
     return team_ids
 
@@ -140,8 +175,10 @@ def snapshot_schedule(season: str, team_ids: list, limiter: RateLimiter) -> str:
     for team_id in team_ids:
         limiter.wait()
         try:
-            payload = espn_api.get_schedule(season_param(season), team_id)
-            parsed = parsing.parse_schedule(payload, season=season)
+            payload = espn_api.get_schedule(season_param(season, LEAGUE),
+                                            team_id, LEAGUE)
+            parsed = parsing.parse_schedule(payload, season=season,
+                                            league=LEAGUE)
         except Exception as e:  # noqa: BLE001 -- recorded, tolerated per team
             failures.append((team_id, f"{type(e).__name__}: {e}"))
             continue
@@ -253,7 +290,10 @@ def snapshot_player_positions(team_ids: list, limiter: RateLimiter,
     for team_id in team_ids:
         limiter.wait()
         try:
-            payload = espn_api.get_roster(team_id, season_param(current_season_label()))
+            payload = espn_api.get_roster(
+                team_id,
+                season_param(current_season_label(league=LEAGUE), LEAGUE),
+                LEAGUE)
             rows.extend(parsing.parse_roster(payload, team_id=team_id))
         except Exception as e:  # noqa: BLE001 -- tolerated per team
             failures.append((team_id, f"{type(e).__name__}: {e}"))
@@ -323,8 +363,8 @@ def _fetch_and_store_box_score(game_id: str, season: str,
     the next run retries it."""
     try:
         limiter.wait()
-        payload = espn_api.get_event_summary(game_id)
-        meta, rows = parsing.parse_summary(payload)
+        payload = espn_api.get_event_summary(game_id, LEAGUE)
+        meta, rows = parsing.parse_summary(payload, LEAGUE)
         if not meta or not rows:
             return (game_id, False, "empty parse (box score not available yet?)")
         if int(meta.get("game_id", -1)) != int(game_id):
@@ -384,7 +424,8 @@ def run_season(season: str, args, limiter: RateLimiter, team_ids: list) -> dict:
         print(f"[{season}] {final_count} final games, {len(pending)} box scores pending")
         return {"season": season, "final_games": final_count, "pending": len(pending)}
 
-    print(f"[{season}] refreshing schedule (espn season={season_param(season)})...")
+    print(f"[{season}] refreshing schedule (espn season="
+          f"{season_param(season, LEAGUE)})...")
     snapshot_schedule(season, team_ids, limiter)
     games = load_schedule(season)
     pending = pending_box_scores(season, games)
@@ -422,8 +463,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
+    parser.add_argument("--league", default="nba", choices=leagues.LEAGUES,
+                        help="League to collect: NBA (default) or WNBA "
+                             "(single-year season labels, data/raw_wnba).")
     parser.add_argument("--season", default=None,
-                        help="Season label like 2012-13, or 'current' (default).")
+                        help="Season label like 2012-13 (WNBA: 2012), or 'current' (default).")
     parser.add_argument("--backfill", action="store_true",
                         help=f"Fetch {BACKFILL_FIRST_SEASON}..latest completed season, "
                              "newest first (the one-off historical import).")
@@ -445,6 +489,8 @@ def main() -> None:
                         help="Minimum seconds between request STARTS, process-wide "
                              "(default 0.15).")
     args = parser.parse_args()
+    set_league(args.league)
+    print(f"League: {leagues.display(LEAGUE)} ({LEAGUE})")
 
     if args.backfill:
         seasons = _season_range(BACKFILL_FIRST_SEASON, latest_completed_season())
@@ -455,7 +501,7 @@ def main() -> None:
     elif args.season and args.season != "current":
         seasons = [args.season]
     else:
-        seasons = [current_season_label()]
+        seasons = [current_season_label(league=LEAGUE)]
 
     print(f"Seasons: {', '.join(seasons)}")
     limiter = RateLimiter(args.delay)

@@ -1,0 +1,258 @@
+{
+ "season": "2013",
+ "snapshots": [
+  {
+   "date": "2026-09-28",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 812,
+      "player_name": "Candace Parker",
+      "rank": 1,
+      "score": 24.9
+     },
+     {
+      "player_id": 585,
+      "player_name": "Diana Taurasi",
+      "rank": 2,
+      "score": 24.41
+     },
+     {
+      "player_id": 872,
+      "player_name": "Angel McCoughtry",
+      "rank": 3,
+      "score": 23.98
+     },
+     {
+      "player_id": 956,
+      "player_name": "Maya Moore",
+      "rank": 4,
+      "score": 23.62
+     },
+     {
+      "player_id": 766,
+      "player_name": "Sylvia Fowles",
+      "rank": 5,
+      "score": 22.3
+     },
+     {
+      "player_id": 545,
+      "player_name": "Lindsay Whalen",
+      "rank": 6,
+      "score": 21.66
+     },
+     {
+      "player_id": 2491877,
+      "player_name": "Elena Delle Donne",
+      "rank": 7,
+      "score": 21.21
+     },
+     {
+      "player_id": 125,
+      "player_name": "Tamika Catchings",
+      "rank": 8,
+      "score": 19.99
+     },
+     {
+      "player_id": 918,
+      "player_name": "Tina Charles",
+      "rank": 9,
+      "score": 19.37
+     },
+     {
+      "player_id": 695,
+      "player_name": "Seimone Augustus",
+      "rank": 10,
+      "score": 19.1
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 125,
+      "player_name": "Tamika Catchings",
+      "rank": 1,
+      "score": 3.87
+     },
+     {
+      "player_id": 766,
+      "player_name": "Sylvia Fowles",
+      "rank": 2,
+      "score": 3.01
+     },
+     {
+      "player_id": 872,
+      "player_name": "Angel McCoughtry",
+      "rank": 3,
+      "score": 2.85
+     },
+     {
+      "player_id": 812,
+      "player_name": "Candace Parker",
+      "rank": 4,
+      "score": 2.71
+     },
+     {
+      "player_id": 2,
+      "player_name": "Erika de Souza",
+      "rank": 5,
+      "score": 2.6
+     },
+     {
+      "player_id": 956,
+      "player_name": "Maya Moore",
+      "rank": 6,
+      "score": 2.53
+     },
+     {
+      "player_id": 2491877,
+      "player_name": "Elena Delle Donne",
+      "rank": 7,
+      "score": 2.22
+     },
+     {
+      "player_id": 2490553,
+      "player_name": "Brittney Griner",
+      "rank": 8,
+      "score": 2.2
+     },
+     {
+      "player_id": 1003,
+      "player_name": "Karima Christmas-Kelly",
+      "rank": 9,
+      "score": 2.18
+     },
+     {
+      "player_id": 1068,
+      "player_name": "Nneka Ogwumike",
+      "rank": 10,
+      "score": 2.12
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 1049,
+      "player_name": "Riquna Williams",
+      "rank": 1,
+      "score": 17.13
+     },
+     {
+      "player_id": 1054,
+      "player_name": "Tiffany Hayes",
+      "rank": 2,
+      "score": 13.04
+     },
+     {
+      "player_id": 881,
+      "player_name": "Monica Wright",
+      "rank": 3,
+      "score": 10.91
+     },
+     {
+      "player_id": 2490773,
+      "player_name": "Alex Bentley",
+      "rank": 4,
+      "score": 10.01
+     },
+     {
+      "player_id": 1013,
+      "player_name": "Jantel Lavender",
+      "rank": 5,
+      "score": 8.63
+     },
+     {
+      "player_id": 2491346,
+      "player_name": "Kelsey Bone",
+      "rank": 6,
+      "score": 8.61
+     },
+     {
+      "player_id": 660,
+      "player_name": "Mistie McCray Bass",
+      "rank": 7,
+      "score": 8.55
+     },
+     {
+      "player_id": 1006,
+      "player_name": "Alex Montgomery",
+      "rank": 8,
+      "score": 8.23
+     },
+     {
+      "player_id": 2490769,
+      "player_name": "Tayler Hill",
+      "rank": 9,
+      "score": 7.65
+     },
+     {
+      "player_id": 773,
+      "player_name": "Charde Houston",
+      "rank": 10,
+      "score": 7.1
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 585,
+      "player_name": "Diana Taurasi",
+      "rank": 1,
+      "score": 24.82
+     },
+     {
+      "player_id": 689,
+      "player_name": "Candice Dupree",
+      "rank": 2,
+      "score": 14.52
+     },
+     {
+      "player_id": 872,
+      "player_name": "Angel McCoughtry",
+      "rank": 3,
+      "score": 10.2
+     },
+     {
+      "player_id": 394,
+      "player_name": "Tina Thompson",
+      "rank": 4,
+      "score": 9.68
+     },
+     {
+      "player_id": 1006,
+      "player_name": "Alex Montgomery",
+      "rank": 5,
+      "score": 8.4
+     },
+     {
+      "player_id": 915,
+      "player_name": "Kelsey Griffin",
+      "rank": 6,
+      "score": 8.22
+     },
+     {
+      "player_id": 1003,
+      "player_name": "Karima Christmas-Kelly",
+      "rank": 7,
+      "score": 7.96
+     },
+     {
+      "player_id": 851,
+      "player_name": "Shavonte Zellous",
+      "rank": 8,
+      "score": 7.64
+     },
+     {
+      "player_id": 916,
+      "player_name": "Allison Hightower",
+      "rank": 9,
+      "score": 7.26
+     },
+     {
+      "player_id": 803,
+      "player_name": "Erlana Larkins",
+      "rank": 10,
+      "score": 7.17
+     }
+    ]
+   }
+  }
+ ]
+}

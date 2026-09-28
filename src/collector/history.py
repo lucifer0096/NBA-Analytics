@@ -31,21 +31,26 @@ moved):
   least a season old are treated as static (180d re-read, which still picks
   up a comeback), active players refresh after ATHLETE_TTL_DAYS (7d);
 - the career-leaders index (5 categories x top 25) is re-read every build
-  (one call).
+  (one call; NBA only -- ESPN's core API exposes no WNBA leaders endpoint,
+  so the WNBA pool seeds from honours + collected-window players instead).
 
 Honest failure policy: per-athlete fetches that die fall back to the
 collected-window line (``line_source: "window"``) or drop the player from the
 pool when he has no window line either -- an honest absence retried next run.
-``build()`` raises only when it can produce nothing at all (no leaders live
-and none cached, or an empty awards index with no cache), which makes the
-refresh script keep its previous payload.
+``build()`` raises only when it can produce nothing at all (the NBA's leaders
+index neither live nor cached, or an empty awards index with no cache), which
+makes the refresh script keep its previous payload.
 
 Trust rules (per-season rows -> peak / seasons / championships), all applied
 here so the dashboard only ever displays what the data supports:
 
 - rows are trusted for a career only when ``min(row year) <= debutYear + 1``
   (ESPN's per-season history starts late for some pre-1977 careers -- Kareem
-  has rows only from 1976, Wilt only 1969-73);
+  has rows only from 1976, Wilt only 1969-73). ESPN gives WNBA athletes no
+  debutYear (verified Sep 2026), so their debut derives from the first row
+  itself (_fetch_athlete's disclosed fallback): the check reduces to "rows
+  exist" there, which holds because ESPN's WNBA season data begins at the
+  league's 1997 inception;
 - untrusted rows -> ``seasons: None`` (blank) and peak falls back to the best
   collected season, else ``None`` (component dropped on the ladder);
 - championships are counted only for trusted careers whose rows start in
@@ -66,6 +71,15 @@ rebound (OFFICIAL_REB_CAREER / OFFICIAL_REB_SEASON) -- and only where
 ESPN's own value is 0, so every real ESPN number survives. What stays an
 era fact: steals/blocks/3PM zeros before they were tracked, which GOAT
 production drops per player instead of scoring a zero he could never earn.
+
+Leagues: --league switches ESPN's league slug (core.api 'nba'/'wnba'), the
+award-type ids, the season-label convention and the cache file
+(data/processed/history_cache.json vs history_cache_wnba.json); the NBA's
+verified-record override tables (official championships/rebounds) apply to
+the NBA only -- see leagues.py. The WNBA's champion index covers every
+season from 1997 via its Finals-MVP team refs, with the six 1997-2002
+seasons filled from leagues.cfg's verified_champions overlay (ESPN's
+detail omits the team ref there, verified live Sep 2026).
 """
 
 import concurrent.futures as cf
@@ -79,6 +93,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import espn_api  # noqa: E402
 import awards  # noqa: E402
+import leagues  # noqa: E402
 
 REPO_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 CACHE_PATH = os.path.join(REPO_ROOT, "data", "processed", "history_cache.json")
@@ -86,6 +101,11 @@ CACHE_PATH = os.path.join(REPO_ROOT, "data", "processed", "history_cache.json")
 BASE = "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba"
 WEB_STATS_URL = ("https://site.web.api.espn.com/apis/common/v3/sports/"
                  "basketball/nba/athletes/{aid}/stats")
+
+# The league these module-level endpoint/config constants currently point
+# at (set_league() below rebinds them all). One league per process: the
+# CLI flag switches it, tests must switch BACK to 'nba' when they're done.
+LEAGUE = "nba"
 
 # The 20 award types ESPN answers with (ids 34/37 are empty). Verified live
 # Sep 2026: names are the official ones and are the exact keys used in
@@ -299,9 +319,32 @@ def _fresh(entry: dict, ttl_days: int, now: datetime) -> bool:
     return bool(fetched) and (now - fetched).total_seconds() < ttl_days * 86400
 
 
+def set_league(league: str) -> str:
+    """Rebind this module's endpoint/config constants to `league` (the CLI's
+    --league flag; refresh_dashboard_fallbacks calls it once per league it
+    refreshes). The WNBA serves the same core.api paths with 'wnba' in them,
+    its own award-type ids (see leagues.cfg), and its own cache file --
+    verified live Sep 2026. Returns the league name."""
+    global LEAGUE, BASE, WEB_STATS_URL, CACHE_PATH
+    global AWARD_TYPE_IDS, FINALS_MVP_ID, CHAMPION_FIRST_YEAR
+    LEAGUE = leagues.validate(league)
+    cfg = leagues.cfg(LEAGUE)
+    BASE = (f"https://sports.core.api.espn.com/v2/sports/"
+            f"basketball/leagues/{LEAGUE}")
+    WEB_STATS_URL = (f"https://site.web.api.espn.com/apis/common/v3/sports/"
+                     f"basketball/{LEAGUE}/athletes/{{aid}}/stats")
+    CACHE_PATH = leagues.history_cache_path(LEAGUE)
+    AWARD_TYPE_IDS = tuple(cfg["award_type_ids"])
+    FINALS_MVP_ID = cfg["finals_mvp_id"]
+    CHAMPION_FIRST_YEAR = cfg["champion_first_year"]
+    return LEAGUE
+
+
 def _current_end_year() -> int:
-    """ESPN's season param for the season the league is in (2026-27 -> 2027)."""
-    return espn_api.season_param(espn_api.current_season_label())
+    """ESPN's season param for the season the league is in (2026-27 -> 2027;
+    the WNBA's 2026 -> 2026)."""
+    return espn_api.season_param(
+        espn_api.current_season_label(league=LEAGUE), LEAGUE)
 
 
 # ---------------------------------------------------------------------------
@@ -370,7 +413,8 @@ def _award_detail(ref: str, cache: dict, now: datetime, live: bool) -> dict | No
 
 def honours(cache: dict, live: bool = True, now: datetime = None) -> tuple:
     """({player_id: {official award name: career wins}}, {year: champion team
-    id}, meta) over all 20 award types x every season ESPN carries."""
+    id}, meta) over every award type ESPN carries for the current league (20
+    types for the NBA, 15 for the WNBA -- see leagues.cfg)."""
     now = now or _now()
     by_player: dict = {}
     champions: dict = {}
@@ -393,6 +437,14 @@ def honours(cache: dict, live: bool = True, now: datetime = None) -> tuple:
                 champions[int(match.group(1))] = detail["champion"]
     if not seasons or not by_player:
         raise RuntimeError("ESPN awards index unavailable and no cached copy")
+    # Verified champion overlay (leagues.cfg 'verified_champions'): ESPN's
+    # WNBA Finals-MVP detail omits the winner's team ref for 1997-2002
+    # (verified live Sep 2026), and a gap there would blank the titles of
+    # every career spanning those seasons. The six league-record champions
+    # (Houston x4, Los Angeles x2) fill ONLY the gaps -- ESPN's own refs
+    # win where they exist; the NBA table is empty.
+    for year, team_id in leagues.cfg(LEAGUE)["verified_champions"].items():
+        champions.setdefault(year, team_id)
     meta = {
         "award_types": len(name_by_tid),
         "award_seasons": seasons,
@@ -405,7 +457,16 @@ def honours(cache: dict, live: bool = True, now: datetime = None) -> tuple:
 
 def leader_ids(cache: dict, live: bool = True) -> set:
     """Career top-25 in PTS/REB/AST/STL/BLK (the blocks category is
-    mislabelled name='assists' -- we take every category's athletes)."""
+    mislabelled name='assists' -- we take every category's athletes).
+
+    WNBA: ESPN's core API has no /leaders endpoint (verified live Sep 2026 --
+    every candidate path 404s, including the site APIs), so the set is empty
+    and the pool is seeded from the honours index + collected-window players
+    instead -- all 15 award types since 1997 (All-WNBA/All-Defensive/All-
+    Rookie teams included) cover every notable name a leaders list would add.
+    """
+    if LEAGUE != "nba":
+        return set()
     ids: set = set()
     if live:
         try:
@@ -521,10 +582,21 @@ def _fetch_athlete(pid: int, now: datetime) -> dict | None:
         pass
     if not info.get("displayName") and line is None and not rows:
         return None
+    debut = info.get("debutYear")
+    if not debut and LEAGUE == "wnba":
+        # ESPN's WNBA athletes carry NO debutYear (verified across the whole
+        # pool, Sep 2026). The NBA rule needs an independent career start to
+        # catch ESPN starting some pre-1977 row sets late; the WNBA's
+        # per-season stats exist only from its 1997 inception, so there is
+        # no earlier career era for rows to miss and the first row year IS
+        # ESPN's career start. (Draft year is deliberately not used: a
+        # zero-play rookie season would make a complete row set look
+        # partial and drop the whole career's titles/seasons.)
+        debut = min(row[0] for row in rows) if rows else None
     entry = {
         "fetched": _iso(now),
         "name": info.get("displayName"),
-        "debut": int(info["debutYear"]) if info.get("debutYear") else None,
+        "debut": int(debut) if debut else None,
         "line": line,
         "rows": rows,
         "team": team,
@@ -539,8 +611,12 @@ def _fetch_athlete(pid: int, now: datetime) -> dict | None:
 def _entry_age_ok(entry: dict, now: datetime) -> bool:
     """Active players refresh weekly; players whose last season row predates
     the previous season are treated as static (6-month re-read still catches
-    a comeback). Partial entries always refetch."""
+    a comeback). Partial entries always refetch, and so do pre-upgrade WNBA
+    bundles that predate the debut fallback in _fetch_athlete (complete
+    bundles always have rows, so the debut resolves on the first build)."""
     if not entry.get("complete"):
+        return False
+    if LEAGUE == "wnba" and entry.get("debut") is None:
         return False
     ttl = ATHLETE_TTL_DAYS
     years = [row[0] for row in entry.get("rows") or []]
@@ -580,7 +656,7 @@ def _season_log(rows: list) -> list:
     for row in rows:
         values = dict(zip(_ROW_FIELDS, row))
         log.append({
-            "season": espn_api.season_label(values["year"]),
+            "season": espn_api.season_label(values["year"], LEAGUE),
             "team": values["team"],
             "gp": values["gp"], "min": values["min"],
             "pts": values["pts"], "reb": values["reb"],
@@ -593,7 +669,11 @@ def _season_log(rows: list) -> list:
 
 def _trusted(entry: dict) -> bool:
     """Per-season rows cover the career from its start (ESPN starts some
-    pre-1977 careers late -- Kareem's rows begin in 1976, debut 1969)."""
+    pre-1977 careers late -- Kareem's rows begin in 1976, debut 1969). For
+    the WNBA the debut comes from the first row itself (_fetch_athlete has
+    no ESPN marker to derive anything else from), so the check reduces to
+    "rows exist" -- disclosed there, and the reason it still holds is that
+    ESPN's WNBA season data begins at the league's 1997 inception."""
     rows = entry.get("rows") or []
     debut = entry.get("debut")
     if not rows or debut is None:
@@ -636,10 +716,14 @@ def _championships(entry: dict, champions: dict,
     champion team per year (Finals-MVP team refs, 1970 on). Careers the
     index can't cover -- pre-1970 titles, late-starting rows (Kareem),
     careers the trust rule rejects -- take their verified official-record
-    count from OFFICIAL_CHAMPIONSHIPS instead of returning None.
+    count from OFFICIAL_CHAMPIONSHIPS instead of returning None (the NBA's
+    override table; the WNBA's champion index covers every season from 1997
+    -- ESPN's 1997-2002 team-ref gaps are filled by leagues.cfg's
+    verified_champions overlay in honours(), so no career-spanning override
+    table exists there).
     Display-only: returns None rather than a wrong number when nothing
     applies, since mid-season trades can make a row carry the wrong team."""
-    if player_id in OFFICIAL_CHAMPIONSHIPS:
+    if LEAGUE == "nba" and player_id in OFFICIAL_CHAMPIONSHIPS:
         return OFFICIAL_CHAMPIONSHIPS[player_id]
     rows = entry.get("rows") or []
     if not rows or not champions or not _trusted(entry):
@@ -673,7 +757,8 @@ def _line_and_source(entry: dict, window_entry: dict) -> tuple:
 
 def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
     """Full-history entries for the pool = career leaders (all-history top-25
-    in 5 categories) U official-award winners U collected-window players with
+    in 5 categories; empty for the WNBA, whose core API has no leaders
+    endpoint) U official-award winners U collected-window players with
     >=ALLTIME_MIN_GP. Returns:
 
     {"players": [career entries shaped like awards.alltime_players() rows,
@@ -712,7 +797,8 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
             # window's total on the entry so the profile cards and the GOAT
             # merge read the same number the box scores produced.
             line = {**line, "plus_minus": window_entry["plus_minus"]}
-        if line and pid in OFFICIAL_REB_CAREER and not (line.get("reb") or 0):
+        if (LEAGUE == "nba" and line and pid in OFFICIAL_REB_CAREER
+                and not (line.get("reb") or 0)):
             line = {**line, "reb": OFFICIAL_REB_CAREER[pid]}
             official_reb_lines += 1
         if not name or not line or not line.get("gp"):
@@ -722,7 +808,9 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
         else:
             window_fallbacks += 1
         trusted = _trusted(bundle)
-        rows = _official_reb_rows(pid, bundle.get("rows") or [])
+        raw_rows = bundle.get("rows") or []
+        rows = (_official_reb_rows(pid, raw_rows)
+                if LEAGUE == "nba" else raw_rows)
         if trusted:
             seasons = len(rows)
             peak = _peak_from_rows(rows)
@@ -760,7 +848,8 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
         "espn_lines": espn_lines,
         "window_fallback": window_fallbacks,
         "official_champions": sum(1 for p in players
-                                  if p["player_id"] in OFFICIAL_CHAMPIONSHIPS),
+                                  if LEAGUE == "nba"
+                                  and p["player_id"] in OFFICIAL_CHAMPIONSHIPS),
         "official_reb_lines": official_reb_lines,
         "stamp": stamp,
         **award_meta,
@@ -773,11 +862,16 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="build/refresh the all-NBA-history cache")
+        description="build/refresh the all-league history cache")
     parser.add_argument(
         "--no-window", action="store_true",
         help="skip the (slow) box-score scan: leaders + honours pool only")
+    parser.add_argument("--league", default="nba", choices=leagues.LEAGUES,
+                        help="League whose history to build (default: NBA).")
     args = parser.parse_args()
-    window = [] if args.no_window else awards.alltime_players()
+    set_league(args.league)
+    window = ([] if args.no_window
+              else awards.alltime_players(raw_dir=leagues.raw_dir(LEAGUE),
+                                          league=LEAGUE))
     result = build(window)
     print(json.dumps(result["meta"], indent=1))

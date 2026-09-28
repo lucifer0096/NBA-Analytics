@@ -36,11 +36,17 @@ Each file carries its own {"_generated_utc": ..., "source": "espn"|"local"}
 envelope so the dashboard can show data age honestly instead of implying
 live freshness when it's serving the fallback.
 
-Run: python src/collector/refresh_dashboard_fallbacks.py
+Run: python src/collector/refresh_dashboard_fallbacks.py [--league nba|wnba ...]
 (That's exactly what the daily GitHub Actions workflow does after
-snapshot.py, then commits data/ back to main.)
+snapshot.py -- once per league -- then commits data/ back to main.)
+
+Leagues: --league switches the whole run (one league per pass, default nba).
+The NBA's committed files keep their historical names; the WNBA's get a
+'_wnba' suffix (_in_dir/dashboard_path below are the only naming points):
+dashboard_wnba_teams.json, schedules_wnba/, races_wnba/, etc. See leagues.py.
 """
 
+import argparse
 import json
 import os
 import re
@@ -50,6 +56,7 @@ from datetime import date, datetime, timedelta, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import espn_api
+import leagues
 import parsing
 
 REPO_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
@@ -60,11 +67,40 @@ SCHEDULES_DIR = os.path.join(DATA_DIR, "schedules")
 RACES_DIR = os.path.join(DATA_DIR, "races")
 SEASON_DIR_RE = re.compile(r"^\d{4}-\d{2}$")
 
+# Current league for this pass (set by set_league() from main()'s --league).
+# One league per pass: every data path below is rebound together so the
+# WNBA's files never mix with the NBA's.
+LEAGUE = "nba"
+
 # Race history bounds: one snapshot per UTC day per season, newest capped
 # (a full NBA season is ~200 days of games; 90 keeps the trend chart's
 # window wide while the file stays a few hundred KB at most).
 RACE_HISTORY_CAP = 90
 RACE_SNAPSHOT_TOP = 25  # players kept per race (ladders render far fewer)
+
+
+def set_league(league: str) -> str:
+    """Switch this pass to `league`: rebind LEAGUE plus every module path and
+    season convention derived from it. Returns the league name."""
+    global LEAGUE, RAW_DIR, SCHEDULES_DIR, RACES_DIR, SEASON_DIR_RE
+    LEAGUE = leagues.validate(league)
+    RAW_DIR = leagues.raw_dir(LEAGUE)
+    SCHEDULES_DIR = leagues.schedules_dir(LEAGUE)
+    RACES_DIR = leagues.races_dir(LEAGUE)
+    SEASON_DIR_RE = leagues.season_dir_re(LEAGUE)
+    return LEAGUE
+
+
+def _in_dir(directory: str, name: str) -> str:
+    """Path to `name` inside `directory` for the current league -- pure
+    delegation to leagues.named_path, the single naming rule shared with
+    leagues.dashboard_path and the app's loaders."""
+    return leagues.named_path(directory, name, LEAGUE)
+
+
+def _dash(name: str) -> str:
+    """One of the committed dashboard files under data/ for this league."""
+    return _in_dir(DATA_DIR, name)
 
 
 def _available_raw_seasons() -> list:
@@ -82,18 +118,40 @@ def _available_raw_seasons() -> list:
 def season_candidates() -> list:
     """Seasons worth refreshing, with the completed season first.
 
-    During the July-September offseason the current/upcoming season's
-    standings endpoint can return 30 zero rows before tip-off. Preferring the
-    latest completed season keeps the fallback truthful, while the current
-    season is still tried as a fallback for January-June in-progress tables.
+    During the July-September NBA offseason (November-January in the WNBA)
+    the current/upcoming season's standings endpoint can return zero rows
+    before tip-off. Preferring the latest completed season keeps the
+    fallback truthful, while the current season is still tried as a
+    fallback for in-progress tables.
     """
-    current = espn_api.current_season_label()
+    current = espn_api.current_season_label(league=LEAGUE)
     today = datetime.now(timezone.utc).date()
-    completed = f"{today.year - 1}-{str(today.year)[2:]}"
+    if LEAGUE == "wnba":
+        # The WNBA season ends in October: Nov-Dec the year that just
+        # finished is completed; Jan-Oct it is {y-1} (this year's season
+        # is still running or has not tipped off yet).
+        completed = str(today.year if today.month >= 11 else today.year - 1)
+    else:
+        completed = f"{today.year - 1}-{str(today.year)[2:]}"
     candidates = [completed, current]
     candidates.extend(_available_raw_seasons())
     # Stable de-duplication while preserving the deliberate priority order.
     return list(dict.fromkeys(candidates))
+
+
+def standings_candidates() -> list:
+    """Season try-order for STANDINGS: the current season first, then the
+    shared completed-first order.
+
+    Standings want the season the app defaults to (the newest with
+    collected games): once the current season has real records its table
+    is truthful AND current -- pre-tip-off, refresh_standings' has-results
+    gate falls through to the completed season anyway. season_candidates()
+    keeps completed-first for the consumers behind it (leaderboards want
+    the last COMPLETE season's totals), which is why standings re-order
+    instead of flipping the shared list."""
+    current = espn_api.current_season_label(league=LEAGUE)
+    return list(dict.fromkeys([current] + season_candidates()))
 
 
 def _has_played_standings(rows: list) -> bool:
@@ -142,9 +200,9 @@ def refresh_teams() -> dict:
     refresh over one bad call would block standings/schedule/awards too) and
     only warns -- the snapshot CLI's load_team_ids remains the hard alarm
     for a genuinely dead teams endpoint."""
-    path = os.path.join(DATA_DIR, "dashboard_teams.json")
+    path = _dash("dashboard_teams.json")
     try:
-        rows = parsing.parse_teams(espn_api.get_teams())
+        rows = parsing.parse_teams(espn_api.get_teams(LEAGUE))
     except Exception as e:  # noqa: BLE001 -- tolerate, keep the committed list
         kept = _read_json(path, {})
         if kept.get("teams"):
@@ -170,7 +228,8 @@ def refresh_standings(seasons_to_try: list) -> dict:
     for season in seasons_to_try:
         try:
             rows = parsing.parse_standings(
-                espn_api.get_standings(espn_api.season_param(season))
+                espn_api.get_standings(
+                    espn_api.season_param(season, LEAGUE), LEAGUE)
             )
         except Exception as e:  # noqa: BLE001 -- try the next candidate season
             print(f"  standings {season}: {e}")
@@ -179,7 +238,7 @@ def refresh_standings(seasons_to_try: list) -> dict:
             continue
         has_results = _has_played_standings(rows)
         if has_results:
-            path = os.path.join(DATA_DIR, "dashboard_standings.json")
+            path = _dash("dashboard_standings.json")
             _write(path, _stamp({"season": season, "standings": rows}, "espn"))
             return {"season": season, "standings": rows}
         if zero_rows is None:
@@ -187,7 +246,7 @@ def refresh_standings(seasons_to_try: list) -> dict:
     if zero_rows is not None:
         print(f"  standings: only zero-record tables found -- "
               f"writing {zero_season} anyway")
-        path = os.path.join(DATA_DIR, "dashboard_standings.json")
+        path = _dash("dashboard_standings.json")
         _write(path, _stamp({"season": zero_season, "standings": zero_rows}, "espn"))
         return {"season": zero_season, "standings": zero_rows}
     print("  WARNING: no standings fetched from any candidate season")
@@ -246,7 +305,7 @@ def refresh_schedule(season: str) -> dict:
     # 2. Legacy merged envelope: any season that never got its own file is
     #    materialised now (one-time migration), keeping the old stamp so the
     #    file doesn't claim freshness it doesn't have.
-    legacy = _read_json(os.path.join(DATA_DIR, "dashboard_schedule.json"), {})
+    legacy = _read_json(_dash("dashboard_schedule.json"), {})
     for label, rows in (legacy.get("seasons") or {}).items():
         if not (isinstance(rows, list) and rows) or label in seasons_rows:
             continue
@@ -287,7 +346,7 @@ def refresh_schedule(season: str) -> dict:
                           or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "source": "local",
     }
-    with open(os.path.join(DATA_DIR, "dashboard_schedule.json"), "w",
+    with open(_dash("dashboard_schedule.json"), "w",
               encoding="utf-8") as f:
         json.dump(index, f, indent=1)
     print(f"  wrote schedule index ({len(seasons_rows)} seasons, "
@@ -315,7 +374,7 @@ def refresh_positions() -> dict:
     call is tolerated per team (the same fault isolation snapshot.py has),
     and when NOTHING could be fetched the committed dashboard_positions.json
     is kept instead of being overwritten with an empty map."""
-    path = os.path.join(DATA_DIR, "dashboard_positions.json")
+    path = _dash("dashboard_positions.json")
     path_in = os.path.join(RAW_DIR, "player_positions.json")
     players: list = []
     source = "local"
@@ -329,15 +388,21 @@ def refresh_positions() -> dict:
         source = "espn"
         failures = []
         try:
-            team_ids = [t["team_id"] for t in parsing.parse_teams(espn_api.get_teams())]
+            team_ids = [t["team_id"]
+                        for t in parsing.parse_teams(
+                            espn_api.get_teams(LEAGUE))]
         except Exception as e:  # noqa: BLE001 -- tolerate, fall through below
             print(f"  WARNING: team fetch failed for positions ({type(e).__name__}: {e})")
             team_ids = []
         for team_id in team_ids:
             try:
                 players.extend(parsing.parse_roster(
-                    espn_api.get_roster(team_id, espn_api.season_param(
-                        espn_api.current_season_label())), team_id=team_id))
+                    espn_api.get_roster(
+                        team_id,
+                        espn_api.season_param(
+                            espn_api.current_season_label(league=LEAGUE),
+                            LEAGUE),
+                        LEAGUE), team_id=team_id))
             except Exception as e:  # noqa: BLE001 -- tolerated per team
                 failures.append(team_id)
                 print(f"  WARNING: roster fetch failed for team {team_id} "
@@ -422,7 +487,7 @@ def refresh_leaderboards(seasons_to_try: list) -> dict:
         row.update(awards.efficiency(row))
         leaders.append(row)
     leaders.sort(key=lambda r: r["fantasy_points"], reverse=True)
-    path = os.path.join(PROCESSED_DIR, "dashboard_leaderboards.json")
+    path = _in_dir(PROCESSED_DIR, "dashboard_leaderboards.json")
     _write(path, _stamp({"season": chosen, "leaders": leaders}, "local"))
     return {"season": chosen, "leaders": leaders}
 
@@ -437,7 +502,7 @@ def _games_by_season() -> dict:
     counts = {name: len(glob.glob(os.path.join(RAW_DIR, name, "games",
                                                 "*.json")))
               for name in _available_raw_seasons()}
-    counts.setdefault(espn_api.current_season_label(), 0)
+    counts.setdefault(espn_api.current_season_label(league=LEAGUE), 0)
     return counts
 
 
@@ -463,14 +528,15 @@ def _write_players(career: dict, history: dict) -> None:
             continue
         row = dict(source)
         row["honours"] = player_honours
+        honour_table = awards.honours_weights(LEAGUE)
         row["honour_points"] = round(sum(
-            awards.GOAT_HONOURS_WEIGHTS.get(name, 0.0) * count
+            honour_table.get(name, 0.0) * count
             for name, count in player_honours.items()), 1)
         placed = ladder.get(pid)
         row["goat_rank"] = placed.get("rank") if placed else None
         row["goat_score"] = placed.get("score") if placed else None
         players[str(pid)] = row
-    path = os.path.join(DATA_DIR, "dashboard_players.json")
+    path = _dash("dashboard_players.json")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     payload = _stamp({"players": players,
                       "meta": history.get("meta") or {}}, "local")
@@ -528,24 +594,25 @@ def _record_race_history(payloads: list) -> None:
 
 
 def refresh_awards(seasons_to_try: list) -> dict:
-    """Award races + stat leaders for EVERY collected season (2010-11 ->),
-    plus the all-NBA-history all-time boards, GOAT ladder (official NBA
-    honours) and the per-season games inventory.
+    """Award races + stat leaders for EVERY collected season, plus the
+    all-league-history all-time boards, GOAT ladder (official honours) and
+    the per-season games inventory.
 
     Season payloads/games counts are pure-local; the all-history half runs
-    through history.py (ESPN + its cache). When THAT fails the previous
-    career sections and dashboard_players.json are kept, and the freshly
-    computed season races still land -- a window-only ladder sneaking in on
-    a bad network day would mislead far more than a stale-but-labelled one.
+    through history.py (ESPN + its cache, already switched to LEAGUE by
+    set_league). When THAT fails the previous career sections and the
+    dashboard_players file are kept, and the freshly computed season races
+    still land -- a window-only ladder sneaking in on a bad network day
+    would mislead far more than a stale-but-labelled one.
 
     CI SURVIVAL (why merged state exists): every CI checkout has data/raw/
     for the CURRENT season only, so rebuilding `seasons` from scratch would
-    erase the 16 historical payloads on the first successful run, collapse
-    the games inventory to one entry, and feed history.build() a one-season
+    erase the historical payloads on the first successful run, collapse the
+    games inventory to one entry, and feed history.build() a one-season
     window pool (shrinking the GOAT ladder and the player index). So:
     local seasons are rebuilt, every other committed season/inventory count
     is preserved, and when raw coverage is incomplete the window pool comes
-    from the committed dashboard_players.json projection instead of the
+    from the committed dashboard_players file projection instead of the
     local box scan. Envelope shape: {"seasons": {label: payload}, "window",
     "games_by_season", "alltime", "goat", "career_note"}."""
     import glob
@@ -553,7 +620,7 @@ def refresh_awards(seasons_to_try: list) -> dict:
     import awards
     import history as history_mod
 
-    prior = _read_json(os.path.join(DATA_DIR, "dashboard_awards.json"), {})
+    prior = _read_json(_dash("dashboard_awards.json"), {})
     prior_seasons = dict(prior.get("seasons") or {})
     labels = [s for s in dict.fromkeys(seasons_to_try)
               if glob.glob(os.path.join(RAW_DIR, s, "games", "*.json"))]
@@ -564,7 +631,7 @@ def refresh_awards(seasons_to_try: list) -> dict:
     season_payloads = []
     for season in labels:
         try:
-            payload = awards.build_payload(season)
+            payload = awards.build_payload(season, league=LEAGUE)
         except Exception as exc:  # noqa: BLE001 -- one bad season must not kill the build
             print(f"  WARNING [{season}]: awards build failed "
                   f"({type(exc).__name__}: {exc}) -- keeping its previous payload")
@@ -583,13 +650,12 @@ def refresh_awards(seasons_to_try: list) -> dict:
         # Partial local raw (every CI run): reuse the committed player
         # projection as the window pool -- it already carries career lines,
         # seasons, peak and team for everyone the box scan would find.
-        players_payload = _read_json(
-            os.path.join(DATA_DIR, "dashboard_players.json"), {})
+        players_payload = _read_json(_dash("dashboard_players.json"), {})
         window_players = list((players_payload.get("players") or {}).values())
         print(f"  window pool: {len(window_players)} committed players "
               "(raw covers one season only)")
     else:
-        window_players = awards.alltime_players()
+        window_players = awards.alltime_players(league=LEAGUE)
     if not window_players:
         print("  no window players to build careers from -- keeping the "
               "previous career sections")
@@ -598,6 +664,7 @@ def refresh_awards(seasons_to_try: list) -> dict:
     hist = None
     if window_players:
         try:
+            history_mod.set_league(LEAGUE)
             hist = history_mod.build(window_players)
         except Exception as exc:  # noqa: BLE001 -- collector must stay resumable
             print(f"  all-history fetch failed ({type(exc).__name__}: {exc}) -- "
@@ -612,7 +679,8 @@ def refresh_awards(seasons_to_try: list) -> dict:
         career = None
         try:
             career = awards.build_career(list(merged_seasons.values()),
-                                         players=window_players, history=hist)
+                                         players=window_players,
+                                         history=hist, league=LEAGUE)
         except Exception as exc:  # noqa: BLE001 -- keep the previous career half
             print(f"  WARNING: career build failed ({type(exc).__name__}: "
                   f"{exc}) -- keeping the previous career sections")
@@ -623,7 +691,7 @@ def refresh_awards(seasons_to_try: list) -> dict:
     envelope["seasons"] = merged_seasons
     envelope["games_by_season"] = {
         **(prior.get("games_by_season") or {}), **_games_by_season()}
-    path = os.path.join(DATA_DIR, "dashboard_awards.json")
+    path = _dash("dashboard_awards.json")
     _write(path, _stamp(envelope, "local"))
     if hist:
         _write_players(envelope, hist)
@@ -648,9 +716,17 @@ def refresh_projections(season: str, horizon_days: int = 21) -> dict:
     rolling near-term window here. Missing model/training data is a normal
     bootstrap state and must not break the daily collector: the previous
     fallback (if any) is deliberately left untouched.
+
+    NBA-only: models/proj_model.txt is trained on the NBA's data/raw tree
+    (src/model), so the WNBA pass skips it instead of projecting with a
+    model that never saw a WNBA game.
     """
     import pandas as pd
 
+    if LEAGUE != "nba":
+        print("  projections: the trained model is NBA-only -- skipping for "
+              f"{leagues.display(LEAGUE)}")
+        return {}
     schedule_path = os.path.join(RAW_DIR, season, "schedule.csv")
     model_path = os.path.join(REPO_ROOT, "models", "proj_model.txt")
     positions_path = os.path.join(RAW_DIR, "player_positions.json")
@@ -701,7 +777,7 @@ def refresh_projections(season: str, horizon_days: int = 21) -> dict:
             "games": int(projections["game_id"].nunique()),
             "projections": records,
         }, "local")
-        path = os.path.join(DATA_DIR, "dashboard_projections.json")
+        path = _dash("dashboard_projections.json")
         _write(path, payload)
         return payload
     except Exception as e:  # noqa: BLE001 -- collector must remain resumable
@@ -709,20 +785,32 @@ def refresh_projections(season: str, horizon_days: int = 21) -> dict:
         return {}
 
 
-def main() -> None:
-    current = espn_api.current_season_label()
-    candidates = season_candidates()
+def main(argv=None) -> None:
+    """Refresh one league per pass (default NBA); pass --league nba wnba to
+    do both in one process, which is what the daily workflow runs."""
+    parser = argparse.ArgumentParser(
+        description="refresh the committed dashboard fallback files")
+    parser.add_argument("--league", nargs="+", default=["nba"],
+                        choices=list(leagues.LEAGUES),
+                        help="league(s) to refresh (default: nba)")
+    args = parser.parse_args(argv)
 
-    print("Refreshing dashboard fallbacks...")
-    refresh_teams()
-    refresh_standings(candidates)
-    refresh_schedule(current)
-    refresh_positions()
-    refresh_leaderboards(candidates)
-    refresh_awards(candidates)
-    # Near-term projections for the deployed app -- silently skipped until
-    # train.py has produced models/proj_model.txt (bootstrap state).
-    refresh_projections(current)
+    for league in args.league:
+        set_league(league)
+        current = espn_api.current_season_label(league=LEAGUE)
+        candidates = season_candidates()
+
+        print(f"Refreshing dashboard fallbacks ({leagues.display(LEAGUE)})...")
+        refresh_teams()
+        refresh_standings(standings_candidates())
+        refresh_schedule(current)
+        refresh_positions()
+        refresh_leaderboards(candidates)
+        refresh_awards(candidates)
+        # Near-term projections for the deployed app -- silently skipped
+        # until train.py has produced models/proj_model.txt (bootstrap
+        # state) or when refreshing the WNBA (NBA-trained model only).
+        refresh_projections(current)
     print("Done.")
 
 

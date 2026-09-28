@@ -68,6 +68,85 @@ def _row(game_id: str, season: str, status: str = "STATUS_FINAL",
 # refresh_schedule: split files + thin index
 # ---------------------------------------------------------------------------
 
+def test_set_league_rebinds_paths_and_writes_wnba_names(monkeypatch):
+    """One refresh pass = one league: set_league() rebinds every data path
+    together and _in_dir gives the WNBA's committed files their '_wnba'
+    names while the NBA keeps the historical ones."""
+    saved = {name: getattr(refresh, name) for name in
+             ("LEAGUE", "RAW_DIR", "SCHEDULES_DIR", "RACES_DIR",
+              "SEASON_DIR_RE")}
+    try:
+        refresh.set_league("wnba")
+        assert refresh.LEAGUE == "wnba"
+        assert refresh.RAW_DIR.endswith("raw_wnba")
+        assert refresh.SCHEDULES_DIR.endswith("schedules_wnba")
+        assert refresh.RACES_DIR.endswith("races_wnba")
+        assert refresh.SEASON_DIR_RE.fullmatch("2026")
+        assert not refresh.SEASON_DIR_RE.fullmatch("2010-11")
+        assert refresh._dash("dashboard_teams.json").endswith(
+            "dashboard_wnba_teams.json")
+        assert refresh._dash("dashboard_players.json").endswith(
+            "dashboard_wnba_players.json")
+        assert refresh._in_dir(refresh.PROCESSED_DIR,
+                               "dashboard_leaderboards.json").endswith(
+            "dashboard_wnba_leaderboards.json")
+        with pytest.raises(ValueError):
+            refresh.set_league("nope")
+    finally:
+        # Plain setattr, not monkeypatch: setattr records the value in
+        # place, so monkeypatch would undo back to THIS test's mutation.
+        for name, value in saved.items():
+            setattr(refresh, name, value)
+    # NBA round trip: historical names restored, no '_wnba' anywhere.
+    assert refresh.LEAGUE == "nba"
+    assert refresh._dash("dashboard_teams.json").endswith(
+        "dashboard_teams.json")
+    assert "_wnba" not in refresh._dash("dashboard_teams.json")
+    assert refresh.SEASON_DIR_RE.fullmatch("2010-11")
+
+
+def test_wnba_season_candidates_are_single_year_labels(monkeypatch):
+    """The candidate list for the WNBA never carries an NBA two-year label
+    (the completed/current seasons are plain calendar years)."""
+    saved = {name: getattr(refresh, name) for name in
+             ("LEAGUE", "RAW_DIR", "SCHEDULES_DIR", "RACES_DIR",
+              "SEASON_DIR_RE")}
+    try:
+        refresh.set_league("wnba")
+        candidates = refresh.season_candidates()
+        assert candidates
+        assert all(refresh.SEASON_DIR_RE.fullmatch(c) for c in candidates)
+        # Two distinct seasons: the completed one and the current one.
+        assert len(set(candidates)) >= 2
+    finally:
+        for name, value in saved.items():
+            setattr(refresh, name, value)
+
+
+def test_standings_candidates_lead_with_current_season():
+    """Standings try the CURRENT season first (it is the app's default
+    season once collected, so its table is the one that must load) while
+    season_candidates() stays completed-first for leaderboards -- same
+    members, reordered; single calendar years for the WNBA."""
+    saved = {name: getattr(refresh, name) for name in
+             ("LEAGUE", "RAW_DIR", "SCHEDULES_DIR", "RACES_DIR",
+              "SEASON_DIR_RE")}
+    try:
+        for league in ("nba", "wnba"):
+            refresh.set_league(league)
+            current = refresh.espn_api.current_season_label(league=league)
+            shared = refresh.season_candidates()
+            candidates = refresh.standings_candidates()
+            assert candidates[0] == current          # current leads
+            assert set(candidates) == set(shared)    # same members, reordered
+            assert len(set(candidates)) == len(candidates)  # deduped
+            assert all(refresh.SEASON_DIR_RE.fullmatch(c)
+                       for c in candidates)
+    finally:
+        for name, value in saved.items():
+            setattr(refresh, name, value)
+
+
 def test_refresh_schedule_splits_and_migrates(isolated):
     """The legacy merged envelope is materialised into per-season files (with
     its ORIGINAL stamp, not a fresh one), local raw csvs win with cleaned
@@ -269,7 +348,8 @@ def test_refresh_awards_preserves_history_when_raw_is_partial(
     import history
 
     monkeypatch.setattr(awards, "build_payload",
-                        lambda season, raw_dir=None: _fresh_payload(season))
+                        lambda season, raw_dir=None, league="nba":
+                        _fresh_payload(season))
     captured = {}
 
     def _boom(window_players, cache=None, live=True):
@@ -311,7 +391,8 @@ def test_refresh_awards_window_metadata_spans_merged_seasons(
     import history
 
     monkeypatch.setattr(awards, "build_payload",
-                        lambda season, raw_dir=None: _fresh_payload(season))
+                        lambda season, raw_dir=None, league="nba":
+                        _fresh_payload(season))
     real_players = json.loads(
         (REPO_ROOT / "data" / "dashboard_players.json").read_text(
             encoding="utf-8"))
@@ -383,11 +464,12 @@ def test_refresh_positions_partial_fetch_writes_what_arrived(
         isolated, monkeypatch):
     """One team's roster 500: the other team's rows still land (the failed
     team's players show honest missing positions until a later run)."""
-    monkeypatch.setattr(refresh.espn_api, "get_teams", lambda: {})
+    monkeypatch.setattr(refresh.espn_api, "get_teams",
+                        lambda league="nba": {})
     monkeypatch.setattr(refresh.parsing, "parse_teams",
                         lambda payload: [{"team_id": 1}, {"team_id": 2}])
 
-    def get_roster(team_id, season):
+    def get_roster(team_id, season, league="nba"):
         if team_id == 1:
             raise RuntimeError("HTTP Error 500: Internal Server Error")
         return {}
@@ -452,7 +534,8 @@ def test_refresh_awards_career_build_failure_keeps_previous_career(
     import history
 
     monkeypatch.setattr(awards, "build_payload",
-                        lambda season, raw_dir=None: _fresh_payload(season))
+                        lambda season, raw_dir=None, league="nba":
+                        _fresh_payload(season))
     real_players = json.loads(
         (REPO_ROOT / "data" / "dashboard_players.json").read_text(
             encoding="utf-8"))

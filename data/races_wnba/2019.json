@@ -1,0 +1,258 @@
+{
+ "season": "2019",
+ "snapshots": [
+  {
+   "date": "2026-09-28",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 2491877,
+      "player_name": "Elena Delle Donne",
+      "rank": 1,
+      "score": 25.31
+     },
+     {
+      "player_id": 2490553,
+      "player_name": "Brittney Griner",
+      "rank": 2,
+      "score": 22.13
+     },
+     {
+      "player_id": 2529130,
+      "player_name": "Natasha Howard",
+      "rank": 3,
+      "score": 21.39
+     },
+     {
+      "player_id": 1068,
+      "player_name": "Nneka Ogwumike",
+      "rank": 4,
+      "score": 21.03
+     },
+     {
+      "player_id": 1017,
+      "player_name": "Liz Cambage",
+      "rank": 5,
+      "score": 20.49
+     },
+     {
+      "player_id": 2999101,
+      "player_name": "Jonquel Jones",
+      "rank": 6,
+      "score": 20.39
+     },
+     {
+      "player_id": 2529122,
+      "player_name": "Chelsea Gray",
+      "rank": 7,
+      "score": 19.95
+     },
+     {
+      "player_id": 869,
+      "player_name": "DeWanna Bonner",
+      "rank": 8,
+      "score": 19.91
+     },
+     {
+      "player_id": 981,
+      "player_name": "Courtney Vandersloot",
+      "rank": 9,
+      "score": 19.65
+     },
+     {
+      "player_id": 3149391,
+      "player_name": "A'ja Wilson",
+      "rank": 10,
+      "score": 19.62
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 2529130,
+      "player_name": "Natasha Howard",
+      "rank": 1,
+      "score": 3.91
+     },
+     {
+      "player_id": 3917450,
+      "player_name": "Napheesa Collier",
+      "rank": 2,
+      "score": 2.76
+     },
+     {
+      "player_id": 2999101,
+      "player_name": "Jonquel Jones",
+      "rank": 3,
+      "score": 2.61
+     },
+     {
+      "player_id": 3142250,
+      "player_name": "Jordin Canada",
+      "rank": 4,
+      "score": 2.5
+     },
+     {
+      "player_id": 2490553,
+      "player_name": "Brittney Griner",
+      "rank": 5,
+      "score": 2.26
+     },
+     {
+      "player_id": 766,
+      "player_name": "Sylvia Fowles",
+      "rank": 6,
+      "score": 2.25
+     },
+     {
+      "player_id": 1068,
+      "player_name": "Nneka Ogwumike",
+      "rank": 7,
+      "score": 2.19
+     },
+     {
+      "player_id": 798,
+      "player_name": "LaToya Sanders",
+      "rank": 8,
+      "score": 2.04
+     },
+     {
+      "player_id": 2529140,
+      "player_name": "Alyssa Thomas",
+      "rank": 9,
+      "score": 1.86
+     },
+     {
+      "player_id": 3146151,
+      "player_name": "Ariel Atkins",
+      "rank": 10,
+      "score": 1.8
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 3027368,
+      "player_name": "Emma Meesseman",
+      "rank": 1,
+      "score": 15.73
+     },
+     {
+      "player_id": 2566106,
+      "player_name": "Dearica Hamby",
+      "rank": 2,
+      "score": 13.82
+     },
+     {
+      "player_id": 2999035,
+      "player_name": "Aerial Powers",
+      "rank": 3,
+      "score": 12.98
+     },
+     {
+      "player_id": 2490514,
+      "player_name": "Tianna Hawkins",
+      "rank": 4,
+      "score": 10.97
+     },
+     {
+      "player_id": 2490773,
+      "player_name": "Alex Bentley",
+      "rank": 5,
+      "score": 10.91
+     },
+     {
+      "player_id": 2529458,
+      "player_name": "Cheyenne Parker-Tyus",
+      "rank": 6,
+      "score": 10.68
+     },
+     {
+      "player_id": 887,
+      "player_name": "Sami Whitcomb",
+      "rank": 7,
+      "score": 8.84
+     },
+     {
+      "player_id": 4038379,
+      "player_name": "Marine Johannes",
+      "rank": 8,
+      "score": 8.82
+     },
+     {
+      "player_id": 3058892,
+      "player_name": "Lexie Brown",
+      "rank": 9,
+      "score": 8.63
+     },
+     {
+      "player_id": 3102133,
+      "player_name": "Rebecca Allen",
+      "rank": 10,
+      "score": 8.16
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 796,
+      "player_name": "Leilani Mitchell",
+      "rank": 1,
+      "score": 11.41
+     },
+     {
+      "player_id": 3056672,
+      "player_name": "Mercedes Russell",
+      "rank": 2,
+      "score": 10.2
+     },
+     {
+      "player_id": 2529047,
+      "player_name": "Odyssey Sims",
+      "rank": 3,
+      "score": 9.54
+     },
+     {
+      "player_id": 2955898,
+      "player_name": "Damiris Dantas",
+      "rank": 4,
+      "score": 7.78
+     },
+     {
+      "player_id": 1013,
+      "player_name": "Jantel Lavender",
+      "rank": 5,
+      "score": 7.58
+     },
+     {
+      "player_id": 2529130,
+      "player_name": "Natasha Howard",
+      "rank": 6,
+      "score": 7.32
+     },
+     {
+      "player_id": 2566106,
+      "player_name": "Dearica Hamby",
+      "rank": 7,
+      "score": 7.24
+     },
+     {
+      "player_id": 3058892,
+      "player_name": "Lexie Brown",
+      "rank": 8,
+      "score": 7.22
+     },
+     {
+      "player_id": 1049,
+      "player_name": "Riquna Williams",
+      "rank": 9,
+      "score": 7.11
+     },
+     {
+      "player_id": 887,
+      "player_name": "Sami Whitcomb",
+      "rank": 10,
+      "score": 6.75
+     }
+    ]
+   }
+  }
+ ]
+}

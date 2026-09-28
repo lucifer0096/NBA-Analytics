@@ -1,10 +1,11 @@
 name: Daily collector
 
-# NBA games happen daily (Oct-Apr) and the ESPN APIs are free/unauthenticated,
-# so a daily run keeps data/raw current: refresh the current season's schedule
-# and standings, fetch any newly-finalized game box scores, refresh the
-# dashboard fallback files, and commit the results back to main (the same
-# pattern as FPL-Analytics' collector workflow). In the offseason (Jun-Sep)
+# NBA games happen daily (Oct-Apr) and the WNBA's run May-Oct, and the ESPN
+# APIs are free/unauthenticated, so a daily run keeps both leagues' data
+# current: refresh each league's current-season schedule and standings, fetch
+# any newly-finalized game box scores, refresh the dashboard fallback files
+# (both leagues in one pass), and commit the results back to main (the same
+# pattern as FPL-Analytics' collector workflow). In either league's offseason
 # the run is nearly a no-op: no new final games, so it only rewrites the
 # schedule/standings copies.
 on:
@@ -36,13 +37,17 @@ jobs:
           cache: pip
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
-      - name: Run collector (current season, incremental)
+      - name: Run collector (NBA, current season, incremental)
         # Schedule + newly-final games for the seasons the state file tracks
         # (defaults to the current season only -- historical backfills are a
         # deliberate one-off local command, see docs/COLLECTOR.md).
         run: python src/collector/snapshot.py --season current
-      - name: Refresh dashboard fallbacks
-        run: python src/collector/refresh_dashboard_fallbacks.py
+      - name: Run collector (WNBA, current season, incremental)
+        # Same policy, its own state file under data/raw_wnba: season label =
+        # calendar year, historical backfills are one-off local runs too.
+        run: python src/collector/snapshot.py --league wnba --season current
+      - name: Refresh dashboard fallbacks (both leagues)
+        run: python src/collector/refresh_dashboard_fallbacks.py --league nba wnba
       - name: Commit refreshed data
         run: |
           git config user.name "collector-bot"

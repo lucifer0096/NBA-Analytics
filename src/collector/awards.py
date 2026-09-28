@@ -40,7 +40,14 @@ Cross-season sections (built from ALL collected seasons at once):
               data/dashboard_players.json (Player Profile page).
 
 Season convention follows espn_api: a season label's END year is the calendar
-year it finishes in (2025-26 games live under data/raw/2025-26/).
+year it finishes in (2025-26 games live under data/raw/2025-26/); the WNBA's
+labels are single calendar years ('2026' under data/raw_wnba/2026/).
+
+Leagues: every entry point takes `league` (default 'nba') for the season
+math, the raw-tree default and -- for the GOAT ladder -- that league's
+honours table and formula text (goat_formula(league); GOAT_FORMULA remains
+the NBA string for existing callers). See leagues.py for the per-league
+config.
 """
 
 import csv
@@ -49,6 +56,8 @@ import json
 import os
 import re
 from collections import Counter
+
+import leagues
 
 REPO_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 RAW_DIR = os.path.join(REPO_ROOT, "data", "raw")
@@ -112,58 +121,22 @@ GOAT_PRODUCTION_WEIGHTS = {"pts": 0.35, "reb": 0.15, "ast": 0.15,
 GOAT_PROD_LABELS = {"pts": "PTS", "reb": "REB", "ast": "AST",
                     "stl": "STL", "blk": "BLK", "fg3m": "3PM",
                     "plus_minus": "+/-"}
-# Official NBA honours -> points per win (keys are ESPN's EXACT award names;
-# verified live Sep 2026 against the 20 non-empty award types -- ids 34/37
-# are empty). All-Star game SELECTIONS aren't in ESPN's awards API at all,
-# so they can't be scored here. Championships are a separate bounded
-# GOAT component (GOAT_WEIGHTS["championships"]), counted from champion-
-# team rows plus history.OFFICIAL_CHAMPIONSHIPS, not part of this table.
-GOAT_HONOURS_WEIGHTS = {
-    "MVP": 6.0,
-    "Finals MVP": 5.0,
-    "Defensive Player of the Year": 4.5,
-    "All-NBA 1st Team": 3.0,
-    "All-Defensive 1st Team": 2.5,
-    "All-NBA 2nd Team": 2.0,
-    "NBA Western Conference Finals MVP": 2.0,
-    "NBA Eastern Conference Finals MVP": 2.0,
-    "All-Defensive 2nd Team": 1.5,
-    "Rookie of the Year": 1.5,
-    "Sixth Man of the Year": 1.5,
-    "Most Improved Player": 1.5,
-    "All-Star MVP": 1.5,
-    "All-NBA 3rd Team": 1.0,
-    "Clutch Player of the Year": 1.0,
-    "NBA Cup MVP": 1.0,
-    "NBA Cup All-Tournament Team": 0.5,
-    "All-Rookie 1st Team": 0.5,
-    "All-Rookie 2nd Team": 0.25,
-    "Twyman-Stokes Teammate of the Year Award": 0.25,
-}
-# Short display names for the caption (the weights above are what the math
-# runs with; both dicts are asserted against GOAT_FORMULA in the tests).
-GOAT_HONOUR_LABELS = {
-    "MVP": "MVP",
-    "Finals MVP": "Finals MVP",
-    "Defensive Player of the Year": "DPOY",
-    "All-NBA 1st Team": "All-NBA 1st",
-    "All-Defensive 1st Team": "All-Def 1st",
-    "All-NBA 2nd Team": "All-NBA 2nd",
-    "NBA Western Conference Finals MVP": "Conf MVP (W)",
-    "NBA Eastern Conference Finals MVP": "Conf MVP (E)",
-    "All-Defensive 2nd Team": "All-Def 2nd",
-    "Rookie of the Year": "ROY",
-    "Sixth Man of the Year": "6MOY",
-    "Most Improved Player": "MIP",
-    "All-Star MVP": "All-Star MVP",
-    "All-NBA 3rd Team": "All-NBA 3rd",
-    "Clutch Player of the Year": "Clutch POY",
-    "NBA Cup MVP": "Cup MVP",
-    "NBA Cup All-Tournament Team": "Cup Tourney",
-    "All-Rookie 1st Team": "All-Rookie 1st",
-    "All-Rookie 2nd Team": "All-Rookie 2nd",
-    "Twyman-Stokes Teammate of the Year Award": "Twyman-Stokes",
-}
+# Official honours -> points per win, keyed by ESPN's EXACT award names.
+# The tables live in leagues.py (per league: the NBA's 20 award types, the
+# WNBA's 15) so the collector and the dashboard share one definition; these
+# module aliases keep the original import paths working.
+GOAT_HONOURS_WEIGHTS = leagues.GOAT_HONOURS_WEIGHTS
+GOAT_HONOUR_LABELS = leagues.GOAT_HONOUR_LABELS
+
+
+def honours_weights(league: str = "nba") -> dict:
+    """Points per official award win for `league` (ESPN's exact names)."""
+    return leagues.cfg(league)["honours_weights"]
+
+
+def honour_labels(league: str = "nba") -> dict:
+    """Short display names for `league`'s honours table."""
+    return leagues.cfg(league)["honours_labels"]
 
 # Display metadata shared with the dashboard (shared.py imports these so the
 # formula text shown in a caption is the SAME string that defines the math --
@@ -192,39 +165,70 @@ RACE_FORMULAS = {
 }
 
 # The GOAT formula is assembled from the very constants the math runs with,
-# so the caption can never drift from the computation. Every one of the 20
-# official-honour weights is printed verbatim (test_goat_* asserts each
-# fragment), because a resume component you can't audit is marketing.
-GOAT_FORMULA = (
-    "GOAT score = "
-    f"{GOAT_WEIGHTS['production']:.0%} career production ("
-    + ", ".join(f"{GOAT_PROD_LABELS[s]} {w:.0%}"
-                for s, w in GOAT_PRODUCTION_WEIGHTS.items())
-    + f" of the component; each stat is a "
-    f"{GOAT_PRODUCTION_BLEND:.0%}/{1 - GOAT_PRODUCTION_BLEND:.0%} blend of "
-    "career total and per-game rate vs the best career among qualified "
-    "players, and a stat the career never had (impossible-zero totals, "
-    "pre-1974 STL/BLK, pre-1980 3PM, no collected-box-score game for +/-) "
-    "is dropped from his blend with the rest rescaled; +/- comes only from "
-    "this repo's collected box scores because ESPN's career statistics "
-    "carry none, so it starts with the 2010-11 window and a negative "
-    "career +/- scores zero instead of negative credit) + "
-    f"{GOAT_WEIGHTS['honours']:.0%} official NBA honours (points per win: "
-    + ", ".join(f"{GOAT_HONOUR_LABELS[name]} ×{weight:g}"
-                for name, weight in GOAT_HONOURS_WEIGHTS.items())
-    + f") + {GOAT_WEIGHTS['peak']:.0%} peak (best season's per-game impact)"
-    f" + {GOAT_WEIGHTS['championships']:.0%} championships (title count vs "
-    "the most among qualified players: champion-season rows plus verified "
-    "official-record counts), each component 0-100 vs the best qualified "
-    "player; a component with no data for a player (impossible-zero career "
-    "total, untrusted peak, unknown title count, no honours input) is "
-    "dropped for him and the remaining weights "
-    f"rescaled; requires ≥{GOAT_MIN_CAREER_GP} career games."
-)
+# so the caption can never drift from the computation. Every one of that
+# league's official-honour weights is printed verbatim (test_goat_* asserts
+# each fragment), because a resume component you can't audit is marketing.
+def goat_formula(league: str = "nba") -> str:
+    """The on-screen GOAT formula text for `league`, built from
+    GOAT_WEIGHTS, GOAT_PRODUCTION_* and that league's honours table so the
+    caption and the computation cannot drift. The NBA's text is identical to
+    the original GOAT_FORMULA constant (kept below as the default alias)."""
+    cfg = leagues.cfg(league)
+    weights = cfg["honours_weights"]
+    labels = cfg["honours_labels"]
+    era_drops = (
+        # NBA-era facts; the GOAT code's untracked-stat rule reads the
+        # same way for both leagues (impossible zero / never attempted).
+        "impossible-zero totals, "
+        "pre-1974 STL/BLK, pre-1980 3PM, no collected-box-score game for +/-"
+        if league == "nba" else
+        "impossible-zero totals, a stat the career never attempted, "
+        "no collected-box-score game for +/-"
+    )
+    titles_source = (
+        "champion-season rows plus verified official-record counts"
+        if league == "nba" else
+        "champion-season rows (Finals-MVP team refs cover every season "
+        "since 1997)"
+    )
+    return (
+        "GOAT score = "
+        f"{GOAT_WEIGHTS['production']:.0%} career production ("
+        + ", ".join(f"{GOAT_PROD_LABELS[s]} {w:.0%}"
+                    for s, w in GOAT_PRODUCTION_WEIGHTS.items())
+        + f" of the component; each stat is a "
+        f"{GOAT_PRODUCTION_BLEND:.0%}/{1 - GOAT_PRODUCTION_BLEND:.0%} blend of "
+        "career total and per-game rate vs the best career among qualified "
+        "players, and a stat the career never had "
+        f"({era_drops}) "
+        "is dropped from his blend with the rest rescaled; +/- comes only from "
+        "this repo's collected box scores because ESPN's career statistics "
+        f"carry none, so it starts with the {leagues.first_season(league)} "
+        "window and a negative "
+        "career +/- scores zero instead of negative credit) + "
+        f"{GOAT_WEIGHTS['honours']:.0%} official {cfg['display']} honours "
+        "(points per win: "
+        + ", ".join(f"{labels[name]} ×{weight:g}"
+                    for name, weight in weights.items())
+        + f") + {GOAT_WEIGHTS['peak']:.0%} peak (best season's per-game impact)"
+        f" + {GOAT_WEIGHTS['championships']:.0%} championships (title count vs "
+        f"the most among qualified players: {titles_source}), "
+        "each component 0-100 vs the best qualified "
+        "player; a component with no data for a player (impossible-zero career "
+        "total, untrusted peak, unknown title count, no honours input) is "
+        "dropped for him and the remaining weights "
+        f"rescaled; requires ≥{GOAT_MIN_CAREER_GP} career games."
+    )
 
 
-def previous_season(season: str) -> str:
-    """'2025-26' -> '2024-25' (MIP needs the year before)."""
+GOAT_FORMULA = goat_formula("nba")
+
+
+def previous_season(season: str, league: str = "nba") -> str:
+    """'2025-26' -> '2024-25' (MIP needs the year before); the WNBA's
+    single-year '2026' -> '2025'."""
+    if league == "wnba":
+        return str(int(season) - 1)
     start = int(season[:4])
     prev_start = start - 1
     return f"{prev_start}-{(prev_start + 1) % 100:02d}"
@@ -237,7 +241,8 @@ def min_games_for(max_team_games: int) -> int:
     return max(8, int(0.5 * max_team_games))
 
 
-def aggregate_players(season: str, raw_dir: str = None) -> list:
+def aggregate_players(season: str, raw_dir: str = None,
+                      league: str = "nba") -> list:
     """Per-player season aggregates from every stored box score.
 
     Games where the player was flagged did_not_play don't count toward games
@@ -250,7 +255,7 @@ def aggregate_players(season: str, raw_dir: str = None) -> list:
     pending_box_scores treats unreadable files as pending, so the next
     snapshot run re-fetches and heals it.
     """
-    raw = raw_dir or RAW_DIR
+    raw = raw_dir or leagues.raw_dir(league)
     files = sorted(glob.glob(os.path.join(raw, season, "games", "*.json")))
     if not files:
         return []
@@ -303,14 +308,15 @@ def aggregate_players(season: str, raw_dir: str = None) -> list:
     return out
 
 
-def team_records(season: str, raw_dir: str = None) -> dict:
+def team_records(season: str, raw_dir: str = None,
+                 league: str = "nba") -> dict:
     """Team W-L and points allowed per game from the season's final games.
 
     Returns {abbrev: {"wins", "losses", "win_pct", "opp_pg", "games"}} and
     also lets callers derive max_team_games for the qualifier. Non-final or
     scoreless schedule rows (the normal pre-tip-off state) are skipped.
     """
-    raw = raw_dir or RAW_DIR
+    raw = raw_dir or leagues.raw_dir(league)
     path = os.path.join(raw, season, "schedule.csv")
     stats: dict = {}
     if not os.path.exists(path):
@@ -593,20 +599,24 @@ def _ranked(rows: list, size: int = RACE_SIZE) -> list:
     return rows[:size]
 
 
-def build_payload(season: str, raw_dir: str = None) -> dict:
+def build_payload(season: str, raw_dir: str = None,
+                  league: str = "nba") -> dict:
     """Everything data/dashboard_awards.json carries, or {} when the season
     has no collected games (caller keeps the previous file untouched)."""
-    raw = raw_dir or RAW_DIR
-    players = aggregate_players(season, raw_dir=raw)
+    raw = raw_dir or leagues.raw_dir(league)
+    players = aggregate_players(season, raw_dir=raw, league=league)
     if not players:
         return {}
 
-    records = team_records(season, raw_dir=raw)
+    records = team_records(season, raw_dir=raw, league=league)
     min_gp = min_games_for(max_games_played(records))
 
-    prev_label = previous_season(season)
-    prev_players = aggregate_players(prev_label, raw_dir=raw) if SEASON_DIR_RE.fullmatch(prev_label) else []
-    prev_records = team_records(prev_label, raw_dir=raw) if prev_players else {}
+    prev_label = previous_season(season, league)
+    season_re = leagues.season_dir_re(league)
+    prev_players = (aggregate_players(prev_label, raw_dir=raw, league=league)
+                    if season_re.fullmatch(prev_label) else [])
+    prev_records = (team_records(prev_label, raw_dir=raw, league=league)
+                    if prev_players else {})
     min_gp_prev = min_games_for(max_games_played(prev_records))
 
     return {
@@ -623,20 +633,21 @@ def build_payload(season: str, raw_dir: str = None) -> dict:
     }
 
 
-def collected_seasons(raw_dir: str = None) -> list:
+def collected_seasons(raw_dir: str = None, league: str = "nba") -> list:
     """Season labels with at least one collected box score, oldest first
     (career boards iterate ascending so a player's latest team wins)."""
-    raw = raw_dir or RAW_DIR
+    raw = raw_dir or leagues.raw_dir(league)
     if not os.path.isdir(raw):
         return []
+    season_re = leagues.season_dir_re(league)
     return sorted(
         name for name in os.listdir(raw)
-        if SEASON_DIR_RE.fullmatch(name)
+        if season_re.fullmatch(name)
         and glob.glob(os.path.join(raw, name, "games", "*.json"))
     )
 
 
-def alltime_players(raw_dir: str = None) -> list:
+def alltime_players(raw_dir: str = None, league: str = "nba") -> list:
     """Career aggregates merged across every collected season.
 
     Same row semantics as aggregate_players (DNP rows skipped), plus `seasons`
@@ -644,8 +655,8 @@ def alltime_players(raw_dir: str = None) -> list:
     single-season per-game impact, feeding the GOAT ladder's peak component).
     Seasons are merged oldest-first, so team_abbrev is the most recent team."""
     merged: dict = {}
-    for season in collected_seasons(raw_dir):
-        for p in aggregate_players(season, raw_dir=raw_dir):
+    for season in collected_seasons(raw_dir, league=league):
+        for p in aggregate_players(season, raw_dir=raw_dir, league=league):
             entry = merged.get(p["player_id"])
             if entry is None:
                 entry = merged[p["player_id"]] = {
@@ -742,17 +753,18 @@ def alltime_rows(players: list) -> dict:
     return out
 
 
-def goat_rows(players: list, honours: dict = None) -> list:
-    """The GOAT ladder across NBA history: production + honours + peak +
+def goat_rows(players: list, honours: dict = None,
+              league: str = "nba") -> list:
+    """The GOAT ladder across league history: production + honours + peak +
     championships.
 
     Production mixes, per stat, a GOAT_PRODUCTION_BLEND blend of the
     career total and the per-game rate against the best career/rate in the
     pool (weights in GOAT_PRODUCTION_WEIGHTS; +/- comes only from this
     repo's collected box scores and floors at zero for negative careers);
-    honours scores ESPN's
-    official NBA awards -- each win of each award type worth
-    GOAT_HONOURS_WEIGHTS[name] points, normalised to 0-100 against the
+    honours scores the league's
+    official ESPN awards -- each win of each award type worth
+    honours_weights(league)[name] points, normalised to 0-100 against the
     richest resume; peak is the best season's per-game impact;
     championships normalise the title count against the most among
     qualified players (history.OFFICIAL_CHAMPIONSHIPS covers careers
@@ -796,8 +808,9 @@ def goat_rows(players: list, honours: dict = None) -> list:
                   default=0)
         for stat in GOAT_PRODUCTION_WEIGHTS
     }
+    honour_table = honours_weights(league)
     honour_points = {
-        p["player_id"]: sum(GOAT_HONOURS_WEIGHTS.get(name, 0.0) * count
+        p["player_id"]: sum(honour_table.get(name, 0.0) * count
                             for name, count in
                             (honours.get(p["player_id"]) or {}).items())
         for p in qualified
@@ -918,13 +931,14 @@ def goat_rows(players: list, honours: dict = None) -> list:
 
 
 def build_career(season_payloads: list, raw_dir: str = None,
-                 history: dict = None, players: list = None) -> dict:
-    """The cross-season half of data/dashboard_awards.json: window metadata,
+                 history: dict = None, players: list = None,
+                 league: str = "nba") -> dict:
+    """The cross-season half of the dashboard_awards file: window metadata,
     the all-time boards, and the GOAT ladder.
 
     `history` is history.py's build() output (full-career ESPN lines for the
     leaders/award-winners/window pool, official honours, champion index,
-    meta/stamp): with it the boards and the ladder span NBA history instead
+    meta/stamp): with it the boards and the ladder span league history instead
     of just the collected window; without it this degrades to the legacy
     window-only shape (tests and offline builds). History lines supersede
     window lines per player -- the window entry still supplies the name/team/
@@ -937,7 +951,8 @@ def build_career(season_payloads: list, raw_dir: str = None,
 
     Empty dict when no season has collected games."""
     if players is None:
-        players = alltime_players(raw_dir=raw_dir)
+        players = alltime_players(raw_dir=raw_dir, league=league)
+    display = leagues.display(league)
     labels = sorted(p["season"] for p in season_payloads if p.get("season"))
     if not labels or not players:
         return {}
@@ -957,14 +972,15 @@ def build_career(season_payloads: list, raw_dir: str = None,
         "window": {"first": labels[0], "last": labels[-1],
                    "seasons": len(labels), "players": window_player_count},
         "alltime": {"leaders": alltime_rows(players)},
-        "goat": {"rows": goat_rows(players, honours_map),
+        "goat": {"rows": goat_rows(players, honours_map, league=league),
                  "min_career_gp": GOAT_MIN_CAREER_GP,
-                 "formula": GOAT_FORMULA},
+                 "formula": goat_formula(league)},
     }
     if meta:
         out["alltime"]["source"] = (
             f"Career lines for {meta.get('pool', 0)} players from ESPN "
-            f"career statistics (full NBA history: {meta.get('espn_lines', 0)} "
+            f"career statistics (full {display} history: "
+            f"{meta.get('espn_lines', 0)} "
             f"career lines, {meta.get('window_fallback', 0)} collected-window "
             f"fallbacks), not just the {labels[0]}→{labels[-1]} box scores"
             + (f"; {as_of}" if as_of else "")
@@ -973,7 +989,7 @@ def build_career(season_payloads: list, raw_dir: str = None,
             f"Production: career totals vs the best career among "
             f"qualified players (+/- summed from collected box scores "
             f"only, {labels[0]} onward); honours: {meta.get('honour_wins', 0)} "
-            f"official NBA award wins across {meta.get('award_types', 0)} "
+            f"official {display} award wins across {meta.get('award_types', 0)} "
             f"award types ({meta.get('award_seasons', 0)} award seasons "
             f"read); peak: best season impact from trusted ESPN season rows "
             f"or the collected window; championship counts "
@@ -984,8 +1000,17 @@ def build_career(season_payloads: list, raw_dir: str = None,
             + ")"
             + (f"; {as_of}" if as_of else "")
         )
+        quirks = (
+            ". ESPN quirks kept as-is and captioned: ABA/NBA totals "
+            "merged (Dr. J 30,026), the blocks leader category is "
+            "mislabelled, and some pre-1977 careers have late-starting "
+            "season rows (untrusted → peak/seasons blank)."
+            if league == "nba" else
+            ". ESPN quirks kept as-is: careers whose season rows can't "
+            "be trusted show blank peak/seasons."
+        )
         out["career_note"] = (
-            f"All-NBA-history careers for {meta.get('pool', 0)} players "
+            f"All-{display}-history careers for {meta.get('pool', 0)} players "
             f"(career leaders + official-award winners + "
             f"{meta.get('window_41', 0)} collected players ≥"
             f"{ALLTIME_MIN_GP} GP), {meta.get('honour_wins', 0)} official "
@@ -995,10 +1020,7 @@ def build_career(season_payloads: list, raw_dir: str = None,
                "(career lines and season rows)"
                if meta.get("official_reb_lines") else "")
             + (f"; {as_of}" if as_of else "")
-            + ". ESPN quirks kept as-is and captioned: ABA/NBA totals "
-            "merged (Dr. J 30,026), the blocks leader category is "
-            "mislabelled, and some pre-1977 careers have late-starting "
-            "season rows (untrusted → peak/seasons blank)."
+            + quirks
         )
     else:
         # Legacy window-only build: no ESPN history input, so say exactly
@@ -1017,16 +1039,19 @@ def build_career(season_payloads: list, raw_dir: str = None,
 if __name__ == "__main__":
     import sys
 
+    league = sys.argv[2] if len(sys.argv) > 2 else "nba"
     target = sys.argv[1] if len(sys.argv) > 1 else None
     if target is None:
+        season_re = leagues.season_dir_re(league)
         candidates = sorted(
-            (name for name in os.listdir(RAW_DIR)
-             if SEASON_DIR_RE.fullmatch(name)
-             and glob.glob(os.path.join(RAW_DIR, name, "games", "*.json"))),
+            (name for name in os.listdir(leagues.raw_dir(league))
+             if season_re.fullmatch(name)
+             and glob.glob(os.path.join(leagues.raw_dir(league), name,
+                                         "games", "*.json"))),
             reverse=True,
         )
         if not candidates:
-            raise SystemExit("no collected seasons under data/raw/")
+            raise SystemExit(f"no collected seasons under {leagues.raw_dir(league)}")
         target = candidates[0]
-    payload = build_payload(target)
+    payload = build_payload(target, league=league)
     print(json.dumps(payload, indent=1)[:4000])

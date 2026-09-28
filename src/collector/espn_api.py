@@ -1,4 +1,8 @@
-"""Thin client for ESPN's free, public, unauthenticated NBA APIs.
+"""Thin client for ESPN's free, public, unauthenticated NBA and WNBA APIs.
+
+Both leagues' endpoints are the same paths with the league slug swapped
+(nba / wnba) -- every function here takes `league` and validates it through
+leagues.py; the NBA names stay the defaults so no existing call changes.
 
 Endpoints used (all verified working, no API key, no auth):
 
@@ -37,9 +41,28 @@ import time
 import urllib.error
 import urllib.request
 
+import leagues
+
+# League base URLs -- WNBA paths verified live Sep 2026 (teams, standings,
+# schedules, summary box scores all answer 200 with the NBA shapes).
 SITE_API = "https://site.api.espn.com/apis/site/v2/sports/basketball/nba"
 WEB_API_V2 = "https://site.web.api.espn.com/apis/v2/sports/basketball/nba"
 WEB_API_COMMON = "https://site.web.api.espn.com/apis/common/v3/sports/basketball/nba"
+
+
+def site_api(league: str = "nba") -> str:
+    """site.api base for `league` (teams/schedule/summary/scoreboard)."""
+    return f"https://site.api.espn.com/apis/site/v2/sports/basketball/{leagues.validate(league)}"
+
+
+def web_api_v2(league: str = "nba") -> str:
+    """site.web.api v2 base for `league` (standings)."""
+    return f"https://site.web.api.espn.com/apis/v2/sports/basketball/{leagues.validate(league)}"
+
+
+def web_api_common(league: str = "nba") -> str:
+    """site.web.api common v3 base for `league` (rosters, athlete stats)."""
+    return f"https://site.web.api.espn.com/apis/common/v3/sports/basketball/{leagues.validate(league)}"
 
 # ESPN's edge (Fastly WAF) answers DIFFERENTLY depending on the client AND
 # the caller's network -- verified directly with the probe-espn.yml workflow
@@ -111,26 +134,41 @@ def _get_json(url: str, timeout: int = 20) -> dict:
 # Season label <-> ESPN season param (the ENDS-in year -- see module docstring)
 # ---------------------------------------------------------------------------
 
-def season_param(season_label: str) -> int:
-    """'2010-11' -> 2011 (ESPN's season param is the year the season ends)."""
+def season_param(season_label: str, league: str = "nba") -> int:
+    """'2010-11' -> 2011 (ESPN's NBA season param is the year the season
+    ends). The WNBA's label IS the param: '2026' -> 2026, because a WNBA
+    season is one calendar year (May -> October)."""
+    if league == "wnba":
+        return int(season_label)
     start = int(str(season_label)[:4])
     return start + 1
 
 
-def season_label(season_param_value: int) -> str:
-    """2011 -> '2010-11'."""
+def season_label(season_param_value: int, league: str = "nba") -> str:
+    """2011 -> '2010-11' (NBA); 2026 -> '2026' (WNBA, one calendar year)."""
+    if league == "wnba":
+        return str(int(season_param_value))
     start = int(season_param_value) - 1
     return f"{start}-{str(int(season_param_value))[2:]}"
 
 
-def current_season_label(today=None) -> str:
-    """The season the league is currently in (or entering, in the Jul-Aug
-    offseason). NBA seasons run Oct -> Jun: from Jul onward the *next*
-    season is the one that matters (its schedule/roster exist by then or
-    soon will), Jan-Jun the one still being played."""
+def current_season_label(today=None, league: str = "nba") -> str:
+    """The season the league is currently in (or entering, in the offseason).
+
+    NBA: seasons run Oct -> Jun, so from Jul onward the *next* season is the
+    one that matters (its schedule/roster exist by then or soon will), Jan-Jun
+    the one still being played.
+
+    WNBA: seasons run May -> October (finals in September/October), so Nov-Dec
+    are the offseason and the next calendar year is the one that matters (its
+    schedule lands in the spring) -- Jan-Oct the calendar year itself, whose
+    Jan-Apr months have not tipped off yet (the dashboard's honest empty
+    states cover that gap)."""
     import datetime
 
     today = today or datetime.date.today()
+    if league == "wnba":
+        return str(today.year if today.month < 11 else today.year + 1)
     if today.month >= 7:
         return f"{today.year}-{str(today.year + 1)[2:]}"
     return f"{today.year - 1}-{str(today.year)[2:]}"
@@ -140,40 +178,44 @@ def current_season_label(today=None) -> str:
 # Endpoints
 # ---------------------------------------------------------------------------
 
-def get_teams() -> dict:
-    """Every NBA team's basic info (current franchise list, not per-season)."""
-    return _get_json(f"{SITE_API}/teams")
+def get_teams(league: str = "nba") -> dict:
+    """Every team's basic info for `league` (current franchise list, not
+    per-season)."""
+    return _get_json(f"{site_api(league)}/teams")
 
 
-def get_schedule(season: int, team_id: int) -> dict:
-    """One team's schedule for the season ENDING in `season` (see season_param)."""
+def get_schedule(season: int, team_id: int, league: str = "nba") -> dict:
+    """One team's schedule for the season ENDING in `season` (NBA) / the
+    season `season` (WNBA) -- see season_param."""
     return _get_json(
-        f"{SITE_API}/teams/{team_id}/schedule?season={season}&seasontype=2"
+        f"{site_api(league)}/teams/{team_id}/schedule?season={season}&seasontype=2"
     )
 
 
-def get_event_summary(event_id: int | str) -> dict:
+def get_event_summary(event_id: int | str, league: str = "nba") -> dict:
     """One game's full detail payload -- header (teams/date/status) + boxscore
     (per-player stat lines for both teams, did-not-play flags included)."""
-    return _get_json(f"{SITE_API}/summary?event={event_id}")
+    return _get_json(f"{site_api(league)}/summary?event={event_id}")
 
 
-def get_standings(season: int) -> dict:
-    """Full conference standings for the season ENDING in `season`.
+def get_standings(season: int, league: str = "nba") -> dict:
+    """Full conference standings for the season ENDING in `season` (NBA) /
+    the season `season` (WNBA; same East/West tree shape, verified live).
     The site.api /standings path only returns a link stub -- this is the
     site.web.api v2 path that actually carries entries (see module docstring)."""
-    return _get_json(f"{WEB_API_V2}/standings?season={season}")
+    return _get_json(f"{web_api_v2(league)}/standings?season={season}")
 
 
-def get_roster(team_id: int, season: int) -> dict:
-    """One team's roster for the season ENDING in `season`, grouped by
-    position -- the project's only source of player positions (G/F/C), since
-    per-game box-score lines carry no position field (verified on the 1995-96
-    fixture: athlete entry has position: null)."""
-    return _get_json(f"{WEB_API_COMMON}/teams/{team_id}/roster?season={season}")
+def get_roster(team_id: int, season: int, league: str = "nba") -> dict:
+    """One team's roster for the season ENDING in `season` (NBA) / the
+    season `season` (WNBA), grouped by position -- the project's only source
+    of player positions (G/F/C), since per-game box-score lines carry no
+    position field (verified on the 1995-96 fixture: athlete entry has
+    position: null)."""
+    return _get_json(f"{web_api_common(league)}/teams/{team_id}/roster?season={season}")
 
 
-def get_scoreboard(dates: str) -> dict:
-    """Every game on calendar date `dates` (YYYYMMDD) -- works for historical
-    dates too, which makes it a cheap schedule cross-check."""
-    return _get_json(f"{SITE_API}/scoreboard?dates={dates}")
+def get_scoreboard(dates: str, league: str = "nba") -> dict:
+    """Every game on calendar date `dates` (YYYYMMDD) for `league` -- works
+    for historical dates too, which makes it a cheap schedule cross-check."""
+    return _get_json(f"{site_api(league)}/scoreboard?dates={dates}")

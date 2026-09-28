@@ -35,6 +35,45 @@ def test_latest_completed_season_uses_end_year():
     assert snapshot.latest_completed_season(datetime.date(2027, 1, 10)) == "2026-27"
 
 
+def test_latest_completed_season_wnba_follows_october_end():
+    import datetime
+
+    # The WNBA season runs May -> October: mid-finals (late Sep) the current
+    # year is NOT completed yet; from November it is; the following Feb it
+    # stays the year that finished.
+    assert snapshot.latest_completed_season(
+        datetime.date(2026, 9, 28), "wnba") == "2025"
+    assert snapshot.latest_completed_season(
+        datetime.date(2026, 11, 15), "wnba") == "2026"
+    assert snapshot.latest_completed_season(
+        datetime.date(2027, 2, 1), "wnba") == "2026"
+    assert snapshot.latest_completed_season(
+        datetime.date(2026, 5, 1), "wnba") == "2025"
+
+
+def test_set_league_rebinds_paths_and_season_labels(monkeypatch):
+    """set_league() switches every derived module constant together (the
+    WNBA's data lives under data/raw_wnba with single-year labels), and the
+    NBA's values survive a round trip so one run can never mix conventions."""
+    saved = {name: getattr(snapshot, name) for name in
+             ("LEAGUE", "RAW_DIR", "STATE_PATH", "BACKFILL_FIRST_SEASON")}
+    try:
+        snapshot.set_league("wnba")
+        assert snapshot.LEAGUE == "wnba"
+        assert snapshot.RAW_DIR.endswith("raw_wnba")
+        assert "raw_wnba" in snapshot.STATE_PATH
+        assert snapshot.BACKFILL_FIRST_SEASON == "2010"
+        assert snapshot._season_range("2010", "2012") == ["2012", "2011", "2010"]
+        with pytest.raises(ValueError):
+            snapshot.set_league("euroleague")
+    finally:
+        for name, value in saved.items():
+            setattr(snapshot, name, value)
+    assert snapshot.LEAGUE == "nba"
+    assert snapshot._season_range("2010-11", "2012-13") == [
+        "2012-13", "2011-12", "2010-11"]
+
+
 def _write_schedule(tmp_path, monkeypatch, rows):
     raw = tmp_path / "raw"
     (raw / "2012-13" / "games").mkdir(parents=True)
@@ -120,14 +159,14 @@ def test_rate_limiter_disabled_when_zero():
 def test_snapshot_schedule_tolerates_one_teams_failure(tmp_path, monkeypatch):
     monkeypatch.setattr(snapshot, "RAW_DIR", str(tmp_path / "raw"))
 
-    def get_schedule(season, team_id):
+    def get_schedule(season, team_id, league="nba"):
         if team_id == 15:
             raise RuntimeError("HTTP Error 500: Internal Server Error")
         return {"team_id": team_id}
 
     monkeypatch.setattr(snapshot.espn_api, "get_schedule", get_schedule)
     monkeypatch.setattr(snapshot.parsing, "parse_schedule",
-                        lambda payload, season: [{
+                        lambda payload, season, league="nba": [{
                             "game_id": f"{payload['team_id']}-1",
                             "date": "2013-01-01", "status": "STATUS_FINAL",
                             "home_score": "100", "away_score": "90"}])
@@ -147,14 +186,14 @@ def test_snapshot_schedule_keeps_existing_when_partial_would_shrink(
     _write_schedule(tmp_path, monkeypatch, [
         _game(1, "STATUS_FINAL"), _game(2, "STATUS_FINAL")])
 
-    def get_schedule(season, team_id):
+    def get_schedule(season, team_id, league="nba"):
         if team_id in (15, 16):
             raise RuntimeError("HTTP Error 500: Internal Server Error")
         return {"team_id": team_id}
 
     monkeypatch.setattr(snapshot.espn_api, "get_schedule", get_schedule)
     monkeypatch.setattr(snapshot.parsing, "parse_schedule",
-                        lambda payload, season: [{
+                        lambda payload, season, league="nba": [{
                             "game_id": "99", "date": "2013-01-01",
                             "status": "STATUS_FINAL", "home_score": "100",
                             "away_score": "90"}])
@@ -178,7 +217,7 @@ def test_player_positions_partial_failure_keeps_existing_rows(
     (raw / "player_positions.json").write_text(json.dumps(existing),
                                                encoding="utf-8")
 
-    def get_roster(team_id, season):
+    def get_roster(team_id, season, league="nba"):
         if team_id == 15:
             raise RuntimeError("HTTP Error 500: Internal Server Error")
         return {"team_id": team_id}
