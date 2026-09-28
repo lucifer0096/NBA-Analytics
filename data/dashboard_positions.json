@@ -1537,12 +1537,6 @@
    "team_id": 13
   },
   {
-   "player_id": 4710770,
-   "player_name": "Meechie Johnson",
-   "position": "G",
-   "team_id": 13
-  },
-  {
    "player_id": 4433136,
    "player_name": "Walker Kessler",
    "position": "C",
@@ -1591,15 +1585,15 @@
    "team_id": 13
   },
   {
-   "player_id": 5105598,
-   "player_name": "Chase Ross",
+   "player_id": 4277811,
+   "player_name": "Collin Sexton",
    "position": "G",
    "team_id": 13
   },
   {
-   "player_id": 4277811,
-   "player_name": "Collin Sexton",
-   "position": "G",
+   "player_id": 4397134,
+   "player_name": "Cole Swider",
+   "position": "F",
    "team_id": 13
   },
   {
@@ -2377,6 +2371,12 @@
    "team_id": 25
   },
   {
+   "player_id": 5116468,
+   "player_name": "Andrew Holifield",
+   "position": "F",
+   "team_id": 25
+  },
+  {
    "player_id": 4433255,
    "player_name": "Chet Holmgren",
    "position": "C",
@@ -2395,6 +2395,12 @@
    "team_id": 25
   },
   {
+   "player_id": 4685802,
+   "player_name": "Robert McCray V",
+   "position": "G",
+   "team_id": 25
+  },
+  {
    "player_id": 4900671,
    "player_name": "Ajay Mitchell",
    "position": "G",
@@ -2403,6 +2409,12 @@
   {
    "player_id": 5106270,
    "player_name": "Otega Oweh",
+   "position": "G",
+   "team_id": 25
+  },
+  {
+   "player_id": 4277923,
+   "player_name": "Zhaire Smith",
    "position": "G",
    "team_id": 25
   },
@@ -2416,6 +2428,12 @@
    "player_id": 5241364,
    "player_name": "Bennett Stirtz",
    "position": "G",
+   "team_id": 25
+  },
+  {
+   "player_id": 5109790,
+   "player_name": "Christoph Tilly",
+   "position": "C",
    "team_id": 25
   },
   {
@@ -3181,8 +3199,8 @@
    "team_id": 28
   },
   {
-   "player_id": 4067017,
-   "player_name": "A.J. Lawson",
+   "player_id": 4279143,
+   "player_name": "Tyreke Key",
    "position": "G",
    "team_id": 28
   },
@@ -3219,6 +3237,12 @@
   {
    "player_id": 4432241,
    "player_name": "Jamal Shead",
+   "position": "G",
+   "team_id": 28
+  },
+  {
+   "player_id": 4397784,
+   "player_name": "Malachi Smith",
    "position": "G",
    "team_id": 28
   },
@@ -3475,6 +3499,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-09-28T04:03:05Z",
+ "_generated_utc": "2026-09-28T11:24:56Z",
  "source": "local"
 }
