@@ -154,6 +154,9 @@ def test_alltime_page_shows_career_board_and_honesty(offline_espn):
     at = _render("app/pages/2_All-Time_Stats.py", offline_espn)
     captions = " ".join(str(c.value) for c in at.caption).lower()
     assert "not full nba history" in captions
+    if (REPO_ROOT / "data" / "dashboard_wnba_awards.json").exists():
+        assert "not full wnba history" in captions  # per-league disclaimer
+        assert len(at.tabs) >= 2  # the NBA | WNBA league switch
     # The career scoring leader must reach the rendered dataframe.
     name = str(pts_rows[0].get("player_name") or "")
     frames = " ".join(str(getattr(df, "value", "")) for df in at.dataframe)
@@ -184,6 +187,10 @@ def test_goat_page_shows_ladder_and_verbatim_formula(offline_espn):
     text = f"{_markdown_text(at)} {captions}"
     assert "GOAT score =" in text
     assert "not an official nba ranking" in captions.lower()
+    if (REPO_ROOT / "data" / "dashboard_wnba_awards.json").exists():
+        # The WNBA ladder carries its own disclaimer and formula text.
+        assert "not an official wnba ranking" in captions.lower()
+        assert "all-WNBA-history" in text
     assert str(goat_rows[0].get("player_name") or "") in text
     # The committed formula is the CURRENT one (weighted +/- included).
     assert "+/-" in captions
@@ -204,6 +211,11 @@ def test_profile_page_renders_cards_accolades_and_chart(offline_espn):
     assert not at.exception
     box = at.multiselect[0]
     assert 1 <= len(box.value) <= 4
+    # One player picker PER league tab (NBA first); the WNBA pane carries
+    # its own index (dashboard_wnba_players.json) when committed.
+    assert len(at.multiselect) >= 2
+    if (REPO_ROOT / "data" / "dashboard_wnba_players.json").exists():
+        assert str(at.multiselect[1].key).endswith("wnba")
     text = f"{_markdown_text(at)} " + " ".join(
         str(c.value) for c in at.caption)
     assert "Official accolades" in text

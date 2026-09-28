@@ -135,3 +135,55 @@ collected box scores (window-only, 2010-11 → present): uncovered careers
 keep `None`, the All-Time +/- board skips them, and the GOAT production
 blend drops the stat (named in `data_gaps`, remaining weights rescaled)
 instead of scoring a zero.
+
+## 2026-09-28 — ESPN's core API has no WNBA leaders endpoint
+
+The NBA's `{core}/nba/leaders` feeds `history.leader_ids`, the "career
+leaders" component of the player pool. The WNBA equivalent
+(`{core}/wnba/leaders` and the site-slug variant) answers **404** --
+verified live Sep 2026 while every sibling endpoint (athletes, awards,
+seasons) responded normally.
+
+**Guard**: `history.leader_ids` returns an empty set for the WNBA by
+design (stated in its docstring), so the pool builds from the other two
+components instead -- official-award winners plus the collected players
+≥41 GP (441 players total for the WNBA), a set the missing leaders list
+would not have widened. `build()`'s meta reports `leaders: 0` honestly
+instead of failing or pretending a fetch happened.
+
+## 2026-09-28 — WNBA athlete payloads carry no debutYear
+
+NBA athlete payloads carry `debutYear`, which the trust check uses to
+answer "do per-season rows cover the career from its start?". WNBA
+athletes have no such field at all -- verified across the athlete pool
+Sep 2026. `draft.year` and `experience.years` exist but are null for
+early-era players, and draft year would be the wrong fallback anyway:
+a drafted player's zero-play rookie season would make her rows look
+incomplete and false-fail trust forever.
+
+**Guard**: `_fetch_athlete`'s WNBA branch derives `debut` from the first
+row year of the athlete's own season rows -- sound because ESPN's WNBA
+season data begins at the league's 1997 inception. `_entry_age_ok`
+returns False for a WNBA cache bundle with no `debut`, triggering a
+one-time refetch wave that upgrades pre-fallback bundles, and `_trusted`
+discloses that the WNBA check reduces to "rows exist". Pinned by
+`test_history.py` (debut fallback vs the NBA's `debutYear`, the refetch
+trigger, the disclosure).
+
+## 2026-09-28 — WNBA Finals-MVP detail omits team refs for 1997-2002
+
+The champion index maps season → champion team id by reading the
+Finals-MVP winner's team reference (the Finals MVP wears the
+championship jersey). For 1997-2000 and 2001-2002 ESPN's WNBA
+Finals-MVP detail returns **no team ref at all** (verified live
+Sep 2026), so those six seasons -- the Houston Comets' four-peat and
+the LA Sparks' back-to-back, the entire 1997-2002 run -- would silently
+vanish from every championship count.
+
+**Guard**: `leagues.verified_champions` pins
+`{1997-2000: team id 4 (Houston Comets), 2001-2002: id 6 (LA Sparks)}`
+for the WNBA (the NBA table is empty -- its refs are complete);
+`history.honours()` applies the overlay with `setdefault`, so ESPN's
+refs always win where they exist and the pin only fills the six gaps.
+Championship counts beyond the overlay stay honest `None`s rather than
+borrowing a number. Pinned by `test_leagues.py`.

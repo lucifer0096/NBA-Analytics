@@ -266,6 +266,20 @@ def section(title: str) -> None:
     st.markdown(f'<div class="na-section">{title}</div>', unsafe_allow_html=True)
 
 
+def league_tabs() -> dict:
+    """The two-league switch every page carries: {label: tab} for
+    st.tabs(["NBA", "WNBA"]), with ?league=NAME rendering that league's
+    tab FIRST -- st.tabs has no programmatic selection, so the reorder is
+    the deep link's whole trick (labels as keys keep the caller's order
+    independent of the display order)."""
+    labels = ["NBA", "WNBA"]
+    deep = (st.query_params.get("league") or "").lower()
+    if deep in ("nba", "wnba"):
+        first = deep.upper()
+        labels = [first] + [label for label in labels if label != first]
+    return dict(zip(labels, st.tabs(labels)))
+
+
 def slot_chip(slot: str) -> str:
     """HTML span for a lineup slot chip (G/F/C/UTIL colored distinctly)."""
     return f'<span class="na-slot na-slot--{slot}">{slot}</span>'

@@ -705,16 +705,10 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
             st.caption(court_note)
 
 
-# ?league= deep link: st.tabs has no programmatic selection, so the requested
-# league renders FIRST (the other keeps its pinned position) -- same pattern
-# as the ?tab= section reorder below.
-league_labels = ["NBA", "WNBA"]
-deep_league = (st.query_params.get("league") or "").lower()
-if deep_league in ("nba", "wnba"):
-    first = deep_league.upper()
-    league_labels = [first] + [label for label in league_labels
-                               if label != first]
-league_tabs = dict(zip(league_labels, st.tabs(league_labels)))
+# ?league= deep link: shared.league_tabs() renders the requested league
+# FIRST (st.tabs has no programmatic selection; the other keeps its
+# pinned position) -- same pattern as the ?tab= section reorder below.
+league_tabs = shared.league_tabs()
 
 # ?tab= deep link: the section labels are identical inside both league tabs,
 # so one reorder serves both (requested section first, pinned default after).

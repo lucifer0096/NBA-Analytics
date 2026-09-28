@@ -3,13 +3,24 @@
 **Run**: `streamlit run app/app.py`. One Home page plus three left-nav
 pages; dark theme ships in `.streamlit/config.toml`.
 
+**Every page carries the same two-league switch**: top-level `NBA | WNBA`
+tabs, each nesting that league's content (on Home, the four section
+sub-tabs). `?league=wnba` renders the requested league's tab first
+(`st.tabs` has no programmatic selection, so the reorder *is* the deep
+link; labels are the map keys, so the caller's content stays matched).
+The two leagues share every loader, widget, and fallback through a
+`league="nba"` default argument -- widget keys are league-suffixed
+because Streamlit renders *both* tabs' content in one script run.
+
 ## Design contract
 
 - **Live-first, fallback-second.** Every loader in `app/shared.py` tries the
   free ESPN API first (60s `st.cache_data` TTL) and falls back to the
-  committed `data/dashboard_*` file only when the call fails, so the same
-  build renders correctly on a data machine, on Streamlit Cloud (no raw
-  data, sometimes no direct ESPN reach), and fully offline (the test
+  committed `data/dashboard_*` file only when the call fails (the WNBA's
+  carry `_wnba` after the `dashboard_` prefix -- one naming rule in
+  `leagues.named_path` shared with the collector that writes them), so the
+  same build renders correctly on a data machine, on Streamlit Cloud (no
+  raw data, sometimes no direct ESPN reach), and fully offline (the test
   suite's condition).
 - **Honest freshness.** Every tab shows a caption from `data_age_note()`:
   `Live (60s cache)` when the API answered, `Offline fallback` plus the
@@ -23,21 +34,31 @@ pages; dark theme ships in `.streamlit/config.toml`.
   arrives all zeros), the Awards Ladder notes that the season has no
   collected games yet plus where the newest data is, and the Schedule tab
   shows its own committed rows for that season or an empty table,
-  whichever is honest.
+  whichever is honest. The same rule applies *across* leagues: an NBA
+  label never preselects a WNBA selector (the label shapes never collide,
+  `2025-26` vs `2026`, so one `?season=` param serves both).
 - **Offline is the tested state.** `app/test_app_offline.py` forces *every*
   ESPN call to fail (monkeypatches `espn_api._get_json`) and asserts every
-  page still renders its tabs, KPI cards, and empty states. The deploy
-  condition is the default test condition.
+  page still renders its league tabs, section tabs, KPI cards, and empty
+  states. The deploy condition is the default test condition.
 
 ## Home (`app/app.py`)
 
-1. **Sidebar**: every season from 2010-11 through 2026-27, defaulting to
-   the newest with collected games (2025-26); a "Games collected"
-   inventory expander listing per-season box-file counts (honest 0 for
-   2026-27); and a "Model & History" expander carrying the validation
+Inside each league tab: the KPI strip, hero line, and the four section
+sub-tabs (reordered together by `?tab=`). Everything below exists once
+per league, with that league's season and data.
+
+1. **Sidebar**: one season selector per league -- NBA every season from
+   2010-11 through 2026-27 (defaulting to the newest with collected
+   games, 2025-26), WNBA every calendar year 2010 → current (its own
+   inventory default, 2026); a "Games collected" inventory expander per
+   league listing per-season box-file counts (honest 0 for 2026-27); and
+   a "Model & History" expander carrying the validation
    headline (model MAE vs the naive rolling-5 baseline plus the
    validation season, or the train-first note when `models/metrics.json`
-   is absent). The model's full numbers stay in `models/metrics.json`.
+   is absent), captioned that the model is NBA-trained and the WNBA tab
+   runs no projections. The model's full numbers stay in
+   `models/metrics.json`.
 2. **KPI strip**: three glass metric cards scoped to the selected season.
    *Games collected* (box-score files for that season, 0 shown honestly
    when none), *Next tip-off* (first future game in the schedule,
@@ -50,7 +71,9 @@ pages; dark theme ships in `.streamlit/config.toml`.
    **L10** (last-ten record) -- both parsed only when ESPN returns the
    stat, so a missing value renders blank, never a fabricated zero;
    playoff (🟢) and play-in (🟡) zone glyphs appear only when
-   the table has real records (preseason all-zero tables get no marks). A
+   the table has real records (preseason all-zero tables get no marks);
+   the WNBA pane marks its top-8 playoff field of 15 franchises with 🟢
+   and has no play-in row. A
    season that hasn't tipped off says so; a failed live fetch over a
    mismatched committed copy shows no table at all, just a note naming
    both seasons. A **Download standings CSV** button exports both
@@ -59,8 +82,9 @@ pages; dark theme ships in `.streamlit/config.toml`.
 4. **Schedule & Scores**: live scoreboard for *today* (empty + explanatory
    caption in the offseason, the normal Oct–Jun-less state), then the
    selected season from the committed **multi-season envelope**
-   (17 seasons, 20,394 games with final scores; regenerated from
-   `data/raw/*/schedule.csv` by `refresh_dashboard_fallbacks.py`, and a
+   (per league: the NBA's 17 seasons / 20,394 games with final scores,
+   the WNBA's 17 calendar years / 3,693; regenerated from
+   `data/raw*/schedule.csv` by `refresh_dashboard_fallbacks.py`, and a
    committed season missing locally is preserved). A season still running
    shows the 15 most recent results (day, matchup, final score) and the
    next 25 fixtures, plus a count of past-dated postponed/canceled rows
@@ -88,10 +112,11 @@ pages; dark theme ships in `.streamlit/config.toml`.
    carrying the FG/3P made-attempt splits + FG%). Every row is a real
    headshot over a team-logo CSS fallback with the race's stat line and
    score. Computed locally from the collected box scores
-   (`src/collector/awards.py`, committed as `data/dashboard_awards.json`,
-   keyed by season for every collected year 2010-11 → present); each
+   (`src/collector/awards.py`, committed as `data/dashboard_awards.json`
+   per league, keyed by season for every collected year NBA 2010-11 →
+   present / WNBA 2010 → present); each
    race's caption prints its exact formula verbatim plus the "not
-   official NBA voting" disclaimer. An empty race names the missing prior
+   official NBA voting" ("... WNBA voting" in the WNBA pane) disclaimer. An empty race names the missing prior
    season instead of inventing a winner, and a season with no collected
    games gets a "no collected games yet" note instead of substituted
    races. Ladder rows carry a **rank-movement arrow** (green ▲ / red ▼
@@ -105,19 +130,23 @@ pages; dark theme ships in `.streamlit/config.toml`.
    (gradient markings, no images). Rank order fills a 2 G / 2 F / 1 C
    formation from the committed roster map, C row first under the basket;
    overflow and unmapped positions land on a bench strip rather than
-   being forced into a slot. Follows the sidebar's season selector (every
-   collected season). Hovering a card shows the player's full per-game
+   being forced into a slot. Follows that league tab's season selector
+   (every collected season, roster map and positions per league). Hovering a card shows the player's full per-game
    line **including the FG/3P shooting splits** (CSS-only tooltip). The
    PuLP optimizer remains a backend component (`src/model/optimizer.py` +
    its tests); this tab moved, it didn't change.
 
 ## Left-nav pages
 
+Each page opens on the same `NBA | WNBA` league tabs as Home; the
+sidebar shows both leagues' game inventories.
+
 ### All-Time Stats (`app/pages/2_All-Time_Stats.py`)
 
-Career totals across **all** collected seasons (2010-11 → 2025-26, the
-window stated honestly: the collector starts at 2010-11, so this is not
-full NBA history) behind a rank-by radio over counting boards
+Career totals across **all** collected seasons per league (NBA 2010-11 →
+2025-26, WNBA 2010 → 2026; the window stated honestly: the collector
+starts at its first year, so this is not
+full league history) behind a rank-by radio over counting boards
 (PTS/REB/AST/STL/BLK/3PM/+/-) and efficiency boards
 (FG%/3P%/FT%/eFG%/TS%). The table shows the full parameter set: GP, MIN,
 PTS, REB/ORB/DREB, AST, STL, BLK, TO, +/-, FG/3P/FT made-attempt
@@ -130,31 +159,36 @@ FT ≥1 FTA/g) so a 1-1 shooter can't top FG%.
 
 ### GOAT Rankings (`app/pages/3_GOAT_Rankings.py`)
 
-A transparent career composite over **all NBA history**, not just this
-repo's collection window:
+A transparent career composite over **all league history** (one ladder per
+league tab), not just this repo's collection window:
 
-- **Data**: ESPN athlete career lines merged by
-  `src/collector/history.py` for 1,809 players (all-history career
-  leaders + official-award winners + the 1,382 collected players ≥41 GP),
-  committed in the career sections of `data/dashboard_awards.json`
-  (GOAT rows) with `data/dashboard_players.json` carrying the same index
-  for the Profile page. The source caption repeats the pool definition
-  and the as-of stamp.
-- **Formula** (printed verbatim above the ladder, every weight on
-  screen): **35%** production (each of career PTS/REB/AST/STL/BLK/3PM/+/-
-  at its printed share, scored as a 50/50 blend of career total and
-  per-game rate vs the pool's best; a stat the career never had
-  (impossible-zero totals, pre-1974 STL/BLK, pre-1980 3PM, no
-  collected-box-score game for +/-) is dropped from his blend with the
-  rest rescaled; +/- comes only from this repo's collected box scores
-  because ESPN's career statistics carry none -- so it starts with the
-  2010-11 window and a negative career +/- scores zero, never negative
-  credit), **30%** official honours (ESPN's 20 award types at
-  points per win, MVP 6.0 down to Sixth Man-tier 0.5), **25%** peak
-  (best season's per-game impact), **10%** championships (title count
-  vs the pool's most among qualified players: champion-season rows plus
-  verified official-record counts). Each component normalizes 0–100
-  against the best qualified player; qualified at ≥82 career GP.
+- **Data**: ESPN athlete career lines merged by `src/collector/history.py`
+  through each league's full-history endpoints: 1,809 NBA players
+  (career leaders + official-award winners + 1,382 collected players
+  ≥41 GP, 2,562 honours across 20 award types) and 441 WNBA players
+  (same recipe + 402 collected ≥41 GP, 807 honours across 15 award
+  types), committed in the career sections of `data/dashboard_awards.json`
+  (`dashboard_wnba_awards.json` for the WNBA) with the matching
+  `..._players.json` carrying the same index for the Profile page. The
+  source caption repeats the pool definition and the as-of stamp.
+- **Formula** (printed verbatim above each ladder, every weight on
+  screen, computed per league): **35%** production (each of career
+  PTS/REB/AST/STL/BLK/3PM/+/- at its printed share, scored as a 50/50
+  blend of career total and per-game rate vs the pool's best; a stat the
+  career never had (impossible-zero totals, pre-1974 STL/BLK, pre-1980
+  3PM, no collected-box-score game for +/-) is dropped from his blend
+  with the rest rescaled; +/- comes only from this repo's collected box
+  scores because ESPN's career statistics carry none -- so it starts with
+  the window (2010-11 NBA, 2010 WNBA) and a negative career +/- scores
+  zero, never negative credit), **30%** official honours (ESPN's award
+  types at points per win: the NBA's 20, MVP 6.0 down to Sixth Man-tier
+  0.5; the WNBA's own 15-type table), **25%** peak (best season's
+  per-game impact), **10%** championships (title count vs the pool's
+  most among qualified players: champion-season rows plus verified
+  official-record counts -- for the WNBA that overlay fills the
+  1997-2000 Comets and 2001-2002 Sparks titles ESPN's Finals-MVP detail
+  omits). Each component normalizes 0–100 against the best qualified
+  player; qualified at ≥82 career GP in both leagues.
 - **Honours are ESPN's official award names only.** Championships
   score as their own bounded component (🏆×N, normalizing against the
   pool maximum so Russell's 11 sets the ceiling); a ringless career
@@ -168,18 +202,22 @@ repo's collection window:
   input from the production blend (named in the row's "no data" line);
   a missing component drops out of the score and the result rescales
   over the weights that are available.
-- Explicitly labeled **not an official NBA ranking**. Each row carries
-  honour chips heaviest-first (top 5, then "+N more") and the four
-  component scores behind the headline number. Known ESPN quirks are
-  captioned on the page (ABA/NBA totals merged, the mislabelled blocks
-  category, late-starting pre-1977 season rows), and ESPN's missing
-  rebounds for 11 pre-1974 legends are patched from the verified
-  official record on career lines and season rows, counted in the
-  source caption.
+- Explicitly labeled **not an official NBA ranking** (the WNBA pane says
+  "not an official WNBA ranking"). Each row carries honour chips
+  heaviest-first (top 5, then "+N more") and the four component scores
+  behind the headline number. Known ESPN quirks are captioned on the
+  page: for the NBA, ABA/NBA totals merged, the mislabelled blocks
+  category, late-starting pre-1977 season rows, and ESPN's missing
+  rebounds for 11 pre-1974 legends patched from the verified official
+  record on career lines and season rows (counted in the source
+  caption); for the WNBA, careers whose season rows can't be trusted
+  show blank peak/seasons.
 
 ### Player Profile (`app/pages/4_Player_Profile.py`)
 
-Up to four players (defaults to the GOAT top four), each section at full
+Up to four players per league tab (defaults to that league's GOAT top
+four; a `?player=` deep link preselects the name in every tab whose
+index carries it, others honestly fall back), each section at full
 width so nothing is squeezed or hidden:
 
 - **Career cards** in a 2×2 grid, two meta lines each (career totals +
@@ -205,9 +243,11 @@ width so nothing is squeezed or hidden:
   season stays in the hover on the career grid); the legend toggles
   players off and on; drag to zoom, double-click to reset.
 - Per-season rows come from ESPN's athlete statistics (`seasons_log` in
-  `data/dashboard_players.json`); seasons ESPN doesn't cover draw no
+  `data/dashboard_players.json`, `data/dashboard_wnba_players.json`);
+  seasons ESPN doesn't cover draw no
   point, and a caption names the affected players instead of
-  interpolating.
+  interpolating. Headshots and the index itself follow the league
+  (`/headshots/wnba/...` URLs in the WNBA pane).
 
 ## UI pass (presentation layer)
 
@@ -225,6 +265,15 @@ All styling is one CSS block in `shared.inject_css()`, CSS-only with no JS:
   `prefers-reduced-motion: reduce`.
 
 ## Fallback files the pages read
+
+Every file below exists once per league: the NBA's keep their historical
+names, the WNBA's insert `_wnba` right after a `dashboard_` prefix
+(`dashboard_teams.json` → `dashboard_wnba_teams.json`) or before the
+extension when there is none (`history_cache.json` →
+`history_cache_wnba.json`) -- one rule, `leagues.named_path()`, shared by
+the collector that writes them and the loaders that read them (the
+`data/races_wnba/` and `data/schedules_wnba/` directories are the same
+rule applied to whole folders).
 
 | File | Written by | Read by |
 |---|---|---|

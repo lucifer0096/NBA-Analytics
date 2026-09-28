@@ -15,6 +15,8 @@ streamlit run app/app.py          # dashboard; runs offline from committed data/
 
 python src/collector/snapshot.py --backfill          # one-off: 2010-11 → latest season, newest first
 python src/collector/snapshot.py                     # daily: current season, incremental (resumable)
+python src/collector/snapshot.py --backfill --league wnba   # same for the WNBA (2010 → current)
+python src/collector/refresh_dashboard_fallbacks.py --league nba wnba  # dashboard fallbacks, both leagues
 
 python src/model/load_historical.py                  # raw box scores → data/processed/historical_games.parquet
 python src/model/features.py                         # → features.parquet (leak-free feature table)
@@ -29,22 +31,22 @@ Dependency layout mirrors FPL-Analytics: `requirements.txt` = exact pins everyth
 
 ## Status
 
-**Stage 1 (done): data collector.** A thin client for ESPN's public APIs (`teams`, `schedule`, `summary`, `standings`, `roster`, `scoreboard`) that snapshots each season's schedule and every finalized game's box score to `data/raw/`, idempotently (the filesystem is the state: an already-fetched game is never refetched), rate-limited, and resumable. Runs daily via GitHub Actions; see [docs/COLLECTOR.md](docs/COLLECTOR.md).
+**Stage 1 (done): data collector.** A thin client for ESPN's public APIs (`teams`, `schedule`, `summary`, `standings`, `roster`, `scoreboard`) that snapshots each season's schedule and every finalized game's box score to `data/raw/`, idempotently (the filesystem is the state: an already-fetched game is never refetched), rate-limited, and resumable. Runs daily via GitHub Actions for **both leagues** -- the NBA and the WNBA share every collector code path through a per-league config module (`src/collector/leagues.py`) and land in `data/raw/` vs `data/raw_wnba/`; see [docs/COLLECTOR.md](docs/COLLECTOR.md).
 
 **Stage 2 (done): projection model.** Player-game rows unified 2010-11 → present into one table (one schema the whole window: no cross-era reconciliation needed, unlike the FPL loader), leak-free rolling form/availability/rest/matchup features, chronological train/validation/holdout split (2024-25 validation, 2025-26 untouched), LightGBM single-stage + two-stage comparison against a naive rolling-5 baseline. See [docs/MODELING.md](docs/MODELING.md).
 
 **Stage 3 (done): lineup optimizer.** PuLP MILP over a projected player pool: 2 G / 2 F / 1 C / 2 UTIL slots with structural position eligibility, provably optimal answers, honest infeasibility errors. Verified against synthetic pools with known optima. See [docs/MODELING.md](docs/MODELING.md#lineup-optimizer).
 
-**Stage 4 (done): dashboard.** Four-page Streamlit app: Home tabs (Standings, Schedule & Scores, Awards Ladder, Court View) plus left-nav pages (All-Time Stats, GOAT Rankings, Player Profile). Live-first from ESPN with 60s cache, committed `data/dashboard_*` fallbacks for offline deploys, and freshness captions that always say which they're showing. The Awards Ladder follows the sidebar season selector across **every collected season (2010-11 → present)**, ranking MVP/DPOY/6th-Man/MIP races and per-game stat leaders (3PM and +/- included, FG/3P shooting splits on every row) with transparent homegrown formulas (each printed verbatim on screen, explicitly not official NBA voting), plus rank-movement arrows and an MVP trend chart fed by the daily race snapshots. The Schedule tab reads the committed multi-season envelope (17 seasons, ~20,400 games with scores): a finished season renders every completed game with its final score, a running season shows recent results plus next fixtures (team and venue filters scope the whole tab, and a CSV download takes the selected rows), and a season with no collected games (2026-27 pre-tip-off) shows an honest empty state instead of another year's data. All-Time Stats shows career totals with the full parameter set (+/-, FG/3P/FT splits, FG%/3P%/eFG%/TS%) over the collector's stated window, qualified at ≥41 career GP (the +/- board ranks only careers the collected box scores cover). GOAT Rankings composites **all-NBA-history** careers: 35% production (a 50/50 blend of career totals and per-game rates vs the pool's best, stats a career never had dropped and rescaled, window-only +/- floored at zero for negative careers) + 30% official ESPN honours (20 award types, every weight printed) + 25% peak + 10% championships (title count vs the pool maximum, verified official-record counts where ESPN's index can't reach), qualified at ≥82 GP, with the exact formula on screen and an explicit "not an official NBA ranking" disclaimer. Player Profile puts up to four careers at once (cards with two readable meta lines, the full-width accolades pivot where every award row is visible, interactive per-season progression chart on a season or career-year axis), and the Court View slots stat leaders onto a CSS-drawn court. See [docs/DASHBOARD.md](docs/DASHBOARD.md).
+**Stage 4 (done): dashboard.** Four-page Streamlit app where **every page opens on two league tabs (NBA | WNBA)**: Home nests its four tabs (Standings, Schedule & Scores, Awards Ladder, Court View) inside each league, and the left-nav pages (All-Time Stats, GOAT Rankings, Player Profile) switch league through the same tabs (`?league=wnba` renders the WNBA tab first). Live-first from ESPN with 60s cache, committed `data/dashboard_*` fallbacks (the WNBA's carry `_wnba`, e.g. `data/dashboard_wnba_teams.json`) for offline deploys, and freshness captions that always say which they're showing. The Awards Ladder follows that league's sidebar season selector across **every collected season (NBA 2010-11 → present, WNBA 2010 → present)**, ranking MVP/DPOY/6th-Man/MIP races and per-game stat leaders (3PM and +/- included, FG/3P shooting splits on every row) with transparent homegrown formulas (each printed verbatim on screen, explicitly not official NBA/WNBA voting), plus rank-movement arrows and an MVP trend chart fed by the daily race snapshots. The Schedule tab reads the committed multi-season envelope per league (NBA: 17 seasons, ~20,400 games with scores; WNBA: 17 calendar years, 3,693): a finished season renders every completed game with its final score, a running season shows recent results plus next fixtures (team and venue filters scope the whole tab, and a CSV download takes the selected rows), and a season with no collected games (2026-27 pre-tip-off) shows an honest empty state instead of another year's data. All-Time Stats shows career totals with the full parameter set (+/-, FG/3P/FT splits, FG%/3P%/eFG%/TS%) over the collector's stated window, qualified at ≥41 career GP (the +/- board ranks only careers the collected box scores cover). GOAT Rankings composites **all-history** careers per league (1,809 NBA players, 441 WNBA): 35% production (a 50/50 blend of career totals and per-game rates vs the pool's best, stats a career never had dropped and rescaled, window-only +/- floored at zero for negative careers) + 30% official ESPN honours (20 NBA award types / the WNBA's 15, every weight printed) + 25% peak + 10% championships (title count vs the pool maximum, verified official-record counts where ESPN's index can't reach -- including the WNBA titles ESPN's Finals-MVP detail omits), qualified at ≥82 GP, with the exact formula on screen and an explicit "not an official NBA/WNBA ranking" disclaimer. Player Profile puts up to four careers at once (cards with two readable meta lines, the full-width accolades pivot where every award row is visible, interactive per-season progression chart on a season or career-year axis), and the Court View slots stat leaders onto a CSS-drawn court. See [docs/DASHBOARD.md](docs/DASHBOARD.md).
 
-**Stage 5 (in progress): live season.** The 2026-27 schedule (1,200 games) is captured; the daily workflow will collect its box scores as games finalize from late October. The historical backfill (2010-11 → 2025-26, ~19,700 games) runs newest-first so training-ready seasons land first.
+**Stage 5 (in progress): live season.** The 2026-27 schedule (1,200 games) is captured; the daily workflow will collect its box scores as games finalize from late October. The historical backfill (2010-11 → 2025-26, ~19,700 games) runs newest-first so training-ready seasons land first. The WNBA side is already live: 2010 → 2026 collected (3,682 regular-season games, same `seasontype=2` policy as the NBA) and refreshed by the same daily workflow.
 
 ## Deploying to Streamlit Community Cloud
 
 The app is designed to deploy as-is from a fresh clone. It runs entirely
 from the committed `data/dashboard_*` fallbacks when it can't reach the
-collector's raw data (which Streamlit Cloud never has, since `data/raw/` is
-gitignored):
+collector's raw data (which Streamlit Cloud never has, since `data/raw/` and
+`data/raw_wnba/` are gitignored):
 
 1. Push this repo to GitHub (see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
    for the exact commands if you're pushing it for the first time).
@@ -69,12 +71,13 @@ seeing `data/raw/`.
 NBA-Analytics/
 ├── src/
 │   ├── collector/
-│   │   ├── espn_api.py                   # Thin client + season-param helpers (ESPN season = END year)
+│   │   ├── leagues.py                    # Per-league config (NBA/WNBA) + THE path rule named_path()
+│   │   ├── espn_api.py                   # Thin client + season params (NBA = END year, WNBA = calendar year)
 │   │   ├── parsing.py                    # Payload → flat rows (pure, fixture-pinned)
-│   │   ├── snapshot.py                   # Idempotent/resumable season snapshots (--backfill/--check-only)
-│   │   ├── refresh_dashboard_fallbacks.py# Stable data/dashboard_* copies for offline deploys
+│   │   ├── snapshot.py                   # Idempotent/resumable season snapshots (--league/--backfill/--check-only)
+│   │   ├── refresh_dashboard_fallbacks.py# Stable data/dashboard_* (+ _wnba) copies for offline deploys
 │   │   ├── awards.py                      # Races + stat leaders per season, all-time boards, GOAT ladder (local box-score math)
-│   │   ├── history.py                     # All-NBA-history career lines + official honours behind GOAT/Profile
+│   │   ├── history.py                     # All-history career lines + official honours behind GOAT/Profile (both leagues)
 │   │   ├── fixtures/                     # Real recorded payloads (incl. a 1995-96 game)
 │   │   ├── test_espn_api.py              # Parsing pinned against fixtures + opt-in live tests
 │   │   ├── test_snapshot.py              # State decisions: what's fetched, skipped, targeted
@@ -89,13 +92,13 @@ NBA-Analytics/
 │       ├── optimizer.py                  # PuLP best-lineup (G/F/C/UTIL slots)
 │       └── test_model.py                 # Scoring, leakage guarantees, split, projections, optimizer
 ├── app/
-│   ├── app.py                            # Home: Standings, Schedule & Scores, Awards Ladder, Court View
-│   ├── shared.py                         # Live-first loaders with committed fallbacks + age notes
+│   ├── app.py                            # Home: NBA | WNBA tabs → Standings, Schedule & Scores, Awards Ladder, Court View
+│   ├── shared.py                         # Live-first loaders (league-aware) with committed fallbacks + age notes
 │   ├── test_app_offline.py               # AppTest renders with EVERY ESPN call forced to fail
 │   └── pages/
-│       ├── 2_All-Time_Stats.py           # Career boards across the collected window
-│       ├── 3_GOAT_Rankings.py            # All-NBA-history GOAT ladder, formula printed verbatim
-│       └── 4_Player_Profile.py           # Cards, accolades, per-season progression chart
+│       ├── 2_All-Time_Stats.py           # Career boards across the collected window (both leagues)
+│       ├── 3_GOAT_Rankings.py            # All-history GOAT ladders (NBA + WNBA), formula printed verbatim
+│       └── 4_Player_Profile.py           # Cards, accolades, per-season progression chart (both leagues)
 ├── r/                                    # EDA in R (arrow reads the same parquet)
 ├── docs/
 │   ├── COLLECTOR.md                      # Endpoints, files written, scheduling, resumability
@@ -135,7 +138,11 @@ Slot structure, eligibility rules, infeasibility handling, and optimality tests:
 
 ## Dashboard
 
-**`streamlit run app/app.py`**: Home (Standings, Schedule & Scores, Awards Ladder, Court View) plus left-nav pages (All-Time Stats, GOAT Rankings, Player Profile), live-first with offline fallbacks, freshness stated honestly on every screen: **[docs/DASHBOARD.md](docs/DASHBOARD.md)**.
+**`streamlit run app/app.py`**: every page opens on the `NBA | WNBA` league
+tabs -- Home's (Standings, Schedule & Scores, Awards Ladder, Court View)
+inside each -- plus left-nav pages (All-Time Stats, GOAT Rankings, Player
+Profile), live-first with offline fallbacks, freshness stated honestly on
+every screen: **[docs/DASHBOARD.md](docs/DASHBOARD.md)**.
 
 ## Known Issues Found & Fixed
 
