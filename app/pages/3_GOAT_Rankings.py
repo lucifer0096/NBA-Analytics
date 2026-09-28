@@ -63,3 +63,6 @@ else:
         "gap named, and the score rescales over the weights that ARE "
         "available."
     )
+
+# Corrupt-fallback warnings ride at the very END (see app.py).
+shared.render_fallback_warnings()

@@ -461,3 +461,116 @@ def test_parse_plays_flattens_and_skips_malformed():
     assert rows[1]["period"] is None  # junk period degrades, never raises
     assert shared_module._parse_plays("not-a-list") == []
     assert shared_module._parse_plays(None) == []
+
+
+# ---------------------------------------------------------------------------
+# Deep links (?season=, ?tab=, ?player=) + the corrupt-fallback warning
+# contract (the app's ONLY st.warning()s, collected during render, emitted
+# once, late; every other test's len(at.warning) == 0 pins the clean run)
+# ---------------------------------------------------------------------------
+
+
+def test_deep_link_season_preselects_sidebar(offline_espn):
+    """?season=NAME opens the home page on that season; an unknown season
+    falls back to the honest default instead of crashing or inventing a
+    year's data."""
+    at = AppTest.from_file(str(REPO_ROOT / "app/app.py"), default_timeout=30)
+    at.query_params["season"] = "2010-11"
+    at.run()
+    assert not at.exception, f"page raised: {at.exception}"
+    box = next(b for b in at.selectbox if str(b.label) == "Season")
+    assert box.value == "2010-11"
+
+    bad = AppTest.from_file(str(REPO_ROOT / "app/app.py"), default_timeout=30)
+    bad.query_params["season"] = "1999-00"
+    bad.run()
+    assert not bad.exception, f"page raised: {bad.exception}"
+    fallback = next(b for b in bad.selectbox if str(b.label) == "Season")
+    assert fallback.value == "2025-26"  # the pinned default, not the typo
+
+
+def test_deep_link_tab_reorders_tabs(offline_espn):
+    """?tab= renders the requested tab FIRST (st.tabs has no programmatic
+    selection) while every other tab keeps the pinned default order and its
+    own content (the label -> element map keeps them matched)."""
+    at = AppTest.from_file(str(REPO_ROOT / "app/app.py"), default_timeout=30)
+    at.query_params["tab"] = "Court View"
+    at.run()
+    assert not at.exception, f"page raised: {at.exception}"
+    labels = [str(t.label) for t in at.tabs]
+    assert labels[0] == "Court View"
+    assert set(labels) == {"Standings", "Schedule & Scores",
+                           "Awards Ladder", "Court View"}
+
+
+def test_deep_link_player_opens_profile(offline_espn):
+    """?player=NAME opens 4_Player_Profile with exactly that player
+    selected -- the Court View card link's landing contract."""
+    path = REPO_ROOT / "data" / "dashboard_players.json"
+    if not path.exists():
+        pytest.skip("dashboard_players.json not committed yet")
+    with open(path, encoding="utf-8") as f:
+        players = json.load(f).get("players") or {}
+    name = next((p.get("player_name") for p in players.values()
+                 if p.get("player_name")), None)
+    if not name:
+        pytest.skip("no named players in the committed index")
+    at = AppTest.from_file(
+        str(REPO_ROOT / "app/pages/4_Player_Profile.py"), default_timeout=30)
+    at.query_params["player"] = name
+    at.run()
+    assert not at.exception, f"page raised: {at.exception}"
+    assert at.multiselect[0].value == [name]
+
+
+def test_court_cards_link_to_player_profile(offline_espn):
+    """Court View cards are anchors to the RELATIVE profile deep link
+    (./4_Player_Profile?player=NAME), so a stat leader is one click from
+    his career page."""
+    at = _render("app/app.py", offline_espn)
+    assert not at.exception
+    assert 'href="./4_Player_Profile?player=' in _markdown_text(at)
+
+
+def test_freshness_line_dedupes_and_drops_empties():
+    """The consolidated hero line joins the page's source notes: empties
+    drop, duplicates collapse, separator is ' · ' (the per-tab Source
+    captions stay where they are)."""
+    import shared as shared_module
+
+    line = shared_module.freshness_line(
+        "Live (60s cache)", "", "Live (60s cache)", "Offline fallback")
+    assert line == "Live (60s cache) · Offline fallback"
+    assert shared_module.freshness_line() == ""
+
+
+def test_corrupt_fallback_warns_once_and_only_honestly(
+        offline_espn, tmp_path, monkeypatch):
+    """A corrupt committed file (here the season schedule) still renders an
+    honest page AND surfaces ONE late warning naming the file. Missing
+    files under the same tmp DATA_DIR stay silent (honest empty, no
+    warning), which is what makes this exactly one."""
+    import shared as shared_module
+
+    schedules = tmp_path / "schedules"
+    schedules.mkdir(parents=True)
+    (schedules / "2025-26.json").write_text("{broken", encoding="utf-8")
+    monkeypatch.setattr(shared_module, "DATA_DIR", tmp_path)
+    shared_module.load_schedule.clear()  # the real file's result is cached
+    shared_module._FALLBACK_ERRORS.clear()
+    try:
+        # Deep-link the season: with DATA_DIR pointed at the empty tmp tree
+        # the sidebar's inventory is gone, so the default would flip to the
+        # upcoming season and never touch the corrupt file.
+        at = AppTest.from_file(str(REPO_ROOT / "app/app.py"),
+                               default_timeout=30)
+        at.query_params["season"] = "2025-26"
+        at.run()
+        assert not at.exception, f"page raised: {at.exception}"
+        warnings = [str(w.value) for w in at.warning]
+        assert len(warnings) == 1
+        assert "schedules/2025-26.json" in warnings[0]
+        assert "unreadable" in warnings[0]
+    finally:
+        shared_module._FALLBACK_ERRORS.clear()
+        shared_module.load_schedule.clear()

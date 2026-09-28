@@ -84,3 +84,6 @@ else:
             "TS% = PTS / (2·(FGA + 0.44·FTA)): computed here from the "
             "box scores, not copied from any official NBA source."
         )
+
+# Corrupt-fallback warnings ride at the very END (see app.py).
+shared.render_fallback_warnings()

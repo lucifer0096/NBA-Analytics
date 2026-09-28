@@ -38,6 +38,7 @@ if not players:
     st.info("No player index yet: data/dashboard_players.json is written "
             "by `python src/collector/refresh_dashboard_fallbacks.py` after "
             "a successful all-history fetch.")
+    shared.render_fallback_warnings()  # a corrupt file says so before stopping
     st.stop()
 
 st.caption(f"Source: {note}")
@@ -50,9 +51,14 @@ for row in players.values():
 names = sorted(by_name)
 
 # Default to the top of the GOAT ladder so the page opens with real careers.
+# A ?player= deep link (Court View cards link here) opens straight on that
+# one player; an unknown name falls back to the ladder defaults honestly.
 defaults = [p["player_name"] for p in sorted(
     (p for p in players.values() if p.get("goat_rank")),
     key=lambda p: p["goat_rank"])[:4]]
+deep_player = st.query_params.get("player") or ""
+if deep_player in by_name:
+    defaults = [deep_player]
 selected = st.multiselect(
     "Players (up to 4)", names,
     default=[d for d in defaults if d in by_name],
@@ -63,6 +69,7 @@ selected = st.multiselect(
 if not selected:
     st.info("Pick up to four players to see career cards, accolades and "
             "the progression chart.")
+    shared.render_fallback_warnings()
     st.stop()
 
 # Cards and accolades share one row so the chart stays above the fold.
@@ -142,3 +149,6 @@ if figure.data:
 else:
     st.caption("No per-season data for this selection: pick another "
                "player or metric.")
+
+# Corrupt-fallback warnings ride at the very END (see app.py).
+shared.render_fallback_warnings()

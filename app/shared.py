@@ -16,6 +16,7 @@ import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import quote
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -211,6 +212,8 @@ div[data-testid="stMetric"] {
   border-top-color: rgba(15, 15, 15, 0.97);
 }
 .na-court-card:hover .na-tip { display: block; }
+.na-court-link { display: contents; color: inherit; text-decoration: none; }
+.na-court-card:hover .na-cname { text-decoration: underline; }
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
@@ -234,6 +237,20 @@ def hero(season_label: str, source_note: str, extra: str = "") -> None:
         f"</div>",
         unsafe_allow_html=True,
     )
+
+
+def freshness_line(*notes: str) -> str:
+    """One consolidated hero freshness line from the page's source notes:
+    empties drop, duplicates collapse, joined with ' . Each tab keeps
+    its OWN Source caption (the per-tab honesty contract and its tests
+    depend on them); this line is the at-a-glance cross-source freshness
+    under the title."""
+    seen = []
+    for note in notes:
+        text = str(note or "").strip()
+        if text and text not in seen:
+            seen.append(text)
+    return " · ".join(seen)
 
 
 def section(title: str) -> None:
@@ -393,7 +410,9 @@ def court_card_html(row: dict, bucket: str, stat: str) -> str:
     """One Court View player card: headshot over team-logo fallback, name,
     team logo + position chip, headline per-game rate, and a CSS-only hover
     tooltip (.na-tip) with the player's full per-game line, shooting splits
-    and season total.
+    and season total. The whole card is an anchor to the relative
+    ./4_Player_Profile?player=NAME deep link (URL-quoted), so a leader is
+    one click from his career page.
 
     Single logical line -- see race_row_html's docstring."""
     name = html.escape(str(row.get("player_name") or "Unknown"))
@@ -407,13 +426,16 @@ def court_card_html(row: dict, bucket: str, stat: str) -> str:
            f"{row.get('bpg', 0)} BLK{_shooting_fragments(row)} · "
            f"{total:,} {total_label} total")
     abbr = awards.STAT_ABBR.get(stat, stat.upper())
-    return (f'<div class="na-court-card">'
+    profile = ("./4_Player_Profile?player="
+               + quote(str(row.get("player_name") or ""), safe=""))
+    return (f'<a class="na-court-link" href="{profile}" title="Open {name} profile">'
+            f'<div class="na-court-card">'
             f'<div class="na-tip">{tip}</div>'
             f'{headshot_html(row.get("player_id"), team, 56)}'
             f'<div class="na-cname">{name}</div>'
             f'<div class="na-cteam">{team_logo_html(team, 14)}{team}{chip}</div>'
             f'<div class="na-cstat">{row.get("per_game", 0)} {abbr}</div>'
-            f'</div>')
+            f'</div></a>')
 
 
 def _court_bucket(raw_pos: str) -> str:
@@ -666,6 +688,28 @@ def render_court(leaders: list, positions, stat: str, min_games: int,
     )
 
 
+# Corrupt fallback files noticed while this script ran. MISSING files are a
+# normal honest state (empty tables, 'train first' notes) and never warn;
+# only UNREADABLE ones do. Collected module-level so every page can render
+# ONE warning block at the very end via render_fallback_warnings() -- after
+# all content, deduped, instead of scattering warnings through render order.
+_FALLBACK_ERRORS: list = []
+
+
+def _record_fallback_error(message: str) -> None:
+    if message not in _FALLBACK_ERRORS:
+        _FALLBACK_ERRORS.append(message)
+
+
+def render_fallback_warnings() -> None:
+    """Emit every corrupt-fallback warning collected this run (deduped, in
+    discovery order). Called once, late, at the end of each page script; a
+    clean run renders nothing, and these are the ONLY st.warning()s the app
+    ever shows -- the honest-empty paths deliberately use captions/info."""
+    for message in list(_FALLBACK_ERRORS):
+        st.warning(message)
+
+
 def _read_fallback(name: str) -> dict:
     path = DATA_DIR / name
     if not path.exists():
@@ -674,6 +718,11 @@ def _read_fallback(name: str) -> dict:
         with open(path, encoding="utf-8") as f:
             return json.load(f)
     except (json.JSONDecodeError, OSError):
+        _record_fallback_error(
+            f"{name} is unreadable on disk: showing an honest empty state "
+            "(regenerate with `python src/collector/"
+            "refresh_dashboard_fallbacks.py`)."
+        )
         return {}
 
 
@@ -768,6 +817,11 @@ def load_schedule(season: str) -> tuple:
             with open(path, encoding="utf-8") as f:
                 payload = json.load(f)
         except (json.JSONDecodeError, OSError):
+            _record_fallback_error(
+                f"schedules/{season}.json is unreadable: falling back to the "
+                "committed schedule index (regenerate with `python "
+                "src/collector/refresh_dashboard_fallbacks.py`)."
+            )
             payload = {}
         rows = payload.get("games") if isinstance(payload, dict) else None
         if isinstance(rows, list) and rows:
@@ -809,6 +863,10 @@ def load_race_history(season: str) -> tuple:
         with open(path, encoding="utf-8") as f:
             payload = json.load(f)
     except (json.JSONDecodeError, OSError):
+        _record_fallback_error(
+            f"races/{season}.json is unreadable: the ladder shows without "
+            "movement until the next refresh rewrites it."
+        )
         return ([], f"Race history for {season} is unreadable: the ladder "
                     "shows without movement")
     snapshots = payload.get("snapshots") if isinstance(payload, dict) else None
@@ -1133,8 +1191,15 @@ def load_metrics() -> dict:
     path = REPO_ROOT / "models" / "metrics.json"
     if not path.exists():
         return {}
-    with open(path, encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        _record_fallback_error(
+            "models/metrics.json is unreadable: the sidebar shows the "
+            "'train first' note instead of stale numbers."
+        )
+        return {}
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
@@ -1144,8 +1209,15 @@ def load_leaderboards() -> tuple:
     if not path.exists():
         return (pd.DataFrame(), "")
     # The file is a JSON object envelope (season/leaders/source/_generated_utc).
-    with open(path, encoding="utf-8") as f:
-        envelope = json.load(f)
+    try:
+        with open(path, encoding="utf-8") as f:
+            envelope = json.load(f)
+    except (json.JSONDecodeError, OSError):
+        _record_fallback_error(
+            "processed/dashboard_leaderboards.json is unreadable: no "
+            "leaderboard to show until the next refresh rewrites it."
+        )
+        return (pd.DataFrame(), "")
     note = data_age_note(envelope, False)
     if envelope.get("season"):
         note = f"{note} · season {envelope['season']}"

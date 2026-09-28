@@ -60,11 +60,18 @@ st.title("NBA Analytics")
 with st.sidebar:
     st.markdown("### Settings")
     options = shared.season_options()
+    # ?season= deep link (2010-11 .. 2026-27): preselect it when it names a
+    # real option; anything else falls back to the default (the newest
+    # season with collected games) instead of crashing or inventing a year.
+    deep_season = st.query_params.get("season") or ""
+    index = (options.index(deep_season) if deep_season in options
+             else (shared.default_season_index(options) if options else None))
     season = st.selectbox(
         "Season", options,
-        index=shared.default_season_index(options) if options else None,
+        index=index,
         help="Leads with the newest season that has collected games; every "
-             "year from 2010-11 through the upcoming season is selectable.",
+             "year from 2010-11 through the upcoming season is selectable. "
+             "Deep link: ?season=2010-11.",
     )
     st.caption(f"Today (UTC): {shared.now_utc():%Y-%m-%d}")
     st.markdown("---")
@@ -154,16 +161,27 @@ col1.metric("Games collected", kpi_games, help=games_help)
 col2.metric("Next tip-off", kpi_next, help=next_help)
 col3.metric("Season scoring leader", top_scorer, help=scoring_help)
 
-shared.hero(season, f"Teams source: {teams_note}")
+# One consolidated freshness line for the page's sources; every tab still
+# keeps its own Source caption (its honesty contract), this is the glance.
+shared.hero(season, shared.freshness_line(
+    f"Teams: {teams_note}", f"Schedule: {sched_note}",
+    f"Awards: {awards_note}"))
 
-tabs = st.tabs(["Standings", "Schedule & Scores", "Awards Ladder",
-                "Court View"])
+# ?tab= deep link: st.tabs has no programmatic selection, so the requested
+# tab renders FIRST (the rest keep their pinned default order) and this
+# label -> element map keeps each block's content under its own label.
+tab_labels = ["Standings", "Schedule & Scores", "Awards Ladder",
+              "Court View"]
+deep_tab = st.query_params.get("tab") or ""
+if deep_tab in tab_labels:
+    tab_labels = [deep_tab] + [label for label in tab_labels if label != deep_tab]
+tabs = dict(zip(tab_labels, st.tabs(tab_labels)))
 
 # ---------------------------------------------------------------------------
 # Standings
 # ---------------------------------------------------------------------------
 
-with tabs[0]:
+with tabs["Standings"]:
     standings, note = shared.load_standings(season)
     st.caption(f"Source: {note}")
     if standings.empty:
@@ -221,7 +239,7 @@ with tabs[0]:
 # Schedule & Scores: today live + the selected season's results with scores
 # ---------------------------------------------------------------------------
 
-with tabs[1]:
+with tabs["Schedule & Scores"]:
     today = shared.now_utc().strftime("%Y%m%d")
     scoreboard, sb_note = shared.load_scoreboard(today)
     shared.section("Today's games")
@@ -367,7 +385,7 @@ with tabs[1]:
 # Awards Ladder: MVP / DPOY / 6th Man / MIP races + season stat leaders
 # ---------------------------------------------------------------------------
 
-with tabs[2]:
+with tabs["Awards Ladder"]:
     st.caption(f"Source: {awards_note}")
     if not awards_payload.get("races"):
         if int(games_counts.get(season) or 0):
@@ -459,7 +477,7 @@ with tabs[2]:
 # Court View: the stat race's leaders on a real court formation
 # ---------------------------------------------------------------------------
 
-with tabs[3]:
+with tabs["Court View"]:
     st.caption(f"Source: {awards_note}")
     if not awards_payload.get("leaders"):
         if int(games_counts.get(season) or 0):
@@ -499,3 +517,8 @@ with tabs[3]:
             "src/model/optimizer.py); positions are ESPN's coarse G/F/C "
             "roster buckets, so PG/SG land in G and SF/PF in F."
         )
+
+# Corrupt-fallback warnings ride at the very END: all content first, then
+# at most one warning per broken file (a clean run shows none -- the app's
+# only st.warning()s, collected while the page rendered).
+shared.render_fallback_warnings()
