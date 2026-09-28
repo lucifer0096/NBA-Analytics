@@ -1,4 +1,4 @@
-"""Train the NBA fantasy projection model.
+"""Train the NBA scoring projection model.
 
 Chronological split, never random -- this is time-series data, and a random
 split would let the model see the future (train on March while validating on
@@ -13,11 +13,11 @@ deliberately an allowlist, not "everything except known-bad columns", so a
 leaky column added to the feature table later can't silently become a model
 input.
 
-TARGET: fantasy_points under the default configured scoring (scoring.py).
-Rows include did-not-play games (fantasy_points == 0, ~35-45% of rows) --
-they're real outcomes for a fantasy manager who started that player, and
-their share mirrors FPL-Analytics' finding that non-playing rows dominate
-error budgets. A two-stage model (P(plays) x E[points|plays]) is trained
+TARGET: fantasy_points (the column scoring.py defines) under the default
+configured weights. Rows include did-not-play games
+(fantasy_points == 0, ~35-45% of rows) -- they're real zero outcomes, not
+missing data, and their share mirrors FPL-Analytics' finding that
+non-playing rows dominate error budgets. A two-stage model (P(plays) x E[points|plays]) is trained
 alongside the single-stage one as a comparison for exactly that reason --
 here too (see metrics.json) -- with the single-stage model used at inference
 unless the numbers say otherwise.

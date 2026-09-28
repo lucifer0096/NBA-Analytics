@@ -26,7 +26,7 @@ tabs read, committed here (the same pattern as FPL-Analytics' refresh script):
                                      all-history fetch succeeds)
     data/processed/dashboard_leaderboards.json
                                      last completed season's per-player totals
-                                     + shooting splits + fantasy points
+                                     + shooting splits + scoring target
     data/processed/history_cache.json
                                      ESPN career/honours cache (gitignore
                                      exception so the daily CI run refetches
@@ -424,7 +424,7 @@ def refresh_positions() -> dict:
 
 
 def refresh_leaderboards(seasons_to_try: list) -> dict:
-    """Per-player season totals (incl. shooting splits + fantasy points under
+    """Per-player season totals (incl. shooting splits + scoring target under
     default scoring) for the first season with collected games, written as a
     200KB JSON so nobody has to scan 20k raw files with pandas on Streamlit
     Cloud (it could, but the JSON is cheaper). No page reads it since Season
@@ -477,7 +477,7 @@ def refresh_leaderboards(seasons_to_try: list) -> dict:
               "the committed leaderboards")
         return {}
 
-    # Score fantasy points (same default weights the model trains under).
+    # Score the target column (same default weights the model trains under).
     sys.path.insert(0, os.path.join(REPO_ROOT, "src", "model"))
     import scoring
 

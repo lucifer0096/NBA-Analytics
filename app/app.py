@@ -692,16 +692,16 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                 )
             if league == "wnba":
                 court_note = (
-                    "Formation 2 G · 2 F · 1 C mirrors a fantasy-style starting "
-                    "lineup slot structure (src/model/'s optimizer and "
-                    "projections are NBA-only); positions are ESPN's coarse "
-                    "G/F/C roster buckets, so PG/SG land in G and SF/PF in F.")
+                    "Formation 2 G · 2 F · 1 C mirrors a traditional starting "
+                    "lineup (src/model/'s optimizer and projections are "
+                    "NBA-only); positions are ESPN's coarse G/F/C roster "
+                    "buckets, so PG/SG land in G and SF/PF in F.")
             else:
                 court_note = (
-                    "Formation 2 G · 2 F · 1 C mirrors a fantasy-style starting "
-                    "lineup slot structure (backend optimizer untouched in "
-                    "src/model/optimizer.py); positions are ESPN's coarse G/F/C "
-                    "roster buckets, so PG/SG land in G and SF/PF in F.")
+                    "Formation 2 G · 2 F · 1 C mirrors a traditional starting "
+                    "lineup (the backend optimizer lives in "
+                    "src/model/optimizer.py); positions are ESPN's coarse "
+                    "G/F/C roster buckets, so PG/SG land in G and SF/PF in F.")
             st.caption(court_note)
 
 

@@ -30,13 +30,13 @@ def load_model(path: str = None) -> lgb.Booster:
 
 
 def predict_points(df: pd.DataFrame, model: lgb.Booster = None) -> np.ndarray:
-    """Projected fantasy points per row of `df` (must already carry every
+    """Projected target points per row of `df` (must already carry every
     FEATURE_COLUMNS input -- i.e. gone through build_feature_table). Missing
     values stay NaN: LightGBM handles them natively via learned default
-    split directions, same as during training. Clipped at 0 -- you can't
-    score negative fantasy points under the default weights... modulo the
-    turnover penalty on a catastrophic game, which clipping deliberately
-    suppresses as an optimistic-but-standard fantasy convention."""
+    split directions, same as during training. Clipped at 0 -- a projection
+    can't go negative under the default weights... modulo the turnover
+    penalty on a catastrophic game, which clipping deliberately
+    suppresses as an optimistic-but-standard convention."""
     model = model or load_model()
     X = prepare_x(df)
     return np.clip(model.predict(X), 0, None)

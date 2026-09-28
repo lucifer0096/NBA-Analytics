@@ -1,12 +1,12 @@
-"""Lineup optimizer: best Fantasy roster from a player pool, via PuLP.
+"""Lineup optimizer: best starting roster from a player pool, via PuLP.
 
-Platform-agnostic by design (README: no Yahoo/ESPN fantasy target): what's
-encoded here is the STRUCTURE every points-league lineup has -- a fixed set
-of roster slots, each accepting certain positions, each player used at most
-once -- not any one platform's salary cap or exact slot names. The scoring
-itself comes from projected_points (predict.py), which comes from the
-configured weights (scoring.py); swap those and the same optimizer solves
-under your league's rules.
+Structure by design: what's encoded is the STRUCTURE a points-style
+starting lineup has -- a fixed set of roster slots, each accepting
+certain positions, each player used at most once -- rather than any
+particular pricing rule or slot naming. The scoring itself comes from
+projected_points (predict.py), which comes from the configured weights
+(scoring.py); swap those and the same optimizer solves under any scoring
+rules.
 
 Default slots follow the common 7-man start (2 G / 2 F / 1 C / 2 UTIL).
 ESPN's positions are coarse G/F/C (its roster endpoint -- see

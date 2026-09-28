@@ -81,11 +81,13 @@ per league, with that league's season and data.
    omitted a stat, never zeros).
 4. **Schedule & Scores**: live scoreboard for *today* (empty + explanatory
    caption in the offseason, the normal Oct–Jun-less state), then the
-   selected season from the committed **multi-season envelope**
-   (per league: the NBA's 17 seasons / 20,394 games with final scores,
-   the WNBA's 17 calendar years / 3,693; regenerated from
-   `data/raw*/schedule.csv` by `refresh_dashboard_fallbacks.py`, and a
-   committed season missing locally is preserved). A season still running
+   selected season from its own committed file under `data/schedules/`
+   (`data/schedules_wnba/` in the WNBA pane; 17 files / 20,394 games for
+   the NBA -- 19,194 with final scores -- and 17 years / 3,693 for the
+   WNBA), regenerated from `data/raw*/schedule.csv` by
+   `refresh_dashboard_fallbacks.py` (each file carries its own stamp and
+   is rewritten only when rows change; a committed season missing locally
+   is preserved). A season still running
    shows the 15 most recent results (day, matchup, final score) and the
    next 25 fixtures, plus a count of past-dated postponed/canceled rows
    excluded from both. A finished season renders the full chronological
@@ -279,7 +281,8 @@ rule applied to whole folders).
 |---|---|---|
 | `data/dashboard_teams.json` | `refresh_dashboard_fallbacks.py` (live) | Teams-source hero note, team labels |
 | `data/dashboard_standings.json` | same (live, zero-record gated) | Standings tab |
-| `data/dashboard_schedule.json` | same (local `schedule.csv` files, merged across all 17 seasons) | KPI next tip-off, Schedule tab |
+| `data/schedules/{season}.json` | same (local `schedule.csv` files, one per season across all 17; the WNBA's under `data/schedules_wnba/`) | Schedule tab, KPI next tip-off |
+| `data/dashboard_schedule.json` | same (thin season index: labels + game counts + current season) | Sidebar default season, schedule fallback messages |
 | `data/dashboard_positions.json` | same (local position map) | Court View formation |
 | `data/dashboard_awards.json` | same (local award math: every collected season's races/leaders, all-time boards, all-history GOAT ladder) | KPI scoring leader, Awards Ladder, Court View, All-Time Stats, GOAT Rankings |
 | `data/dashboard_players.json` | same (`history.py` all-history index: careers, honours, GOAT ranks) | Player Profile |

@@ -1,6 +1,6 @@
 # Modeling
 
-How the projection model turns collected box scores into leak-free fantasy
+How the projection model turns collected box scores into leak-free scoring
 projections, and how the optimizer turns projections into lineups.
 
 ## Training data
@@ -16,8 +16,8 @@ projections, and how the optimizer turns projections into lineups.
   (verified against the fixture + roster endpoint). Rolling features group by
   it directly -- no FPL-style "id resets every season" trap.
 - **Rows**: one per player per game, **including did-not-play appearances**
-  (min=0, every stat 0, `did_not_play=True`). They're real fantasy outcomes
-  (a manager who started that player scored 0) and the model's availability
+  (min=0, every stat 0, `did_not_play=True`). They're real outcomes for the
+  scoring target (a 0, not missing data) and the model's availability
   signal -- ~35–45% of rows, mirroring FPL's finding that non-playing rows
   dominate error budgets.
 - **Team context**: each season's `schedule.csv` joins final team scores onto
@@ -32,10 +32,11 @@ projections, and how the optimizer turns projections into lineups.
 
 ### Target
 
-`fantasy_points` = configurable weighted sum of the box score
-(`scoring.py`, default: PTS×1 + REB×1 + AST×2 + STL×3 + BLK×3 + TO×−1).
-The weights are a pluggable dict -- swap them and the same pipeline trains
-under your league's scoring. 9-category leagues are deliberately *not*
+`fantasy_points` (the target column's name in the data) = configurable
+weighted sum of the box score (`scoring.py`, default: PTS×1 + REB×1 +
+AST×2 + STL×3 + BLK×3 + TO×−1). The weights are a pluggable dict -- swap
+them and the same pipeline trains under any points-style scoring rules.
+9-category leagues are deliberately *not*
 modeled as one additive number (category value depends on the rest of the
 lineup); see README Future Improvements.
 
@@ -86,7 +87,7 @@ Architectures trained every run:
    play-classifier ROC-AUC is reported too.
 3. **Naive baseline**: the player's own rolling-5 average. If the model
    can't beat this, the dashboard says so in red -- a projection that can't
-   beat last-5-means isn't worth a manager's trust.
+   beat last-5-means isn't worth trusting.
 
 Diagnostics reported: MAE split played-only vs did-not-play-only (the FPL
 project's error-budget lesson, checked here the same way).
@@ -112,10 +113,10 @@ feature pipeline over the combined table:
 `optimizer.py` -- a PuLP MILP, so the answer is **provably optimal** for the
 chosen pool and slots (not a greedy approximation):
 
-- **Slots** (default): 2 G · 2 F · 1 C · 2 UTIL -- the common 7-man
-  start. Platform-agnostic: no salary cap, because the project targets no
-  platform; add a cost column + budget constraint for a
-  DraftKings-style variant (Future Improvements).
+- **Slots** (default): 2 G · 2 F · 1 C · 2 UTIL -- the traditional
+  starting five plus two utility spots. No salary cap by design; add a
+  cost column + budget constraint for a salary-cap variant (Future
+  Improvements).
 - **Eligibility is structural**: an ineligible (player, slot) pair simply
   isn't a variable, so "C slot needs a center" can't be violated -- it fails
   to exist rather than being penalized. ESPN's coarse G/F/C positions are

@@ -242,7 +242,7 @@ def parse_summary(payload: dict, league: str = "nba") -> tuple:
     scores and status; boxscore.players carries one block per team with that
     team's player lines. Every scheduled player appears, including
     did-not-play rows (stats empty, did_not_play=True) -- those are real
-    fantasy outcomes (a 0) and the model's availability signal, not junk to
+    scoring-target outcomes (a 0) and the model's availability signal, not junk to
     drop. Stat columns are matched by ESPN's own label names
     (MIN/PTS/FG/.../+/-), which the WNBA's box scores carry identically
     (verified live Sep 2026); `league` only picks the date->season rule."""
@@ -317,7 +317,7 @@ def parse_summary(payload: dict, league: str = "nba") -> tuple:
 
             if row["did_not_play"] or not values:
                 # Honest zeros vs NaN: a DNP's stat line is a real 0 for
-                # fantasy purposes (they scored 0), not missing data. min
+                # scoring purposes (they scored 0), not missing data. min
                 # stays 0 so played = (min > 0) is well-defined everywhere.
                 for column in ("min", "pts", "reb", "oreb", "dreb", "ast", "stl",
                                "blk", "to", "pf", "fgm", "fga", "fg3m", "fg3a",

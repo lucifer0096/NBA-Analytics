@@ -14,18 +14,22 @@ venv/
 data/raw/
 
 # Processed data is normally gitignored (regenerates via load_historical.py +
-# features.py against data/raw/), EXCEPT the committed dashboard fallbacks
-# below, which the deployed app reads directly and Streamlit Cloud has no way
-# to regenerate, plus history_cache.json -- ESPN career/honours data that
-# history.py would otherwise refetch (~10k requests) on every fresh CI clone.
-# historical_games.parquet is the one exception for a different reason: it is
-# the model's training table (7.6MB, regenerable from data/raw/ locally) and
-# the monthly retrain workflow cannot rebuild it without raw/, so committing
-# it is what makes CI retrains possible at all (see retrain.yml).
+# features.py against data/raw/), EXCEPT the committed artifacts below: the
+# two dashboard leaderboards and the two history caches (the WNBA's carry
+# _wnba, same named_path rule), which the deployed app reads directly and
+# Streamlit Cloud has no way to regenerate -- the caches especially, since
+# history.py would otherwise refetch ESPN career/honours data (~10k
+# requests) on every fresh CI clone. historical_games.parquet is the one
+# exception for a different reason: it is the model's training table
+# (7.6MB, regenerable from data/raw/ locally) and the monthly retrain
+# workflow cannot rebuild it without raw/, so committing it is what makes
+# CI retrains possible at all (see retrain.yml).
 # No personal data -- league-wide stats only.
 data/processed/*
 !data/processed/dashboard_leaderboards.json
+!data/processed/dashboard_wnba_leaderboards.json
 !data/processed/history_cache.json
+!data/processed/history_cache_wnba.json
 !data/processed/historical_games.parquet
 !data/processed/.gitkeep
 

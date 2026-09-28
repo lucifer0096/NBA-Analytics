@@ -1,17 +1,16 @@
-"""Fantasy scoring: box-score stats -> fantasy points.
+"""Scoring: box-score stats -> the model's weighted target.
 
-Platform-agnostic by design (this project does NOT target Yahoo/ESPN
-fantasy -- see README): the "fantasy points" modeled here are a
-CONFIGURABLE weighted sum of a box score, defaulting to a standard
-points-league scoring line. Swap the weights dict to score for your
-league.
+The target (column `fantasy_points`, kept as the pipeline's canonical
+name) is a CONFIGURABLE weighted sum of a box score, defaulting to a
+standard points-league scoring line. Swap the weights dict and the same
+pipeline trains under any other scoring rules.
 
 9-category leagues are deliberately NOT modeled here: category leagues
-score by RANKING managers within each category across a week, which is
-not a per-player additive quantity -- a player's "9-cat value" depends
-on who else you started. What DOES work for category leagues (and is
+score by RANKING participants within each category across a week, which
+is not a per-player additive quantity -- a player's "9-cat value" depends
+on who else is in the lineup. What DOES work for category leagues (and is
 future work, see docs/MODELING.md) is modeling each stat category
-separately and letting the drafter weight them. This module provides
+separately and letting the consumer weight them. This module provides
 the per-category pieces that would feed that.
 
 Every column name here matches parsing.py's player-game row schema.
@@ -42,13 +41,13 @@ ESPN_STYLE_WEIGHTS = {
     "to": -1.0,
 }
 
-# Stats a fantasy score can be built from -- the canonical stat list both
+# Stats a score can be built from -- the canonical stat list both
 # the scorer and the future per-category model share.
 STAT_COLUMNS = ["pts", "reb", "ast", "stl", "blk", "to"]
 
 
 def score_row(row: dict, weights: dict = None) -> float:
-    """Fantasy points for ONE player-game row under `weights`."""
+    """Scoring target for ONE player-game row under `weights`."""
     weights = DEFAULT_POINTS_WEIGHTS if weights is None else weights
     total = 0.0
     for stat, weight in weights.items():

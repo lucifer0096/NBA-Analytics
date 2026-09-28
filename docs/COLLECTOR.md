@@ -57,11 +57,12 @@ Box-score files store the **parsed form** (the raw payload is multi-MB with
 plays/winprobability we never read), ~5–8 KB per game, about 120 MB for the
 full 2010-11+ backfill.
 
-Regular season only (`seasontype=2`) **in both leagues**: fantasy leagues
-play regular seasons, and the WNBA's schedule endpoint answers the same
-season type (its collected counts -- 204 games in the 12-team era, 331 in
-2026 -- are regular seasons with no playoff rows).
-Playoffs are deliberately excluded, not overlooked.
+Regular season only (`seasontype=2`) **in both leagues**: standings,
+per-game leaders and the model's training frame are all built on the
+regular season, and the WNBA's schedule endpoint answers the same season
+type (its collected counts -- 204 games in the 12-team era, 331 in 2026
+-- are regular seasons with no playoff rows). Playoffs are deliberately
+excluded, not overlooked.
 
 ## Commands
 
@@ -85,14 +86,15 @@ python src/collector/refresh_dashboard_fallbacks.py --league nba wnba  # both le
 - **Retries**: 429/5xx (and WAF 403) retry with exponential backoff
   (`espn_api._get_json`); a game that still fails is recorded, not fatal:
   its file simply wasn't written, so the next run retries it. One bad game
-  can't kill a 19.7k-game backfill.
+  can't kill a 19.1k-game backfill.
 - **Offseason guard**: a schedule refresh that returns 0 games will not
   clobber an existing good `schedule.csv` (warning instead).
 
 ## Automated collection
 
 `.github/workflows/collector.yml` runs daily at 12:20 UTC (after most US
-games finish), for **each league in turn**:
+games finish; GitHub's batched scheduler often fires hours later, so the
+data commits typically land later in the day), for **each league in turn**:
 
 1. `snapshot.py --season current` (NBA, then `--league wnba`): schedule
    refresh + newly-final box scores, each league through its own state
@@ -120,10 +122,11 @@ the WNBA's carry `_wnba` by `leagues.named_path`'s one rule
 |---|---|---|
 | `data/dashboard_teams.json` | team list | live ESPN |
 | `data/dashboard_standings.json` | the current season once it has real records, else the newest with them (zero-record preseason tables skipped: `season_candidates()` stays completed-first for consumers wanting the last complete table, `standings_candidates()` leads with current because that is the season the app defaults to; verified 2026-27 arrives all-zeros in Sep) | live ESPN |
-| `data/dashboard_schedule.json` | every collected season's schedule merged from `data/raw/{season}/schedule.csv` (NBA 17 seasons, 20,394 games with final scores; WNBA 17 calendar years, 3,693; a committed season missing locally is preserved) | local |
+| `data/schedules/{season}.json` | one season's full schedule from `data/raw*/schedule.csv`, with its own generation stamp, rewritten only when rows change (NBA: 17 files / 20,394 games, 19,194 with final scores; the WNBA's under `data/schedules_wnba/`: 17 files / 3,693; a committed season missing locally is preserved) | local |
+| `data/dashboard_schedule.json` | thin season index (labels, per-season game counts, current season) behind the sidebar's default season and the schedule tab's honest "index says N games" fallback messages | local |
 | `data/dashboard_positions.json` | current player → position map | local/live |
 | `data/dashboard_awards.json` | **every collected season's** MVP/DPOY/6th-Man/MIP races + per-game stat leaders (incl. 3PM, +/-, FG/3P splits), plus the cross-season all-time boards and the all-history GOAT ladder (`awards.py` + `history.py`, both leagues with their own formulas and honours tables) | local (collected box scores + cached ESPN history) |
 | `data/dashboard_players.json` | all-history player index for the Player Profile page: career line, per-season rows, official honours, GOAT score/rank (`history.py`) | local |
-| `data/races/{season}.json` | daily race snapshots (top rows' rank + score) behind the ladder's movement arrows and MVP trend: one per UTC day, written only while a race moves, same-day replaced, capped | local (the same award math) |
+| `data/races/{season}.json` | daily race snapshots (top rows' rank + score) behind the ladder's movement arrows and MVP trend: one per UTC day, written only while a race moves, same-day replaced, capped; the WNBA's under `data/races_wnba/` | local (the same award math) |
 | `data/dashboard_projections.json` | upcoming-game model projections (NBA-trained model; never written for the WNBA) | computed where raw data + model exist |
-| `data/processed/dashboard_leaderboards.json` | last completed season's per-player totals (counting stats incl. the collected-window +/-) + shooting splits (FG/3P/FT counts, FG%, eFG%, TS%) + fantasy points; kept as a committed artifact (no page reads it since Season Leaders was removed) | local |
+| `data/processed/dashboard_leaderboards.json` | last completed season's per-player totals (counting stats incl. the collected-window +/-) + shooting splits (FG/3P/FT counts, FG%, eFG%, TS%) + the `fantasy_points` scoring target; kept as a committed artifact (no page reads it since Season Leaders was removed) | local |

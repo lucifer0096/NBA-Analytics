@@ -187,7 +187,7 @@ def load_all_seasons(seasons: list = None) -> pd.DataFrame:
         )
         combined["position"] = combined["position"].fillna("UNK")
 
-    # Fantasy points under the configured scoring (the model's target).
+    # Scoring target (fantasy_points) under the configured weights.
     combined = scoring.score_dataframe(combined)
     combined["played"] = (combined["min"].fillna(0) > 0).astype(int)
 

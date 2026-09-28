@@ -1,4 +1,4 @@
-"""Feature engineering for the NBA fantasy projection model.
+"""Feature engineering for the NBA scoring projection model.
 
 Same principle as FPL-Analytics' features.py: this game's own stats are the
 TARGET, never an input -- the signal for predicting a player's NEXT game is
@@ -56,7 +56,7 @@ def _player_sort(df: pd.DataFrame) -> pd.DataFrame:
 
 def add_rolling_form_features(df: pd.DataFrame,
                               windows: tuple = (3, 5, 10)) -> pd.DataFrame:
-    """Per-player rolling averages of fantasy points, minutes and the raw
+    """Per-player rolling averages of the scoring target, minutes and the raw
     counting stats -- shift(1) first so the current row's own outcome is
     excluded (the leak this structure exists to prevent). min_periods=1 so a
     player's 2nd career game already has a 1-game average."""
