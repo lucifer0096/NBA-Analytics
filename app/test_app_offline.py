@@ -227,12 +227,17 @@ def test_profile_page_renders_cards_accolades_and_chart(offline_espn):
     top = [p for p in players.values() if p.get("goat_rank") == 1]
     if top:
         assert str(top[0].get("player_name")) in text
-    # Each card carries TWO meta lines (career totals, then debut/honours/
-    # rings/rank) instead of one 140-character wall of micro-text.
+    # The profile card is a WWE-style PLAYING card: two corner indices
+    # (the GOAT rank, top-left + rotated bottom-right), the /100 OVR
+    # block (the GOAT score on its documented scale) and the career stat
+    # strip that carries the +/- label whenever the index has it.
     card_html = [str(m.value) for m in at.markdown
-                 if '<div class="na-rmeta' in str(getattr(m, "value", ""))]
+                 if '<div class="na-pcard"' in str(getattr(m, "value", ""))]
     assert card_html, "career cards missing"
-    assert all(c.count("na-rmeta") == 2 for c in card_html)
+    assert all(c.count("na-pcorner--") == 2 for c in card_html)
+    assert all("na-povr" in c and "/100" in c for c in card_html)
+    assert all("na-pstats" in c and "na-pfoot" in c for c in card_html)
+    assert all("<span>+/-</span>" in c for c in card_html)
     # The accolades table is a pivot: one row per award type, a column
     # per selected player, and an award a player never won renders BLANK
     # -- never a fabricated zero.
@@ -245,6 +250,82 @@ def test_profile_page_renders_cards_accolades_and_chart(offline_espn):
     assert all(p in pivot.columns for p in picks)
     cells = pivot[picks]
     assert not (cells == 0).any().any()
+
+
+def _load_players(name: str) -> dict:
+    path = REPO_ROOT / "data" / name
+    if not path.exists():
+        pytest.skip(f"{name} not committed yet")
+    with open(path, encoding="utf-8") as f:
+        return json.load(f).get("players") or {}
+
+
+def test_profile_card_is_a_wwe_card_with_the_goat_score_as_ovr():
+    """The Profile card renders as a WWE collectible playing card whose
+    headline number is the GOAT score on its OWN scale: each formula
+    component normalizes 0-100 against the pool's best and the weights
+    sum to 100, so round(score) already is the /100 OVR -- no invented
+    rescaling -- with the rank in both corner indices, the career stat
+    strip and the rings/honours footer."""
+    import shared as shared_module
+
+    players = _load_players("dashboard_players.json")
+    if not players:
+        pytest.skip("empty player index")
+    top = next((p for p in players.values() if p.get("goat_score")), None)
+    if top is None:
+        pytest.skip("no GOAT-scored career in the index")
+    card = shared_module.profile_card_html(top, "nba")
+
+    assert '<div class="na-pcard"' in card
+    assert card.count("na-pcorner--") == 2
+    # OVR = the score rounded, shown out of 100, next to the ladder note.
+    expected = str(int(round(float(top["goat_score"]))))
+    assert f"<b>{expected}</b><em>/100</em>" in card
+    if top.get("goat_rank"):
+        assert f"<b>{expected}</b><em>/100</em><span>GOAT #" in card
+        assert card.count(f"#{int(top['goat_rank'])}") >= 2  # both corners
+    for label in ("PTS", "REB", "AST", "+/-"):
+        assert f"<span>{label}</span>" in card
+    assert "na-pfoot" in card and f"{int(top.get('gp') or 0):,} GP" in card
+
+
+def test_profile_card_unranked_career_is_an_honest_dash():
+    """Only the ladder's top 25 (>=82 career GP) carry a score; every
+    other career in the index must get a dash OVR saying so -- never a
+    fabricated rating -- while the photo, name and stat strip stay."""
+    import shared as shared_module
+
+    players = _load_players("dashboard_players.json")
+    if not players:
+        pytest.skip("empty player index")
+    unranked = next((p for p in players.values()
+                     if not p.get("goat_score") and p.get("player_name")),
+                    None)
+    if unranked is None:
+        pytest.skip("every career carries a GOAT score")
+    card = shared_module.profile_card_html(unranked, "nba")
+
+    assert "<b>—</b><em>/100</em><span>not in the GOAT top 25</span>" in card
+    assert card.count("na-pcorner--") == 2
+    assert "<div class=\"na-pname\">" in card and "na-pstats" in card
+    # The corner index is a dash too -- no rank, no fabricated "#0".
+    assert card.count("na-pcorner--tl") == 1 and "#0" not in card
+
+
+def test_profile_card_wnba_league_plumbs_headshot_and_logo():
+    """The league argument drives the headshot CDN and team-logo URLs:
+    the same card function serves the WNBA pane with WNBA endpoints."""
+    import shared as shared_module
+
+    players = _load_players("dashboard_wnba_players.json")
+    if not players:
+        pytest.skip("empty WNBA player index")
+    card = shared_module.profile_card_html(next(iter(players.values())),
+                                           "wnba")
+    assert '<div class="na-pcard"' in card
+    if "a.espncdn.com" in card:
+        assert "/wnba/" in card
 
 
 def test_progression_chart_ticks_once_per_season():

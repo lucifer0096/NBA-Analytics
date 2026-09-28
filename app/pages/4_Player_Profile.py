@@ -96,6 +96,14 @@ def _render_league(league: str) -> None:
         with grid[i // 2][i % 2]:
             st.markdown(shared.profile_card_html(by_name[name], league),
                         unsafe_allow_html=True)
+    st.caption(
+        "Cards are a WWE-style restyle of the same career data. OVR = "
+        "the GOAT score rounded onto its documented 0-100 scale (each "
+        "component normalizes 0-100 against the pool's best, weights "
+        "sum to 100); the ladder carries its top 25 at \u226582 career "
+        "GP, so a career outside it shows an honest dash instead of a "
+        "made-up rating. Corner indices are the GOAT rank -- explicitly "
+        "not an official NBA/WNBA ranking.")
 
     shared.section("Official accolades")
     honour_weights = awards.honours_weights(league)

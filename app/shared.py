@@ -148,6 +148,61 @@ div[data-testid="stMetric"] {
 .na-race-row .na-up { color: #7FE0A8; }
 .na-race-row .na-down { color: #FF4B2B; }
 
+/* Player Profile: WWE-style collectible PLAYING card -- dark card with a
+   gold frame, photo + uppercase name banner, the big OVR (the GOAT score
+   on its documented 0-100 scale), career stat strip and playing-card
+   corner indices (GOAT rank, top-left + rotated bottom-right). Fixed dark
+   palette on purpose (a collectible card looks like one in any theme),
+   theme tokens where they still apply. */
+.na-pcard {
+  position: relative; overflow: hidden; padding: 14px 18px 12px;
+  border: 2px solid var(--na-gold); border-radius: 14px;
+  background: linear-gradient(165deg, #23232f 0%, #101016 58%, #1c1408 100%);
+  color: #F2F2F5; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+.na-pcorner {
+  position: absolute; z-index: 1; text-align: center;
+  font-weight: 800; font-size: 0.78rem; line-height: 1.15;
+  letter-spacing: 0.04em; color: var(--na-gold);
+}
+.na-pcorner--tl { top: 8px; left: 10px; }
+.na-pcorner--br { right: 10px; bottom: 8px; transform: rotate(180deg); }
+.na-phead { display: flex; align-items: center; gap: 16px; padding-left: 30px; }
+.na-pface { flex: 1; min-width: 0; }
+.na-pname {
+  display: flex; align-items: center; gap: 8px;
+  font-weight: 800; font-size: 1.05rem; text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: linear-gradient(90deg, #7d1524, var(--na-accent) 45%, #7d1524);
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+  padding: 5px 10px; margin-bottom: 6px;
+}
+.na-pmeta { font-size: 0.76rem; opacity: 0.72; }
+.na-povr { display: flex; align-items: baseline; gap: 7px; margin-top: 8px; }
+.na-povr b {
+  font-size: 2rem; font-weight: 800; line-height: 1; color: var(--na-gold);
+}
+.na-povr em { font-style: normal; font-size: 0.88rem; opacity: 0.7; }
+.na-povr span {
+  font-size: 0.66rem; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; opacity: 0.8;
+}
+.na-pstats {
+  display: flex; gap: 6px; margin-top: 10px; padding-top: 9px;
+  border-top: 1px dashed rgba(245, 197, 66, 0.45);
+}
+.na-pstats div { flex: 1; text-align: center; min-width: 0; }
+.na-pstats b { display: block; font-size: 0.98rem; font-weight: 800; }
+.na-pstats span {
+  font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
+  opacity: 0.66;
+}
+.na-pfoot {
+  text-align: center; font-size: 0.74rem; opacity: 0.85;
+  margin-top: 9px; padding: 0 34px;
+}
+
 /* Real photos: headshot <img> over a team-logo CSS background. The fallback
    shows through when the CDN 404s -- no JS (Streamlit sanitizes onerror
    away), no broken-image icon (no alt attribute), no cropped heads
@@ -587,45 +642,73 @@ def goat_row_html(row: dict, league: str = "nba") -> str:
 
 
 def profile_card_html(p: dict, league: str = "nba") -> str:
-    """Player Profile header card: large headshot (team-logo CSS fallback
-    behind it), name + team logo, then TWO meta lines instead of one
-    140-character wall -- line 1 the career totals (+/- window value),
-    line 2 debut, official-honour tally with points, championships and
-    the GOAT rank if he made the ladder. Each line is ~60-70 chars so it
-    fits a half-width card without wrapping into unreadable micro-text.
+    """Player Profile career card as a WWE-style collectible PLAYING card.
 
-    Single logical line -- see race_row_html's docstring."""
+    Photo (team-logo CSS fallback behind it) beside an uppercase name
+    banner, team/debut/seasons meta, then the headline OVR: the GOAT
+    score rounded onto its documented scale -- each formula component
+    normalizes 0-100 against the pool's best and the weights sum to
+    100, so round(score) already IS the /100 rating (no invented math;
+    only the ladder's top-25 at >=82 career GP carry one, everyone else
+    gets an honest dash + why instead of a fabricated number). A career
+    stat strip (PTS/REB/AST/+/-) and a GP/rings/honours footer follow,
+    with the GOAT rank in playing-card corner indices (top-left +
+    rotated bottom-right, like a card's suit index).
+
+    Same fields the old two-meta-line row printed -- a restyle, not a
+    recomputation. Single logical line -- see race_row_html's."""
     name = html.escape(str(p.get("player_name") or "Unknown"))
     team = str(p.get("team_abbrev") or "")
+    rank = p.get("goat_rank")
+    score = p.get("goat_score")
+    if score is None:
+        ovr, ovr_note = "—", "not in the GOAT top 25"
+    else:
+        ovr = str(int(round(float(score))))
+        ovr_note = f"GOAT #{int(rank)}" if rank else "GOAT score"
+    corner = f"#{int(rank)}" if rank else "—"
+    # Meta as joined parts: a missing record drops its fragment instead of
+    # printing "None seasons" or a dangling separator.
+    meta_parts = [team or "—"]
+    if p.get("seasons") is not None:
+        meta_parts.append(f"{int(p['seasons'])} seasons")
+    if p.get("debut"):
+        meta_parts.append(f"debut {p['debut']}")
+    meta = html.escape(" · ".join(meta_parts))
+    # Career +/- exists only where collected box scores do (ESPN's career
+    # statistics carry none): a real number, or an honest dash.
+    plus_minus = p.get("plus_minus")
+    pm_text = ("—" if plus_minus is None
+               else f"{int(round(plus_minus)):+,}")
+    stats = "".join(
+        f"<div><b>{value}</b><span>{label}</span></div>"
+        for label, value in (("PTS", f"{int(p.get('pts') or 0):,}"),
+                             ("REB", f"{int(p.get('reb') or 0):,}"),
+                             ("AST", f"{int(p.get('ast') or 0):,}"),
+                             ("+/-", pm_text)))
     rings = p.get("championships")
     rings_text = "🏆 —" if rings is None else f"🏆×{int(rings)}"
-    seasons = p.get("seasons")
-    seasons_text = "—" if seasons is None else str(int(seasons))
-    debut_text = f"debut {p['debut']} · " if p.get("debut") else ""
     honours = p.get("honours") or {}
     honour_count = int(sum(honours.values()))
     honours_text = (f"{honour_count} official honours "
                     f"({p.get('honour_points', 0)} pts)" if honour_count
                     else "no official honours")
-    rank = p.get("goat_rank")
-    goat_text = (f" · GOAT #{int(rank)} ({p.get('goat_score')})"
-                 if rank else "")
-    # Career +/- exists only where collected box scores do (ESPN's career
-    # statistics carry none): a real number, or an honest dash.
-    plus_minus = p.get("plus_minus")
-    pm_text = ("+/- —" if plus_minus is None
-               else f"+/- {int(round(plus_minus)):+,}")
-    stats_line = (f"{seasons_text} seasons · {p.get('gp', 0):,} GP · "
-                  f"{p.get('pts', 0):,} PTS · {p.get('reb', 0):,} REB · "
-                  f"{p.get('ast', 0):,} AST · {pm_text}")
-    honours_line = f"{debut_text}{honours_text} · {rings_text}{goat_text}"
-    return (f'<div class="na-race-row">'
-            f'{headshot_html(p.get("player_id"), team, 64, league)}'
-            f'<div class="na-rbody">'
-            f'<div class="na-rname">{name}{team_logo_html(team, 18, league)}</div>'
-            f'<div class="na-rmeta na-rlead">{stats_line}</div>'
-            f'<div class="na-rmeta">{honours_line}</div>'
-            f'</div>'
+    gp = int(p.get("gp") or 0)
+    return (f'<div class="na-pcard">'
+            f'<div class="na-pcorner na-pcorner--tl">{corner}</div>'
+            f'<div class="na-pcorner na-pcorner--br">{corner}</div>'
+            f'<div class="na-phead">'
+            f'{headshot_html(p.get("player_id"), team, 120, league)}'
+            f'<div class="na-pface">'
+            f'<div class="na-pname">{name}'
+            f'{team_logo_html(team, 18, league)}</div>'
+            f'<div class="na-pmeta">{meta}</div>'
+            f'<div class="na-povr"><b>{ovr}</b><em>/100</em>'
+            f'<span>{ovr_note}</span></div>'
+            f'</div></div>'
+            f'<div class="na-pstats">{stats}</div>'
+            f'<div class="na-pfoot">{gp:,} GP · {rings_text} · '
+            f'{honours_text}</div>'
             f'</div>')
 
 

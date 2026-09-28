@@ -235,10 +235,15 @@ four; a `?player=` deep link preselects the name in every tab whose
 index carries it, others honestly fall back), each section at full
 width so nothing is squeezed or hidden:
 
-- **Career cards** in a 2×2 grid, two meta lines each (career totals +
-  window +/- on the lead line, then debut / honours with points / rings
-  / GOAT rank) instead of one 140-character line that wrapped into
-  unreadable micro-text.
+- **Career cards** in a 2×2 grid as WWE-style collectible **playing
+  cards**: photo (team-logo CSS fallback) beside an uppercase name
+  banner, team/seasons/debut meta, the headline **OVR /100** (the GOAT
+  score rounded onto its documented scale -- components normalize 0-100
+  against the pool's best and the weights sum to 100, so it needs no
+  rescaling; only the ladder's top 25 at ≥82 career GP carry one, other
+  careers show an honest dash), a career stat strip (PTS/REB/AST/+/-)
+  and a GP/rings/honours footer, with the GOAT rank in playing-card
+  corner indices (top-left + rotated bottom-right).
 - **Official accolades** as a pivot: one row per ESPN award type at the
   GOAT formula's honour weight (sorted heaviest first), one column per
   selected player, cells = that player's wins with BLANK where he never
