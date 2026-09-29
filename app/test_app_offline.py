@@ -49,6 +49,25 @@ def _markdown_text(at: AppTest) -> str:
     return " ".join(str(getattr(m, "value", "")) for m in md)
 
 
+def test_committed_data_json_is_parseable():
+    """Every committed fallback JSON must parse: a merge that commits its
+    conflict markers (observed Sep 2026, a GUI merge on top of a rebase)
+    turns whole fallback sets into honest empty states on every page, and
+    the raw JSONDecodeError then surfaces far from its cause. One clear
+    red naming the files beats page-level cascades."""
+    broken = []
+    for pattern in ("data/*.json", "data/processed/*.json",
+                    "data/postseason/*.json", "data/postseason_wnba/*.json"):
+        for path in sorted(REPO_ROOT.glob(pattern)):
+            try:
+                json.loads(path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError) as exc:
+                broken.append(f"{path.relative_to(REPO_ROOT)}: {exc}")
+    assert not broken, ("unreadable committed data files "
+                        "(conflict markers or truncation?):\n"
+                        + "\n".join(broken))
+
+
 def test_home_page_renders_offline(offline_espn):
     at = _render("app/app.py", offline_espn)
     assert not at.exception
@@ -881,6 +900,27 @@ def test_postseason_empty_state_is_honest_for_a_new_season(offline_espn):
     assert "No postseason schedule for 2026-27" in captions
     assert "bracket does not exist" in captions
     assert len(at.warning) == 0
+
+
+def test_wnba_postseason_renders_real_scores_offline(offline_espn):
+    """The WNBA pane's Schedule tab must show its own bracket's playoff
+    scores under the fresh-checkout condition (committed fallbacks only):
+    data/postseason_wnba/2026.json carries a live bracket, so a pane that
+    degrades to empty states (seen Sep 2026 when a GUI merge committed
+    conflict markers into the fallbacks) is a regression, not an honest
+    gap. league=wnba reorders the panes, so the leading postseason frame
+    is the WNBA's."""
+    at = AppTest.from_file(str(REPO_ROOT / "app/app.py"), default_timeout=30)
+    at.query_params["league"] = "wnba"
+    at.run()
+    assert not at.exception, f"page raised: {at.exception}"
+    frames = [df.value for df in at.dataframe
+              if hasattr(getattr(df, "value", None), "columns")]
+    post = [f for f in frames
+            if {"Date", "Away", "Home", "Status"} <= set(f.columns)]
+    assert post, "the collected WNBA bracket's table must render"
+    finals = int((post[0]["Status"] == "Final").sum())
+    assert finals > 0, "real WNBA playoff scores, not just fixtures"
 
 
 def test_parse_plays_flattens_and_skips_malformed():
