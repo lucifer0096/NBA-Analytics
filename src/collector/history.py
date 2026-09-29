@@ -597,6 +597,13 @@ def _fetch_athlete(pid: int, now: datetime) -> dict | None:
         "fetched": _iso(now),
         "name": info.get("displayName"),
         "debut": int(debut) if debut else None,
+        # 2K-corner vitals: position + jersey from the SAME identity
+        # payload the fetch already reads (verified both leagues, retired
+        # included: Jordan "G"/23, Wilson "C"/22). An absent one stays
+        # None -- an honest dash on the card, never a guess.
+        "position": (info.get("position") or {}).get("abbreviation") or None,
+        "jersey": (str(info.get("jersey")).strip()
+                   if info.get("jersey") not in (None, "") else None),
         "line": line,
         "rows": rows,
         "team": team,
@@ -611,10 +618,15 @@ def _fetch_athlete(pid: int, now: datetime) -> dict | None:
 def _entry_age_ok(entry: dict, now: datetime) -> bool:
     """Active players refresh weekly; players whose last season row predates
     the previous season are treated as static (6-month re-read still catches
-    a comeback). Partial entries always refetch, and so do pre-upgrade WNBA
+    a comeback). Partial entries always refetch, so do pre-upgrade WNBA
     bundles that predate the debut fallback in _fetch_athlete (complete
-    bundles always have rows, so the debut resolves on the first build)."""
+    bundles always have rows, so the debut resolves on the first build),
+    and bundles predating the position/jersey vitals (key absent = one
+    refetch upgrades them; an explicit None is a real ESPN absence and
+    ages normally)."""
     if not entry.get("complete"):
+        return False
+    if "position" not in entry:
         return False
     if LEAGUE == "wnba" and entry.get("debut") is None:
         return False
@@ -762,8 +774,9 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
     >=ALLTIME_MIN_GP. Returns:
 
     {"players": [career entries shaped like awards.alltime_players() rows,
-                 plus championships/seasons_log/line_source/debut and the
-                 collected-window +/- when he has one],
+                 plus championships/seasons_log/line_source/debut/
+                 position/jersey and the collected-window +/- when he has
+                 one],
      "honours": {pid: {official award name: wins}},
      "champions": {end year: championship team id},
      "meta": counts for the caption, "stamp": ISO UTC}
@@ -832,6 +845,8 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
             "championships": _championships(bundle, champions, pid),
             "line_source": source,
             "debut": bundle.get("debut"),
+            "position": bundle.get("position"),
+            "jersey": bundle.get("jersey"),
         })
         if rows:
             entry["seasons_log"] = _season_log(rows)

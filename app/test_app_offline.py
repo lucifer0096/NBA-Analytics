@@ -236,7 +236,7 @@ def test_profile_page_renders_cards_accolades_and_chart(offline_espn):
     assert card_html, "career cards missing"
     assert all(c.count("na-pcorner--") == 2 for c in card_html)
     assert all("na-povr" in c and "/100" in c for c in card_html)
-    assert all("na-pstats" in c and "na-pfoot" in c for c in card_html)
+    assert all("na-pspec" in c and "na-pfoot" in c for c in card_html)
     assert all("<span>+/-</span>" in c for c in card_html)
     # The accolades table is a pivot: one row per award type, a column
     # per selected player, and an award a player never won renders BLANK
@@ -260,13 +260,14 @@ def _load_players(name: str) -> dict:
         return json.load(f).get("players") or {}
 
 
-def test_profile_card_is_a_wwe_card_with_the_goat_score_as_ovr():
-    """The Profile card renders as a WWE collectible playing card whose
+def test_profile_card_is_a_2k_card_with_the_goat_score_as_ovr():
+    """The Profile card renders as a 2K/WWE-style collectible whose
     headline number is the GOAT score on its OWN scale: each formula
     component normalizes 0-100 against the pool's best and the weights
     sum to 100, so round(score) already is the /100 OVR -- no invented
-    rescaling -- with the rank in both corner indices, the career stat
-    strip and the rings/honours footer."""
+    rescaling -- with the tale-of-the-tape slots (RANK = GOAT rank,
+    FIGHTS = career matches, MVPs, TITLES, PTS, +/-) and the
+    REB/AST/honours footer."""
     import shared as shared_module
 
     players = _load_players("dashboard_players.json")
@@ -282,18 +283,28 @@ def test_profile_card_is_a_wwe_card_with_the_goat_score_as_ovr():
     # OVR = the score rounded, shown out of 100, next to the ladder note.
     expected = str(int(round(float(top["goat_score"]))))
     assert f"<b>{expected}</b><em>/100</em>" in card
+    for label in ("RANK", "FIGHTS", "MVPs", "TITLES", "PTS", "+/-"):
+        assert f"<span>{label}</span>" in card
     if top.get("goat_rank"):
         assert f"<b>{expected}</b><em>/100</em><span>GOAT #" in card
-        assert card.count(f"#{int(top['goat_rank'])}") >= 2  # both corners
-    for label in ("PTS", "REB", "AST", "+/-"):
-        assert f"<span>{label}</span>" in card
-    assert "na-pfoot" in card and f"{int(top.get('gp') or 0):,} GP" in card
+        assert (f"<span>RANK</span><b>#{int(top['goat_rank'])}</b>"
+                in card)
+    # FIGHTS = career matches; TITLES = championships with the trophy;
+    # MVPs reads the honours map's own "MVP" key (both leagues share it).
+    assert (f"<span>FIGHTS</span><b>{int(top.get('gp') or 0):,}</b>"
+            in card)
+    if top.get("championships") is not None:
+        assert f"<b>🏆×{int(top['championships'])}</b>" in card
+    if top.get("honours") is not None:
+        expected_mvp = int(top["honours"].get("MVP", 0))
+        assert f"<span>MVPs</span><b>{expected_mvp}</b>" in card
+    assert "na-pfoot" in card and " REB · " in card
 
 
 def test_profile_card_unranked_career_is_an_honest_dash():
     """Only the ladder's top 25 (>=82 career GP) carry a score; every
     other career in the index must get a dash OVR saying so -- never a
-    fabricated rating -- while the photo, name and stat strip stay."""
+    fabricated rating -- while the photo, name and spec panel stay."""
     import shared as shared_module
 
     players = _load_players("dashboard_players.json")
@@ -308,9 +319,47 @@ def test_profile_card_unranked_career_is_an_honest_dash():
 
     assert "<b>—</b><em>/100</em><span>not in the GOAT top 25</span>" in card
     assert card.count("na-pcorner--") == 2
-    assert "<div class=\"na-pname\">" in card and "na-pstats" in card
-    # The corner index is a dash too -- no rank, no fabricated "#0".
-    assert card.count("na-pcorner--tl") == 1 and "#0" not in card
+    assert "<div class=\"na-pname\">" in card and "na-pspec" in card
+    # The RANK slot is a dash too -- no rank, no fabricated "#0".
+    assert (card.count("na-pcorner--tl") == 1
+            and "<span>RANK</span><b>—" in card and "#0" not in card)
+
+
+def test_profile_card_corners_carry_2k_identity():
+    """2K-style corners: position + jersey number top-left, every career
+    team top-right -- both free of new requests (position/jersey come
+    from history.py's identity fetch, teams from seasons_log's own team
+    column) -- over the centred portrait."""
+    import shared as shared_module
+
+    players = _load_players("dashboard_players.json")
+    if not players:
+        pytest.skip("empty player index")
+    top = next((p for p in players.values() if p.get("goat_rank") == 1),
+               None) or next(iter(players.values()))
+    card = shared_module.profile_card_html(top, "nba")
+
+    assert 'class="na-pcorner na-pcorner--tl"' in card
+    assert 'class="na-pcorner na-pcorner--tr"' in card
+    assert 'class="na-phead"' in card  # portrait centred, not beside text
+    if top.get("position"):
+        expected_tl = top["position"]
+        if top.get("jersey"):
+            expected_tl += f" {top['jersey']}"
+        assert f"na-pcorner--tl\">{expected_tl}</div>" in card
+    teams: list = []
+    for row in top.get("seasons_log") or []:
+        team = str(row.get("team") or "")
+        if team and team not in teams:
+            teams.append(team)
+    if not teams and top.get("team_abbrev"):
+        teams = [str(top["team_abbrev"])]
+    if teams:
+        if len(teams) > 3:
+            expected_tr = " · ".join(teams[:3]) + f" +{len(teams) - 3}"
+        else:
+            expected_tr = " · ".join(teams)
+        assert f"na-pcorner--tr\">{expected_tr}</div>" in card
 
 
 def test_profile_card_wnba_league_plumbs_headshot_and_logo():

@@ -148,12 +148,13 @@ div[data-testid="stMetric"] {
 .na-race-row .na-up { color: #7FE0A8; }
 .na-race-row .na-down { color: #FF4B2B; }
 
-/* Player Profile: WWE-style collectible PLAYING card -- dark card with a
-   gold frame, photo + uppercase name banner, the big OVR (the GOAT score
-   on its documented 0-100 scale), career stat strip and playing-card
-   corner indices (GOAT rank, top-left + rotated bottom-right). Fixed dark
-   palette on purpose (a collectible card looks like one in any theme),
-   theme tokens where they still apply. */
+/* Player Profile: 2K/WWE-style collectible card -- dark card with a gold
+   frame, centred portrait, position + number in the top-left corner and
+   the career's teams top-right, uppercase name banner, the big OVR (the
+   GOAT score on its documented 0-100 scale), a tale-of-the-tape spec
+   panel and a stats footer. Fixed dark palette on purpose (a collectible
+   card looks like one in any theme), theme tokens where they still
+   apply. */
 .na-pcard {
   position: relative; overflow: hidden; padding: 14px 18px 12px;
   border: 2px solid var(--na-gold); border-radius: 14px;
@@ -166,20 +167,22 @@ div[data-testid="stMetric"] {
   letter-spacing: 0.04em; color: var(--na-gold);
 }
 .na-pcorner--tl { top: 8px; left: 10px; }
-.na-pcorner--br { right: 10px; bottom: 8px; transform: rotate(180deg); }
-.na-phead { display: flex; align-items: center; gap: 16px; padding-left: 30px; }
-.na-pface { flex: 1; min-width: 0; }
+.na-pcorner--tr { top: 8px; right: 10px; max-width: 45%; }
+.na-phead { display: flex; justify-content: center; padding-top: 22px; }
 .na-pname {
-  display: flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
   font-weight: 800; font-size: 1.05rem; text-transform: uppercase;
   letter-spacing: 0.05em;
   background: linear-gradient(90deg, #7d1524, var(--na-accent) 45%, #7d1524);
   border-top: 1px solid rgba(255, 255, 255, 0.28);
   border-bottom: 1px solid rgba(255, 255, 255, 0.28);
-  padding: 5px 10px; margin-bottom: 6px;
+  padding: 5px 10px; margin: 8px -18px 6px; text-align: center;
 }
-.na-pmeta { font-size: 0.76rem; opacity: 0.72; }
-.na-povr { display: flex; align-items: baseline; gap: 7px; margin-top: 8px; }
+.na-pmeta { text-align: center; font-size: 0.76rem; opacity: 0.72; }
+.na-povr {
+  display: flex; align-items: baseline; justify-content: center;
+  gap: 7px; margin-top: 8px;
+}
 .na-povr b {
   font-size: 2rem; font-weight: 800; line-height: 1; color: var(--na-gold);
 }
@@ -188,19 +191,23 @@ div[data-testid="stMetric"] {
   font-size: 0.66rem; font-weight: 700; letter-spacing: 0.14em;
   text-transform: uppercase; opacity: 0.8;
 }
-.na-pstats {
-  display: flex; gap: 6px; margin-top: 10px; padding-top: 9px;
+.na-pspec {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+  margin-top: 10px; padding-top: 9px;
   border-top: 1px dashed rgba(245, 197, 66, 0.45);
 }
-.na-pstats div { flex: 1; text-align: center; min-width: 0; }
-.na-pstats b { display: block; font-size: 0.98rem; font-weight: 800; }
-.na-pstats span {
-  font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase;
-  opacity: 0.66;
+.na-pspec div {
+  text-align: center; min-width: 0; padding: 4px 2px;
+  border: 1px solid rgba(245, 197, 66, 0.28); border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
 }
+.na-pspec span {
+  display: block; font-size: 0.6rem; letter-spacing: 0.1em;
+  text-transform: uppercase; opacity: 0.66;
+}
+.na-pspec b { display: block; font-size: 0.98rem; font-weight: 800; }
 .na-pfoot {
-  text-align: center; font-size: 0.74rem; opacity: 0.85;
-  margin-top: 9px; padding: 0 34px;
+  text-align: center; font-size: 0.74rem; opacity: 0.85; margin-top: 9px;
 }
 
 /* Real photos: headshot <img> over a team-logo CSS background. The fallback
@@ -642,21 +649,26 @@ def goat_row_html(row: dict, league: str = "nba") -> str:
 
 
 def profile_card_html(p: dict, league: str = "nba") -> str:
-    """Player Profile career card as a WWE-style collectible PLAYING card.
+    """Player Profile career card as a 2K/WWE hybrid collectible.
 
-    Photo (team-logo CSS fallback behind it) beside an uppercase name
-    banner, team/debut/seasons meta, then the headline OVR: the GOAT
-    score rounded onto its documented scale -- each formula component
+    2K-style corners -- position + jersey number top-left, every team of
+    the career top-right (chronological from seasons_log's own team
+    column, capped at three + "+N" so a journeyman's list can't run into
+    the portrait) -- over a CENTRED portrait (team-logo CSS fallback) and
+    an uppercase name banner, then the headline OVR: the GOAT score
+    rounded onto its documented scale -- each formula component
     normalizes 0-100 against the pool's best and the weights sum to
     100, so round(score) already IS the /100 rating (no invented math;
     only the ladder's top-25 at >=82 career GP carry one, everyone else
-    gets an honest dash + why instead of a fabricated number). A career
-    stat strip (PTS/REB/AST/+/-) and a GP/rings/honours footer follow,
-    with the GOAT rank in playing-card corner indices (top-left +
-    rotated bottom-right, like a card's suit index).
+    gets an honest dash + why instead of a fabricated number).
 
-    Same fields the old two-meta-line row printed -- a restyle, not a
-    recomputation. Single logical line -- see race_row_html's."""
+    The wrestling card's tale-of-the-tape follows: RANK (GOAT rank),
+    FIGHTS (career games), MVPs (official MVP wins from the honours
+    map), TITLES (championships), PTS and the window-only +/-, each an
+    honest dash when the index carries nothing -- plus a REB/AST/honours
+    footer. Same fields as before plus position/jersey that history.py's
+    identity fetch already reads -- a restyle, not a recomputation.
+    Single logical line -- see race_row_html's."""
     name = html.escape(str(p.get("player_name") or "Unknown"))
     team = str(p.get("team_abbrev") or "")
     rank = p.get("goat_rank")
@@ -666,49 +678,72 @@ def profile_card_html(p: dict, league: str = "nba") -> str:
     else:
         ovr = str(int(round(float(score))))
         ovr_note = f"GOAT #{int(rank)}" if rank else "GOAT score"
-    corner = f"#{int(rank)}" if rank else "—"
+    # 2K corners: position + number left, career teams right (only what
+    # the data actually knows -- a missing half drops, both missing is a
+    # dash).
+    position = str(p.get("position") or "").strip()
+    jersey = str(p.get("jersey") or "").strip()
+    tl_corner = " ".join(v for v in (position, jersey) if v) or "—"
+    teams: list = []
+    for row in p.get("seasons_log") or []:
+        abbrev = str(row.get("team") or "")
+        if abbrev and abbrev not in teams:
+            teams.append(abbrev)
+    if not teams and team:
+        teams = [team]
+    if len(teams) > 3:
+        tr_corner = " · ".join(teams[:3]) + f" +{len(teams) - 3}"
+    else:
+        tr_corner = " · ".join(teams) or "—"
     # Meta as joined parts: a missing record drops its fragment instead of
-    # printing "None seasons" or a dangling separator.
-    meta_parts = [team or "—"]
+    # printing "None seasons" or a dangling separator (the team lives in
+    # the corner now, so it stays out of here).
+    meta_parts = []
     if p.get("seasons") is not None:
         meta_parts.append(f"{int(p['seasons'])} seasons")
     if p.get("debut"):
         meta_parts.append(f"debut {p['debut']}")
-    meta = html.escape(" · ".join(meta_parts))
+    meta = html.escape(" · ".join(meta_parts)) or "—"
     # Career +/- exists only where collected box scores do (ESPN's career
     # statistics carry none): a real number, or an honest dash.
     plus_minus = p.get("plus_minus")
     pm_text = ("—" if plus_minus is None
                else f"{int(round(plus_minus)):+,}")
-    stats = "".join(
-        f"<div><b>{value}</b><span>{label}</span></div>"
-        for label, value in (("PTS", f"{int(p.get('pts') or 0):,}"),
-                             ("REB", f"{int(p.get('reb') or 0):,}"),
-                             ("AST", f"{int(p.get('ast') or 0):,}"),
-                             ("+/-", pm_text)))
     rings = p.get("championships")
-    rings_text = "🏆 —" if rings is None else f"🏆×{int(rings)}"
-    honours = p.get("honours") or {}
-    honour_count = int(sum(honours.values()))
-    honours_text = (f"{honour_count} official honours "
-                    f"({p.get('honour_points', 0)} pts)" if honour_count
-                    else "no official honours")
+    rings_text = "—" if rings is None else f"🏆×{int(rings)}"
+    honours = p.get("honours")
+    if honours is None:
+        mvp_text, honour_count, honours_text = "—", 0, "no official honours"
+    else:
+        mvp_text = str(int(honours.get("MVP", 0)))
+        honour_count = int(sum(honours.values()))
+        honours_text = (f"{honour_count} official honours "
+                        f"({p.get('honour_points', 0)} pts)" if honour_count
+                        else "no official honours")
     gp = int(p.get("gp") or 0)
+    # Tale of the tape: label above value, six slots in the card's order.
+    spec = "".join(
+        f"<div><span>{label}</span><b>{value}</b></div>"
+        for label, value in (("RANK", f"#{int(rank)}" if rank else "—"),
+                             ("FIGHTS", f"{gp:,}"),
+                             ("MVPs", mvp_text),
+                             ("TITLES", rings_text),
+                             ("PTS", f"{int(p.get('pts') or 0):,}"),
+                             ("+/-", pm_text)))
+    footer = (f"{int(p.get('reb') or 0):,} REB · "
+              f"{int(p.get('ast') or 0):,} AST · {honours_text}")
     return (f'<div class="na-pcard">'
-            f'<div class="na-pcorner na-pcorner--tl">{corner}</div>'
-            f'<div class="na-pcorner na-pcorner--br">{corner}</div>'
+            f'<div class="na-pcorner na-pcorner--tl">{tl_corner}</div>'
+            f'<div class="na-pcorner na-pcorner--tr">{tr_corner}</div>'
             f'<div class="na-phead">'
-            f'{headshot_html(p.get("player_id"), team, 120, league)}'
-            f'<div class="na-pface">'
+            f'{headshot_html(p.get("player_id"), team, 120, league)}</div>'
             f'<div class="na-pname">{name}'
             f'{team_logo_html(team, 18, league)}</div>'
             f'<div class="na-pmeta">{meta}</div>'
             f'<div class="na-povr"><b>{ovr}</b><em>/100</em>'
             f'<span>{ovr_note}</span></div>'
-            f'</div></div>'
-            f'<div class="na-pstats">{stats}</div>'
-            f'<div class="na-pfoot">{gp:,} GP · {rings_text} · '
-            f'{honours_text}</div>'
+            f'<div class="na-pspec">{spec}</div>'
+            f'<div class="na-pfoot">{footer}</div>'
             f'</div>')
 
 

@@ -116,13 +116,40 @@ def test_fetch_athlete_debut_fallback_wnba_vs_nba(monkeypatch):
     assert not history._trusted(nba_entry)
 
 
+def test_fetch_athlete_stores_position_and_jersey(monkeypatch):
+    """The identity fetch keeps the 2K-corner vitals (position + jersey)
+    from the same payload it already reads -- both leagues carry them for
+    retired players too (verified Sep 2026: Jordan G/23, Wilson C/22) --
+    and an ESPN absence stays an honest None, never a guess."""
+    monkeypatch.setattr(history, "_get",
+                        lambda url: {"displayName": "Test Player",
+                                     "position": {"abbreviation": "G"},
+                                     "jersey": "23"})
+    monkeypatch.setattr(history, "_parse_line", lambda payload: {"gp": 90})
+    monkeypatch.setattr(history, "_parse_rows",
+                        lambda payload: ([[2020, 1, "ATL", 30]], "ATL"))
+    entry = history._fetch_athlete(1, history._now())
+    assert entry["position"] == "G"
+    assert entry["jersey"] == "23"
+    # Empty strings / a position object without an abbreviation -> None.
+    monkeypatch.setattr(history, "_get",
+                        lambda url: {"displayName": "X", "jersey": "",
+                                     "position": {}})
+    bare = history._fetch_athlete(1, history._now())
+    assert bare["position"] is None and bare["jersey"] is None
+
+
 def test_entry_age_ok_refetches_pre_debut_wnba_bundles(monkeypatch):
     """Pre-upgrade WNBA bundles (complete but debut-less) refetch once so
     the trust rule can run; fresh NBA bundles with a debut stay cached."""
     now = history._now()
     stamp = history._iso(now)
+    # Vitals keys present (that absence is the OTHER upgrade trigger --
+    # see test_entry_age_ok_refetches_pre_vitals_bundles); debut is the
+    # only thing varying in this test.
     fresh = {"complete": True, "debut": 2019, "fetched": stamp,
-             "rows": [[2019, 1, "ATL", 30]]}
+             "rows": [[2019, 1, "ATL", 30]],
+             "position": "G", "jersey": "23"}
     saved = {name: getattr(history, name) for name in
              ("LEAGUE", "BASE", "WEB_STATS_URL", "CACHE_PATH",
               "AWARD_TYPE_IDS", "FINALS_MVP_ID", "CHAMPION_FIRST_YEAR")}
@@ -136,6 +163,19 @@ def test_entry_age_ok_refetches_pre_debut_wnba_bundles(monkeypatch):
         for name, value in saved.items():
             setattr(history, name, value)
     assert history._entry_age_ok(fresh, now)               # NBA path unchanged
+
+
+def test_entry_age_ok_refetches_pre_vitals_bundles():
+    """Bundles predating the position/jersey upgrade refetch once (the
+    key's absence IS the upgrade marker); an explicit None is a real
+    ESPN absence and ages normally by TTL instead of refetching forever."""
+    now = history._now()
+    stamp = history._iso(now)
+    pre_vitals = {"complete": True, "debut": 2019, "fetched": stamp,
+                  "rows": [[2019, 1, "ATL", 30]]}
+    upgraded = dict(pre_vitals, position=None, jersey=None)
+    assert not history._entry_age_ok(pre_vitals, now)   # refetch trigger
+    assert history._entry_age_ok(upgraded, now)         # absence is data
 
 
 def test_championships_wnba_counts_via_overlay_and_blank_honest_gaps(monkeypatch):
@@ -206,6 +246,9 @@ def test_build_offline_from_committed_cache(monkeypatch):
     assert (lebron.get("seasons") or 0) >= 20
     assert lebron.get("line_source") == "espn"
     assert lebron.get("seasons_log"), "per-season rows feed the chart"
+    # The 2K-corner vitals ride the same build: keys always set (an ESPN
+    # absence is an explicit None, not a silent gap).
+    assert "position" in lebron and "jersey" in lebron
     assert result["honours"], "official honours map is empty"
     assert result["meta"]["stamp"]
     assert result["meta"]["pool"] >= len(result["honours"])

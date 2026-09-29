@@ -235,15 +235,21 @@ four; a `?player=` deep link preselects the name in every tab whose
 index carries it, others honestly fall back), each section at full
 width so nothing is squeezed or hidden:
 
-- **Career cards** in a 2×2 grid as WWE-style collectible **playing
-  cards**: photo (team-logo CSS fallback) beside an uppercase name
-  banner, team/seasons/debut meta, the headline **OVR /100** (the GOAT
+- **Career cards** in a 2×2 grid as **2K-style collectible cards**:
+  centred portrait (team-logo CSS fallback) over an uppercase name
+  banner, seasons/debut meta, the headline **OVR /100** (the GOAT
   score rounded onto its documented scale -- components normalize 0-100
   against the pool's best and the weights sum to 100, so it needs no
   rescaling; only the ladder's top 25 at ≥82 career GP carry one, other
-  careers show an honest dash), a career stat strip (PTS/REB/AST/+/-)
-  and a GP/rings/honours footer, with the GOAT rank in playing-card
-  corner indices (top-left + rotated bottom-right).
+  careers show an honest dash), a tale-of-the-tape spec panel (RANK =
+  GOAT rank, FIGHTS = career games, MVPs = official MVP wins, TITLES =
+  championships, PTS and the window-only +/-, each an honest dash when
+  the index carries nothing) and a REB/AST/honours footer, with 2K-style
+  corners: position + jersey number top-left, every career team
+  top-right. Both corners are free of extra requests -- position/jersey
+  ride `history.py`'s identity fetch (stored on the entry, so pre-upgrade
+  bundles refetch once) and the teams come from `seasons_log`'s own team
+  column.
 - **Official accolades** as a pivot: one row per ESPN award type at the
   GOAT formula's honour weight (sorted heaviest first), one column per
   selected player, cells = that player's wins with BLANK where he never
@@ -305,7 +311,7 @@ rule applied to whole folders).
 | `data/dashboard_schedule.json` | same (thin season index: labels + game counts + current season) | Sidebar default season, schedule fallback messages |
 | `data/dashboard_positions.json` | same (local position map) | Court View formation |
 | `data/dashboard_awards.json` | same (local award math: every collected season's races/leaders, all-time boards, all-history GOAT ladder) | KPI scoring leader, Awards Ladder, Court View, All-Time Stats, GOAT Rankings |
-| `data/dashboard_players.json` | same (`history.py` all-history index: careers, honours, GOAT ranks) | Player Profile |
+| `data/dashboard_players.json` | same (`history.py` all-history index: careers, honours, GOAT ranks, position/jersey) | Player Profile |
 | `data/races/{season}.json` | same (daily race snapshots: one per UTC day, written only while a race moves; a finished season freezes after its first) | Ladder movement arrows, MVP race trend |
 | `data/processed/dashboard_leaderboards.json` | same (local totals + shooting splits) | committed artifact only; no page reads it since Season Leaders was removed |
 | `models/metrics.json`, `models/proj_model.txt` | `train.py` | Sidebar Model & History mention (headline) |
