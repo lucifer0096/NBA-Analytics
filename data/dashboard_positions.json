@@ -379,6 +379,12 @@
    "team_id": 30
   },
   {
+   "player_id": 4684269,
+   "player_name": "Kylan Boswell",
+   "position": "G",
+   "team_id": 30
+  },
+  {
    "player_id": 2578239,
    "player_name": "Pat Connaughton",
    "position": "G",
@@ -952,12 +958,6 @@
    "player_id": 4431690,
    "player_name": "Zeke Nnaji",
    "position": "F",
-   "team_id": 7
-  },
-  {
-   "player_id": 4683834,
-   "player_name": "KJ Simpson",
-   "position": "G",
    "team_id": 7
   },
   {
@@ -2365,12 +2365,6 @@
    "team_id": 18
   },
   {
-   "player_id": 4592401,
-   "player_name": "N'Faly Dante",
-   "position": "C",
-   "team_id": 18
-  },
-  {
    "player_id": 5289900,
    "player_name": "Mohamed Diawara",
    "position": "F",
@@ -2397,12 +2391,6 @@
   {
    "player_id": 4433225,
    "player_name": "Tyler Kolek",
-   "position": "G",
-   "team_id": 18
-  },
-  {
-   "player_id": 3134932,
-   "player_name": "John Konchar",
    "position": "G",
    "team_id": 18
   },
@@ -3655,6 +3643,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-09-30T18:00:59Z",
+ "_generated_utc": "2026-10-01T18:26:43Z",
  "source": "local"
 }
