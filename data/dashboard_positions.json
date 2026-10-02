@@ -583,18 +583,6 @@
    "team_id": 4
   },
   {
-   "player_id": 5106674,
-   "player_name": "Peter Suder",
-   "position": "G",
-   "team_id": 4
-  },
-  {
-   "player_id": 5107264,
-   "player_name": "Marquel Sutton",
-   "position": "F",
-   "team_id": 4
-  },
-  {
    "player_id": 4848625,
    "player_name": "Dailyn Swain",
    "position": "G",
@@ -955,6 +943,12 @@
    "team_id": 7
   },
   {
+   "player_id": 4433629,
+   "player_name": "Ryan Nembhard",
+   "position": "G",
+   "team_id": 7
+  },
+  {
    "player_id": 4431690,
    "player_name": "Zeke Nnaji",
    "position": "F",
@@ -1233,12 +1227,6 @@
   {
    "player_id": 3102529,
    "player_name": "Clint Capela",
-   "position": "C",
-   "team_id": 10
-  },
-  {
-   "player_id": 4684443,
-   "player_name": "Rafael Castro",
    "position": "C",
    "team_id": 10
   },
@@ -3643,6 +3631,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-01T18:26:43Z",
+ "_generated_utc": "2026-10-02T17:53:50Z",
  "source": "local"
 }
