@@ -1909,6 +1909,12 @@
    "team_id": 14
   },
   {
+   "player_id": 4693954,
+   "player_name": "Ian Schieffelin",
+   "position": "F",
+   "team_id": 14
+  },
+  {
    "player_id": 4066993,
    "player_name": "Dru Smith",
    "position": "G",
@@ -3301,6 +3307,12 @@
    "team_id": 28
   },
   {
+   "player_id": 4433138,
+   "player_name": "Nimari Burnett",
+   "position": "G",
+   "team_id": 28
+  },
+  {
    "player_id": 5149115,
    "player_name": "Allen Graves",
    "position": "F",
@@ -3631,6 +3643,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-03T16:19:59Z",
+ "_generated_utc": "2026-10-04T10:45:37Z",
  "source": "local"
 }
