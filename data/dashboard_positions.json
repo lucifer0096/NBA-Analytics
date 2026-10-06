@@ -2317,6 +2317,12 @@
    "team_id": 18
   },
   {
+   "player_id": 4683730,
+   "player_name": "Jaden Akins",
+   "position": "G",
+   "team_id": 18
+  },
+  {
    "player_id": 4277869,
    "player_name": "Jose Alvarado",
    "position": "G",
@@ -2326,6 +2332,12 @@
    "player_id": 3934719,
    "player_name": "OG Anunoby",
    "position": "F",
+   "team_id": 18
+  },
+  {
+   "player_id": 4065673,
+   "player_name": "Tony Bradley",
+   "position": "C",
    "team_id": 18
   },
   {
@@ -3325,12 +3337,6 @@
    "team_id": 28
   },
   {
-   "player_id": 4432190,
-   "player_name": "Andre Jackson Jr.",
-   "position": "G",
-   "team_id": 28
-  },
-  {
    "player_id": 4431684,
    "player_name": "Trayce Jackson-Davis",
    "position": "F",
@@ -3423,6 +3429,12 @@
   {
    "player_id": 4683933,
    "player_name": "Tamar Bates",
+   "position": "G",
+   "team_id": 26
+  },
+  {
+   "player_id": 4395997,
+   "player_name": "Terrell Brown Jr.",
    "position": "G",
    "team_id": 26
   },
@@ -3643,6 +3655,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-04T16:51:52Z",
+ "_generated_utc": "2026-10-06T18:23:30Z",
  "source": "local"
 }
