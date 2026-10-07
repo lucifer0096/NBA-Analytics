@@ -1495,12 +1495,6 @@
    "team_id": 12
   },
   {
-   "player_id": 5105853,
-   "player_name": "Fletcher Loyer",
-   "position": "G",
-   "team_id": 12
-  },
-  {
    "player_id": 5105832,
    "player_name": "Nick Martinelli",
    "position": "F",
@@ -2491,12 +2485,6 @@
    "team_id": 25
   },
   {
-   "player_id": 4685802,
-   "player_name": "Robert McCray V",
-   "position": "G",
-   "team_id": 25
-  },
-  {
    "player_id": 4900671,
    "player_name": "Ajay Mitchell",
    "position": "G",
@@ -2505,6 +2493,12 @@
   {
    "player_id": 5106270,
    "player_name": "Otega Oweh",
+   "position": "G",
+   "team_id": 25
+  },
+  {
+   "player_id": 4897155,
+   "player_name": "Anthony Pritchard",
    "position": "G",
    "team_id": 25
   },
@@ -3433,12 +3427,6 @@
    "team_id": 26
   },
   {
-   "player_id": 4395997,
-   "player_name": "Terrell Brown Jr.",
-   "position": "G",
-   "team_id": 26
-  },
-  {
    "player_id": 4683766,
    "player_name": "Isaiah Collier",
    "position": "G",
@@ -3447,6 +3435,12 @@
   {
    "player_id": 4684793,
    "player_name": "Kyle Filipowski",
+   "position": "F",
+   "team_id": 26
+  },
+  {
+   "player_id": 4278395,
+   "player_name": "Taylor Funk",
    "position": "F",
    "team_id": 26
   },
@@ -3655,6 +3649,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-06T18:23:30Z",
+ "_generated_utc": "2026-10-07T18:58:10Z",
  "source": "local"
 }
