@@ -499,6 +499,12 @@
    "team_id": 4
   },
   {
+   "player_id": 4432946,
+   "player_name": "Jalen Bridges",
+   "position": "F",
+   "team_id": 4
+  },
+  {
    "player_id": 4711294,
    "player_name": "Matas Buzelis",
    "position": "F",
@@ -525,6 +531,12 @@
   {
    "player_id": 4871145,
    "player_name": "Josh Giddey",
+   "position": "G",
+   "team_id": 4
+  },
+  {
+   "player_id": 4683750,
+   "player_name": "Jordan Hawkins",
    "position": "G",
    "team_id": 4
   },
@@ -580,6 +592,12 @@
    "player_id": 4397189,
    "player_name": "Jalen Smith",
    "position": "F",
+   "team_id": 4
+  },
+  {
+   "player_id": 4432117,
+   "player_name": "Isaiah Stevens",
+   "position": "G",
    "team_id": 4
   },
   {
@@ -1711,12 +1729,6 @@
    "team_id": 29
   },
   {
-   "player_id": 4683750,
-   "player_name": "Jordan Hawkins",
-   "position": "G",
-   "team_id": 29
-  },
-  {
    "player_id": 4684806,
    "player_name": "Taylor Hendricks",
    "position": "F",
@@ -1933,15 +1945,15 @@
    "team_id": 15
   },
   {
-   "player_id": 5082206,
-   "player_name": "Brayden Burries",
-   "position": "G",
+   "player_id": 4433569,
+   "player_name": "Johni Broome",
+   "position": "F",
    "team_id": 15
   },
   {
-   "player_id": 4432588,
-   "player_name": "John Butler Jr.",
-   "position": "F",
+   "player_id": 5082206,
+   "player_name": "Brayden Burries",
+   "position": "G",
    "team_id": 15
   },
   {
@@ -2995,6 +3007,12 @@
    "team_id": 22
   },
   {
+   "player_id": 4684737,
+   "player_name": "Jaylen Martin",
+   "position": "G",
+   "team_id": 22
+  },
+  {
    "player_id": 4279888,
    "player_name": "Ja Morant",
    "position": "G",
@@ -3649,6 +3667,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-07T18:58:10Z",
+ "_generated_utc": "2026-10-08T18:51:53Z",
  "source": "local"
 }

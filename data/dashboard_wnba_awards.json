@@ -9932,7 +9932,7 @@
     }
    ]
   },
-  "source": "Career lines for 442 players from ESPN career statistics (full WNBA history: 442 career lines, 0 collected-window fallbacks), not just the 2010\u21922026 box scores; as of 2026-10-07T18:58:14Z"
+  "source": "Career lines for 442 players from ESPN career statistics (full WNBA history: 442 career lines, 0 collected-window fallbacks), not just the 2010\u21922026 box scores; as of 2026-10-08T18:51:58Z"
  },
  "goat": {
   "rows": [
@@ -10755,9 +10755,9 @@
   ],
   "min_career_gp": 82,
   "formula": "GOAT score = 35% career production (PTS 35%, REB 15%, AST 15%, STL 10%, BLK 10%, 3PM 5%, +/- 10% of the component; each stat is a 50%/50% blend of career total and per-game rate vs the best career among qualified players, and a stat the career never had (impossible-zero totals, a stat the career never attempted, no collected-box-score game for +/-) is dropped from his blend with the rest rescaled; +/- comes only from this repo's collected box scores because ESPN's career statistics carry none, so it starts with the 2010 window and a negative career +/- scores zero instead of negative credit) + 30% official WNBA honours (points per win: MVP \u00d76, Finals MVP \u00d75, DPOY \u00d74.5, All-WNBA 1st \u00d73, All-Def 1st \u00d72.5, All-WNBA 2nd \u00d72, All-Def 2nd \u00d71.5, ROY \u00d71.5, 6MOY \u00d71.5, MIP \u00d71.5, All-Star MVP \u00d71.5, Cup MVP \u00d71, All-Rookie \u00d70.5, Sportsmanship \u00d70.25, Comm. Assist \u00d70.25) + 25% peak (best season's per-game impact) + 10% championships (title count vs the most among qualified players: champion-season rows (Finals-MVP team refs cover every season since 1997)), each component 0-100 vs the best qualified player; a component with no data for a player (impossible-zero career total, untrusted peak, unknown title count, no honours input) is dropped for him and the remaining weights rescaled; requires \u226582 career games.",
-  "source": "Production: career totals vs the best career among qualified players (+/- summed from collected box scores only, 2010 onward); honours: 811 official WNBA award wins across 15 award types (344 award seasons read); peak: best season impact from trusted ESPN season rows or the collected window; championship counts (29 champion seasons indexed); as of 2026-10-07T18:58:14Z"
+  "source": "Production: career totals vs the best career among qualified players (+/- summed from collected box scores only, 2010 onward); honours: 811 official WNBA award wins across 15 award types (344 award seasons read); peak: best season impact from trusted ESPN season rows or the collected window; championship counts (29 champion seasons indexed); as of 2026-10-08T18:51:58Z"
  },
- "career_note": "All-WNBA-history careers for 442 players (career leaders + official-award winners + 402 collected players \u226541 GP), 811 official honours across 15 award types; as of 2026-10-07T18:58:14Z. ESPN quirks kept as-is: careers whose season rows can't be trusted show blank peak/seasons.",
+ "career_note": "All-WNBA-history careers for 442 players (career leaders + official-award winners + 402 collected players \u226541 GP), 811 official honours across 15 award types; as of 2026-10-08T18:51:58Z. ESPN quirks kept as-is: careers whose season rows can't be trusted show blank peak/seasons.",
  "seasons": {
   "2025": {
    "season": "2025",
@@ -49225,6 +49225,6 @@
   "2011": 205,
   "2010": 204
  },
- "_generated_utc": "2026-10-07T18:58:17Z",
+ "_generated_utc": "2026-10-08T18:52:00Z",
  "source": "local"
 }
