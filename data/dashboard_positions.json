@@ -1855,12 +1855,6 @@
    "team_id": 14
   },
   {
-   "player_id": 4702784,
-   "player_name": "J'Vonne Hadley",
-   "position": "F",
-   "team_id": 14
-  },
-  {
    "player_id": 2528210,
    "player_name": "Tim Hardaway Jr.",
    "position": "G",
@@ -1879,8 +1873,20 @@
    "team_id": 14
   },
   {
+   "player_id": 3950760,
+   "player_name": "Kylor Kelley",
+   "position": "C",
+   "team_id": 14
+  },
+  {
    "player_id": 4601025,
    "player_name": "Pelle Larsson",
+   "position": "G",
+   "team_id": 14
+  },
+  {
+   "player_id": 4432753,
+   "player_name": "Gabe Madsen",
    "position": "G",
    "team_id": 14
   },
@@ -1900,12 +1906,6 @@
    "player_id": 3064482,
    "player_name": "Bobby Portis",
    "position": "F",
-   "team_id": 14
-  },
-  {
-   "player_id": 4431720,
-   "player_name": "Lester Quinones",
-   "position": "G",
    "team_id": 14
   },
   {
@@ -3607,6 +3607,12 @@
    "team_id": 27
   },
   {
+   "player_id": 3936296,
+   "player_name": "Skal Labissiere",
+   "position": "C",
+   "team_id": 27
+  },
+  {
    "player_id": 4433622,
    "player_name": "Chris Livingston",
    "position": "F",
@@ -3667,6 +3673,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-08T18:51:53Z",
+ "_generated_utc": "2026-10-09T18:22:12Z",
  "source": "local"
 }
