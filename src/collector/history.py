@@ -413,11 +413,20 @@ def _award_detail(ref: str, cache: dict, now: datetime, live: bool) -> dict | No
 
 def honours(cache: dict, live: bool = True, now: datetime = None) -> tuple:
     """({player_id: {official award name: career wins}}, {year: champion team
-    id}, meta) over every award type ESPN carries for the current league (20
-    types for the NBA, 15 for the WNBA -- see leagues.cfg)."""
+    id}, {year: [Finals MVP athlete ids]}, {year: {race: [athlete ids]}},
+    meta) over every award type ESPN carries for the current league (20
+    types for the NBA, 15 for the WNBA -- see leagues.cfg). The third
+    element is the per-season Finals MVP feed behind the dashboard's
+    tracker and the fourth the four races' OFFICIAL winners (league cfg's
+    race_award_names) behind the official-vs-algorithm verdicts: winners
+    kept per season instead of folded into the career counts."""
     now = now or _now()
     by_player: dict = {}
     champions: dict = {}
+    finals_mvp: dict = {}
+    race_official: dict = {}
+    name_to_race = {name: race for race, name
+                    in leagues.cfg(LEAGUE)["race_award_names"].items()}
     seasons = 0
     name_by_tid: dict = {}
     for tid in AWARD_TYPE_IDS:
@@ -433,6 +442,12 @@ def honours(cache: dict, live: bool = True, now: datetime = None) -> tuple:
             for pid in detail["athletes"]:
                 counts = by_player.setdefault(pid, {})
                 counts[detail["name"]] = counts.get(detail["name"], 0) + 1
+            if int(tid) == FINALS_MVP_ID:
+                finals_mvp[int(match.group(1))] = list(detail["athletes"])
+            race = name_to_race.get(detail["name"])
+            if race is not None:
+                race_official.setdefault(int(match.group(1)), {})[race] = \
+                    list(detail["athletes"])
             if detail.get("champion") is not None:
                 champions[int(match.group(1))] = detail["champion"]
     if not seasons or not by_player:
@@ -452,7 +467,7 @@ def honours(cache: dict, live: bool = True, now: datetime = None) -> tuple:
         "honour_wins": sum(sum(c.values()) for c in by_player.values()),
         "champion_years": len(champions),
     }
-    return (by_player, champions, meta)
+    return (by_player, champions, finals_mvp, race_official, meta)
 
 
 def leader_ids(cache: dict, live: bool = True) -> set:
@@ -779,6 +794,8 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
                  one],
      "honours": {pid: {official award name: wins}},
      "champions": {end year: championship team id},
+     "finals_mvp": {end year: [{player_id, player_name, team_id}]},
+     "official_winners": {end year: {race: [{player_id, player_name}]}},
      "meta": counts for the caption, "stamp": ISO UTC}
 
     live=False builds purely from the cached fixtures (tests); the default
@@ -787,7 +804,8 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
     cache = cache if cache is not None else _load_cache()
     now = _now()
     leaders = leader_ids(cache, live)
-    honours_map, champions, award_meta = honours(cache, live, now)
+    honours_map, champions, finals_mvp, race_official, award_meta = \
+        honours(cache, live, now)
     _save_cache(cache)  # award phase is expensive; keep it across crashes
 
     window_index = {int(p["player_id"]): p for p in window_players or []}
@@ -855,6 +873,35 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
     if not players:
         raise RuntimeError("no athlete entries could be assembled")
 
+    # Per-season Finals MVP winners for the dashboard's tracker, newest
+    # first. Every winner carries an official honour, so he is in the pool
+    # and his bundle (or the collected window) has the display name; the
+    # team is that year's champion ref (ESPN's own, or the verified
+    # overlay's gap fill). A bundle that failed to fetch keeps the row
+    # with a null name instead of a guessed one.
+    finals_rows = {}
+    for year, pids in sorted(finals_mvp.items(), reverse=True):
+        finals_rows[year] = [
+            {"player_id": pid,
+             "player_name": (cache["athletes"].get(str(pid)) or {}).get("name")
+                            or (window_index.get(pid) or {}).get("player_name"),
+             "team_id": champions.get(year)}
+            for pid in pids]
+
+    # The four races' OFFICIAL winners (ESPN's award index again) for the
+    # dashboard's official-vs-algorithm verdicts: same per-season shape
+    # with names resolved off the same bundles, per race this time.
+    official_rows = {}
+    for year, by_race in sorted(race_official.items(), reverse=True):
+        official_rows[year] = {
+            race: [{"player_id": pid,
+                    "player_name": (cache["athletes"].get(str(pid))
+                                    or {}).get("name")
+                                   or (window_index.get(pid) or {})
+                                       .get("player_name")}
+                   for pid in pids]
+            for race, pids in by_race.items()}
+
     stamp = _iso(now)
     meta = {
         "pool": len(pool),
@@ -870,7 +917,9 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
         **award_meta,
     }
     return {"players": players, "honours": honours_map,
-            "champions": champions, "meta": meta, "stamp": stamp}
+            "champions": champions, "finals_mvp": finals_rows,
+            "official_winners": official_rows, "meta": meta,
+            "stamp": stamp}
 
 
 if __name__ == "__main__":

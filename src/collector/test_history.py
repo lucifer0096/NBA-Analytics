@@ -59,8 +59,10 @@ def test_honours_wnba_verified_champion_overlay_fills_espn_gaps(monkeypatch):
         history.set_league("wnba")
         base = ("https://sports.core.api.espn.com/v2/sports/basketball/"
                 "leagues/wnba/seasons/{}/awards/257?lang=en&region=us")
+        mvp_base = base.replace("awards/257", "awards/237")
         cache = {
-            "listings": {"257": [base.format(1997), base.format(2005)]},
+            "listings": {"257": [base.format(1997), base.format(2005)],
+                         "237": [mvp_base.format(2005)]},
             "awards": {
                 # ESPN gap year: winner carries no team ref.
                 "257-1997": {"name": "Finals MVP", "athletes": [141],
@@ -70,11 +72,23 @@ def test_honours_wnba_verified_champion_overlay_fills_espn_gaps(monkeypatch):
                 "257-2005": {"name": "Finals MVP", "athletes": [7],
                              "champion": 8,
                              "fetched": "2026-01-01T00:00:00Z"},
+                # A race award (MVP, cfg's race_award_names): its winner
+                # feeds the official-vs-algorithm verdicts per season.
+                "237-2005": {"name": "MVP", "athletes": [42],
+                             "champion": None,
+                             "fetched": "2026-01-01T00:00:00Z"},
             },
         }
-        by_player, champions, meta = history.honours(cache, live=False)
+        by_player, champions, finals_mvp, race_official, meta = \
+            history.honours(cache, live=False)
         assert champions[1997] == 4   # overlay (Houston Comets)
         assert champions[2005] == 8   # ESPN's own ref wins
+        # Per-season tracker feed: the winners stay keyed by season, not
+        # only folded into the career counts.
+        assert finals_mvp == {1997: [141], 2005: [7]}
+        # The race awards' official winners ride the same index, keyed
+        # per season and race.
+        assert race_official == {2005: {"mvp": [42]}}
         # The six gap years are league record, present even when this
         # fixture's index doesn't list them, plus the ESPN-ref season.
         assert set(champions) >= {1997, 1998, 1999, 2000, 2001, 2002, 2005}
@@ -252,6 +266,23 @@ def test_build_offline_from_committed_cache(monkeypatch):
     assert result["honours"], "official honours map is empty"
     assert result["meta"]["stamp"]
     assert result["meta"]["pool"] >= len(result["honours"])
+    # The tracker feed: per-season Finals MVP winners with resolved names
+    # and the champion team ref, newest first (2025-26: Jalen Brunson,
+    # Knicks -- ESPN award detail verified live Oct 2026).
+    finals = result["finals_mvp"]
+    assert finals and max(finals) == 2026
+    top = finals[2026][0]
+    assert top["player_name"] == "Jalen Brunson"
+    assert top["team_id"] == 18
+    # The official side of the verdicts: the four races' winners per
+    # season from the same index (2025-26: SGA MVP, Wemby DPOY).
+    official = result["official_winners"]
+    assert official and 2026 in official
+    assert set(official[2026]) >= {"mvp", "dpoy", "sixth_man", "mip"}
+    assert {r["player_name"] for r in official[2026]["mvp"]} == \
+        {"Shai Gilgeous-Alexander"}
+    assert {r["player_name"] for r in official[2026]["dpoy"]} == \
+        {"Victor Wembanyama"}
     # Official-record ring counts land on careers ESPN's champion index
     # can't vouch for, and meta counts them for the on-screen caption.
     assert by_pid[4145]["championships"] == 6   # Kareem (rows start 1976)

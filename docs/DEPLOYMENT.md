@@ -30,7 +30,7 @@ SSH remote (`git@github.com:<your-user>/NBA-Analytics.git`).
 |---|---|
 | Standings (live ESPN → committed fallback) | `data/raw*/` history (the NBA's `data/raw/` is gitignored, regenerate via `snapshot.py --backfill`; the WNBA's `data/raw_wnba/` ships with the repo) |
 | Schedule & Scores (committed per-season `data/schedules*/*.json` + the labeled Postseason tables from `data/postseason*/*.json` + live scoreboard) | Retraining (`features.py` + `train.py`) |
-| Awards Ladder + Court View, movement arrows + MVP trend (committed `dashboard_awards.json` for every collected season, plus the `data/races/*.json` snapshots) | Nothing |
+| Awards Ladder + Court View, movement arrows + MVP trend (committed `dashboard_awards.json` for every collected season, plus the `data/races/*.json` snapshots) and the season-headline awards rows, the Finals MVP tracker and the official-vs-algorithm verdict block (the same committed `dashboard_players.json` + `dashboard_teams.json`) | Nothing |
 | All-Time Stats + GOAT Rankings (career sections of the same file) | Nothing |
 | Player Profile (committed `dashboard_players.json`) | Nothing |
 

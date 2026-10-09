@@ -607,6 +607,28 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
 
     with tabs["Awards Ladder"]:
         st.caption(f"Source: {awards_note}")
+
+        # Season headline: the SELECTED season's two official awards off
+        # ESPN's award index -- MVP first, then Finals MVP -- so the page
+        # opens on who actually won, not on a scoring leader. Unconditional
+        # (an unannounced season renders honest pending rows), and the
+        # stat leaders stay below the races where they were.
+        shared.section("Official season awards")
+        official_top = shared.load_official_winners(season, league)
+        st.markdown(
+            shared.season_award_row_html(
+                "MVP", (official_top.get("mvp") or [None])[0]),
+            unsafe_allow_html=True)
+        finals_top = next((r for r in shared.load_finals_mvp(league)[0]
+                           if r.get("season") == season), None)
+        st.markdown(shared.season_award_row_html("Finals MVP", finals_top),
+                    unsafe_allow_html=True)
+        st.caption(
+            "Official winners from ESPN's award index for the selected "
+            "season -- the same source as the honours and the tracker "
+            "below. A dash means the award isn't announced yet."
+        )
+
         if not awards_payload.get("races"):
             if int(games_counts.get(season) or 0):
                 st.info(
@@ -688,6 +710,24 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                     f"MVP race trend: {race_note} -- a line and the ladders' "
                     "rank arrows need at least two snapshots.")
 
+            # Official vs algorithm: each race's homegrown #1 next to the
+            # season's ACTUAL award winner from ESPN's award index -- a
+            # transparent scorecard, not official voting on either side.
+            shared.section("Official vs algorithm winners")
+            official_here = shared.load_official_winners(season, league)
+            for race_key in ("mvp", "dpoy", "sixth_man", "mip"):
+                st.markdown(
+                    shared.official_vs_algo_row_html(
+                        race_key, official_here.get(race_key) or [],
+                        (races.get(race_key) or [None])[0]),
+                    unsafe_allow_html=True)
+            st.caption(
+                "Official winner: ESPN's award index (the honours' own "
+                "source); algorithm winner: the homegrown race's #1 above "
+                "(transparent formula, not official voting). ✓ same "
+                "player, ✗ different, dash not announced yet."
+            )
+
             shared.section("📈 Season stat leaders")
             leaders_by_stat = awards_payload.get("leaders") or {}
             stat_keys = [k for k in awards.STAT_CATEGORIES
@@ -720,6 +760,25 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                     f"{awards_payload.get('season', '—')}. Totals shown for context; "
                     "FG/3P splits + FG% come straight from the collected box scores."
                 )
+
+        # Official Finals MVP tracker: ESPN's own award index (official
+        # history, unlike the homegrown races above) -- current season
+        # first, one row per season the award exists, pending until the
+        # winner is announced.
+        shared.section("🏆 Finals MVP")
+        finals_rows, finals_note = shared.load_finals_mvp(league)
+        decided_rows = [r for r in finals_rows if not r.get("pending")]
+        if not decided_rows:
+            st.info("No Finals MVP seasons in the committed index yet: "
+                    f"regenerate it with `{refresh_cmd}`.")
+        for row in finals_rows[:shared.FINAL_MVP_SHOW]:
+            st.markdown(shared.finals_mvp_row_html(row, league),
+                        unsafe_allow_html=True)
+        if len(finals_rows) > shared.FINAL_MVP_SHOW:
+            st.caption(f"Showing the {shared.FINAL_MVP_SHOW} most recent "
+                       f"of {len(finals_rows)} seasons: the award index "
+                       "carries the full history.")
+        st.caption(finals_note)
 
     # -------------------------------------------------------------------------
     # Court View: the stat race's leaders on a real court formation

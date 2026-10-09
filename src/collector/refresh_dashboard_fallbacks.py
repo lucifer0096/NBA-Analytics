@@ -221,10 +221,12 @@ def refresh_teams() -> dict:
 def refresh_standings(seasons_to_try: list) -> dict:
     """Standings for the first season in `seasons_to_try` that ESPN actually
     answers with entries for AND that has real results -- a not-yet-started
-    season answers fine but with every win total 0 (verified Sep 2026: the
-    2026-27 table is all zeros), which is technically-live but useless as a
-    fallback. Only if NO candidate has a nonzero record do the zero rows get
-    written at all (still better than shipping nothing)."""
+    season answers fine but with every win total 0 (seasontype=2 keeps
+    preseason scores out of the record, verified live Oct 2026: the 2026-27
+    table is all zeros until the regular season tips), which is
+    technically-live but useless as a fallback. Only if NO candidate has a
+    nonzero record do the zero rows get written at all (still better than
+    shipping nothing)."""
     zero_rows = None
     zero_season = None
     for season in seasons_to_try:
@@ -576,8 +578,11 @@ def _write_players(career: dict, history: dict) -> None:
     Every all-history pool player with >=41 career GP or at least one
     official honour, carrying his career line, per-season log (the
     progression graph), official honours + points, championships and -- when
-    he made the ladder -- GOAT rank/score. Written only after a successful
-    history build so a failed fetch never degrades a committed file."""
+    he made the ladder -- GOAT rank/score, plus the per-season Finals MVP
+    winners map and the four races' official winners map (the Awards
+    Ladder's tracker and official-vs-algorithm verdicts). Written only
+    after a successful history build so a failed fetch never degrades a
+    committed file."""
     import awards
 
     ladder = {row["player_id"]: row
@@ -603,7 +608,10 @@ def _write_players(career: dict, history: dict) -> None:
     path = _dash("dashboard_players.json")
     os.makedirs(os.path.dirname(path), exist_ok=True)
     payload = _stamp({"players": players,
-                      "meta": history.get("meta") or {}}, "local")
+                      "meta": history.get("meta") or {},
+                      "finals_mvp": history.get("finals_mvp") or {},
+                      "official_winners": history.get("official_winners")
+                      or {}}, "local")
     with open(path, "w", encoding="utf-8") as f:
         json.dump(payload, f, separators=(",", ":"))
     print(f"  wrote {path} ({len(players)} players)")

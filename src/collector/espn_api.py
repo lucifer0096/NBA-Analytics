@@ -17,7 +17,11 @@ Endpoints used (all verified working, no API key, no auth):
     verified back to 1995-96 -- the pre-2010 window is real, this project
     just deliberately focuses on 2010-11+ (see README)
 - standings: full conference standings for one season
-    site.web.api.espn.com/apis/v2/.../standings?season={end_year}
+    site.web.api.espn.com/apis/v2/.../standings?season={end_year}&seasontype=2
+    (seasontype=2 pins REGULAR-SEASON records: ESPN's default totals fold
+    preseason games in -- verified live Oct 2026, the 2026-27 table read
+    0-2 off preseason before tip-off; completed seasons answer identically
+    with or without it, same verification)
     NOTE: site.api's own /standings path only returns a link stub ("Full
     Standings") -- the site.web.api v2 path is the one with actual entries
 - roster: one team-season roster with player positions (G/F/C)
@@ -207,8 +211,16 @@ def get_standings(season: int, league: str = "nba") -> dict:
     """Full conference standings for the season ENDING in `season` (NBA) /
     the season `season` (WNBA; same East/West tree shape, verified live).
     The site.api /standings path only returns a link stub -- this is the
-    site.web.api v2 path that actually carries entries (see module docstring)."""
-    return _get_json(f"{web_api_v2(league)}/standings?season={season}")
+    site.web.api v2 path that actually carries entries (see module
+    docstring).
+
+    seasontype=2 pins regular-season records: without it ESPN folds
+    preseason games into the totals (verified live Oct 2026: the 2026-27
+    table read 0-2 off preseason results, which passed the app's
+    has-results guard), while completed seasons answer identically with
+    or without it (same verification: NBA 2025-26, WNBA 2026)."""
+    return _get_json(f"{web_api_v2(league)}/standings?season={season}"
+                     "&seasontype=2")
 
 
 def get_roster(team_id: int, season: int, league: str = "nba") -> dict:

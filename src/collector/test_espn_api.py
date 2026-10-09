@@ -202,6 +202,28 @@ def test_parse_standings_2024_25_fixture():
     assert len(ids) == len(set(ids))
 
 
+def test_get_standings_pins_regular_season_records(monkeypatch):
+    """seasontype=2 must ride every standings URL: ESPN's default totals
+    fold preseason games into the record (verified live Oct 2026: the
+    2026-27 table read 0-2 off preseason results), which passes the app's
+    has-results guard and prints preseason scores as standings. Completed
+    seasons answer identically either way (same verification: NBA
+    2025-26, WNBA 2026), so the filter never hides a real table."""
+    asked = []
+
+    def _capture(url):
+        asked.append(url)
+        return {}
+
+    monkeypatch.setattr(espn_api, "_get_json", _capture)
+    espn_api.get_standings(2027)
+    assert asked == ["https://site.web.api.espn.com/apis/v2/sports/"
+                     "basketball/nba/standings?season=2027&seasontype=2"]
+    espn_api.get_standings(2026, "wnba")
+    assert asked[-1].endswith(
+        "/basketball/wnba/standings?season=2026&seasontype=2")
+
+
 def test_parse_standings_last_ten_and_differential():
     """L10 form and the team's +/- (per-game point differential) parse
     under ESPN's exact stat names, verified live Sep 2026. The minimal

@@ -151,6 +151,142 @@ def test_home_awards_tab_shows_races_and_formula_captions(offline_espn):
     assert "snapshot" in captions
 
 
+def test_home_awards_tab_shows_finals_mvp_tracker(offline_espn):
+    """The Awards Ladder's official Finals MVP tracker renders off the
+    committed index: section header, the real winner (2025-26: Jalen
+    Brunson) and the source caption -- official ESPN award history, never
+    one of the homegrown race formulas."""
+    path = REPO_ROOT / "data" / "dashboard_players.json"
+    payload = {}
+    if path.exists():
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+    if not payload.get("finals_mvp"):
+        pytest.skip("finals_mvp map not committed yet")
+    at = _render("app/app.py", offline_espn)
+    text = (f"{_markdown_text(at)} "
+            + " ".join(str(c.value) for c in at.caption))
+    assert "Finals MVP" in text
+    assert "Jalen Brunson" in text
+    assert "ESPN award index" in text
+
+
+def test_load_finals_mvp_pending_row_and_team_resolution(monkeypatch):
+    """The tracker loader sorts seasons newest first, pins the CURRENT
+    season as an honest pending row until ESPN announces a winner, and
+    resolves champion teams off the committed franchise list -- a team id
+    it doesn't know keeps its row season-only instead of a guessed name."""
+    import shared
+
+    players = {"_generated_utc": "2026-10-03T00:00:00Z",
+               "finals_mvp": {
+                   "2025": [{"player_id": 7, "player_name": "Winner A",
+                             "team_id": 8}],
+                   "2024": [{"player_id": 9, "player_name": "Winner B",
+                             "team_id": 999}]}}
+    teams = {"teams": [{"team_id": 8, "abbrev": "SEA",
+                        "display_name": "Seattle Storm"}]}
+
+    def _fallback(name, league="nba"):
+        return players if "players" in name else teams
+
+    monkeypatch.setattr(shared, "_read_fallback", _fallback)
+    shared.load_finals_mvp.clear()
+    try:
+        rows, note = shared.load_finals_mvp("nba")
+    finally:
+        shared.load_finals_mvp.clear()  # never leak synthetic rows
+    # Synthetic past seasons can never become "current", so the pending
+    # row stays deterministic whenever the suite runs.
+    assert rows[0].get("pending") is True
+    assert rows[0]["season"] == espn_api.current_season_label(league="nba")
+    assert [r["season"] for r in rows[1:]] == ["2024-25", "2023-24"]
+    assert rows[1]["player_name"] == "Winner A"
+    assert rows[1]["team_name"] == "Seattle Storm"
+    assert rows[2]["team_name"] is None   # unknown id: honest, no guess
+    assert "2 decided seasons" in note
+
+
+def test_load_official_winners_maps_season_label_to_year(monkeypatch):
+    """The verdict loader converts the season label to ESPN's end-year key
+    ('2025-26' -> 2026) and returns that season's official winners only --
+    an unannounced or predating season is an honest empty dict, never
+    another year's data."""
+    import shared
+
+    players = {"official_winners": {
+        "2026": {"mvp": [{"player_id": 3, "player_name": "Official Guy"}]}}}
+    monkeypatch.setattr(shared, "_read_fallback",
+                        lambda name, league="nba": players)
+    shared.load_official_winners.clear()
+    try:
+        assert shared.load_official_winners("2025-26", "nba") == {
+            "mvp": [{"player_id": 3, "player_name": "Official Guy"}]}
+        assert shared.load_official_winners("2020-21", "nba") == {}
+    finally:
+        shared.load_official_winners.clear()  # never leak synthetic rows
+
+
+def test_home_awards_tab_shows_official_vs_algorithm(offline_espn):
+    """The Awards Ladder's verdict block renders the official-vs-algorithm
+    comparison off the committed winners map: the section title, both
+    sides' labels and the honest-verdict caption."""
+    path = REPO_ROOT / "data" / "dashboard_players.json"
+    payload = {}
+    if path.exists():
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+    if not payload.get("official_winners"):
+        pytest.skip("official_winners map not committed yet")
+    at = _render("app/app.py", offline_espn)
+    text = (f"{_markdown_text(at)} "
+            + " ".join(str(c.value) for c in at.caption))
+    assert "Official vs algorithm winners" in text
+    assert "Official winner: ESPN's award index" in text
+    assert "Algorithm #1" in text
+
+
+def test_season_award_row_html_official_and_pending():
+    """The season-headline row names the official winner with the award
+    label and index provenance when ESPN has one, carries the resolved
+    franchise when given one, and prints an honest 'not awarded yet'
+    pending row (clock slot, dash score) when it doesn't -- never a
+    guessed name."""
+    import shared
+
+    decided = shared.season_award_row_html(
+        "MVP", {"player_id": 1, "player_name": "Some Star",
+                "team_name": "City Team"})
+    assert "Some Star" in decided
+    assert "award index" in decided
+    assert "City Team" in decided
+    assert decided.count("na-rname") == 1
+    pending = shared.season_award_row_html("Finals MVP", None)
+    assert "Not awarded yet" in pending
+    assert 'na-rscore">—' in pending
+
+
+def test_home_awards_tab_headline_opens_with_official_mvp(offline_espn):
+    """The Awards Ladder opens on the SELECTED season's official awards:
+    the headline section (MVP + Finals MVP off ESPN's award index) renders
+    BEFORE the homegrown race ladders and before the stat leaders -- the
+    page leads with who actually won, not a scoring leader."""
+    path = REPO_ROOT / "data" / "dashboard_players.json"
+    payload = {}
+    if path.exists():
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+    if not (payload.get("official_winners") or {}).get("2026"):
+        pytest.skip("2026 official winners not committed yet")
+    at = _render("app/app.py", offline_espn)
+    text = (f"{_markdown_text(at)} "
+            + " ".join(str(c.value) for c in at.caption))
+    assert "Official season awards" in text
+    head = text.index("Official season awards")
+    assert head < text.index("MVP race")
+    assert head < text.index("Season stat leaders")
+
+
 def _committed_awards() -> dict:
     """The committed envelope: multi-season {"seasons": ...} or legacy."""
     path = REPO_ROOT / "data" / "dashboard_awards.json"

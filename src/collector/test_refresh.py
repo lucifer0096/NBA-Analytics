@@ -473,6 +473,12 @@ def test_refresh_awards_window_metadata_spans_merged_seasons(
             "players": sample,
             "honours": {},
             "champions": {},
+            "finals_mvp": {2025: [{"player_id": 7,
+                                   "player_name": "Sample Winner",
+                                   "team_id": 8}]},
+            "official_winners": {2025: {"mvp": [{"player_id": 7,
+                                                 "player_name":
+                                                 "Sample Winner"}]}},
             "meta": {"pool": len(window_players), "espn_lines": 2,
                      "window_fallback": 0, "honour_wins": 0, "award_types": 0,
                      "award_seasons": 0, "champion_years": 0},
@@ -489,6 +495,10 @@ def test_refresh_awards_window_metadata_spans_merged_seasons(
         (isolated["data"] / "dashboard_players.json").read_text(
             encoding="utf-8"))
     assert set(written["players"]) == {str(p["player_id"]) for p in sample}
+    # The Finals MVP tracker's feed passes through to the published file.
+    assert written["finals_mvp"]["2025"][0]["player_name"] == "Sample Winner"
+    assert written["official_winners"]["2025"]["mvp"][0]["player_name"] == \
+        "Sample Winner"
 
 
 # ---------------------------------------------------------------------------

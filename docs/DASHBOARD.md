@@ -73,10 +73,13 @@ per league, with that league's season and data.
    playoff (🟢) and play-in (🟡) zone glyphs appear only when
    the table has real records (preseason all-zero tables get no marks);
    the WNBA pane marks its top-8 playoff field of 15 franchises with 🟢
-   and has no play-in row. A
-   season that hasn't tipped off says so; a failed live fetch over a
-   mismatched committed copy shows no table at all, just a note naming
-   both seasons. A **Download standings CSV** button exports both
+   and has no play-in row. Standings are pinned to regular-season
+   records (`seasontype=2`): October preseason scores never update the
+   table (ESPN's default totals fold them in -- verified live Oct 2026,
+   the 2026-27 table read 0-2 off preseason before tip-off), so a
+   season whose regular season hasn't started says so; a failed live
+   fetch over a mismatched committed copy shows no table at all, just a
+   note naming both seasons. A **Download standings CSV** button exports both
    conferences with exactly the columns on screen (blanks where ESPN
    omitted a stat, never zeros).
 4. **Schedule & Scores**: live scoreboard for *today* (empty + explanatory
@@ -121,9 +124,12 @@ per league, with that league's season and data.
    shows tip-off, status, venue and TV instead of pretending a box score
    exists. Unreachable ESPN degrades to a caption saying why -- the
    committed schedule carries scores, never per-player lines or PBP.
-5. **Awards Ladder**: the selected season's MVP / DPOY / 6th Man / MIP
-   races in two columns, then a stat-leaders strip behind a
-   PTS/REB/AST/STL/BLK/**3PM**/**+/-** radio (top-10 per-game rates, each row
+5. **Awards Ladder**: opens with the selected season's **official
+   season awards** headline (MVP first, then Finals MVP, both off
+   ESPN's award index, honest pending rows until announced), so the
+   page leads with the actual winners; then the selected season's
+   MVP / DPOY / 6th Man / MIP races in two columns, then a stat-leaders
+   strip behind a PTS/REB/AST/STL/BLK/**3PM**/**+/-** radio (top-10 per-game rates, each row
    carrying the FG/3P made-attempt splits + FG%). Every row is a real
    headshot over a team-logo CSS fallback with the race's stat line and
    score. Computed locally from the collected box scores
@@ -140,6 +146,29 @@ per league, with that league's season and data.
    scores across those snapshots (top 6 of the latest, absent scores
    left as gaps). With fewer than two snapshots both degrade to a caption
    saying exactly that -- movement and trends are never invented.
+   Between the races and the stat leaders sits the
+   **official-vs-algorithm scorecard**: one row per race pairing the
+   season's actual award winner from ESPN's award index ("Official:
+   ...") with the race's homegrown #1 above ("Algorithm #1: ..."), and a
+   verdict slot -- green ✓ agree / red ✗ differs, a dash while ESPN
+   hasn't announced that season's award yet. The caption keeps both
+   sides' provenance explicit (official = the honours' own source,
+   algorithm = the transparent formula, never official voting), and a
+   season the index hasn't reached prints its honest gap instead of a
+   name.
+   Below the races, the tab also carries the **official Finals MVP
+   tracker**: one race-row per season from ESPN's award index (trophy
+   slot, real headshot, winner, franchise, `Finals MVP` score slot) --
+   current season first, then the previous ones (latest 10 shown), with
+   the current season rendered as an honest "not awarded yet" pending
+   row until ESPN publishes a winner (offseason or Finals in progress,
+   verified live Oct 2026: WNBA 2026 is 404 until the Finals end). The
+   winners ride the committed `dashboard_players.json`'s `finals_mvp`
+   map (written by `history.py` next to the honours), team names
+   resolve off the committed franchise list (an unknown id keeps the
+   row season-only), and the caption prints the index's season coverage
+   and file age -- official ESPN award history, unlike the homegrown
+   races above.
 6. **Court View** (fourth tab, moved here from the deleted Model &
    History page): the selected stat's leaders on a CSS-only hardwood court
    (gradient markings, no images). Rank order fills a 2 G / 2 F / 1 C
@@ -311,7 +340,7 @@ rule applied to whole folders).
 | `data/dashboard_schedule.json` | same (thin season index: labels + game counts + current season) | Sidebar default season, schedule fallback messages |
 | `data/dashboard_positions.json` | same (local position map) | Court View formation |
 | `data/dashboard_awards.json` | same (local award math: every collected season's races/leaders, all-time boards, all-history GOAT ladder) | KPI scoring leader, Awards Ladder, Court View, All-Time Stats, GOAT Rankings |
-| `data/dashboard_players.json` | same (`history.py` all-history index: careers, honours, GOAT ranks, position/jersey) | Player Profile |
+| `data/dashboard_players.json` | same (`history.py` all-history index: careers, honours, GOAT ranks, position/jersey, per-season Finals MVP winners, official race winners) | Player Profile, Awards Ladder (Finals MVP tracker, official-vs-algorithm verdicts) |
 | `data/races/{season}.json` | same (daily race snapshots: one per UTC day, written only while a race moves; a finished season freezes after its first) | Ladder movement arrows, MVP race trend |
 | `data/processed/dashboard_leaderboards.json` | same (local totals + shooting splits) | committed artifact only; no page reads it since Season Leaders was removed |
 | `models/metrics.json`, `models/proj_model.txt` | `train.py` | Sidebar Model & History mention (headline) |

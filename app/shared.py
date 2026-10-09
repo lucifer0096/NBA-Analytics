@@ -472,6 +472,121 @@ def race_row_html(row: dict, race: str, move: int = 0,
             f'</div>')
 
 
+def finals_mvp_row_html(row: dict, league: str = "nba") -> str:
+    """One official Finals MVP tracker row (same race-row look): trophy
+    slot, the winner's real headshot over a team-logo CSS fallback, name +
+    logo, the season and franchise in the meta line, 'Finals MVP' in the
+    score slot -- or the current season's honest pending row (clock, a
+    'not awarded yet' meta, a dash) until ESPN announces a winner.
+    Single logical line, no leading indentation anywhere: see
+    race_row_html's Markdown trap."""
+    season = html.escape(str(row.get("season") or "?"))
+    if row.get("pending"):
+        return (f'<div class="na-race-row">'
+                f'<div class="na-rank">⏳</div>'
+                f'<div class="na-rbody">'
+                f'<div class="na-rname">{season}</div>'
+                f'<div class="na-rmeta">Not awarded yet: no winner on the '
+                f'award index while the season is still being decided.</div>'
+                f'</div>'
+                f'<div class="na-rscore">—</div>'
+                f'</div>')
+    name = html.escape(str(row.get("player_name") or "—"))
+    team_abbrev = str(row.get("team_abbrev") or "")
+    team_name = html.escape(str(row.get("team_name") or ""))
+    meta = f"{season} · {team_name}" if team_name else season
+    return (f'<div class="na-race-row">'
+            f'<div class="na-rank">🏆</div>'
+            f'{headshot_html(row.get("player_id"), team_abbrev, 44, league)}'
+            f'<div class="na-rbody">'
+            f'<div class="na-rname">{name}'
+            f'{team_logo_html(team_abbrev, 16, league) if team_abbrev else ""}'
+            f'</div>'
+            f'<div class="na-rmeta">{meta}</div>'
+            f'</div>'
+            f'<div class="na-rscore">Finals MVP</div>'
+            f'</div>')
+
+
+def official_vs_algo_row_html(race: str, official: list,
+                              algo_row: dict) -> str:
+    """One official-vs-algorithm verdict row (Awards Ladder): the race
+    emoji in the rank slot, the race label, both winners on the meta line
+    (official winner from ESPN's award index; algorithm winner = the
+    race's #1 above) and the verdict slot -- a green ✓ when both name the
+    same player, a red ✗ when they differ, a dash while ESPN hasn't
+    announced the award. Neither side invents itself: a missing winner
+    prints its honest gap text. Single logical line, no leading
+    indentation anywhere: see race_row_html's Markdown trap."""
+    emoji = awards.RACE_EMOJI.get(race, "")
+    label = html.escape(str(awards.RACE_LABELS.get(race, race)))
+    official_names = [w.get("player_name") for w in official or [] if
+                      w.get("player_name")]
+    algo_name = (algo_row or {}).get("player_name")
+    if official_names:
+        official_text = "Official: " + ", ".join(
+            html.escape(str(n)) for n in official_names)
+    else:
+        official_text = ("Official winner not announced yet (no entry on "
+                         "the award index for this season)")
+    if algo_name:
+        algo_text = f"Algorithm #1: {html.escape(str(algo_name))}"
+    else:
+        algo_text = "Algorithm #1: no qualified race in this build"
+    if official_names and algo_name:
+        agree = algo_name in set(official_names)
+        verdict = ('<span class="na-mv na-up">✓ agree</span>' if agree
+                   else '<span class="na-mv na-down">✗ differs</span>')
+    else:
+        verdict = "—"
+    meta = f"{official_text} · {algo_text}"
+    return (f'<div class="na-race-row">'
+            f'<div class="na-rank">{emoji}</div>'
+            f'<div class="na-rbody">'
+            f'<div class="na-rname">{label}</div>'
+            f'<div class="na-rmeta">{meta}</div>'
+            f'</div>'
+            f'<div class="na-rscore">{verdict}</div>'
+            f'</div>')
+
+
+def season_award_row_html(award: str, winner: dict) -> str:
+    """One season-headline row (Awards Ladder top): the SELECTED season's
+    official winner of `award` off ESPN's award index -- trophy slot, the
+    winner's name, the award + index provenance in the meta line (and the
+    champion franchise when the caller resolved one), the award's short
+    label in the score slot -- or an honest pending row (clock slot, dash
+    score) while ESPN hasn't announced the award for this season. Text-only
+    on purpose: these award types carry no team ref in the index, so no
+    headshot or franchise is invented for them.
+    Single logical line, no leading indentation anywhere: see
+    race_row_html's Markdown trap."""
+    label = html.escape(str(award))
+    if not winner or not winner.get("player_name"):
+        return (f'<div class="na-race-row">'
+                f'<div class="na-rank">⏳</div>'
+                f'<div class="na-rbody">'
+                f'<div class="na-rname">{label}</div>'
+                f'<div class="na-rmeta">Not awarded yet: no winner on '
+                f"ESPN's award index for this season.</div>"
+                f'</div>'
+                f'<div class="na-rscore">—</div>'
+                f'</div>')
+    name = html.escape(str(winner["player_name"]))
+    team = html.escape(str(winner.get("team_name") or ""))
+    meta = f"{label} · official winner, ESPN's award index"
+    if team:
+        meta = f"{meta} · {team}"
+    return (f'<div class="na-race-row">'
+            f'<div class="na-rank">🏆</div>'
+            f'<div class="na-rbody">'
+            f'<div class="na-rname">{name}</div>'
+            f'<div class="na-rmeta">{meta}</div>'
+            f'</div>'
+            f'<div class="na-rscore">{label}</div>'
+            f'</div>')
+
+
 def _shooting_fragments(row: dict) -> str:
     """' · 712-1580 FG (45.1%) · 268-702 3P (38.2%)' fragments for a leader
     row's meta line, empty when the box scores carry no attempts (older
@@ -969,11 +1084,16 @@ def data_age_note(payload: dict, live: bool) -> str:
 
 
 def standings_have_results(df: pd.DataFrame) -> bool:
-    """Whether a standings table has at least one completed game.
+    """Whether a standings table has at least one completed REGULAR-season
+    game.
 
     ESPN returns 30 structurally valid all-zero rows for a season before
-    tip-off. Treating those as a live 0-0 table is misleading, so both the
-    live loader and the committed fallback use this same guard.
+    the regular season tips, and its default totals otherwise fold
+    preseason scores into the record (that is why espn_api.get_standings
+    pins seasontype=2 -- without it, October preseason results passed
+    this guard and printed as standings). Treating an all-zero table as a
+    live 0-0 one is misleading, so both the live loader and the committed
+    fallback use this same guard.
     """
     if df.empty or "wins" not in df.columns or "losses" not in df.columns:
         return False
@@ -1570,6 +1690,64 @@ def load_players(league: str = "nba") -> tuple:
             else f"ESPN career lines + official honours for "
                  f"{len(players):,} players")
     return (players, meta, note)
+
+
+FINAL_MVP_SHOW = 10  # Finals MVP tracker rows rendered (current season first)
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def load_finals_mvp(league: str = "nba") -> tuple:
+    """(rows, note) -- the official Finals MVP tracker off the committed
+    index's `finals_mvp` map (history build: one entry per decided season,
+    winner + champion team ref from ESPN's award index). Newest first, and
+    the CURRENT season rides on top as an honest pending row until ESPN
+    publishes a winner (offseason or Finals in progress). Team names come
+    from the committed franchise list; an id it doesn't know keeps the row
+    season-only instead of a guessed name."""
+    payload = _read_fallback("dashboard_players.json", league)
+    finals = payload.get("finals_mvp") or {}
+    teams = {int(t["team_id"]): t for t in
+             (_read_fallback("dashboard_teams.json", league)
+              .get("teams") or []) if t.get("team_id")}
+    rows = []
+    for key in sorted(finals, key=lambda k: int(k), reverse=True):
+        season = espn_api.season_label(int(key), league)
+        for winner in finals.get(key) or []:
+            team = teams.get(int(winner.get("team_id") or 0)) or {}
+            rows.append({
+                "season": season,
+                "player_id": winner.get("player_id"),
+                "player_name": winner.get("player_name"),
+                "team_abbrev": team.get("abbrev"),
+                "team_name": team.get("display_name"),
+            })
+    current = espn_api.current_season_label(league=league)
+    if not any(r.get("season") == current for r in rows):
+        rows.insert(0, {"season": current, "pending": True,
+                        "player_name": None})
+    decided = [r for r in rows if not r.get("pending")]
+    if decided:
+        seasons = {r["season"] for r in decided}
+        note = (f"Official ESPN award index: {len(seasons)} decided seasons, "
+                f"{decided[-1]['season']} through {decided[0]['season']} · "
+                f"{data_age_note(payload, False)}")
+    else:
+        note = (f"No Finals MVP seasons in the committed index · "
+                f"{data_age_note(payload, False)}")
+    return (rows, note)
+
+
+@st.cache_data(ttl=300, show_spinner=False)
+def load_official_winners(season: str, league: str = "nba") -> dict:
+    """{race: [{player_id, player_name}...]} for the season LABEL's year --
+    the official side of the Awards Ladder's official-vs-algorithm
+    verdicts, off the committed index's `official_winners` map (history
+    build: ESPN's award index, the four race awards' winners per season).
+    An empty dict is an honest gap (the award isn't announced yet, or the
+    season predates the index) -- never another season's data."""
+    year = str(espn_api.season_param(season, league))
+    payload = _read_fallback("dashboard_players.json", league)
+    return (payload.get("official_winners") or {}).get(year) or {}
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
