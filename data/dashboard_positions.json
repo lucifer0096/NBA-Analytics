@@ -1513,6 +1513,12 @@
    "team_id": 12
   },
   {
+   "player_id": 5105853,
+   "player_name": "Fletcher Loyer",
+   "position": "G",
+   "team_id": 12
+  },
+  {
    "player_id": 5105832,
    "player_name": "Nick Martinelli",
    "position": "F",
@@ -1552,6 +1558,12 @@
    "player_id": 4065778,
    "player_name": "Max Strus",
    "position": "G",
+   "team_id": 12
+  },
+  {
+   "player_id": 4702785,
+   "player_name": "Jahmyl Telfort",
+   "position": "F",
    "team_id": 12
   },
   {
@@ -1855,6 +1867,12 @@
    "team_id": 14
   },
   {
+   "player_id": 4702784,
+   "player_name": "J'Vonne Hadley",
+   "position": "F",
+   "team_id": 14
+  },
+  {
    "player_id": 2528210,
    "player_name": "Tim Hardaway Jr.",
    "position": "G",
@@ -1909,6 +1927,12 @@
    "team_id": 14
   },
   {
+   "player_id": 4431720,
+   "player_name": "Lester Quinones",
+   "position": "G",
+   "team_id": 14
+  },
+  {
    "player_id": 4278076,
    "player_name": "Nick Richards",
    "position": "C",
@@ -1923,6 +1947,12 @@
   {
    "player_id": 4066993,
    "player_name": "Dru Smith",
+   "position": "G",
+   "team_id": 14
+  },
+  {
+   "player_id": 4065697,
+   "player_name": "Dennis Smith Jr.",
    "position": "G",
    "team_id": 14
   },
@@ -3337,6 +3367,12 @@
    "team_id": 28
   },
   {
+   "player_id": 4898260,
+   "player_name": "Tyson Degenhart",
+   "position": "F",
+   "team_id": 28
+  },
+  {
    "player_id": 5149115,
    "player_name": "Allen Graves",
    "position": "F",
@@ -3345,6 +3381,12 @@
   {
    "player_id": 4590360,
    "player_name": "Chucky Hepburn",
+   "position": "G",
+   "team_id": 28
+  },
+  {
+   "player_id": 4432190,
+   "player_name": "Andre Jackson Jr.",
    "position": "G",
    "team_id": 28
   },
@@ -3589,6 +3631,12 @@
    "team_id": 27
   },
   {
+   "player_id": 4708972,
+   "player_name": "Jazian Gortman",
+   "position": "G",
+   "team_id": 27
+  },
+  {
    "player_id": 3947736,
    "player_name": "Caleb Homesley",
    "position": "SG",
@@ -3673,6 +3721,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-10T17:21:45Z",
+ "_generated_utc": "2026-10-11T11:00:50Z",
  "source": "local"
 }
