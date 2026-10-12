@@ -715,6 +715,12 @@
    "team_id": 5
   },
   {
+   "player_id": 4702528,
+   "player_name": "Jaxson Robinson",
+   "position": "F",
+   "team_id": 5
+  },
+  {
    "player_id": 5041951,
    "player_name": "Meleek Thomas",
    "position": "G",
@@ -741,6 +747,12 @@
   {
    "player_id": 4576087,
    "player_name": "Peyton Watson",
+   "position": "G",
+   "team_id": 5
+  },
+  {
+   "player_id": 5457832,
+   "player_name": "Noam Yaacov",
    "position": "G",
    "team_id": 5
   },
@@ -1987,6 +1999,12 @@
    "team_id": 15
   },
   {
+   "player_id": 4432588,
+   "player_name": "John Butler Jr.",
+   "position": "F",
+   "team_id": 15
+  },
+  {
    "player_id": 4997526,
    "player_name": "Ousmane Dieng",
    "position": "F",
@@ -2697,6 +2715,12 @@
   {
    "player_id": 5239561,
    "player_name": "Jase Richardson",
+   "position": "G",
+   "team_id": 19
+  },
+  {
+   "player_id": 5105875,
+   "player_name": "Mike Sharavjamts",
    "position": "G",
    "team_id": 19
   },
@@ -3721,6 +3745,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-11T17:42:11Z",
+ "_generated_utc": "2026-10-12T21:17:23Z",
  "source": "local"
 }
