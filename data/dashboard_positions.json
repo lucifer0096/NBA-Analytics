@@ -91,6 +91,12 @@
    "team_id": 1
   },
   {
+   "player_id": 4712845,
+   "player_name": "Isaac McKneely",
+   "position": "G",
+   "team_id": 1
+  },
+  {
    "player_id": 4873201,
    "player_name": "Asa Newell",
    "position": "F",
@@ -255,6 +261,12 @@
   {
    "player_id": 4066450,
    "player_name": "Armoni Brooks",
+   "position": "G",
+   "team_id": 17
+  },
+  {
+   "player_id": 5107242,
+   "player_name": "Dion Brown",
    "position": "G",
    "team_id": 17
   },
@@ -987,12 +999,6 @@
   {
    "player_id": 4432181,
    "player_name": "Julian Strawther",
-   "position": "G",
-   "team_id": 7
-  },
-  {
-   "player_id": 4277890,
-   "player_name": "Lonnie Walker IV",
    "position": "G",
    "team_id": 7
   },
@@ -2263,12 +2269,6 @@
    "team_id": 3
   },
   {
-   "player_id": 4433623,
-   "player_name": "Caleb Houstan",
-   "position": "F",
-   "team_id": 3
-  },
-  {
    "player_id": 5170947,
    "player_name": "AJ Johnson",
    "position": "G",
@@ -2541,6 +2541,12 @@
   {
    "player_id": 4683778,
    "player_name": "Jared McCain",
+   "position": "G",
+   "team_id": 25
+  },
+  {
+   "player_id": 4685802,
+   "player_name": "Robert McCray V",
    "position": "G",
    "team_id": 25
   },
@@ -3403,12 +3409,6 @@
    "team_id": 28
   },
   {
-   "player_id": 4590360,
-   "player_name": "Chucky Hepburn",
-   "position": "G",
-   "team_id": 28
-  },
-  {
    "player_id": 4432190,
    "player_name": "Andre Jackson Jr.",
    "position": "G",
@@ -3511,6 +3511,12 @@
    "team_id": 26
   },
   {
+   "player_id": 4395997,
+   "player_name": "Terrell Brown Jr.",
+   "position": "G",
+   "team_id": 26
+  },
+  {
    "player_id": 4683766,
    "player_name": "Isaiah Collier",
    "position": "G",
@@ -3597,6 +3603,12 @@
   {
    "player_id": 5105839,
    "player_name": "Brice Sensabaugh",
+   "position": "F",
+   "team_id": 26
+  },
+  {
+   "player_id": 5106293,
+   "player_name": "Mohamed Wague",
    "position": "F",
    "team_id": 26
   },
@@ -3739,12 +3751,18 @@
    "team_id": 27
   },
   {
+   "player_id": 4592216,
+   "player_name": "Alondes Williams",
+   "position": "G",
+   "team_id": 27
+  },
+  {
    "player_id": 4277905,
    "player_name": "Trae Young",
    "position": "G",
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-12T21:17:23Z",
+ "_generated_utc": "2026-10-13T19:18:59Z",
  "source": "local"
 }
