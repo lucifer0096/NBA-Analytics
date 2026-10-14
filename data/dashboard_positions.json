@@ -91,12 +91,6 @@
    "team_id": 1
   },
   {
-   "player_id": 4712845,
-   "player_name": "Isaac McKneely",
-   "position": "G",
-   "team_id": 1
-  },
-  {
    "player_id": 4873201,
    "player_name": "Asa Newell",
    "position": "F",
@@ -265,12 +259,6 @@
    "team_id": 17
   },
   {
-   "player_id": 5107242,
-   "player_name": "Dion Brown",
-   "position": "G",
-   "team_id": 17
-  },
-  {
    "player_id": 5101761,
    "player_name": "Mikel Brown Jr.",
    "position": "G",
@@ -279,12 +267,6 @@
   {
    "player_id": 4712896,
    "player_name": "Noah Clowney",
-   "position": "F",
-   "team_id": 17
-  },
-  {
-   "player_id": 4432189,
-   "player_name": "Dain Dainja",
    "position": "F",
    "team_id": 17
   },
@@ -1129,6 +1111,12 @@
    "team_id": 9
   },
   {
+   "player_id": 4431914,
+   "player_name": "Tyler Burton",
+   "position": "F",
+   "team_id": 9
+  },
+  {
    "player_id": 6430,
    "player_name": "Jimmy Butler III",
    "position": "F",
@@ -1162,12 +1150,6 @@
    "player_id": 4703396,
    "player_name": "Graham Ike",
    "position": "F",
-   "team_id": 9
-  },
-  {
-   "player_id": 4696317,
-   "player_name": "Miles Kelly",
-   "position": "G",
    "team_id": 9
   },
   {
@@ -1519,12 +1501,6 @@
    "team_id": 12
   },
   {
-   "player_id": 5159895,
-   "player_name": "Yuki Kawamura",
-   "position": "G",
-   "team_id": 12
-  },
-  {
    "player_id": 3448,
    "player_name": "Brook Lopez",
    "position": "C",
@@ -1647,6 +1623,12 @@
   {
    "player_id": 4897943,
    "player_name": "Dalton Knecht",
+   "position": "F",
+   "team_id": 13
+  },
+  {
+   "player_id": 5107258,
+   "player_name": "William Kyle III",
    "position": "F",
    "team_id": 13
   },
@@ -3163,6 +3145,12 @@
    "team_id": 23
   },
   {
+   "player_id": 4701192,
+   "player_name": "Viktor Lakhin",
+   "position": "F",
+   "team_id": 23
+  },
+  {
    "player_id": 3064440,
    "player_name": "Zach LaVine",
    "position": "G",
@@ -3256,12 +3244,6 @@
    "player_id": 4592479,
    "player_name": "Julian Champagnie",
    "position": "F",
-   "team_id": 24
-  },
-  {
-   "player_id": 4433176,
-   "player_name": "RJ Davis",
-   "position": "G",
    "team_id": 24
   },
   {
@@ -3463,6 +3445,12 @@
    "team_id": 28
   },
   {
+   "player_id": 4897696,
+   "player_name": "Jamarion Sharp",
+   "position": "C",
+   "team_id": 28
+  },
+  {
    "player_id": 4432241,
    "player_name": "Jamal Shead",
    "position": "G",
@@ -3603,12 +3591,6 @@
   {
    "player_id": 5105839,
    "player_name": "Brice Sensabaugh",
-   "position": "F",
-   "team_id": 26
-  },
-  {
-   "player_id": 5106293,
-   "player_name": "Mohamed Wague",
    "position": "F",
    "team_id": 26
   },
@@ -3763,6 +3745,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-13T19:18:59Z",
+ "_generated_utc": "2026-10-14T17:11:56Z",
  "source": "local"
 }
