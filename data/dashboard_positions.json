@@ -7,6 +7,12 @@
    "team_id": 1
   },
   {
+   "player_id": 4397003,
+   "player_name": "Giorgi Bezhanishvili",
+   "position": "F",
+   "team_id": 1
+  },
+  {
    "player_id": 4712902,
    "player_name": "Cameron Corhen",
    "position": "F",
@@ -709,12 +715,6 @@
    "team_id": 5
   },
   {
-   "player_id": 4702528,
-   "player_name": "Jaxson Robinson",
-   "position": "F",
-   "team_id": 5
-  },
-  {
    "player_id": 5041951,
    "player_name": "Meleek Thomas",
    "position": "G",
@@ -777,6 +777,12 @@
   {
    "player_id": 5279129,
    "player_name": "Sergio de Larrea",
+   "position": "F",
+   "team_id": 6
+  },
+  {
+   "player_id": 5105411,
+   "player_name": "Jorge Diaz Graham",
    "position": "F",
    "team_id": 6
   },
@@ -889,6 +895,12 @@
    "team_id": 7
   },
   {
+   "player_id": 4588201,
+   "player_name": "Steven Crowl",
+   "position": "C",
+   "team_id": 7
+  },
+  {
    "player_id": 3978,
    "player_name": "DeMar DeRozan",
    "position": "G",
@@ -981,6 +993,12 @@
   {
    "player_id": 4432181,
    "player_name": "Julian Strawther",
+   "position": "G",
+   "team_id": 7
+  },
+  {
+   "player_id": 4277890,
+   "player_name": "Lonnie Walker IV",
    "position": "G",
    "team_id": 7
   },
@@ -1501,6 +1519,12 @@
    "team_id": 12
   },
   {
+   "player_id": 5159895,
+   "player_name": "Yuki Kawamura",
+   "position": "G",
+   "team_id": 12
+  },
+  {
    "player_id": 3448,
    "player_name": "Brook Lopez",
    "position": "C",
@@ -1570,6 +1594,12 @@
    "player_id": 4683935,
    "player_name": "Blake Wesley",
    "position": "G",
+   "team_id": 12
+  },
+  {
+   "player_id": 4397355,
+   "player_name": "DeAndre Williams",
+   "position": "F",
    "team_id": 12
   },
   {
@@ -1672,12 +1702,6 @@
    "player_id": 4277811,
    "player_name": "Collin Sexton",
    "position": "G",
-   "team_id": 13
-  },
-  {
-   "player_id": 4397134,
-   "player_name": "Cole Swider",
-   "position": "F",
    "team_id": 13
   },
   {
@@ -2251,6 +2275,12 @@
    "team_id": 3
   },
   {
+   "player_id": 4433623,
+   "player_name": "Caleb Houstan",
+   "position": "F",
+   "team_id": 3
+  },
+  {
    "player_id": 5170947,
    "player_name": "AJ Johnson",
    "position": "G",
@@ -2296,6 +2326,12 @@
    "player_id": 5061589,
    "player_name": "Yves Missi",
    "position": "C",
+   "team_id": 3
+  },
+  {
+   "player_id": 4701819,
+   "player_name": "Jalon Moore",
+   "position": "F",
    "team_id": 3
   },
   {
@@ -3247,6 +3283,12 @@
    "team_id": 24
   },
   {
+   "player_id": 4433176,
+   "player_name": "RJ Davis",
+   "position": "G",
+   "team_id": 24
+  },
+  {
    "player_id": 3155937,
    "player_name": "Jon Elmore",
    "position": "G",
@@ -3301,12 +3343,6 @@
    "team_id": 24
   },
   {
-   "player_id": 4703421,
-   "player_name": "Taelon Peter",
-   "position": "G",
-   "team_id": 24
-  },
-  {
    "player_id": 5101845,
    "player_name": "Jayden Quaintance",
    "position": "F",
@@ -3319,6 +3355,12 @@
    "team_id": 24
   },
   {
+   "player_id": 4279815,
+   "player_name": "Terry Taylor",
+   "position": "F",
+   "team_id": 24
+  },
+  {
    "player_id": 4395630,
    "player_name": "Devin Vassell",
    "position": "G",
@@ -3328,12 +3370,6 @@
    "player_id": 5104157,
    "player_name": "Victor Wembanyama",
    "position": "F",
-   "team_id": 24
-  },
-  {
-   "player_id": 4277880,
-   "player_name": "Malik Williams",
-   "position": "C",
    "team_id": 24
   },
   {
@@ -3400,12 +3436,6 @@
    "player_id": 4431684,
    "player_name": "Trayce Jackson-Davis",
    "position": "F",
-   "team_id": 28
-  },
-  {
-   "player_id": 4395623,
-   "player_name": "Trey Jemison III",
-   "position": "C",
    "team_id": 28
   },
   {
@@ -3745,6 +3775,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-14T17:11:56Z",
+ "_generated_utc": "2026-10-15T17:02:26Z",
  "source": "local"
 }
