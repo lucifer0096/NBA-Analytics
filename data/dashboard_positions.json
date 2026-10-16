@@ -1291,6 +1291,12 @@
    "team_id": 10
   },
   {
+   "player_id": 4432394,
+   "player_name": "Cameron Matthews",
+   "position": "F",
+   "team_id": 10
+  },
+  {
    "player_id": 4709131,
    "player_name": "Sean Pedulla",
    "position": "G",
@@ -3427,6 +3433,12 @@
    "team_id": 28
   },
   {
+   "player_id": 4590360,
+   "player_name": "Chucky Hepburn",
+   "position": "G",
+   "team_id": 28
+  },
+  {
    "player_id": 4432190,
    "player_name": "Andre Jackson Jr.",
    "position": "G",
@@ -3436,6 +3448,12 @@
    "player_id": 4431684,
    "player_name": "Trayce Jackson-Davis",
    "position": "F",
+   "team_id": 28
+  },
+  {
+   "player_id": 4395623,
+   "player_name": "Trey Jemison III",
+   "position": "C",
    "team_id": 28
   },
   {
@@ -3775,6 +3793,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-15T17:02:26Z",
+ "_generated_utc": "2026-10-16T16:40:52Z",
  "source": "local"
 }
