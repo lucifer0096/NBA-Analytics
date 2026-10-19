@@ -643,12 +643,6 @@
    "team_id": 5
   },
   {
-   "player_id": 6576,
-   "player_name": "Quincy Acy",
-   "position": "F",
-   "team_id": 6
-  },
-  {
    "player_id": 4593125,
    "player_name": "Santi Aldama",
    "position": "F",
@@ -729,12 +723,6 @@
   {
    "player_id": 3138160,
    "player_name": "Caleb Martin",
-   "position": "F",
-   "team_id": 6
-  },
-  {
-   "player_id": 2531367,
-   "player_name": "Dwight Powell",
    "position": "F",
    "team_id": 6
   },
@@ -1089,12 +1077,6 @@
   {
    "player_id": 3102529,
    "player_name": "Clint Capela",
-   "position": "C",
-   "team_id": 10
-  },
-  {
-   "player_id": 984,
-   "player_name": "Tyson Chandler",
    "position": "C",
    "team_id": 10
   },
@@ -1675,12 +1657,6 @@
    "team_id": 14
   },
   {
-   "player_id": 4702784,
-   "player_name": "J'Vonne Hadley",
-   "position": "F",
-   "team_id": 14
-  },
-  {
    "player_id": 2528210,
    "player_name": "Tim Hardaway Jr.",
    "position": "G",
@@ -1717,12 +1693,6 @@
    "team_id": 14
   },
   {
-   "player_id": 4431720,
-   "player_name": "Lester Quinones",
-   "position": "G",
-   "team_id": 14
-  },
-  {
    "player_id": 4278076,
    "player_name": "Nick Richards",
    "position": "C",
@@ -1731,12 +1701,6 @@
   {
    "player_id": 4066993,
    "player_name": "Dru Smith",
-   "position": "G",
-   "team_id": 14
-  },
-  {
-   "player_id": 4065697,
-   "player_name": "Dennis Smith Jr.",
    "position": "G",
    "team_id": 14
   },
@@ -1762,12 +1726,6 @@
    "player_id": 5082206,
    "player_name": "Brayden Burries",
    "position": "G",
-   "team_id": 15
-  },
-  {
-   "player_id": 4432588,
-   "player_name": "John Butler Jr.",
-   "position": "F",
    "team_id": 15
   },
   {
@@ -1999,12 +1957,6 @@
    "team_id": 3
   },
   {
-   "player_id": 4431778,
-   "player_name": "Christian Koloko",
-   "position": "C",
-   "team_id": 3
-  },
-  {
    "player_id": 4683634,
    "player_name": "Bennedict Mathurin",
    "position": "G",
@@ -2227,12 +2179,6 @@
    "team_id": 25
   },
   {
-   "player_id": 4685802,
-   "player_name": "Robert McCray V",
-   "position": "G",
-   "team_id": 25
-  },
-  {
    "player_id": 4900671,
    "player_name": "Ajay Mitchell",
    "position": "G",
@@ -2367,12 +2313,6 @@
   {
    "player_id": 5239561,
    "player_name": "Jase Richardson",
-   "position": "G",
-   "team_id": 19
-  },
-  {
-   "player_id": 5105875,
-   "player_name": "Mike Sharavjamts",
    "position": "G",
    "team_id": 19
   },
@@ -2667,12 +2607,6 @@
   {
    "player_id": 6606,
    "player_name": "Damian Lillard",
-   "position": "G",
-   "team_id": 22
-  },
-  {
-   "player_id": 4684737,
-   "player_name": "Jaylen Martin",
    "position": "G",
    "team_id": 22
   },
@@ -3037,12 +2971,6 @@
    "team_id": 26
   },
   {
-   "player_id": 4395997,
-   "player_name": "Terrell Brown Jr.",
-   "position": "G",
-   "team_id": 26
-  },
-  {
    "player_id": 4683766,
    "player_name": "Isaiah Collier",
    "position": "G",
@@ -3181,12 +3109,6 @@
    "team_id": 27
   },
   {
-   "player_id": 4708972,
-   "player_name": "Jazian Gortman",
-   "position": "G",
-   "team_id": 27
-  },
-  {
    "player_id": 3947736,
    "player_name": "Caleb Homesley",
    "position": "SG",
@@ -3229,12 +3151,6 @@
    "team_id": 27
   },
   {
-   "player_id": 4704043,
-   "player_name": "Steve Settle III",
-   "position": "F",
-   "team_id": 27
-  },
-  {
    "player_id": 4997537,
    "player_name": "Tristan Vukcevic",
    "position": "F",
@@ -3253,6 +3169,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-18T15:53:17Z",
+ "_generated_utc": "2026-10-19T18:44:40Z",
  "source": "local"
 }
