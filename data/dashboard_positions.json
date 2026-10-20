@@ -517,12 +517,6 @@
    "team_id": 4
   },
   {
-   "player_id": 4432117,
-   "player_name": "Isaiah Stevens",
-   "position": "G",
-   "team_id": 4
-  },
-  {
    "player_id": 4848625,
    "player_name": "Dailyn Swain",
    "position": "G",
@@ -1105,12 +1099,6 @@
    "team_id": 10
   },
   {
-   "player_id": 4709131,
-   "player_name": "Sean Pedulla",
-   "position": "G",
-   "team_id": 10
-  },
-  {
    "player_id": 5105553,
    "player_name": "Julian Phillips",
    "position": "F",
@@ -1423,12 +1411,6 @@
    "team_id": 13
   },
   {
-   "player_id": 4897943,
-   "player_name": "Dalton Knecht",
-   "position": "F",
-   "team_id": 13
-  },
-  {
    "player_id": 4592691,
    "player_name": "Jake LaRavia",
    "position": "F",
@@ -1501,12 +1483,6 @@
    "team_id": 29
   },
   {
-   "player_id": 4896372,
-   "player_name": "Walter Clayton Jr.",
-   "position": "G",
-   "team_id": 29
-  },
-  {
    "player_id": 5105817,
    "player_name": "Carson Cooper",
    "position": "C",
@@ -1564,12 +1540,6 @@
    "player_id": 4594326,
    "player_name": "Kris Murray",
    "position": "F",
-   "team_id": 29
-  },
-  {
-   "player_id": 4432185,
-   "player_name": "Micah Peavy",
-   "position": "G",
    "team_id": 29
   },
   {
@@ -1780,12 +1750,6 @@
    "player_id": 5214989,
    "player_name": "Bogoljub Markovic",
    "position": "F",
-   "team_id": 15
-  },
-  {
-   "player_id": 4397140,
-   "player_name": "Kevin Porter Jr.",
-   "position": "G",
    "team_id": 15
   },
   {
@@ -2449,12 +2413,6 @@
    "team_id": 21
   },
   {
-   "player_id": 4591259,
-   "player_name": "Koby Brea",
-   "position": "G",
-   "team_id": 21
-  },
-  {
    "player_id": 4066383,
    "player_name": "Miles Bridges",
    "position": "F",
@@ -2497,12 +2455,6 @@
    "team_id": 21
   },
   {
-   "player_id": 4702602,
-   "player_name": "CJ Huntley",
-   "position": "F",
-   "team_id": 21
-  },
-  {
    "player_id": 4601023,
    "player_name": "Oso Ighodaro",
    "position": "F",
@@ -2536,6 +2488,12 @@
    "player_id": 4592714,
    "player_name": "Pat Spencer",
    "position": "G",
+   "team_id": 21
+  },
+  {
+   "player_id": 4431695,
+   "player_name": "Drew Timme",
+   "position": "F",
    "team_id": 21
   },
   {
@@ -2673,12 +2631,6 @@
   {
    "player_id": 4702384,
    "player_name": "Nique Clifford",
-   "position": "G",
-   "team_id": 23
-  },
-  {
-   "player_id": 4397654,
-   "player_name": "Adam Flagler",
    "position": "G",
    "team_id": 23
   },
@@ -3169,6 +3121,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-19T18:44:40Z",
+ "_generated_utc": "2026-10-20T17:10:56Z",
  "source": "local"
 }
