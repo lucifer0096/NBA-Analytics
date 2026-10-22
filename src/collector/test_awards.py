@@ -711,3 +711,21 @@ def test_aggregate_series_games_sums_and_skips():
     assert entry["minutes"] == 58
     assert (entry["pts"], entry["reb"], entry["ast"]) == (45, 8, 16)
     assert (entry["fgm"], entry["fga"]) == (18, 33)
+
+
+def test_in_season_min_gp_scales_with_the_schedule():
+    """The live tracker's qualifier is the season rule (min_games_for:
+    half the schedule, floor 8) rescaled for a season still being played:
+    half the busiest team's games, rounded UP, floored at 1 so opening
+    night ranks whoever played instead of printing an empty race."""
+    assert awards.in_season_min_gp(0) == 1
+    assert awards.in_season_min_gp(1) == 1    # opening night
+    assert awards.in_season_min_gp(2) == 1
+    assert awards.in_season_min_gp(3) == 2
+    assert awards.in_season_min_gp(4) == 2
+    assert awards.in_season_min_gp(7) == 4
+    assert awards.in_season_min_gp(44) == 22  # full WNBA season
+    assert awards.in_season_min_gp(82) == 41  # full NBA season
+    # Same half-the-schedule shape as the committed rule, without its
+    # early-season emptiness (floor 8 would lock an October race shut).
+    assert awards.in_season_min_gp(10) == 5 < awards.min_games_for(10)

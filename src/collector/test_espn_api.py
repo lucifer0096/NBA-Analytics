@@ -373,3 +373,105 @@ def test_live_schedule_endpoint_current_season():
         espn_api.season_param(espn_api.current_season_label()), 4
     )
     assert parsing.parse_schedule(payload)
+
+
+# ---------------------------------------------------------------------------
+# Live in-season MVP tracker endpoints (sports.core)
+# ---------------------------------------------------------------------------
+
+def test_core_api_and_live_endpoint_urls(monkeypatch):
+    """The tracker's three calls build the verified sports.core paths:
+    leaders and season statistics carry BOTH the season and type=2 (the
+    bare statistics path answers the CAREER split instead -- documented in
+    the getter), and the profile resolves under the same id the leaders
+    $ref (site.api 404s for those). League slug swaps everywhere, the
+    public host only (the .pvt variant is unreachable)."""
+    asked = []
+
+    def _capture(url):
+        asked.append(url)
+        return {}
+
+    monkeypatch.setattr(espn_api, "_get_json", _capture)
+    espn_api.get_leaders(2027, "nba", limit=50)
+    assert asked[-1] == (
+        "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba"
+        "/seasons/2027/types/2/leaders"
+        "?region=us&lang=en&contentorigin=espn&limit=50")
+    espn_api.get_athlete_season_stats(4278073, 2027, "nba")
+    assert asked[-1] == (
+        "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba"
+        "/seasons/2027/types/2/athletes/4278073/statistics/0")
+    espn_api.get_athlete(4278073, "nba")
+    assert asked[-1] == (
+        "https://sports.core.api.espn.com/v2/sports/basketball/leagues/nba"
+        "/athletes/4278073?lang=en&region=us")
+    espn_api.get_leaders(2026, "wnba", limit=10)
+    assert "/leagues/wnba/seasons/2026/types/2/leaders" in asked[-1]
+    assert "limit=10" in asked[-1]
+    assert ".pvt" not in "".join(asked)
+    with pytest.raises(ValueError):
+        espn_api.core_api("nbaall")
+
+
+def test_parse_leader_candidates_dedupes_refs_and_caps_depth():
+    """Leaderboard entries are $ref + value only (verified live Oct 2026):
+    the candidate pool takes the athlete/team ids from the ref's last path
+    segment, dedupes a player who leads several categories (keeping the
+    first category's team), skips an entry without an athlete ref, and
+    stops at per_category -- entries arrive ranked, so the cap keeps the
+    deep WNBA boards (which answer past ESPN's limit) from turning a
+    render into 150 per-athlete calls."""
+    payload = {"categories": [
+        {"name": "pointsPerGame", "leaders": [
+            {"value": 38.0,
+             "athlete": {"$ref": ".../seasons/2027/athletes/4251?lang=en"},
+             "team": {"$ref": ".../seasons/2027/teams/2?lang=en"}},
+            {"value": 32.0,
+             "athlete": {"$ref": ".../athletes/4278073"},
+             "team": {"$ref": ".../teams/25"}},
+            {"value": 30.0,
+             "athlete": {"$ref": ".../athletes/9999"},
+             "team": {"$ref": ".../teams/13"}},
+        ]},
+        {"name": "assistsPerGame", "leaders": [
+            {"value": 11.0,
+             "athlete": {"$ref": ".../athletes/4278073"},
+             "team": {"$ref": ".../teams/25"}},
+            {"value": 9.0, "athlete": {"$ref": ""}},   # no ref: skipped
+        ]},
+    ]}
+    rows = parsing.parse_leader_candidates(payload, per_category=2)
+    assert rows == [{"player_id": 4251, "team_id": 2},
+                    {"player_id": 4278073, "team_id": 25}]
+    # Uncapped keeps the third points entry (dedup across categories).
+    rows = parsing.parse_leader_candidates(payload, per_category=50)
+    assert [r["player_id"] for r in rows] == [4251, 4278073, 9999]
+
+
+def test_parse_athlete_stats_flattens_season_totals():
+    """The season-scoped statistics payload spreads the ladder's six
+    totals across categories (gp/rebounds under general, points/assists/
+    shooting under offensive): all categories are walked into one flat
+    dict, a stat the payload never carries reads 0 (never None -- the
+    ladder math adds these), and the legacy list-shaped splits answer too."""
+    payload = {"splits": {"type": "total", "categories": [
+        {"name": "general", "stats": [
+            {"name": "gamesPlayed", "value": 3.0},
+            {"name": "rebounds", "value": 30.0},
+            {"name": "minutes", "value": 100.0}]},
+        {"name": "offensive", "stats": [
+            {"name": "points", "value": 90.0},
+            {"name": "assists", "value": 21.0},
+            {"name": "fieldGoalsMade", "value": 33.0},
+            {"name": "fieldGoalsAttempted", "value": 66.0}]},
+    ]}}
+    assert parsing.parse_athlete_stats(payload) == {
+        "gp": 3, "pts": 90, "reb": 30, "ast": 21, "fgm": 33, "fga": 66}
+    # Empty payload: every stat a zero, so the row can be built and gated.
+    assert parsing.parse_athlete_stats({}) == {
+        "gp": 0, "pts": 0, "reb": 0, "ast": 0, "fgm": 0, "fga": 0}
+    # Legacy list shape: the first split is the one to read.
+    legacy = {"splits": [{"categories": [
+        {"name": "general", "stats": [{"name": "gamesPlayed", "value": 5.0}]}]}]}
+    assert parsing.parse_athlete_stats(legacy)["gp"] == 5

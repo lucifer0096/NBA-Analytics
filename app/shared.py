@@ -1699,6 +1699,7 @@ def load_players(league: str = "nba") -> tuple:
 
 FINAL_MVP_SHOW = 10  # Finals MVP tracker rows rendered (current season first)
 FINALS_MVP_FORMULA_SHOW = 5  # calculator formula rows under the verdict row
+LIVE_MVP_SHOW = 10  # live in-season MVP tracker rows rendered
 
 
 @st.cache_data(ttl=300, show_spinner=False)
@@ -1830,6 +1831,120 @@ def load_finals_series(season: str, league: str = "nba") -> tuple:
     note = (f"Live ESPN Finals box scores (15 min cache): "
             f"{len(game_ids)} series games, {len(metas)} played")
     return (formula_rows, info, note)
+
+
+@st.cache_data(ttl=600, show_spinner=False)
+def load_live_mvp_race(season: str, league: str = "nba") -> tuple:
+    """(ranked rows, note) -- the LIVE in-season MVP race for the season
+    being played right now: ESPN's leaderboards (top 50 each of PPG/RPG/
+    APG) pick the candidates, their per-athlete season totals feed the
+    EXACT formula the committed races use (one in-season qualifier: half
+    the busiest team's games, rounded up, floored at 1 -- the season rule
+    scaled to a season still being played), and the live standings supply
+    the win percentage, team ids mapped onto the row abbrevs by the
+    committed teams file.
+
+    Honest states, never another season's race: ESPN unreachable, an
+    empty leaderboard, no games yet -- and standings that fail degrade to
+    a neutral 0.5 win% for EVERY team, said in the note rather than
+    silently. Names are fetched per rendered row (live_athlete_name), so
+    this burst stays leaders + one totals call per candidate."""
+    import espn_api
+    import parsing
+
+    try:
+        year = espn_api.season_param(season, league)
+        candidates = parsing.parse_leader_candidates(
+            espn_api.get_leaders(year, league, limit=50))
+    except Exception as exc:
+        return ([], f"Live MVP race unavailable: ESPN unreachable from "
+                    f"this session ({type(exc).__name__})")
+    if not candidates:
+        return ([], "Live MVP race has no candidates yet: ESPN's "
+                    "leaderboards answered empty.")
+    # Team ids -> the abbrevs the ladder rows (and mvp_rows' records
+    # lookup) carry, off the committed franchise list for this league.
+    abbrevs = {int(t["team_id"]): t.get("abbrev") for t in
+               (_read_fallback("dashboard_teams.json", league)
+                .get("teams") or []) if t.get("team_id")}
+    by_abbrev = {abbrev: team_id for team_id, abbrev in abbrevs.items()
+                 if abbrev}
+    rows: list = []
+    for candidate in candidates:
+        line = live_athlete_line(candidate["player_id"], year, league)
+        if not line or not line.get("gp"):
+            continue          # no games this season: nothing to rank yet
+        rows.append({**line, "starts": 0, "minutes": 0,
+                     "player_id": candidate["player_id"],
+                     "player_name": f"Player {candidate['player_id']}",
+                     "team_abbrev": abbrevs.get(candidate["team_id"] or 0)
+                     or ""})
+    if not rows:
+        return ([], "Live MVP race has no qualified games yet: the "
+                    "leaderboards answered, but nobody's played.")
+    standings_note = "standings live"
+    records: dict = {}
+    try:
+        for record in parsing.parse_standings(
+                espn_api.get_standings(year, league)):
+            abbrev = by_abbrev.get(int(record.get("team_id") or 0))
+            if not abbrev:
+                continue
+            wins = int(record.get("wins") or 0)
+            losses = int(record.get("losses") or 0)
+            records[abbrev] = {
+                "wins": wins, "losses": losses,
+                "win_pct": (wins / (wins + losses))
+                if (wins + losses) else 0.5}
+    except Exception:
+        standings_note = ("standings unreachable: every team's win% held "
+                          "at a neutral 0.5")
+    qualifier = awards.in_season_min_gp(
+        max(int(r.get("gp") or 0) for r in rows))
+    ranked = awards.mvp_rows(rows, records, qualifier)
+    note = (f"Live ESPN leaders + season totals (10 min cache): "
+            f"{len(candidates)} candidates, top {len(ranked)} ranked "
+            f"(qualifier: ≥{qualifier} GP) · {standings_note}")
+    return (ranked, note)
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def live_athlete_line(player_id: int, year: int, league: str = "nba") -> dict:
+    """One live candidate's season totals (cached an hour: the tracker's
+    per-candidate burst amortizes across rerenders and tab flips; only the
+    expired hour refetches). An unreachable athlete answers {} and is
+    skipped -- the note reports candidates vs ranked, so the gap shows."""
+    import espn_api
+    import parsing
+
+    try:
+        return parsing.parse_athlete_stats(
+            espn_api.get_athlete_season_stats(player_id, year, league))
+    except Exception:
+        return {}
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def live_athlete_name(player_id: int, league: str = "nba") -> str:
+    """A live candidate's display name -- the leaders/statistics payloads
+    carry ids and $refs only, so RENDERED rows pay one profile call each
+    (cached an hour, never the whole candidate pool). 'Player {id}' keeps
+    a profile hiccup from blanking a rendered row."""
+    import espn_api
+
+    try:
+        profile = espn_api.get_athlete(player_id, league)
+    except Exception:
+        profile = {}
+    return (profile.get("displayName") or profile.get("fullName")
+            or f"Player {player_id}")
+
+
+def current_season_label(league: str = "nba") -> str:
+    """The season the league is playing right now (or entering, in the
+    offseason) -- espn_api's calendar rule, exposed here so app.py keeps
+    its single dependency surface (it never imports the API client)."""
+    return espn_api.current_season_label(league=league)
 
 
 @st.cache_data(ttl=300, show_spinner=False)

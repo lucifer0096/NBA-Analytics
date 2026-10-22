@@ -32,6 +32,7 @@ SSH remote (`git@github.com:<your-user>/NBA-Analytics.git`).
 | Schedule & Scores (committed per-season `data/schedules*/*.json` + the labeled Postseason tables from `data/postseason*/*.json` + live scoreboard) | Retraining (`features.py` + `train.py`) |
 | Awards Ladder + Court View, movement arrows + MVP trend (committed `dashboard_awards.json` for every collected season, plus the `data/races/*.json` snapshots) and the season-headline awards rows, the Finals MVP tracker and the official-vs-algorithm verdict block (the same committed `dashboard_players.json` + `dashboard_teams.json`) | Nothing |
 | Finals MVP calculator (the committed `data/postseason*/*.json` files identify the season's Finals series; the formula ladder itself reads live ESPN series summaries, so offline renders the honest pending/unreachable note instead of a ranking) | Nothing |
+| MVP progress tracker (live only: sports.core leaderboards + per-athlete season totals + live standings for the season being played; past seasons use the committed race, offline renders the honest unreachable note) | Nothing |
 | All-Time Stats + GOAT Rankings (career sections of the same file) | Nothing |
 | Player Profile (committed `dashboard_players.json`) | Nothing |
 

@@ -1464,3 +1464,84 @@ def test_load_finals_series_identifies_and_ranks(monkeypatch):
         assert info["standings"] == "NYK 3-1 · SA 1-3"
     finally:
         shared.load_finals_series.clear()
+
+
+# ---------------------------------------------------------------------------
+# Live in-season MVP progress tracker
+# ---------------------------------------------------------------------------
+
+def test_live_mvp_tracker_honest_offline(offline_espn):
+    """On the season being played right now (selected explicitly -- the
+    sidebar default follows the collector's inventory, this gate follows
+    the calendar), every ESPN call failing leaves the tracker section with
+    its honest note (never a stack trace, never another year's race) and
+    the verbatim committed MVP formula in the caption."""
+    import shared as shared_module
+
+    shared_module.load_live_mvp_race.clear()
+    at = _render("app/app.py", offline_espn)
+    at.selectbox(key="season_nba").select(
+        shared_module.current_season_label("nba")).run()
+    assert not at.exception
+    text = (f"{_markdown_text(at)} "
+            + " ".join(str(c.value) for c in at.caption))
+    assert "MVP progress tracker -- live" in text
+    assert "MVP race is homegrown math, not official NBA voting" in text
+    import awards as awards_module
+
+    assert awards_module.RACE_FORMULAS["mvp"] in text
+    infos = " ".join(str(i.value) for i in at.info)
+    assert "Live MVP race unavailable: ESPN unreachable" in infos
+    assert len(at.warning) == 0
+
+
+def test_live_mvp_tracker_renders_synthetic_rows(monkeypatch, offline_espn):
+    """With a stubbed live race the tracker renders its rows over the real
+    race-row widgets (rank medal, stat line, score), the per-row names
+    come from the name helper (stubbed here, so no profile call), and the    caption states formula AND the live note together."""
+    import shared as shared_module
+
+    rows = [{"player_id": 1, "player_name": "Live Guy",
+             "team_abbrev": "BOS", "gp": 3, "ppg": 31.0, "rpg": 7.0,
+             "apg": 6.0, "wins": 2, "losses": 1, "win_pct": 0.667,
+             "fgp": 48.5, "score": 33.7, "rank": 1},
+            {"player_id": 2, "player_name": "Second Live",
+             "team_abbrev": "OKC", "gp": 3, "ppg": 27.0, "rpg": 5.0,
+             "apg": 4.0, "wins": 3, "losses": 0, "win_pct": 1.0,
+             "fgp": 50.1, "score": 30.9, "rank": 2}]
+    note = ("Live ESPN leaders + season totals (10 min cache): 2 candidates, "
+            "top 2 ranked (qualifier: ≥1 GP) · standings live")
+
+    monkeypatch.setattr(shared_module, "load_live_mvp_race",
+                        lambda season, league="nba": (rows, note))
+    # The app names every rendered row through the helper (the payloads
+    # carry ids only), so the stub answers per id like the real one would.
+    monkeypatch.setattr(
+        shared_module, "live_athlete_name",
+        lambda pid, league="nba": ("Live Guy" if int(pid) == 1
+                                   else "Second Live"))
+    at = _render("app/app.py", offline_espn)
+    assert not at.exception
+    text = (f"{_markdown_text(at)} "
+            + " ".join(str(c.value) for c in at.caption))
+    assert "MVP progress tracker -- live" in text
+    assert "Live Guy" in text and "Second Live" in text
+    assert "31.0 PPG" in text and "33.7" in text   # stat line + score
+    assert "≥1 GP" in text                          # the live note
+    assert len(at.warning) == 0
+
+
+def test_live_mvp_tracker_absent_for_a_past_season(offline_espn):
+    """A finished season's race is the committed one further down the
+    page: the live tracker section does not render for it (its
+    per-candidate burst is the page's most expensive read, and a past
+    season's live re-fetch would only restate history). Both selectors
+    move off the current season -- each league tab gates on ITS OWN."""
+    at = _render("app/app.py", offline_espn)
+    at.selectbox(key="season_nba").select("2025-26").run()
+    at.selectbox(key="season_wnba").select("2025").run()
+    assert not at.exception
+    text = (f"{_markdown_text(at)} "
+            + " ".join(str(c.value) for c in at.caption))
+    assert "MVP progress tracker -- live" not in text
+    assert "Live ESPN leaders" not in text

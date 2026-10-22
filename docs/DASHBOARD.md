@@ -127,8 +127,28 @@ per league, with that league's season and data.
 5. **Awards Ladder**: opens with the selected season's **official
    season awards** headline (MVP first, then Finals MVP, both off
    ESPN's award index, honest pending rows until announced), so the
-   page leads with the actual winners. Straight below sits the
-   **Finals MVP calculator -- official vs formula**: the season MVP
+   page leads with the actual winners. While the selected season is the
+   one being played, the headline is followed by the **MVP progress
+   tracker -- live**: ESPN's leaderboards pick the candidate pool (the
+   top 30 each of PTS/REB/AST, deduped by $ref id -- the deep WNBA
+   boards answer past ESPN's own limit, so the per-category cap is what
+   keeps one render from firing 150 athlete calls), their season
+   totals from the season-scoped statistics endpoint feed the SAME
+   committed formula at an in-season qualifier (half the busiest
+   team's games, rounded up, floored at 1 so opening night still ranks
+   whoever played), the live standings supply each team's win
+   percentage (team ids mapped to row abbrevs by the committed teams
+   file; a standings failure holds every team at a neutral 0.5 and says
+   so), and each rendered row's name comes from the core athlete
+   profile (ids only in the payloads; an unreachable profile keeps the
+   id-based fallback). Movement arrows ride the committed daily race
+   snapshots (the trend chart further down already covers the trend,
+   so it never draws twice), the note always states candidates vs top
+   ranked vs the qualifier, and ESPN unreachable renders its honest
+   note instead of a race. A finished season skips the tracker
+   entirely -- its race is the committed one below, never re-fetched.
+   Straight below sits the **Finals MVP calculator -- official vs
+   formula**: the season MVP
    formula re-applied to the selected season's Finals series (per-game
    impact from the series' box scores -- live ESPN summaries, 15-min
    cache -- times the series-win multiplier, with the series standings

@@ -257,6 +257,15 @@ def min_games_for(max_team_games: int) -> int:
     return max(8, int(0.5 * max_team_games))
 
 
+def in_season_min_gp(max_team_games: int) -> int:
+    """The LIVE tracker's qualifier, the season rule (min_games_for: half
+    the schedule) scaled to a season still being played: half the busiest
+    team's games, rounded UP, floored at 1 -- opening night still ranks
+    whoever played instead of printing an empty race (the verbatim note
+    always states the bar, so a 1-game race never reads as a full one)."""
+    return max(1, -(-int(max_team_games) // 2))
+
+
 def aggregate_players(season: str, raw_dir: str = None,
                       league: str = "nba") -> list:
     """Per-player season aggregates from every stored box score.

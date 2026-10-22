@@ -347,6 +347,81 @@ def parse_standings(payload: dict) -> list:
 
 
 # ---------------------------------------------------------------------------
+# live leaders + per-athlete season totals (the in-season MVP tracker)
+# ---------------------------------------------------------------------------
+
+def _ref_id(ref) -> str | None:
+    """A sports.core $ref -> its id: '.../seasons/2027/athletes/4251?
+    lang=en&region=us' -> '4251' (last path segment, query string dropped).
+    Non-strings and empty refs answer None -- a ref without an id is not a
+    candidate, it is a payload to skip."""
+    if not isinstance(ref, str) or not ref:
+        return None
+    path = ref.split("?", 1)[0].rstrip("/")
+    return path.rsplit("/", 1)[-1] or None
+
+
+def parse_leader_candidates(payload: dict, per_category: int = 30) -> list:
+    """leaders payload -> deduped (player_id, team_id) candidate rows.
+
+    Every category's entries carry only $ref links (athlete, team) plus the
+    category value (verified live Oct 2026): names and stat lines live on
+    the per-athlete endpoints, and values/categories are deliberately NOT
+    copied here -- the tracker rebuilds every ladder line from the
+    season-totals endpoint, one consistent source for the whole table.
+
+    `per_category` caps how deep each leaderboard's entries go (entries
+    arrive ranked): the tracker's ladder stores the top 10, and a player
+    outside the top 30 of ALL THREE counting categories (PTS/REB/AST)
+    cannot reach that ladder's impact top 10 -- while uncapped WNBA
+    leaderboards (the endpoint answers past ESPN's own limit=50 there)
+    would otherwise turn one render into 150 per-athlete calls."""
+    rows: list = []
+    seen: set = set()
+    for category in payload.get("categories") or []:
+        for entry in (category.get("leaders") or [])[:int(per_category)]:
+            if not isinstance(entry, dict):
+                continue
+            player_id = _to_int(_ref_id((entry.get("athlete") or {}).get("$ref")))
+            if player_id is None or player_id in seen:
+                continue
+            seen.add(player_id)
+            rows.append({
+                "player_id": player_id,
+                "team_id": _to_int(_ref_id((entry.get("team") or {}).get("$ref"))),
+            })
+    return rows
+
+
+def parse_athlete_stats(payload: dict) -> dict:
+    """season-scoped athlete statistics payload -> flat season TOTALS for
+    the tracker's rows: gp/pts/reb/ast/fgm/fga.
+
+    The payload spreads the totals across categories (gamesPlayed and
+    rebounds under 'general', points/assists/shooting under 'offensive'),
+    so every category is walked into one namespace -- first occurrence
+    wins, and a stat the payload doesn't carry reads 0 (never None: the
+    ladder math adds these)."""
+    splits = payload.get("splits") or {}
+    if isinstance(splits, list):        # legacy/list shape: take the first
+        splits = splits[0] if splits else {}
+    totals: dict = {}
+    for category in splits.get("categories") or []:
+        for stat in category.get("stats") or []:
+            name = stat.get("name")
+            if name and name not in totals:
+                totals[name] = _to_float(stat.get("value"), 0.0)
+
+    def _total(name: str) -> int:
+        return int(totals.get(name) or 0)
+
+    return {"gp": _total("gamesPlayed"), "pts": _total("points"),
+            "reb": _total("rebounds"), "ast": _total("assists"),
+            "fgm": _total("fieldGoalsMade"),
+            "fga": _total("fieldGoalsAttempted")}
+
+
+# ---------------------------------------------------------------------------
 # roster
 # ---------------------------------------------------------------------------
 

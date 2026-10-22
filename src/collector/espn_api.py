@@ -28,6 +28,21 @@ Endpoints used (all verified working, no API key, no auth):
     site.web.api.espn.com/apis/common/v3/.../teams/{team_id}/roster?season={end_year}
 - scoreboard: every game on one calendar date (any historical date)
     site.api.espn.com/.../scoreboard?dates=YYYYMMDD
+- leaders: every per-category leaderboard for one in-progress or completed
+    season (the live MVP tracker's candidate pool)
+    sports.core.api.espn.com/v2/.../seasons/{end_year}/types/2/leaders
+    (types=2 pins the regular season; entries carry athlete + team $refs
+    and the category value only -- names and stat lines come from the two
+    endpoints below)
+- athlete statistics: one athlete's season totals (gamesPlayed, points,
+    rebounds, assists, shooting splits)
+    sports.core.api.espn.com/v2/.../athletes/{athlete_id}/statistics/0
+    (the trailing /0 is required: bare /statistics 404s for the
+    in-progress season, verified Oct 2026)
+- athlete profile: one athlete's display name
+    sports.core.api.espn.com/v2/.../athletes/{athlete_id}
+    (same id the leaders $ref -- site.api's own /athletes/{id} answers
+    404 for those)
 
 SEASON PARAM SEMANTICS (easy to get wrong): ESPN's `season` parameter is the
 year a season ENDS, not the year it starts. Season 2010-11 -> season=2011,
@@ -67,6 +82,16 @@ def web_api_v2(league: str = "nba") -> str:
 def web_api_common(league: str = "nba") -> str:
     """site.web.api common v3 base for `league` (rosters, athlete stats)."""
     return f"https://site.web.api.espn.com/apis/common/v3/sports/basketball/{leagues.validate(league)}"
+
+
+def core_api(league: str = "nba") -> str:
+    """sports.core.api base for `league` (leaderboards + per-athlete season
+    statistics -- the live MVP tracker's source). Note the extra `leagues`
+    path segment (core's own layout, unlike site.api's): the PUBLIC host is
+    the reachable one -- the same paths behind the .pvt variant answer
+    nothing from here (verified live Oct 2026)."""
+    return (f"https://sports.core.api.espn.com/v2/sports/basketball/leagues/"
+            f"{leagues.validate(league)}")
 
 # ESPN's edge (Fastly WAF) answers DIFFERENTLY depending on the client AND
 # the caller's network -- verified directly with the probe-espn.yml workflow
@@ -236,3 +261,36 @@ def get_scoreboard(dates: str, league: str = "nba") -> dict:
     """Every game on calendar date `dates` (YYYYMMDD) for `league` -- works
     for historical dates too, which makes it a cheap schedule cross-check."""
     return _get_json(f"{site_api(league)}/scoreboard?dates={dates}")
+
+
+def get_leaders(season: int, league: str = "nba", limit: int = 50) -> dict:
+    """Every per-category leaderboard for the season ENDING in `season`
+    (NBA) / the season `season` (WNBA), regular season (types=2) -- the
+    live MVP tracker's candidate pool. `limit` caps each category's depth
+    (verified: the endpoint answers past it with the full list)."""
+    return _get_json(f"{core_api(league)}/seasons/{season}/types/2/leaders"
+                     f"?region=us&lang=en&contentorigin=espn&limit={limit}")
+
+
+def get_athlete_season_stats(athlete_id: int | str, season: int,
+                             league: str = "nba") -> dict:
+    """One athlete's season TOTALS for the season ENDING in `season`
+    (NBA) / the season `season` (WNBA): gamesPlayed, points, rebounds,
+    assists, shooting splits (parse_athlete_stats flattens them).
+
+    The season + type path segment is load-bearing: the bare
+    /athletes/{id}/statistics/0 answers the CAREER split (all seasons
+    summed), while /seasons/{year}/types/2/athletes/{id}/statistics/0
+    answers the season itself -- and the trailing /0 is required for the
+    in-progress season (verified live Oct 2026)."""
+    return _get_json(f"{core_api(league)}/seasons/{season}/types/2"
+                     f"/athletes/{athlete_id}/statistics/0")
+
+
+def get_athlete(athlete_id: int | str, league: str = "nba") -> dict:
+    """One athlete's profile -- the display NAME, which the leaders and
+    statistics payloads carry only as ids and $refs. The core host serves
+    it under the SAME id the leaders $ref (site.api's own /athletes/{id}
+    answers 404 for those, verified live Oct 2026)."""
+    return _get_json(f"{core_api(league)}/athletes/{athlete_id}"
+                     "?lang=en&region=us")

@@ -629,6 +629,32 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
             "below. A dash means the award isn't announced yet."
         )
 
+        # Live in-season MVP race: only while the selected season is the
+        # one being played -- a finished season's race is the committed
+        # one further down (never re-fetched), and this is the page's most
+        # expensive read (leaderboards + one totals call per candidate),
+        # hence the 10 min cache. Movement arrows come from the committed
+        # daily snapshots; the MVP trend chart below already covers the
+        # trend, so it is never drawn twice.
+        if season == shared.current_season_label(league):
+            shared.section("MVP progress tracker -- live")
+            live_rows, live_note = shared.load_live_mvp_race(season, league)
+            if live_rows:
+                snapshots, _ = shared.load_race_history(season, league)
+                moves = shared.race_movement(snapshots, "mvp")
+                for row in live_rows[:shared.LIVE_MVP_SHOW]:
+                    row["player_name"] = shared.live_athlete_name(
+                        int(row["player_id"]), league)
+                    st.markdown(shared.race_row_html(
+                        row, "mvp",
+                        moves.get(int(row["player_id"]), 0), league),
+                        unsafe_allow_html=True)
+            else:
+                st.info(live_note)
+            st.caption(
+                f"MVP race is homegrown math, not official {display} "
+                f"voting: {awards.RACE_FORMULAS['mvp']} · {live_note}")
+
         # Finals MVP calculator: the season MVP formula on the selected
         # season's Finals series, beside the same official winner the
         # headline just showed -- formula vs award, one glance. Live ESPN
