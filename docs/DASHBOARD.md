@@ -59,7 +59,7 @@ per league, with that league's season and data.
    is absent), captioned that the model is NBA-trained and the WNBA tab
    runs no projections. The model's full numbers stay in
    `models/metrics.json`.
-2. **KPI strip**: three glass metric cards scoped to the selected season.
+2. **KPI strip**: three quiet metric tiles scoped to the selected season.
    *Games collected* (box-score files for that season, 0 shown honestly
    when none), *Next tip-off* (first future game in the schedule,
    otherwise "—" with help text for finished seasons), *Season scoring
@@ -346,8 +346,10 @@ width so nothing is squeezed or hidden:
 All styling is one CSS block in `shared.inject_css()`, CSS-only with no JS:
 
 - accent-gradient page title, hero strip with season/data-age pills,
-- glass metric cards, accent-underlined tabs, uppercase section labels,
-- slot chips, award-race/leader rows, and court cards whose stat tooltips
+- quiet metric tiles, accent-underlined tabs (inactive ones faded),
+  uppercase section labels on an accent bar with wide spacing,
+- slot chips, award-race/leader rows as a calm divider list (hover
+  restores the card fill), and court cards whose stat tooltips
   are pure CSS (`:hover`), including the image fallback (headshot `<img>`
   over a team-logo `background-image`, so a CDN 404 just shows the logo);
 - every color derived from Streamlit's own theme tokens

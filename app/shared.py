@@ -86,25 +86,34 @@ CSS = """
 }
 .na-sub { opacity: 0.75; font-size: 0.9rem; }
 
-/* Uppercase section labels */
+/* Uppercase section labels: accent bar + air, so a long tab (the Awards
+   Ladder carries 11 of them) reads as one hierarchy instead of a wall of
+   equally-weighted headers. */
 .na-section {
-  margin: 18px 0 6px; font-size: 0.8rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.65;
+  margin: 26px 0 10px; padding-left: 10px;
+  border-left: 3px solid var(--na-accent);
+  font-size: 0.76rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.14em; opacity: 0.75;
 }
 
-/* Metric cards: glass tiles instead of bare numbers */
+/* Metric tiles: quiet fill, no boxed-card noise (the KPI row sits right
+   under the hero; boxed tiles doubled the frame count on every page) */
 div[data-testid="stMetric"] {
-  background: var(--na-card); border: 1px solid var(--na-border);
-  border-radius: 14px; padding: 14px 16px;
+  background: color-mix(in srgb, var(--na-card) 55%, transparent);
+  border: none; border-radius: 12px; padding: 12px 14px;
 }
 
-/* Tabs: accent underline on the active tab */
-[data-baseweb="tab-list"] { gap: 6px; }
-[data-baseweb="tab"] { padding-left: 14px; padding-right: 14px; }
+/* Tabs: accent underline on the active tab, quieter inactive ones */
+[data-baseweb="tab-list"] { gap: 4px; }
+[data-baseweb="tab"] {
+  padding-left: 12px; padding-right: 12px;
+  font-size: 0.92rem; opacity: 0.72;
+}
 [data-baseweb="tab"][aria-selected="true"] {
   background: transparent;
   border-bottom: 2px solid var(--na-accent);
   color: var(--text-color);
+  opacity: 1;
 }
 
 /* Lineup slot chips */
@@ -118,11 +127,21 @@ div[data-testid="stMetric"] {
 .na-slot--C { color: #FFB37F; border-color: #E07A2E; }
 .na-slot--UTIL { color: var(--na-gold); border-color: color-mix(in srgb, var(--na-gold) 60%, transparent); }
 
-/* Award-race + stat-leader rows (Awards Ladder) */
+/* Award-race + stat-leader rows (Awards Ladder, official awards, verdict
+   rows -- every ladder on the page): a calm divider list instead of one
+   boxed card per row (stacked bordered cards were the single loudest
+   source of clutter); hover restores the card fill so the row under the
+   cursor stays findable. */
 .na-race-row {
-  display: flex; align-items: center; gap: 12px; padding: 8px 12px;
-  border: 1px solid var(--na-border); background: var(--na-card);
-  border-radius: 12px; margin-bottom: 6px;
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 10px; border-radius: 9px; margin-bottom: 1px;
+  border: 1px solid transparent;
+  border-bottom-color: color-mix(in srgb, var(--text-color) 10%, transparent);
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.na-race-row:hover {
+  background: var(--na-card);
+  border-color: var(--na-border);
 }
 .na-race-row .na-rank {
   width: 34px; flex: none; text-align: center;
@@ -285,6 +304,26 @@ div[data-testid="stMetric"] {
 .na-court-card:hover .na-tip { display: block; }
 .na-court-link { display: contents; color: inherit; text-decoration: none; }
 .na-court-card:hover .na-cname { text-decoration: underline; }
+
+/* Captions: muted small print that GROUPS instead of stacking line after
+   line at full weight -- consecutive captions pull together so a section's
+   formula + source + disclaimer read as one footnote block. */
+[data-testid="stCaptionContainer"] {
+  opacity: 0.66; font-size: 0.78rem; line-height: 1.55;
+}
+[data-testid="stCaptionContainer"] + [data-testid="stCaptionContainer"] {
+  margin-top: -6px;
+}
+
+/* Info/warning notes: tighter, calmer blocks */
+[data-testid="stAlertContainer"] {
+  padding: 10px 14px; border-radius: 10px; font-size: 0.85rem;
+}
+
+/* Tables + charts + sidebar expanders: rounded frames, no raw grid edges */
+[data-testid="stDataFrame"] { border-radius: 10px; overflow: hidden; }
+[data-testid="stPlotlyChart"] { border-radius: 10px; }
+[data-testid="stExpander"] details { border-radius: 10px; }
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
