@@ -661,6 +661,12 @@
    "team_id": 6
   },
   {
+   "player_id": 4896372,
+   "player_name": "Walter Clayton Jr.",
+   "position": "G",
+   "team_id": 6
+  },
+  {
    "player_id": 5279129,
    "player_name": "Sergio de Larrea",
    "position": "F",
@@ -1749,6 +1755,12 @@
   {
    "player_id": 5214989,
    "player_name": "Bogoljub Markovic",
+   "position": "F",
+   "team_id": 15
+  },
+  {
+   "player_id": 4397233,
+   "player_name": "Pete Nance",
    "position": "F",
    "team_id": 15
   },
@@ -3121,6 +3133,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-21T17:13:43Z",
+ "_generated_utc": "2026-10-22T17:11:58Z",
  "source": "local"
 }
