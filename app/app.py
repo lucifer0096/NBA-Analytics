@@ -629,6 +629,37 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
             "below. A dash means the award isn't announced yet."
         )
 
+        # Finals MVP calculator: the season MVP formula on the selected
+        # season's Finals series, beside the same official winner the
+        # headline just showed -- formula vs award, one glance. Live ESPN
+        # box scores (15 min cache), so it also tracks the series WHILE it
+        # is played (the series block names the Finals mid-series); an
+        # honest info row when the Finals isn't in the record yet or ESPN
+        # is unreachable, never a guess.
+        shared.section("Finals MVP calculator -- official vs formula")
+        fmvp_rows, fmvp_info, fmvp_note = shared.load_finals_series(
+            season, league)
+        if fmvp_rows:
+            official = ([finals_top]
+                        if (finals_top or {}).get("player_name") else [])
+            st.markdown(shared.official_vs_algo_row_html(
+                "finals_mvp", official, fmvp_rows[0]),
+                unsafe_allow_html=True)
+            for row in fmvp_rows[:shared.FINALS_MVP_FORMULA_SHOW]:
+                st.markdown(shared.race_row_html(
+                    row, "finals_mvp", league=league),
+                    unsafe_allow_html=True)
+        else:
+            st.info(fmvp_note)
+        st.caption(
+            f"Formula (homegrown math, not official voting): "
+            f"{awards.FINALS_MVP_FORMULA}")
+        if fmvp_rows:
+            st.caption(
+                f"Series: {fmvp_info['standings']} · Qualifier: appeared in "
+                f"at least {fmvp_info['min_gp']} of the series' "
+                f"{fmvp_info['games']} games · Source: {fmvp_note}")
+
         if not awards_payload.get("races"):
             if int(games_counts.get(season) or 0):
                 st.info(

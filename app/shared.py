@@ -429,6 +429,11 @@ def race_meta(race: str, row: dict) -> str:
         return (f"{team} · {gp} GP · {row.get('starts', 0)} starts "
                 f"({start_pct:.0f}%) · {row.get('ppg', 0)} PPG · "
                 f"{row.get('apg', 0)} APG")
+    if race == "finals_mvp":
+        rec = (f" · {row['wins']}-{row['losses']} in the series"
+               if row.get("wins") is not None else "")
+        return (f"{team} · {gp} GP · {row.get('ppg', 0)} PPG · "
+                f"{row.get('rpg', 0)} RPG · {row.get('apg', 0)} APG{rec}")
     return (f"{team} · {gp} GP · {row.get('ppg_prev', 0)} → "
             f"{row.get('ppg', 0)} PPG ({row.get('delta_ppg', 0):+.1f}) · "
             f"{row.get('gp_prev', 0)} GP last season")
@@ -1693,6 +1698,7 @@ def load_players(league: str = "nba") -> tuple:
 
 
 FINAL_MVP_SHOW = 10  # Finals MVP tracker rows rendered (current season first)
+FINALS_MVP_FORMULA_SHOW = 5  # calculator formula rows under the verdict row
 
 
 @st.cache_data(ttl=300, show_spinner=False)
@@ -1735,6 +1741,95 @@ def load_finals_mvp(league: str = "nba") -> tuple:
         note = (f"No Finals MVP seasons in the committed index · "
                 f"{data_age_note(payload, False)}")
     return (rows, note)
+
+
+@st.cache_data(ttl=900, show_spinner=False)
+def load_finals_series(season: str, league: str = "nba") -> tuple:
+    """(formula rows, info dict, note) -- the Finals MVP calculator's series
+    side: awards.finals_mvp_rows (the season MVP formula, on the series)
+    over LIVE ESPN Finals box scores for the SELECTED season.
+
+    Bootstrap: the committed postseason file names the season's last
+    completed game; its summary's playoff-series block carries every Finals
+    game's id (verified on every tested season, 2012 WNBA through 2026
+    NBA). NBA series blocks say 'NBA Finals' outright; WNBA blocks say a
+    generic 'Playoff Series' for every round (verified 2012-2025), so a
+    generic block counts as the Finals only when it is the season's LAST
+    series (no later committed game) or sits in the best-of-7 slot the
+    modern WNBA Finals uses. Every series game's box score is then parsed
+    like any other game. Honest states, never a guess: Finals not played
+    (or not identifiable) yet, any series game unreachable (a partial
+    series would move every per-game number, so no rows at all), or ESPN
+    down -- the same wording the Schedule tab's game detail uses."""
+    import parsing  # noqa: E402  (src/collector on sys.path via the app)
+
+    frame, _post_note = load_postseason_schedule(season, league)
+    empty = frame if isinstance(frame, pd.DataFrame) else pd.DataFrame()
+    done = (empty[empty["status"] == "STATUS_FINAL"]
+            if "status" in empty.columns else empty)
+    if done.empty:
+        return ([], {}, f"{season}'s Finals isn't in the record yet: no "
+                        "completed postseason games committed for the season")
+    done = done.sort_values("date")
+    latest_id = str(done.iloc[-1]["game_id"])
+    # Season over? The chronologically last committed game IS this completed
+    # game (no scheduled games after it) -- the generic-series tiebreaker.
+    ordered = empty.sort_values("date")
+    season_over = str(ordered.iloc[-1].get("status")) == "STATUS_FINAL"
+    try:
+        payload = espn_api.get_event_summary(latest_id, league)
+    except Exception:
+        return ([], {}, "Live Finals box scores unavailable: ESPN "
+                        "unreachable from this session (the series formula "
+                        "reads every Finals game's box score live)")
+    comps = (payload.get("header") or {}).get("competitions") or [{}]
+    series = None
+    for block in comps[0].get("series") or []:
+        if block.get("type") != "playoff":
+            continue
+        desc = str(block.get("description") or "")
+        if "Finals" in desc and "Conference" not in desc:
+            series = block
+            break
+        if desc in ("", "Playoff Series") and (
+                int(block.get("totalCompetitions") or 0) >= 7 or season_over):
+            series = block
+            break
+    if series is None:
+        return ([], {}, f"{season}'s Finals isn't in the record yet: the "
+                        "latest completed postseason game isn't a Finals "
+                        "game on ESPN")
+    game_ids = [str(e.get("id")) for e in (series.get("events") or [])
+                if e.get("id")]
+    if latest_id not in game_ids:
+        game_ids.append(latest_id)
+    rows: list = []
+    metas: list = []
+    for gid in game_ids:
+        try:
+            meta, game_rows = parsing.parse_summary(
+                espn_api.get_event_summary(gid, league), league)
+        except Exception:
+            return ([], {}, f"Live Finals box scores unavailable: game "
+                            f"{gid} is unreachable -- every Finals game "
+                            "counts in the formula")
+        if not (meta.get("home_score") and meta.get("away_score")):
+            continue  # a scheduled game in the series list: no box score yet
+        metas.append(meta)
+        rows.extend(game_rows)
+    if not metas:
+        return ([], {}, f"{season}'s Finals has no completed games on ESPN "
+                        "yet")
+    formula_rows, min_gp = awards.finals_mvp_rows(rows, metas)
+    records = awards.series_results(metas)
+    standings = " · ".join(
+        f"{team} {rec['wins']}-{rec['losses']}"
+        for team, rec in sorted(records.items(),
+                                key=lambda kv: -kv[1]["win_pct"]))
+    info = {"min_gp": min_gp, "games": len(metas), "standings": standings}
+    note = (f"Live ESPN Finals box scores (15 min cache): "
+            f"{len(game_ids)} series games, {len(metas)} played")
+    return (formula_rows, info, note)
 
 
 @st.cache_data(ttl=300, show_spinner=False)

@@ -606,3 +606,108 @@ def test_build_payload_envelope(tmp_path):
     assert pts[0]["per_game"] == 30.0
     assert pts[0]["mpg"] == 30.0
     assert len(pts) == 4                             # DNP guy excluded
+
+
+# ---------------------------------------------------------------------------
+# Finals MVP: the season formula, applied to a playoff series
+# ---------------------------------------------------------------------------
+
+def _series_meta(home, away, hs, aws, gid=0):
+    """A parse_summary game-meta dict for a played series game."""
+    return {"game_id": gid, "home_abbrev": home, "away_abbrev": away,
+            "home_score": hs, "away_score": aws, "status": "STATUS_FINAL"}
+
+
+def test_finals_formula_caption_matches_the_math():
+    """The printed Finals formula carries every constant the math runs
+    with (rendered from them, the goat_formula rule): the impact weights,
+    the multiplier floor and ceiling, and the series qualifier."""
+    text = awards.FINALS_MVP_FORMULA
+    assert f"{awards.IMPACT_RPG_WEIGHT:.2f}·REB" in text
+    assert f"{awards.IMPACT_APG_WEIGHT:.1f}·AST" in text
+    assert (f"{awards.MULTIPLIER_FLOOR:.1f}× floor to "
+            f"{1.0:.1f}× for a sweep") in text
+    assert "MVP race formula" in text
+    assert "half the series' games" in text
+
+
+def test_finals_min_gp_scales_to_the_series():
+    # Half the series, rounded up, floored at 1 (a curtailed series still
+    # ranks whoever played).
+    assert awards.finals_min_gp(4) == 2
+    assert awards.finals_min_gp(5) == 3
+    assert awards.finals_min_gp(7) == 4
+    assert awards.finals_min_gp(3) == 2
+    assert awards.finals_min_gp(1) == 1
+    assert awards.finals_min_gp(0) == 1
+
+
+def test_series_results_and_finals_mvp_rows():
+    """A 3-1 series ranked by the season MVP formula on series aggregates:
+    the champion's star wins on production AND the series win percentage,
+    the runner-up's star ranks second at his own team's 0.25, and a
+    one-game cameo is gated out (min_gp = ceil(4/2))."""
+    metas = [_series_meta("CHI", "BOS", 101, 95, 1),
+             _series_meta("BOS", "CHI", 99, 96, 2),
+             _series_meta("CHI", "BOS", 105, 98, 3),
+             _series_meta("CHI", "BOS", 97, 91, 4)]
+    results = awards.series_results(metas)
+    assert results["CHI"] == {"wins": 3, "losses": 1, "games": 4,
+                              "win_pct": 0.75}
+    assert results["BOS"]["win_pct"] == 0.25
+
+    rows = []
+    for gid in (1, 2, 3, 4):
+        rows.append(_box(1, "Star Guy", "CHI", starter=True, min=36,
+                         pts=30, reb=8, ast=6, fgm=12, fga=22, gid=gid))
+        rows.append(_box(2, "Runner Guy", "BOS", starter=True, min=35,
+                         pts=28, reb=4, ast=4, gid=gid))
+        rows.append(_box(3, "Sixth Guy", "CHI", min=28, pts=14, reb=4,
+                         ast=3, gid=gid))
+    rows.append(_box(1, "Star Guy", "CHI", dnp=True, pts=0))  # DNP: no GP
+    rows.append(_box(4, "Bench Guy", "CHI", min=6, pts=6, gid=1))  # 1 GP: gated
+
+    ladder, min_gp = awards.finals_mvp_rows(rows, metas)
+    assert min_gp == 2
+    top = ladder[0]
+    assert top["player_name"] == "Star Guy"
+    # (30 + 0.75*8 + 6) * (0.6 + 0.4*0.75) = 42 * 0.9
+    assert top["score"] == 37.8
+    assert (top["wins"], top["losses"], top["win_pct"]) == (3, 1, 0.75)
+    assert top["ppg"] == 30.0 and top["rpg"] == 8.0 and top["apg"] == 6.0
+    assert top["gp"] == 4
+    assert top["fgp"] == round(100 * 48 / 88, 1)
+    second = ladder[1]
+    assert second["player_name"] == "Runner Guy"
+    # (28 + 0.75*4 + 4) * (0.6 + 0.4*0.25) = 35 * 0.7
+    assert second["score"] == 24.5
+    names = [r["player_name"] for r in ladder]
+    assert "Bench Guy" not in names and "Star Guy (DNP)" not in names
+    assert set(names) == {"Star Guy", "Runner Guy", "Sixth Guy"}
+
+    # An unplayed game in the series list (no scores) changes nothing.
+    unplayed = metas + [{"game_id": 5, "home_abbrev": "CHI",
+                         "away_abbrev": "BOS", "home_score": None,
+                         "away_score": None}]
+    ladder2, min_gp2 = awards.finals_mvp_rows(rows, unplayed)
+    assert min_gp2 == 2
+    assert [r["player_name"] for r in ladder2] == names
+
+
+def test_aggregate_series_games_sums_and_skips():
+    """Series aggregates follow the season rules: DNP rows and id-less
+    rows count for nothing; totals sum across games."""
+    rows = [_box(7, "Guy", "LAL", starter=True, min=30, pts=20, reb=3,
+                 ast=9, fgm=8, fga=15),
+            _box(7, "Guy", "LAL", starter=True, min=28, pts=25, reb=5,
+                 ast=7, fgm=10, fga=18),
+            _box(7, "Guy", "LAL", dnp=True),
+            {"player_name": "No Id", "team_abbrev": "LAL"}]
+    agg = awards.aggregate_series_games(rows)
+    assert len(agg) == 1
+    entry = agg[0]
+    assert entry["player_id"] == 7
+    assert entry["gp"] == 2 and entry["starts"] == 2
+    assert entry["minutes"] == 58
+    assert (entry["pts"], entry["reb"], entry["ast"]) == (45, 8, 16)
+    assert (entry["fgm"], entry["fga"]) == (18, 33)

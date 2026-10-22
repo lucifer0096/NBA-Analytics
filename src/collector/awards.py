@@ -150,9 +150,15 @@ STAT_LABELS = {"pts": "Points", "reb": "Rebounds", "ast": "Assists",
 STAT_ABBR = {"pts": "PPG", "reb": "RPG", "ast": "APG", "stl": "SPG",
              "blk": "BPG", "fg3m": "3PM", "plus_minus": "+/-", "fgp": "FG%",
              "fg3p": "3P%", "ftp": "FT%", "efg": "eFG%", "ts": "TS%"}
+# Display-only maps for the Finals MVP calculator's rows and verdict (the
+# calculator reuses the race-row look but is NOT a sidebar race -- RACES
+# below stays the four collected races, and the collector never writes a
+# "finals_mvp" race).
 RACE_LABELS = {"mvp": "MVP race", "dpoy": "DPOY race",
-               "sixth_man": "6th Man race", "mip": "MIP race"}
-RACE_EMOJI = {"mvp": "🏆", "dpoy": "🛡️", "sixth_man": "🪑", "mip": "📈"}
+               "sixth_man": "6th Man race", "mip": "MIP race",
+               "finals_mvp": "Finals MVP"}
+RACE_EMOJI = {"mvp": "🏆", "dpoy": "🛡️", "sixth_man": "🪑", "mip": "📈",
+              "finals_mvp": "🏆"}
 RACE_FORMULAS = {
     "mvp": ("Impact per game (PTS + 0.75·REB + 1.0·AST) scaled by the "
             "team's win percentage, 0.6× floor to 1.0× at a perfect record."),
@@ -163,6 +169,16 @@ RACE_FORMULAS = {
     "mip": ("Year-over-year change in per-game impact vs the previous "
             "season; both seasons must clear the games-played qualifier."),
 }
+
+# The Finals MVP formula is the season MVP formula applied to a playoff
+# series -- assembled from the very constants the math runs with, so the
+# caption can never drift from the computation (the goat_formula rule).
+FINALS_MVP_FORMULA = (
+    "The MVP race formula, on the series: impact per game (PTS + "
+    f"{IMPACT_RPG_WEIGHT:.2f}·REB + {IMPACT_APG_WEIGHT:.1f}·AST) scaled by "
+    "the team's Finals series win percentage, "
+    f"{MULTIPLIER_FLOOR:.1f}× floor to 1.0× for a sweep; qualifiers: "
+    "appeared in at least half the series' games.")
 
 # The GOAT formula is assembled from the very constants the math runs with,
 # so the caption can never drift from the computation. Every one of that
@@ -440,6 +456,94 @@ def mvp_rows(players: list, records: dict, min_gp: int) -> list:
         })
     rows.sort(key=lambda r: (-r["score"], -r["ppg"], r["player_name"] or ""))
     return _ranked(rows)
+
+
+# ---------------------------------------------------------------------------
+# Finals MVP: the season formula, applied to a playoff series
+# ---------------------------------------------------------------------------
+
+def finals_min_gp(series_games: int) -> int:
+    """Finals qualifier: appeared in at least half the series' games (ceil).
+    The season rule's half-the-season gate on a <=7-game series, floored at
+    1 so even a curtailed series ranks its players."""
+    return max(1, -(-int(series_games) // 2))
+
+
+def series_results(game_metas: list) -> dict:
+    """{team_abbrev: {wins, losses, win_pct, games}} -- a playoff series'
+    standings from its played games' metas (parse_summary's home/away
+    abbrevs + final scores). A game missing a side's abbrev or a score is
+    skipped: never a fabricated result, and unplayed games in the series
+    list count for nothing."""
+    out: dict = {}
+    for meta in game_metas or []:
+        home = meta.get("home_abbrev")
+        away = meta.get("away_abbrev")
+        home_score = meta.get("home_score")
+        away_score = meta.get("away_score")
+        if not home or not away or not home_score or not away_score:
+            continue
+        for team, won in ((home, int(home_score) > int(away_score)),
+                          (away, int(away_score) > int(home_score))):
+            rec = out.setdefault(team, {"wins": 0, "losses": 0})
+            if won:
+                rec["wins"] += 1
+            else:
+                rec["losses"] += 1
+    for rec in out.values():
+        rec["games"] = rec["wins"] + rec["losses"]
+        rec["win_pct"] = (round(rec["wins"] / rec["games"], 3)
+                          if rec["games"] else 0.0)
+    return out
+
+
+def aggregate_series_games(rows: list) -> list:
+    """Season-race-shaped per-player series aggregates from already-parsed
+    player-game rows (parse_summary output across the series' games): the
+    aggregate_players output shape -- CAREER_SUM_STATS totals + gp/starts/
+    minutes + the identity fields mvp_rows reads -- so the series formula
+    IS the season formula, run on a different game list. Did-not-play rows
+    don't count (the season rule); a player's team is the one he appeared
+    for in the series (no traded ambiguity inside a playoff series)."""
+    agg: dict = {}
+    for row in rows or []:
+        if row.get("did_not_play"):
+            continue
+        pid = row.get("player_id")
+        if pid is None:
+            continue
+        entry = agg.get(pid)
+        if entry is None:
+            entry = agg[pid] = {
+                "player_id": pid,
+                "player_name": row.get("player_name"),
+                "team_abbrev": row.get("team_abbrev"),
+                "team_id": row.get("team_id"),
+                "gp": 0,
+                "starts": 0,
+                "minutes": 0,
+            }
+            for stat in CAREER_SUM_STATS:
+                entry[stat] = 0
+        entry["gp"] += 1
+        entry["starts"] += 1 if row.get("starter") else 0
+        entry["minutes"] += int(row.get("min") or 0)
+        for stat in CAREER_SUM_STATS:
+            entry[stat] += int(row.get(stat) or 0)
+    return list(agg.values())
+
+
+def finals_mvp_rows(rows: list, game_metas: list) -> tuple:
+    """((ranked rows, min_gp)) -- mvp_rows over series aggregates and the
+    series' own standings (win percentage over the series, not the
+    season), with the qualifier scaled to a <=7-game series. Row shape is
+    mvp_rows' (rank, player, score, ppg/rpg/apg, wins/losses/win_pct,
+    fgp)."""
+    played = [m for m in (game_metas or [])
+              if m.get("home_score") and m.get("away_score")]
+    min_gp = finals_min_gp(len(played))
+    return (mvp_rows(aggregate_series_games(rows), series_results(played),
+                     min_gp), min_gp)
 
 
 def dpoy_rows(players: list, records: dict, min_gp: int) -> list:

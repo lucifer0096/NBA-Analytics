@@ -777,22 +777,24 @@ def test_fallback_envelopes_carry_generation_timestamp():
     assert checked >= 0
 
 
-def test_sidebar_every_year_leads_with_data_and_honest_empty(offline_espn):
+def test_sidebar_every_year_leads_with_the_default_season(offline_espn):
     """Sidebar offers a season selector PER LEAGUE: the NBA box offers every
-    season 2010-11 -> upcoming 2026-27 and leads with the newest season
-    that HAS collected games; the WNBA box offers single calendar years
-    (label shapes never collide, so one ?season= param serves both).
-    Selecting the not-yet-started 2026-27 shows honest empty states: no
-    loud fallback banner (the old show-2025-26-with-a-warning contract is
-    gone) and the Awards note says the season has no collected games --
-    never another year's races."""
+    season 2010-11 -> the upcoming one and leads with the newest season
+    that HAS collected games (the daily collector moves that default, so
+    the test asks shared.default_season_index -- the app's own logic --
+    instead of pinning a year); the WNBA box offers single calendar years
+    (label shapes never collide, so one ?season= param serves both)."""
+    import shared as shared_module
+
     at = _render("app/app.py", offline_espn)
     # Label lookup, not [0]: the Schedule tab's Fixture pickers also render
     # (AppTest orders sidebar widgets after main content).
     box = next(b for b in at.selectbox if str(b.label) == "Season (NBA)")
     labels = list(box.options)
-    assert "2010-11" in labels and "2025-26" in labels and "2026-27" in labels
-    assert box.value == "2025-26"
+    assert "2010-11" in labels and "2025-26" in labels
+    nba_options = shared_module.season_options("nba")
+    assert box.value == nba_options[shared_module.default_season_index(
+        nba_options, "nba")]
     # The WNBA selector is a parallel box with single-year labels: its
     # defaults come from ITS OWN collected inventory, not the NBA's.
     wnba_box = next(b for b in at.selectbox
@@ -800,16 +802,38 @@ def test_sidebar_every_year_leads_with_data_and_honest_empty(offline_espn):
     wnba_labels = list(wnba_box.options)
     assert "2010" in wnba_labels and "2026" in wnba_labels
     assert all("-" not in str(v) for v in wnba_labels)
-    box.select("2026-27").run()
     assert not at.exception
     assert len(at.warning) == 0
-    text = f"{_markdown_text(at)} " + " ".join(
-        str(c.value) for c in at.caption)
-    assert "2026-27 has no collected games yet" in text
-    # Standings empty out too (the committed copy is 2025-26 -- never shown
-    # under the 2026-27 header).
+
+
+def test_empty_season_states_are_honest(monkeypatch, offline_espn):
+    """A season with no collected games shows empty states everywhere --
+    the loaders are stubbed empty so the contract holds no matter how far
+    the daily collector has run: the Awards note says the season has no
+    collected games, the standings section says no table, and nothing
+    falls back to another year's data under this header (zero warnings,
+    the old show-last-season-with-a-banner contract stays dead)."""
+    import pandas as pd
+
+    import shared as shared_module
+
+    empty = pd.DataFrame()
+    monkeypatch.setattr(shared_module, "load_schedule",
+                        lambda season, league="nba": (empty, "none collected"))
+    monkeypatch.setattr(shared_module, "load_standings",
+                        lambda season, league="nba": (empty, "not started"))
+    monkeypatch.setattr(shared_module, "load_awards",
+                        lambda season, league="nba": ({}, "not started"))
+    monkeypatch.setattr(shared_module, "load_games_by_season",
+                        lambda league="nba": {})
+    at = _render("app/app.py", offline_espn)
+    assert not at.exception
+    box = next(b for b in at.selectbox if str(b.label) == "Season (NBA)")
+    season = str(box.value)
+    assert len(at.warning) == 0
     infos = " ".join(str(i.value) for i in at.info)
-    assert "No standings available for 2026-27" in infos
+    assert f"{season} has no collected games yet" in infos
+    assert "No standings available" in infos
 
 
 # ---------------------------------------------------------------------------
@@ -917,8 +941,12 @@ def test_schedule_filters_and_csv_downloads_render(offline_espn):
     and each league tab's team + venue filters scope THAT tab's results
     table, fixture picker and export together -- a BOS filter in the NBA
     tab never leaves another team's row on screen, and the WNBA tab's
-    frame keeps its own teams (the two toolbars are independent)."""
+    frame keeps its own teams (the two toolbars are independent).
+    Pinned on 2025-26: the default season is in progress and renders the
+    compact results+upcoming view, while a finished season carries the
+    full table this filter contract is written against."""
     at = _render("app/app.py", offline_espn)
+    at.selectbox(key="season_nba").select("2025-26").run()
     assert not at.exception
     labels = [str(b.label) for b in at.download_button]
     assert "Download standings CSV" in labels
@@ -972,8 +1000,10 @@ def test_postseason_section_renders_labeled_scoped_and_exportable(
     collected playoff rows (the Status column distinguishes it from the
     regular tables), its own CSV button, the honesty caption keeping it
     out of every computed view, and (PO)-marked playoff fixtures in the
-    game-detail picker."""
+    game-detail picker. Pinned on 2025-26: the default (in-progress)
+    season has no bracket yet -- its honest empty state has its own test."""
     at = _render("app/app.py", offline_espn)
+    at.selectbox(key="season_nba").select("2025-26").run()
     assert not at.exception
 
     assert "postseason" in _markdown_text(at).lower()
@@ -999,8 +1029,10 @@ def test_postseason_section_follows_the_team_filter(offline_espn):
     """The toolbar's team filter scopes the postseason table with every
     other frame: pick a team that made the bracket and every row of the
     NBA tab's postseason table involves it (the WNBA tab's toolbar stays
-    independent, exactly like the regular tables)."""
+    independent, exactly like the regular tables). Pinned on 2025-26:
+    the default (in-progress) season has no NBA bracket to filter."""
     at = _render("app/app.py", offline_espn)
+    at.selectbox(key="season_nba").select("2025-26").run()
     assert not at.exception
     frames = [df.value for df in at.dataframe
               if hasattr(getattr(df, "value", None), "columns")]
@@ -1119,7 +1151,13 @@ def test_deep_link_season_preselects_sidebar(offline_espn):
     assert not bad.exception, f"page raised: {bad.exception}"
     fallback = next(b for b in bad.selectbox
                     if str(b.label) == "Season (NBA)")
-    assert fallback.value == "2025-26"  # the pinned default, not the typo
+    # The honest default, asked of the app's own logic (the daily
+    # collector moves it; pinning a year here broke every refresh).
+    import shared as shared_module
+
+    nba_options = shared_module.season_options("nba")
+    assert fallback.value == nba_options[shared_module.default_season_index(
+        nba_options, "nba")]
 
 
 def test_deep_link_league_reorders_league_tabs(offline_espn):
@@ -1231,3 +1269,198 @@ def test_corrupt_fallback_warns_once_and_only_honestly(
     finally:
         shared_module._FALLBACK_ERRORS.clear()
         shared_module.load_schedule.clear()
+
+
+# ---------------------------------------------------------------------------
+# Finals MVP calculator: the season formula on the series vs the award
+# ---------------------------------------------------------------------------
+
+def test_finals_mvp_calculator_pending_for_undecided_season(offline_espn):
+    """The current season has no committed postseason and every ESPN call
+    fails, so the calculator renders its section, an honest pending info
+    row (never a stack trace, never another season's series) and the
+    verbatim series formula caption."""
+    at = _render("app/app.py", offline_espn)
+    text = (f"{_markdown_text(at)} "
+            + " ".join(str(c.value) for c in at.caption))
+    infos = " ".join(str(i.value) for i in at.info)
+    assert "Finals MVP calculator" in text
+    season = espn_api.current_season_label(league="nba")
+    assert f"{season}'s Finals isn't in the record yet" in infos
+    assert "The MVP race formula, on the series" in text
+
+
+def test_finals_mvp_calculator_offline_note_for_played_finals(offline_espn):
+    """Selecting a season whose Finals WAS played (2025-26, committed
+    postseason present): the bootstrap reaches for ESPN, fails honestly
+    with the unreachable note, and the official headline still names the
+    committed award winner."""
+    at = _render("app/app.py", offline_espn)
+    at.selectbox(key="season_nba").select("2025-26").run()
+    assert not at.exception
+    infos = " ".join(str(i.value) for i in at.info)
+    assert "Live Finals box scores unavailable" in infos
+    assert "ESPN unreachable from this session" in infos
+    text = (f"{_markdown_text(at)} "
+            + " ".join(str(c.value) for c in at.caption))
+    assert "Jalen Brunson" in text   # official side renders off the index
+
+
+def test_finals_mvp_calculator_formula_vs_award(monkeypatch, offline_espn):
+    """With a synthetic series ladder the calculator renders the verdict
+    row against the committed award (2025-26: Jalen Brunson): a differing
+    formula #1 shows the red verdict, the formula rows follow, and the
+    series/qualifier caption states the standings and the games bar."""
+    import shared
+
+    rows = [{"player_id": 1, "player_name": "Formula Guy",
+             "team_abbrev": "NYK", "gp": 5, "ppg": 31.2, "rpg": 7.8,
+             "apg": 8.4, "wins": 4, "losses": 1, "win_pct": 0.8,
+             "fgp": 48.1, "score": 36.9, "rank": 1},
+            {"player_id": 2, "player_name": "Second Man",
+             "team_abbrev": "NYK", "gp": 5, "ppg": 22.0, "rpg": 4.1,
+             "apg": 3.3, "wins": 4, "losses": 1, "win_pct": 0.8,
+             "fgp": 45.0, "score": 24.0, "rank": 2}]
+    info = {"min_gp": 3, "games": 5, "standings": "NYK 4-1 SA"}
+    note = "Live ESPN Finals box scores (15 min cache): 5 series games, 5 played"
+
+    def _fake(season, league="nba"):
+        if season == "2025-26":
+            return (rows, info, note)
+        return ([], {}, f"{season}'s Finals isn't in the record yet")
+
+    monkeypatch.setattr(shared, "load_finals_series", _fake)
+    at = _render("app/app.py", offline_espn)
+    at.selectbox(key="season_nba").select("2025-26").run()
+    assert not at.exception
+    text = (f"{_markdown_text(at)} "
+            + " ".join(str(c.value) for c in at.caption))
+    assert "Finals MVP calculator" in text
+    assert "Algorithm #1: Formula Guy" in text   # the reused verdict row
+    assert "Jalen Brunson" in text           # the award side of the verdict
+    assert "✗ differs" in text               # formula #1 != the award
+    assert "Second Man" in text              # the ladder rows render
+    assert "NYK 4-1 SA" in text              # series standings caption
+    assert "at least 3 of the series' 5 games" in text
+
+
+def _mini_summary(gid, home, away, hs, aws, series_desc, events,
+                  total=7, series_type="playoff", lines=()):
+    """A minimal but structurally real ESPN summary payload: header with
+    the playoff-series block + boxscore player lines (`lines`:
+    (team_id, abbrev, player_id, name, pts, reb, ast) per player)."""
+    players_by_team = {}
+    abbrev_of = {}
+    for team_id, abbrev, pid, name, pts, reb, ast in lines:
+        abbrev_of.setdefault(team_id, abbrev)
+        players_by_team.setdefault(team_id, []).append(
+            {"athlete": {"id": str(pid), "displayName": name},
+             "starter": True,
+             "stats": ["30", str(pts), str(reb), str(ast)]})
+    blocks = [{"team": {"id": str(tid), "abbreviation": abbrev_of[tid]},
+               "statistics": [{"labels": ["MIN", "PTS", "REB", "AST"],
+                               "athletes": athletes}]}
+              for tid, athletes in players_by_team.items()]
+    return {"header": {"competitions": [{
+        "id": str(gid), "date": "2026-06-14T00:00Z",
+        "status": {"type": {"name": "final"}},
+        "competitors": [
+            {"homeAway": "home",
+             "team": {"id": "18", "abbreviation": home}, "score": hs},
+            {"homeAway": "away",
+             "team": {"id": "24", "abbreviation": away}, "score": aws}],
+        "series": [{"type": series_type, "description": series_desc,
+                    "completed": True, "totalCompetitions": total,
+                    "events": [{"id": str(e)} for e in events]}]}]},
+        "boxscore": {"players": blocks}}
+
+
+def test_load_finals_series_identifies_and_ranks(monkeypatch):
+    """The loader's identification contract on synthetic payloads: an NBA
+    series block ('NBA Finals') is the Finals; a generic 'Playoff Series'
+    block counts only when it is the season's last committed series; the
+    series' games aggregate into the season-formula ladder. All fetches
+    are stubbed -- no network."""
+    import pandas as pd
+
+    import espn_api as espn_module
+    import shared
+
+    def _frame(games):
+        return (pd.DataFrame(games), "")
+
+    payloads = {
+        "101": _mini_summary(101, "NYK", "SA", "101", "95", "NBA Finals",
+                             ["101", "102", "103", "104"],
+                             lines=[(18, "NYK", 1, "Series Star", 30, 8, 6),
+                                    (24, "SA", 2, "Rival Star", 25, 6, 4)]),
+        "102": _mini_summary(102, "SA", "NYK", "99", "96", "NBA Finals",
+                             ["101", "102", "103", "104"],
+                             lines=[(18, "NYK", 1, "Series Star", 20, 5, 5),
+                                    (24, "SA", 2, "Rival Star", 30, 7, 3)]),
+        "103": _mini_summary(103, "NYK", "SA", "105", "98", "NBA Finals",
+                             ["101", "102", "103", "104"],
+                             lines=[(18, "NYK", 1, "Series Star", 32, 9, 7)]),
+        "104": _mini_summary(104, "NYK", "SA", "97", "91", "NBA Finals",
+                             ["101", "102", "103", "104"],
+                             lines=[(18, "NYK", 1, "Series Star", 28, 7, 8)]),
+    }
+    games = [{"game_id": str(g), "date": f"2026-06-{d:02d}T00:00Z",
+              "status": "STATUS_FINAL", "home_abbrev": h, "away_abbrev": a,
+              "home_score": hs, "away_score": aws}
+             for g, d, h, a, hs, aws in
+             ((101, 10, "NYK", "SA", "101", "95"),
+              (102, 12, "SA", "NYK", "99", "96"),
+              (103, 14, "NYK", "SA", "105", "98"),
+              (104, 16, "NYK", "SA", "97", "91"))]
+    monkeypatch.setattr(shared, "load_postseason_schedule",
+                        lambda season, league="nba": _frame(games))
+    monkeypatch.setattr(espn_module, "get_event_summary",
+                        lambda gid, league="nba": payloads[str(gid)])
+    shared.load_finals_series.clear()
+    try:
+        rows, info, note = shared.load_finals_series("2025-26", "nba")
+        assert [r["player_name"] for r in rows] == ["Series Star",
+                                                    "Rival Star"]
+        # Series Star: (110 + 0.75*29 + 26)/4 = 39.4375, NYK 3-1 -> x0.9
+        assert rows[0]["score"] == 35.49
+        # Rival Star: (55 + 0.75*13 + 7)/2 = 35.875, SA 1-3 -> x0.7
+        assert rows[1]["score"] == 25.11
+        assert info["games"] == 4 and info["min_gp"] == 2
+        assert info["standings"] == "NYK 3-1 · SA 1-3"
+        assert "4 series games, 4 played" in note
+
+        # A generic 'Playoff Series' block in the best-of-5 slot is NOT the
+        # Finals while other postseason games are still scheduled after it
+        # (semis in progress: a WNBA semis and finals share this shape).
+        with_later = games + [{"game_id": "105",
+                               "date": "2026-06-20T00:00Z",
+                               "status": "STATUS_SCHEDULED",
+                               "home_abbrev": "NYK", "away_abbrev": "SA",
+                               "home_score": None, "away_score": None}]
+        generic = json.loads(json.dumps(payloads["104"]))
+        generic["header"]["competitions"][0]["series"][0]["description"] = \
+            "Playoff Series"
+        generic["header"]["competitions"][0]["series"][0][
+            "totalCompetitions"] = 5
+        monkeypatch.setattr(shared, "load_postseason_schedule",
+                            lambda season, league="nba": _frame(with_later))
+        monkeypatch.setattr(
+            espn_module, "get_event_summary",
+            lambda gid, league="nba": (generic if str(gid) == "104"
+                                       else payloads[str(gid)]))
+        shared.load_finals_series.clear()
+        rows, info, note = shared.load_finals_series("2025-26", "nba")
+        assert rows == [] and "isn't in the record yet" in note
+
+        # The same generic best-of-5 block IS the Finals when the season is
+        # over (no later committed game): the last series of the postseason
+        # is the Finals (the WNBA's block never says so, any era).
+        monkeypatch.setattr(shared, "load_postseason_schedule",
+                            lambda season, league="nba": _frame(games))
+        shared.load_finals_series.clear()
+        rows, info, note = shared.load_finals_series("2025-26", "nba")
+        assert rows
+        assert info["standings"] == "NYK 3-1 · SA 1-3"
+    finally:
+        shared.load_finals_series.clear()

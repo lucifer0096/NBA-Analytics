@@ -127,8 +127,25 @@ per league, with that league's season and data.
 5. **Awards Ladder**: opens with the selected season's **official
    season awards** headline (MVP first, then Finals MVP, both off
    ESPN's award index, honest pending rows until announced), so the
-   page leads with the actual winners; then the selected season's
-   MVP / DPOY / 6th Man / MIP races in two columns, then a stat-leaders
+   page leads with the actual winners. Straight below sits the
+   **Finals MVP calculator -- official vs formula**: the season MVP
+   formula re-applied to the selected season's Finals series (per-game
+   impact from the series' box scores -- live ESPN summaries, 15-min
+   cache -- times the series-win multiplier, with the series standings
+   and the games-played qualifier printed beside the ladder), beside
+   the same official Finals MVP winner the headline just showed, in
+   the verdict row (green ✓ agree / red ✗ differs / dash while
+   undecided). It works WHILE the Finals are played, too: the NBA's
+   series block names the Finals mid-series, and the WNBA's best-of-7
+   slot (2025+) or the season's last committed series (season over)
+   identifies it, so the formula ladder runs game by game as the
+   series unfolds (qualifier: at least half the series' games, rounded
+   up, floored at 1). A season whose Finals isn't in the record yet,
+   an unreachable ESPN, a series with no completed games, or a
+   pre-2025 WNBA best-of-5 mid-series (its generic block is
+   indistinguishable from the semis) each render their honest note
+   instead of a guess. Then the selected season's MVP / DPOY / 6th
+   Man / MIP races in two columns, then a stat-leaders
    strip behind a PTS/REB/AST/STL/BLK/**3PM**/**+/-** radio (top-10 per-game rates, each row
    carrying the FG/3P made-attempt splits + FG%). Every row is a real
    headshot over a team-logo CSS fallback with the race's stat line and
