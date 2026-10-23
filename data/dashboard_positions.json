@@ -547,12 +547,6 @@
    "team_id": 5
   },
   {
-   "player_id": 4997530,
-   "player_name": "Khalifa Diop",
-   "position": "C",
-   "team_id": 5
-  },
-  {
    "player_id": 4431734,
    "player_name": "Tristan Enaruna",
    "position": "F",
@@ -613,21 +607,9 @@
    "team_id": 5
   },
   {
-   "player_id": 5106268,
-   "player_name": "Nae'Qwan Tomlin",
-   "position": "F",
-   "team_id": 5
-  },
-  {
    "player_id": 4683747,
    "player_name": "Jaylon Tyson",
    "position": "G",
-   "team_id": 5
-  },
-  {
-   "player_id": 5106261,
-   "player_name": "Ernest Udeh Jr.",
-   "position": "C",
    "team_id": 5
   },
   {
@@ -3133,6 +3115,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-22T17:11:58Z",
+ "_generated_utc": "2026-10-23T17:08:29Z",
  "source": "local"
 }
