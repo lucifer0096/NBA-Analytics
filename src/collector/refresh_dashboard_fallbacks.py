@@ -183,11 +183,47 @@ def _read_json(path: str, default):
     return data if isinstance(data, type(default)) else default
 
 
-def _write(path: str, payload: dict) -> None:
+# Freshness stamps: rewritten on every build and never content. The
+# collector now runs several times a day (game-night crons, see
+# collector.yml), so writes compare payloads with these keys stripped (at
+# any depth) and keep the committed file -- with its honest last-updated
+# stamp -- whenever nothing else moved. Churning stamps hourly would bury
+# real data movement under timestamp-only commits.
+STAMP_KEYS = ("_generated_utc", "last_run_utc", "updated_utc", "stamp")
+
+
+def _content(value):
+    """payload minus every stamp key, at any depth (freshness stamps live
+    at the top level and inside the history meta)."""
+    if isinstance(value, dict):
+        return {k: _content(v) for k, v in value.items()
+                if k not in STAMP_KEYS}
+    if isinstance(value, list):
+        return [_content(v) for v in value]
+    return value
+
+
+def _write(path: str, payload: dict, compact: bool = False) -> bool:
+    """Write `payload` to `path` -- unless the file already carries the
+    same CONTENT (stamps stripped): an unchanged refresh keeps the old
+    file and its stamp untouched, so off-hour runs are git-silent.
+    Answers whether a write happened."""
+    try:
+        with open(path, encoding="utf-8") as f:
+            old = json.load(f)
+        if _content(old) == _content(payload):
+            print(f"  unchanged {path}")
+            return False
+    except (OSError, ValueError):
+        pass  # missing or corrupt on disk: this write heals it
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(payload, f, indent=1)
+        if compact:
+            json.dump(payload, f, separators=(",", ":"))
+        else:
+            json.dump(payload, f, indent=1)
     print(f"  wrote {path}")
+    return True
 
 
 def _stamp(payload: dict, source: str) -> dict:
@@ -606,15 +642,13 @@ def _write_players(career: dict, history: dict) -> None:
         row["goat_score"] = placed.get("score") if placed else None
         players[str(pid)] = row
     path = _dash("dashboard_players.json")
-    os.makedirs(os.path.dirname(path), exist_ok=True)
     payload = _stamp({"players": players,
                       "meta": history.get("meta") or {},
                       "finals_mvp": history.get("finals_mvp") or {},
                       "official_winners": history.get("official_winners")
                       or {}}, "local")
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(payload, f, separators=(",", ":"))
-    print(f"  wrote {path} ({len(players)} players)")
+    _write(path, payload, compact=True)
+    print(f"  players: {len(players)}")
 
 
 def _record_race_history(payloads: list) -> None:

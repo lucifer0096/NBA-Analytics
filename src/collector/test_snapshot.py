@@ -413,6 +413,55 @@ def test_player_positions_total_failure_keeps_existing_file(
     assert json.loads(Path(out).read_text(encoding="utf-8")) == existing
 
 
+def test_player_positions_unchanged_rows_keep_committed_stamp(
+        tmp_path, monkeypatch):
+    """Game-night cadence: an unchanged roster map must NOT be rewritten
+    with a fresh updated_utc (that alone would make every hourly run
+    commit). Same rows -> the committed file and its stamp stay byte-
+    identical; a real roster change still lands."""
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    monkeypatch.setattr(snapshot, "RAW_DIR", str(raw))
+    rows = [{"player_id": 101, "player_name": "P16", "team_id": 16,
+             "position": "G"}]
+    existing = {"updated_utc": "2026-09-01T00:00:00Z", "players": rows}
+    (raw / "player_positions.json").write_text(json.dumps(existing),
+                                               encoding="utf-8")
+    monkeypatch.setattr(snapshot.espn_api, "get_roster",
+                        lambda team_id, season, league="nba": {"t": team_id})
+    monkeypatch.setattr(snapshot.parsing, "parse_roster",
+                        lambda payload, team_id: rows)
+
+    out = snapshot.snapshot_player_positions([16], snapshot.RateLimiter(0),
+                                             force=True)
+    assert json.loads(Path(out).read_text(encoding="utf-8")) == existing
+
+
+def test_save_state_unchanged_results_keep_committed_stamp(
+        tmp_path, monkeypatch):
+    """Same per-season results -> the state file (last_run_utc) is left
+    alone; only real collection movement re-stamps it."""
+    monkeypatch.setattr(snapshot, "RAW_DIR", str(tmp_path / "raw"))
+    monkeypatch.setattr(snapshot, "STATE_PATH",
+                        str(tmp_path / "collector_state.json"))
+    results = [{"season": "2026-27", "final_games": 2, "stored": 2,
+                "failures": 0}]
+    snapshot._save_state(results)
+    first = json.loads((tmp_path / "collector_state.json")
+                       .read_text(encoding="utf-8"))
+    assert first["last_run_utc"]
+
+    snapshot._save_state([dict(results[0])])  # identical -> untouched
+    assert json.loads((tmp_path / "collector_state.json")
+                      .read_text(encoding="utf-8")) == first
+
+    snapshot._save_state([{"season": "2026-27", "final_games": 3,
+                           "stored": 3, "failures": 0}])
+    assert json.loads((tmp_path / "collector_state.json")
+                      .read_text(encoding="utf-8"))["seasons"][0][
+                          "final_games"] == 3
+
+
 def test_main_attempts_every_season_then_exits_nonzero(tmp_path, monkeypatch):
     """A hard failure in ONE season still fails the run (the workflow's
     failure issue must fire) -- but only after every season had its turn,

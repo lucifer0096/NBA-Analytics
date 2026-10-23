@@ -546,6 +546,33 @@ def test_build_career_window_and_honest_empties(tmp_path):
     assert "official record" not in legacy["goat"]["source"]
 
 
+def test_build_career_prose_ignores_the_history_stamp(tmp_path):
+    """The history stamp never rides along in the source prose: two builds
+    at different times produce byte-identical captions, so an unchanged
+    career file compares equal once freshness stamps are stripped
+    (refresh_dashboard_fallbacks' contract) and the collector never commits
+    timestamp-only churn."""
+    for season, scorer in (("2016-17", 20), ("2017-18", 30)):
+        _write_games(tmp_path, season, {
+            1: [_box(1, "Ace", "BOS", minutes=30, pts=scorer,
+                     fgm=8, fga=16)],
+        })
+    season_payloads = [awards.build_payload(s, raw_dir=str(tmp_path))
+                       for s in ("2017-18", "2016-17")]
+
+    def _prose(stamp):
+        career = awards.build_career(
+            season_payloads, raw_dir=str(tmp_path),
+            history={"meta": {"champion_years": 57}, "stamp": stamp})
+        return (career["alltime"]["source"], career["goat"]["source"],
+                career["career_note"])
+
+    early = _prose("2026-10-01T00:00:00Z")
+    late = _prose("2026-12-31T23:59:59Z")
+    assert early == late, "prose changed with the build timestamp"
+    assert not any("as of" in text or "2026-10-01" in text for text in early)
+
+
 def test_build_payload_envelope(tmp_path):
     """End-to-end over a synthetic 8-game season: DNP skip, traded majority,
     a 4-4 traded tie resolved to the first sorted game, starter counts, the

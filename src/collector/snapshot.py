@@ -433,6 +433,16 @@ def snapshot_player_positions(team_ids: list, limiter: RateLimiter,
               "row(s) for those teams")
 
     os.makedirs(RAW_DIR, exist_ok=True)
+    # Stamp-stable: unchanged rows keep the old file (and its
+    # updated_utc), so the game-night crons' off-hour runs stay
+    # git-silent instead of committing a fresh timestamp hourly.
+    try:
+        with open(out_path, encoding="utf-8") as f:
+            if json.load(f).get("players") == rows:
+                print(f"  player positions: unchanged ({len(rows)} rows)")
+                return out_path
+    except (OSError, ValueError):
+        pass  # missing or corrupt on disk: this write heals it
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump({"updated_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                    "players": rows}, f)
@@ -577,6 +587,15 @@ def run_season(season: str, args, limiter: RateLimiter, team_ids: list) -> dict:
 
 def _save_state(results: list) -> None:
     os.makedirs(RAW_DIR, exist_ok=True)
+    # Stamp-stable: with the game-night crons the state saves several
+    # times a day -- unchanged results keep the old last_run_utc, so only
+    # real collection movement reaches git.
+    try:
+        with open(STATE_PATH, encoding="utf-8") as f:
+            if json.load(f).get("seasons") == results:
+                return
+    except (OSError, ValueError):
+        pass  # missing or corrupt on disk: this write heals it
     state = {"last_run_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
              "seasons": results}
     with open(STATE_PATH, "w", encoding="utf-8") as f:

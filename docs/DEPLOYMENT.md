@@ -41,8 +41,10 @@ Every file above exists once per league: the WNBA's carry `_wnba`
 in `leagues.named_path`), so a deployed instance renders both league
 tabs fully offline.
 
-The daily workflow (`.github/workflows/collector.yml`) keeps every committed
+The collector workflow (`.github/workflows/collector.yml`) keeps every committed
 fallback fresh **for both leagues in one pass** (schedules + the
 postseason tables, standings, positions, leaderboards, award races
 and their daily snapshots, and, once `models/proj_model.txt` exists, a
-rolling 21-day projection window), so the deployed app stays current without access to raw data.
+rolling 21-day projection window), running hourly through the US
+game-night window (01:40-06:40 UTC) plus a 12:20 UTC daily safety net, so
+the deployed app stays current without access to raw data.

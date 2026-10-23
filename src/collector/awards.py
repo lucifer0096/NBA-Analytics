@@ -1051,7 +1051,7 @@ def build_career(season_payloads: list, raw_dir: str = None,
 
     `history` is history.py's build() output (full-career ESPN lines for the
     leaders/award-winners/window pool, official honours, champion index,
-    meta/stamp): with it the boards and the ladder span league history instead
+    meta): with it the boards and the ladder span league history instead
     of just the collected window; without it this degrades to the legacy
     window-only shape (tests and offline builds). History lines supersede
     window lines per player -- the window entry still supplies the name/team/
@@ -1078,9 +1078,7 @@ def build_career(season_payloads: list, raw_dir: str = None,
             index[int(entry["player_id"])] = merged
         players = list(index.values())
     honours_map = (history or {}).get("honours") or {}
-    stamp = (history or {}).get("stamp")
     meta = (history or {}).get("meta") or {}
-    as_of = f"as of {stamp}" if stamp else None
     out = {
         "window": {"first": labels[0], "last": labels[-1],
                    "seasons": len(labels), "players": window_player_count},
@@ -1096,7 +1094,6 @@ def build_career(season_payloads: list, raw_dir: str = None,
             f"{meta.get('espn_lines', 0)} "
             f"career lines, {meta.get('window_fallback', 0)} collected-window "
             f"fallbacks), not just the {labels[0]}→{labels[-1]} box scores"
-            + (f"; {as_of}" if as_of else "")
         )
         out["goat"]["source"] = (
             f"Production: career totals vs the best career among "
@@ -1111,7 +1108,6 @@ def build_career(season_payloads: list, raw_dir: str = None,
                f"the verified official record where ESPN's index can't reach"
                if meta.get("official_champions") else "")
             + ")"
-            + (f"; {as_of}" if as_of else "")
         )
         quirks = (
             ". ESPN quirks kept as-is and captioned: ABA/NBA totals "
@@ -1132,7 +1128,6 @@ def build_career(season_payloads: list, raw_dir: str = None,
                "pre-1974 legends patched from the official record "
                "(career lines and season rows)"
                if meta.get("official_reb_lines") else "")
-            + (f"; {as_of}" if as_of else "")
             + quirks
         )
     else:

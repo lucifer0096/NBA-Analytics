@@ -502,6 +502,53 @@ def test_refresh_awards_window_metadata_spans_merged_seasons(
 
 
 # ---------------------------------------------------------------------------
+# Stamp-stable writes: the game-night cadence (collector.yml runs hourly
+# through the 01:00-06:30 UTC finish window) would otherwise commit a fresh
+# _generated_utc on every dashboard file several times a day. _write compares
+# CONTENT with freshness stamps stripped and keeps the committed file (and
+# its honest last-updated stamp) whenever nothing else moved.
+# ---------------------------------------------------------------------------
+
+def test_write_keeps_file_and_stamp_when_only_stamps_differ(isolated):
+    path = isolated["data"] / "dashboard_teams.json"
+    old = {"teams": [{"team_id": 1, "abbrev": "ATL"}],
+           "_generated_utc": "2026-10-20T00:00:00Z", "source": "espn"}
+    path.write_text(json.dumps(old), encoding="utf-8")
+
+    fresh = {"teams": [{"team_id": 1, "abbrev": "ATL"}],
+             "_generated_utc": "2026-10-24T03:40:00Z", "source": "espn"}
+    assert refresh._write(str(path), fresh) is False  # stamp-only: no write
+    on_disk = json.loads(path.read_text(encoding="utf-8"))
+    assert on_disk == old  # stamp preserved, byte-for-byte content
+
+    # Real content movement still lands, stamps included.
+    moved = {"teams": [{"team_id": 1, "abbrev": "ATL"},
+                       {"team_id": 2, "abbrev": "BOS"}],
+             "_generated_utc": "2026-10-24T03:41:00Z", "source": "espn"}
+    assert refresh._write(str(path), moved) is True
+    assert json.loads(path.read_text(encoding="utf-8")) == moved
+
+
+def test_write_strips_stamps_at_any_depth_and_heals_corrupt_files(
+        isolated):
+    """Freshness keys live inside the history meta too; a corrupt or missing
+    on-disk file is healed by the next write instead of raising."""
+    path = isolated["data"] / "dashboard_players.json"
+    payload = {"players": {"7": {"player_id": 7}},
+               "meta": {"pool": 1, "stamp": "2026-10-24T03:40:00Z"}}
+    first = refresh._write(str(path), payload)
+    assert first is True
+    # Same content, new nested stamp -> silent.
+    restamped = {"players": {"7": {"player_id": 7}},
+                 "meta": {"pool": 1, "stamp": "2026-10-24T04:40:00Z"}}
+    assert refresh._write(str(path), restamped) is False
+    # Corrupt on-disk bytes -> rewritten (healing), not a crash.
+    path.write_text("{broken json", encoding="utf-8")
+    assert refresh._write(str(path), restamped) is True
+    assert json.loads(path.read_text(encoding="utf-8")) == restamped
+
+
+# ---------------------------------------------------------------------------
 # Fault isolation: transient ESPN failures and corrupt local files must
 # degrade to the committed fallbacks instead of killing the refresh run
 # (the Sep 2026 weekly-refresh failure opened issue #1).

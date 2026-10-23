@@ -111,9 +111,13 @@ python src/collector/refresh_dashboard_fallbacks.py --league nba wnba  # both le
 
 ## Automated collection
 
-`.github/workflows/collector.yml` runs daily at 12:20 UTC (after most US
-games finish; GitHub's batched scheduler often fires hours later, so the
-data commits typically land later in the day), for **each league in turn**:
+`.github/workflows/collector.yml` runs hourly through the US game-night
+window (at :40 from 01:40 to 06:40 UTC -- finals land between ~01:00 and
+~06:30 UTC, East Coast first and the West Coast nightcap last, so a box
+score reaches the dashboard within the hour of ESPN marking it final;
+GitHub's batched scheduler often fires later, so commits can land after
+the scheduled minute), plus a 12:20 UTC daily safety net for late
+backfills, for **each league in turn**:
 
 1. `snapshot.py --season current` (NBA, then `--league wnba`): schedule
    refresh (regular + postseason + the play-in gap probe) + newly-final
@@ -128,8 +132,10 @@ data commits typically land later in the day), for **each league in turn**:
 CI (`.github/workflows/ci.yml`) skips pushes where **every** changed file is
 under `data/**`/`models/**`: data-only refreshes exercise no code.
 
-In the offseason this run is nearly a no-op: no new final games, schedule
-rewritten identically, fallbacks re-stamped.
+In the offseason this run is a silent no-op: no new final games, and every
+write compares content against the file on disk with the freshness stamp
+(`_generated_utc` and friends) stripped first, so an unchanged file is not
+rewritten at all -- nothing to commit, no timestamp-only churn.
 
 ## Dashboard fallback files
 

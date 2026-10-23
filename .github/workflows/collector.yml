@@ -1,16 +1,32 @@
-name: Daily collector
+name: Data collector (game-night refreshes)
 
-# NBA games happen daily (Oct-Apr) and the WNBA's run May-Oct, and the ESPN
-# APIs are free/unauthenticated, so a daily run keeps both leagues' data
+# NBA games happen daily (Oct-Jun) and the WNBA's run May-Oct, and the ESPN
+# APIs are free/unauthenticated, so the collector keeps both leagues' data
 # current: refresh each league's current-season schedule and standings, fetch
 # any newly-finalized game box scores, refresh the dashboard fallback files
 # (both leagues in one pass), and commit the results back to main (the same
-# pattern as FPL-Analytics' collector workflow). In either league's offseason
-# the run is nearly a no-op: no new final games, so it only rewrites the
-# schedule/standings copies.
+# pattern as FPL-Analytics' collector workflow).
+#
+# Cadence: hourly through the game-night window (US games tip 23:00-02:00
+# UTC and go final between ~01:00 and ~06:30 UTC -- East Coast first, the
+# West Coast nightcap last), so a box score reaches the dashboard within
+# the hour of ESPN marking it final, plus a 12:20 UTC daily safety net for
+# late backfills. Every write is stamp-stable (refresh_dashboard_fallbacks
+#._write compares CONTENT with freshness stamps stripped; the player
+# positions and collector state files gate the same way), so a run with no
+# new finals commits nothing -- an offseason night is a silent no-op.
 on:
   schedule:
-    - cron: "20 12 * * *"   # 12:20 UTC daily -- after most US games finish
+    # Game-night window, :40 to dodge GitHub's top-of-hour congestion
+    # (delayed/dropped crons cluster at :00 and :30).
+    - cron: "40 1 * * *"
+    - cron: "40 2 * * *"
+    - cron: "40 3 * * *"
+    - cron: "40 4 * * *"
+    - cron: "40 5 * * *"
+    - cron: "40 6 * * *"
+    # Daily safety net (the pre-season cadence).
+    - cron: "20 12 * * *"
   workflow_dispatch:
 
 permissions:
@@ -65,13 +81,16 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes."
           else
-            git commit -m "data: daily collector refresh $(date -u +%F)"
+            git commit -m "data: collector refresh $(date -u +'%F %H:%M')"
             git push
           fi
       - name: Open or update the failure issue
         # A silent dead collector is the worst failure mode (data just goes
         # stale): on ANY failed step, upsert one tracked issue that links the
         # failing run (shared script with refresh-history.yml/retrain.yml).
+        # The title stays verbatim even though the workflow's display name
+        # changed: the script matches issues BY TITLE, so a new string would
+        # fork a second tracked issue next to the existing one.
         if: failure()
         env:
           GH_TOKEN: ${{ github.token }}
