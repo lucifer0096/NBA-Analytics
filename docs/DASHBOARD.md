@@ -99,9 +99,11 @@ per league, with that league's season and data.
 4. **Schedule & Scores**: live scoreboard for *today in the viewer's time
    zone* -- the covering ESPN date buckets are fetched and filtered to the
    reader's local day, the table leads with a zoned **Tip-off** column and
-   keeps neither the internal game id nor the raw UTC stamp (empty +
-   explanatory caption in the offseason, the normal Oct–Jun-less state),
-   then the
+   keeps neither the internal game id nor the raw UTC stamp (both of
+   ESPN's `score` shapes parse -- bare string or `displayValue` dict --
+   and a game that hasn't started shows a blank, never its placeholder
+   zero; empty + explanatory caption in the offseason, the normal
+   Oct–Jun-less state), then the
    selected season from its own committed file under `data/schedules/`
    (`data/schedules_wnba/` in the WNBA pane; 17 files / 20,394 games for
    the NBA -- 19,194 with final scores -- and 17 years / 3,693 for the

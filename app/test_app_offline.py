@@ -1755,3 +1755,57 @@ def test_schedule_today_table_leads_with_a_zoned_tipoff(offline_espn,
     assert "game_id" not in list(today_table.columns)
     assert "date" not in list(today_table.columns)
     assert today_table.iloc[0]["Tip-off (UTC)"] == "2026-10-26 12:30"
+
+
+def test_load_scoreboard_parses_both_live_score_shapes(monkeypatch):
+    """ESPN's competitor `score` ships two shapes (parsing._score_value
+    documents the split): the scoreboard's live answer is a bare '125'
+    string while schedule/summary payloads carry
+    {'value': 99.0, 'displayValue': '99'}. The string shape used to raise
+    inside the per-event loop, the exception was swallowed by the honest
+    empty handler, and 'Today's games' said Offline fallback while ESPN
+    answered -- the slate never showed. Both shapes parse, an unplayed
+    game stays blank, and a not-started game's '0' placeholder never
+    shows as a score (the schedule tables ship '' for the same rows).
+    Fetches are stubbed, no network."""
+    import pandas as pd
+
+    import espn_api as espn_module
+    import shared as shared_module
+
+    def _event(eid, home, away, status=None, date="2026-10-24T23:30:00Z"):
+        return {"id": eid, "date": date,
+                "competitions": [{
+                    "status": {"type": status or {"name": "STATUS_FINAL"}},
+                    "competitors": [
+                        {"homeAway": "home", "score": home,
+                         "team": {"abbreviation": "BOS"}},
+                        {"homeAway": "away", "score": away,
+                         "team": {"abbreviation": "NYK"}},
+                    ]}]}
+
+    payload = {"events": [
+        _event("1", "125", {"value": 99.0, "displayValue": "99"}),
+        _event("2", {"value": 88.0, "displayValue": "88"}, "101"),
+        _event("3", None, ""),
+        # tonight's slate: state 'pre' and ESPN's placeholder zero
+        _event("4", "0", "0",
+               status={"name": "STATUS_SCHEDULED", "state": "pre"},
+               date="2026-10-25T00:00:00Z"),
+    ]}
+    monkeypatch.setattr(espn_module, "get_scoreboard",
+                        lambda dates, league="nba": payload)
+    shared_module.load_scoreboard.clear()
+    try:
+        frame, note = shared_module.load_scoreboard("20261024", "nba")
+        assert note == "Live (60s cache)", "the parse raised and was swallowed"
+        assert list(frame["home_score"])[:2] == ["125", "88"]
+        assert list(frame["away_score"])[:2] == ["99", "101"]
+        for col in ("home_score", "away_score"):
+            assert pd.isna(frame[col].iloc[2])   # no score yet
+            assert pd.isna(frame[col].iloc[3])   # placeholder zero blanked
+        # neither the dict's float value nor a fabricated 0 leaks on screen
+        assert "101.0" not in list(frame["away_score"])
+        assert "0" not in list(frame["home_score"])
+    finally:
+        shared_module.load_scoreboard.clear()

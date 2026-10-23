@@ -1595,6 +1595,41 @@ def load_today_scoreboard(league: str = "nba", tz_key: str = "UTC") -> tuple:
                             day_start, day_end, tz), note)
 
 
+def _score_display(raw) -> str | None:
+    """A competitor's `score` as the string the table shows.
+
+    ESPN ships two shapes -- parsing._score_value documents the split:
+    schedule/summary payloads carry {'value': 105.0, 'displayValue':
+    '105'} while the scoreboard's live answer is a bare '125' string.
+    Calling .get('displayValue') on that string raised inside
+    load_scoreboard's per-event loop, the exception was swallowed by its
+    honest-empty handler, and 'Today's games' reported Offline fallback
+    while ESPN was answering: the slate simply never appeared. A missing
+    score (unplayed) stays None, never 0."""
+    if isinstance(raw, dict):
+        raw = raw.get("displayValue", raw.get("value"))
+    if raw is None or raw == "":
+        return None
+    return str(raw)
+
+
+def _game_started(status_type: dict) -> bool:
+    """Whether a game's scores mean anything right now.
+
+    ESPN's status type carries `state` ('pre' | 'in' | 'post'), and a
+    'pre' game answers score '0' -- a placeholder, not a result. This
+    repo's rule is blanks, never a fabricated zero (the committed
+    schedule tables ship '' and the standings caption says the same),
+    so the scoreboard blanks until tip. The STATUS_* name is the
+    fallback if `state` ever goes missing: only a game that has started
+    names itself FINAL or IN_PROGRESS, and a postponed/canceled game
+    must not show a zero either."""
+    state = status_type.get("state")
+    if state:
+        return state in ("in", "post")
+    return status_type.get("name") in ("STATUS_FINAL", "STATUS_IN_PROGRESS")
+
+
 @st.cache_data(ttl=60, show_spinner=False)
 def load_scoreboard(dates: str, league: str = "nba") -> tuple:
     """(scoreboard events DataFrame, note) for a YYYYMMDD date -- genuinely
@@ -1610,14 +1645,18 @@ def load_scoreboard(dates: str, league: str = "nba") -> tuple:
                 continue
             comp = comps[0]
             sides = {c.get("homeAway"): c for c in comp.get("competitors", [])}
+            status_type = (comp.get("status") or {}).get("type") or {}
+            started = _game_started(status_type)
             rows.append({
                 "game_id": event.get("id"),
                 "date": event.get("date"),
-                "status": ((comp.get("status") or {}).get("type") or {}).get("name"),
+                "status": status_type.get("name"),
                 "home": sides.get("home", {}).get("team", {}).get("abbreviation"),
                 "away": sides.get("away", {}).get("team", {}).get("abbreviation"),
-                "home_score": (sides.get("home", {}).get("score") or {}).get("displayValue"),
-                "away_score": (sides.get("away", {}).get("score") or {}).get("displayValue"),
+                "home_score": (_score_display(sides.get("home", {}).get("score"))
+                               if started else None),
+                "away_score": (_score_display(sides.get("away", {}).get("score"))
+                               if started else None),
             })
         return (pd.DataFrame(rows), data_age_note({}, True))
     except Exception:
