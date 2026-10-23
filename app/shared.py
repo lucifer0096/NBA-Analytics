@@ -367,6 +367,12 @@ def freshness_line(*notes: str) -> str:
     return " · ".join(seen)
 
 
+# Quiet chart chrome: the trend lines are static reading, so the floating
+# Plotly modebar (camera/download/icons on hover) and the Plotly logo are
+# noise -- one shared config for every chart the app renders.
+CHART_CONFIG = {"displayModeBar": False, "displaylogo": False}
+
+
 def section(title: str) -> None:
     st.markdown(f'<div class="na-section">{title}</div>', unsafe_allow_html=True)
 
@@ -1736,6 +1742,34 @@ def fmt_score(value) -> str:
         return str(value)
 
 
+_STATUS_WORDS = {
+    "SCHEDULED": "Scheduled",
+    "IN_PROGRESS": "In progress",
+    "FINAL": "Final",
+    "POSTPONED": "Postponed",
+    "CANCELED": "Canceled",
+    "CANCELLED": "Canceled",
+    "HALFTIME": "Halftime",
+    "SUSPENDED": "Suspended",
+    "DELAYED": "Delayed",
+    "TBD": "TBD",
+}
+
+
+def status_label(raw) -> str:
+    """Human words for an ESPN status enum: STATUS_SCHEDULED is API
+    plumbing, not UI copy, so today's slate, the postseason table and the
+    game-detail line all render this instead of the raw token (the CSV
+    exports keep the enum -- data, not display). Unknown tokens lose only
+    their enum casing; empties stay empty, never an invented status."""
+    text = str(raw or "").strip()
+    if text.lower() in ("", "nan", "<na>"):
+        return ""
+    bare = text[7:] if text.startswith("STATUS_") else text
+    return _STATUS_WORDS.get(
+        bare.upper(), bare.replace("_", " ").capitalize())
+
+
 def render_box_sides(rows: pd.DataFrame, meta: dict) -> None:
     """Both teams' box-score lines side by side (the NBA app's two-column
     game box): starters then bench in ESPN's order, splits as made-attempted,
@@ -1923,17 +1957,25 @@ def load_games_by_season(league: str = "nba") -> dict:
     return counts if isinstance(counts, dict) and counts else {}
 
 
-def sidebar_games(counts: dict, options: list, league: str = "nba") -> None:
-    """Sidebar inventory expander: games collected for EVERY selectable
-    season, so the selector's range is auditable at a glance. The league is
-    named in the title because each page shows one expander per league."""
-    if not counts:
+def sidebar_inventory(inventories: list) -> None:
+    """One sidebar expander for EVERY league's box-score inventory: the
+    header carries the grand total, each league its own bold group of
+    per-season counts inside -- one sidebar row where there used to be one
+    expander per league, so the selector's whole range stays auditable at
+    a glance. A league with no inventory file is skipped, and with nothing
+    collected at all the expander is absent (an honest empty, like the
+    per-league version before it)."""
+    groups = [(leagues.display(league), counts, options)
+              for league, counts, options in inventories if counts]
+    if not groups:
         return
-    total = sum(int(v or 0) for v in counts.values())
-    label = leagues.display(league)
-    with st.expander(f"Games collected ({label}) · {total:,} total"):
-        for option in options:
-            st.caption(f"{option} · {int(counts.get(option) or 0):,}")
+    total = sum(int(v or 0) for _, counts, _ in groups
+                for v in counts.values())
+    with st.expander(f"Games collected · {total:,} total"):
+        for label, counts, options in groups:
+            st.markdown(f"**{label}**")
+            for option in options:
+                st.caption(f"{option} · {int(counts.get(option) or 0):,}")
 
 
 @st.cache_data(ttl=300, show_spinner=False)

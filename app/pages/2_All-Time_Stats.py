@@ -26,9 +26,11 @@ st.title("All-Time Stats")
 
 with st.sidebar:
     st.markdown("### Data inventory")
-    for league in ("nba", "wnba"):
-        shared.sidebar_games(shared.load_games_by_season(league),
-                             shared.season_options(league), league)
+    shared.sidebar_inventory([
+        (league, shared.load_games_by_season(league),
+         shared.season_options(league))
+        for league in ("nba", "wnba")
+    ])
 
 
 def _render_league(league: str) -> None:

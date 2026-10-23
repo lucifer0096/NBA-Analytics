@@ -91,13 +91,14 @@ with st.sidebar:
                  f"every season from {oldest} through {newest} is selectable. "
                  f"Deep link: ?season={newest}&league={league}.",
         )
-    _sidebar_tz = shared.viewer_tz()
-    st.caption(f"Today ({shared.tz_label(_sidebar_tz)}): "
-               f"{shared.local_today(_sidebar_tz)}")
+    # The reader's local 'today' line lives in the hero strip, not here:
+    # it is page context, not a setting, and the sidebar burying it made
+    # "what's on today" easy to miss.
     st.markdown("---")
-    for league in ("nba", "wnba"):
-        shared.sidebar_games(shared.load_games_by_season(league),
-                             season_options[league], league)
+    shared.sidebar_inventory([
+        (league, shared.load_games_by_season(league), season_options[league])
+        for league in ("nba", "wnba")
+    ])
     with st.expander("📈 Model & History"):
         _m = shared.load_metrics()
         _single, _naive = _m.get("single_stage", {}), _m.get("naive_baseline", {})
@@ -151,12 +152,31 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
     teams, teams_note = shared.load_teams(league)
 
     # -------------------------------------------------------------------------
-    # KPI strip: three glass cards scoped to the SELECTED season
+    # Page data (feeds the hero line and the KPI strip)
     # -------------------------------------------------------------------------
 
     games, sched_note = shared.load_schedule(season, league)
     awards_payload, awards_note = shared.load_awards(season, league)
     games_counts = shared.load_games_by_season(league)
+
+    # -------------------------------------------------------------------------
+    # Hero line: the page's CONTEXT -- season pill, the reader's own 'today'
+    # pill, and the consolidated data freshness -- rendered above the KPI
+    # strip it frames, so the numbers below are never read unmoored from the
+    # season and the clock they describe.
+    # -------------------------------------------------------------------------
+
+    shared.hero(
+        season,
+        shared.freshness_line(f"Teams: {teams_note}",
+                              f"Schedule: {sched_note}",
+                              f"Awards: {awards_note}"),
+        extra=f"Today ({shared.tz_label(tz)}): {shared.local_today(tz)}",
+    )
+
+    # -------------------------------------------------------------------------
+    # KPI strip: three glass cards scoped to the SELECTED season
+    # -------------------------------------------------------------------------
 
     if not games.empty:
         finals = games[games["status"] == "STATUS_FINAL"].sort_values("date")
@@ -184,19 +204,25 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
         kpi_games = "—"
         games_help = "No games collected for this season yet."
 
-    # Next tip-off exists only for seasons with unplayed games left.
-    kpi_next = (shared.local_stamp(upcoming.iloc[0]["date"], tz, "%Y-%m-%d")
+    # Next tip-off exists only for seasons with unplayed games left. The
+    # value carries the local TIME as well as the day: a tip-off without a
+    # clock is half an answer to "when does it start".
+    kpi_next = (shared.local_stamp(upcoming.iloc[0]["date"], tz)
                 if not upcoming.empty else "—")
-    next_help = ("First unplayed game of this season's schedule."
+    next_help = ("First unplayed game of this season's schedule, on your "
+                 "local clock."
                  if not upcoming.empty else
                  "No unplayed games left in this season.")
 
     top_scorer = "—"
+    scorer_delta = None
     pts_leaders = (awards_payload.get("leaders") or {}).get("pts") or []
     if pts_leaders:
         best = pts_leaders[0]
-        top_scorer = (f"{best.get('player_name', '—')} · "
-                      f"{best.get('per_game', 0)} PPG")
+        # Name on the tile, the PPG rate as a muted second line: a long
+        # "Name · 32.4 PPG" wraps the big metric font into a wall of text.
+        top_scorer = str(best.get("player_name") or "—")
+        scorer_delta = f"{best.get('per_game', 0)} PPG"
         scoring_help = (
             f"Per-game rate, qualified at ≥{awards_payload.get('min_games', '?')} GP "
             f"({awards_payload.get('season', '—')}): computed from collected box "
@@ -211,13 +237,9 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
     col1, col2, col3 = st.columns(3)
     col1.metric("Games collected", kpi_games, help=games_help)
     col2.metric("Next tip-off", kpi_next, help=next_help)
-    col3.metric("Season scoring leader", top_scorer, help=scoring_help)
-
-    # One consolidated freshness line for the page's sources; every tab still
-    # keeps its own Source caption (its honesty contract), this is the glance.
-    shared.hero(season, shared.freshness_line(
-        f"Teams: {teams_note}", f"Schedule: {sched_note}",
-        f"Awards: {awards_note}"))
+    # delta_color="off": the PPG rate is context, not a movement to judge.
+    col3.metric("Season scoring leader", top_scorer, delta=scorer_delta,
+                delta_color="off", help=scoring_help)
 
     # Section sub-tabs: the caller owns the ?tab= reordering so both league
     # tabs show the requested section first (labels are identical).
@@ -341,23 +363,30 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                 "full upcoming schedule are below." if league == "nba" else
                 "The WNBA offseason runs Nov–Apr; historical results and the "
                 "full upcoming schedule are below.")
-            st.caption(f"No games on {today}: {sb_note}. {off_note}")
+            # Info block, like every other empty state on the page: during
+            # the offseason this line IS the answer to "what's on today",
+            # and quiet small print reads like a broken section.
+            st.info(f"No games on {today}: {sb_note}. {off_note}")
         else:
             # game_id/raw UTC date are internal: the reader gets the local
-            # tip-off column (zoned in the header) in their place.
+            # tip-off column (zoned in the header) in their place, and the
+            # raw STATUS_* enum becomes words (the enum stays in the CSV
+            # exports -- data, not display).
+            _slate = scoreboard.drop(columns=["game_id", "date"],
+                                     errors="ignore").copy()
+            _slate["status"] = _slate["status"].map(shared.status_label)
             _tip = f"Tip-off ({shared.tz_label(tz)})"
             st.dataframe(
-                scoreboard.drop(columns=["game_id", "date"],
-                                errors="ignore").rename(columns={
-                                    "time": _tip, "away": "Away",
-                                    "home": "Home",
-                                    "away_score": "Away pts",
-                                    "home_score": "Home pts",
-                                    "status": "Status",
-                                })[[
-                                    _tip, "Status", "Away", "Away pts",
-                                    "Home", "Home pts",
-                                ]],
+                _slate.rename(columns={
+                        "time": _tip, "away": "Away",
+                        "home": "Home",
+                        "away_score": "Away pts",
+                        "home_score": "Home pts",
+                        "status": "Status",
+                    })[[
+                        _tip, "Status", "Away", "Away pts",
+                        "Home", "Home pts",
+                    ]],
                 width="stretch", hide_index=True,
             )
 
@@ -434,7 +463,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                     recent["day"] = shared.local_dates(recent["date"], tz)
                     recent["matchup"] = (
                         recent["away_abbrev"] + " @ " + recent["home_abbrev"]
-                        + "  " + recent["away_score"].astype(str)
+                        + " · " + recent["away_score"].astype(str)
                         + ":" + recent["home_score"].astype(str)
                     )
                     st.markdown("**Most recent results**")
@@ -520,9 +549,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                 st.caption(f"Source: {shared.localize_note(post_note)}")
                 table = post_view.copy().sort_values("date")
                 table["Date"] = shared.local_dates(table["date"], tz)
-                table["Status"] = (table["status"].astype(str)
-                                   .str.replace("STATUS_", "", regex=False)
-                                   .str.title())
+                table["Status"] = table["status"].map(shared.status_label)
                 table = table.rename(columns={
                     "away_abbrev": "Away", "away_score": "Away pts",
                     "home_abbrev": "Home", "home_score": "Home pts",
@@ -613,9 +640,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                         shared.render_play_by_play(plays, league)
                     else:
                         when = shared.local_stamp(meta.get("date"), tz)
-                        status = (str(meta.get("status") or "")
-                                  .replace("STATUS_", "").replace("_", " ")
-                                  .title())
+                        status = shared.status_label(meta.get("status"))
                         parts = [f"**{away} @ {home}**", when, status]
                         if meta.get("venue"):
                             parts.append(str(meta["venue"]))
@@ -779,7 +804,8 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
             trend = shared.race_trend_figure(snapshots, "mvp")
             if trend.data:
                 shared.section("MVP race trend")
-                st.plotly_chart(trend, width="stretch")
+                st.plotly_chart(trend, width="stretch",
+                                config=shared.CHART_CONFIG)
                 st.caption(
                     f"MVP score across {race_note}: the top "
                     f"{shared.RACE_TREND_TOP} of the latest snapshot, and the "

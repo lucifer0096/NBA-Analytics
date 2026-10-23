@@ -1710,22 +1710,47 @@ def test_load_today_scoreboard_scopes_to_the_viewer_day(monkeypatch):
         shared_module.load_today_scoreboard.clear()
 
 
-def test_schedule_today_caption_reads_the_local_date_and_zone(offline_espn):
+def test_schedule_today_line_reads_the_local_date_and_zone(offline_espn):
     """The Schedule tab's empty state names the READER's day in
-    YYYY-MM-DD (never ESPN's YYYYMMDD bucket format), and the sidebar
-    names the zone it read -- both say UTC here, which is exactly the
-    no-browser-zone contract AppTest exercises."""
+    YYYY-MM-DD (never ESPN's YYYYMMDD bucket format) -- as an info block,
+    like every other empty state on the page, since during the offseason
+    that line IS the answer to "what's on today" -- and the hero strip
+    carries the local 'Today (zone): date' pill (it moved out of the
+    sidebar, where it was easy to miss). Both say UTC here, which is
+    exactly the no-browser-zone contract AppTest exercises."""
     import re
 
     import shared as shared_module
 
     at = _render("app/app.py", offline_espn)
-    captions = " ".join(str(c.value) for c in at.caption)
+    info = " ".join(str(i.value) for i in at.info)
     today = shared_module.local_today(shared_module.viewer_tz("UTC"))
-    assert f"No games on {today}:" in captions
-    assert re.search(r"Today \(UTC\): \d{4}-\d{2}-\d{2}", captions)
-    assert not re.search(r"No games on \d{8}", captions), \
-        "the raw YYYYMMDD bucket leaked into the reader's caption"
+    assert f"No games on {today}:" in info
+    assert re.search(r"Today \(UTC\): \d{4}-\d{2}-\d{2}", _markdown_text(at))
+    assert not re.search(r"No games on \d{8}", info), \
+        "the raw YYYYMMDD bucket leaked into the reader's note"
+
+
+def test_status_label_speaks_words_not_api_enums():
+    """ESPN's STATUS_* enums are API plumbing, not UI copy: today's slate,
+    the postseason table and the game-detail line all render the same
+    human words through shared.status_label (the postseason tests pin
+    'Final'/'Scheduled', which this must keep producing). Unknown tokens
+    lose only their enum casing, and empties stay empty -- never an
+    invented status. Pure unit test, no render."""
+    import shared as shared_module
+
+    label = shared_module.status_label
+    assert label("STATUS_SCHEDULED") == "Scheduled"
+    assert label("STATUS_IN_PROGRESS") == "In progress"
+    assert label("STATUS_FINAL") == "Final"
+    assert label("STATUS_POSTPONED") == "Postponed"
+    assert label("STATUS_HALFTIME") == "Halftime"
+    assert label("STATUS_CANCELED") == label("STATUS_CANCELLED") == "Canceled"
+    assert label("STATUS_WEIRD") == "Weird"   # unknown: de-enum only
+    assert label("SCHEDULED") == "Scheduled"  # bare token, no prefix
+    assert label("") == "" and label(None) == ""
+    assert label(float("nan")) == ""          # a missing status stays missing
 
 
 def test_schedule_today_table_leads_with_a_zoned_tipoff(offline_espn,
@@ -1755,6 +1780,10 @@ def test_schedule_today_table_leads_with_a_zoned_tipoff(offline_espn,
     assert "game_id" not in list(today_table.columns)
     assert "date" not in list(today_table.columns)
     assert today_table.iloc[0]["Tip-off (UTC)"] == "2026-10-26 12:30"
+    # the raw STATUS_* enum is plumbing, not copy: the reader sees words
+    # (Scheduled / Final / ...); the CSV exports keep the enum.
+    assert today_table.iloc[0]["Status"] == "Scheduled"
+    assert not any("STATUS_" in str(v) for v in today_table["Status"])
 
 
 def test_load_scoreboard_parses_both_live_score_shapes(monkeypatch):

@@ -37,9 +37,11 @@ st.title("Player Profile")
 
 with st.sidebar:
     st.markdown("### Data inventory")
-    for league in ("nba", "wnba"):
-        shared.sidebar_games(shared.load_games_by_season(league),
-                             shared.season_options(league), league)
+    shared.sidebar_inventory([
+        (league, shared.load_games_by_season(league),
+         shared.season_options(league))
+        for league in ("nba", "wnba")
+    ])
 
 
 def _render_league(league: str) -> None:
@@ -173,7 +175,8 @@ def _render_league(league: str) -> None:
     figure = shared.progression_figure(series, metric, mode, height=400,
                                        axis=axis)
     if figure.data:
-        st.plotly_chart(figure, width="stretch")
+        st.plotly_chart(figure, width="stretch",
+                        config=shared.CHART_CONFIG)
         missing = [n for n, rows in series.items() if not rows]
         if missing:
             st.caption(f"No per-season rows for {', '.join(missing)}: "

@@ -57,15 +57,18 @@ because Streamlit renders *both* tabs' content in one script run.
 
 ## Home (`app/app.py`)
 
-Inside each league tab: the KPI strip, hero line, and the four section
+Inside each league tab: the hero line (season pill, the reader's local
+*Today* pill, and the consolidated data freshness -- the page's context,
+framing the numbers below it), then the KPI strip, then the four section
 sub-tabs (reordered together by `?tab=`). Everything below exists once
 per league, with that league's season and data.
 
 1. **Sidebar**: one season selector per league -- NBA every season from
    2010-11 through 2026-27 (defaulting to the newest with collected
    games, 2025-26), WNBA every calendar year 2010 → current (its own
-   inventory default, 2026); a "Games collected" inventory expander per
-   league listing per-season box-file counts (honest 0 for 2026-27); and
+   inventory default, 2026); a single "Games collected" inventory
+   expander carrying both leagues' per-season box-file counts as grouped
+   lists under one grand total (honest 0 for 2026-27); and
    a "Model & History" expander carrying the validation
    headline (model MAE vs the naive rolling-5 baseline plus the
    validation season, or the train-first note when `models/metrics.json`
@@ -75,9 +78,12 @@ per league, with that league's season and data.
 2. **KPI strip**: three quiet metric tiles scoped to the selected season.
    *Games collected* (box-score files for that season, 0 shown honestly
    when none), *Next tip-off* (the first unplayed game from the viewer's
-   local today onward, otherwise "—" with help text for finished
+   local today onward, rendered with its local date AND time, otherwise
+   "—" with help text for finished
    seasons), *Season scoring
-   leader* (per-game points from the committed awards payload, with
+   leader* (the leader's name on the tile with their per-game points as a
+   muted delta -- rates are context, not movement -- from the committed
+   awards payload, with
    season-aware help when no games are collected). The old Model
    validation KPI moved to the sidebar expander.
 3. **Standings**: conference tables, W-L combined, Win%, seed, streak,
@@ -99,10 +105,12 @@ per league, with that league's season and data.
 4. **Schedule & Scores**: live scoreboard for *today in the viewer's time
    zone* -- the covering ESPN date buckets are fetched and filtered to the
    reader's local day, the table leads with a zoned **Tip-off** column and
-   keeps neither the internal game id nor the raw UTC stamp (both of
+   keeps neither the internal game id, the raw UTC stamp, nor the raw
+   `STATUS_*` enum (statuses render as words -- Scheduled / In progress /
+   Final / Postponed -- with the enums kept in the CSV exports; both of
    ESPN's `score` shapes parse -- bare string or `displayValue` dict --
    and a game that hasn't started shows a blank, never its placeholder
-   zero; empty + explanatory caption in the offseason, the normal
+   zero; empty + explanatory info note in the offseason, the normal
    Oct–Jun-less state), then the
    selected season from its own committed file under `data/schedules/`
    (`data/schedules_wnba/` in the WNBA pane; 17 files / 20,394 games for
@@ -127,7 +135,8 @@ per league, with that league's season and data.
    section: that season's playoff and play-in rows from their own
    committed tree (`data/postseason/`, `data/postseason_wnba/`), an
    identical chronological table with a **Status** column (Final /
-   Scheduled / Postponed, title-cased), scoped by the same Team/Venue
+   Scheduled / In progress / Postponed -- same word mapping as today's
+   slate), scoped by the same Team/Venue
    toolbar, with its own **Download postseason CSV** button and a caption
    stating these rows are display-only -- standings, leaders, GOAT and
    the projection model stay regular-season-only. A season without a
@@ -367,9 +376,12 @@ width so nothing is squeezed or hidden:
 
 All styling is one CSS block in `shared.inject_css()`, CSS-only with no JS:
 
-- accent-gradient page title, hero strip with season/data-age pills,
+- accent-gradient page title, hero strip with season and
+  reader-local-today pills plus the consolidated freshness note,
 - quiet metric tiles, accent-underlined tabs (inactive ones faded),
   uppercase section labels on an accent bar with wide spacing,
+- charts rendered through one quiet config (`shared.CHART_CONFIG`): no
+  floating Plotly modebar, no Plotly logo,
 - slot chips, award-race/leader rows as a calm divider list (hover
   restores the card fill), and court cards whose stat tooltips
   are pure CSS (`:hover`), including the image fallback (headshot `<img>`
