@@ -91,7 +91,9 @@ with st.sidebar:
                  f"every season from {oldest} through {newest} is selectable. "
                  f"Deep link: ?season={newest}&league={league}.",
         )
-    st.caption(f"Today (UTC): {shared.now_utc():%Y-%m-%d}")
+    _sidebar_tz = shared.viewer_tz()
+    st.caption(f"Today ({shared.tz_label(_sidebar_tz)}): "
+               f"{shared.local_today(_sidebar_tz)}")
     st.markdown("---")
     for league in ("nba", "wnba"):
         shared.sidebar_games(shared.load_games_by_season(league),
@@ -135,6 +137,10 @@ with st.sidebar:
 
 def _render_league(league: str, season: str, tab_labels: list) -> None:
     display = leagues.display(league)
+    # The viewer's zone, resolved once per render: every game time below
+    # (today's slate, Date columns, fixture labels, the tip-off split)
+    # converts into it, so a reader in New Zealand reads their own clock.
+    tz = shared.viewer_tz()
     awards_json = leagues.named_path("", "dashboard_awards.json", league)
     refresh_cmd = ("python src/collector/refresh_dashboard_fallbacks.py"
                    + ("" if league == "nba" else f" --league {league}"))
@@ -155,10 +161,13 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
     if not games.empty:
         finals = games[games["status"] == "STATUS_FINAL"].sort_values("date")
         rest = games[games["status"] != "STATUS_FINAL"]
-        _today = f"{shared.now_utc():%Y-%m-%d}"
-        upcoming = rest[rest["date"].astype(str).str[:10] >= _today].sort_values(
-            "date")
-        stale = rest[rest["date"].astype(str).str[:10] < _today]  # postponed etc.
+        # The split follows the READER's calendar day, not the server's
+        # UTC one: a 23:30Z tip is tomorrow in Auckland, and filing rows
+        # by the UTC date pushed today's fixtures into the postponed bucket.
+        _today = shared.local_today(tz)
+        _local_day = shared.local_dates(rest["date"], tz)
+        upcoming = rest[_local_day >= _today].sort_values("date")
+        stale = rest[_local_day < _today]  # postponed etc.
     else:
         finals = upcoming = stale = games  # empty frames (no columns to touch)
 
@@ -176,7 +185,8 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
         games_help = "No games collected for this season yet."
 
     # Next tip-off exists only for seasons with unplayed games left.
-    kpi_next = str(upcoming.iloc[0]["date"])[:10] if not upcoming.empty else "—"
+    kpi_next = (shared.local_stamp(upcoming.iloc[0]["date"], tz, "%Y-%m-%d")
+                if not upcoming.empty else "—")
     next_help = ("First unplayed game of this season's schedule."
                  if not upcoming.empty else
                  "No unplayed games left in this season.")
@@ -219,7 +229,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
 
     with tabs["Standings"]:
         standings, note = shared.load_standings(season, league)
-        st.caption(f"Source: {note}")
+        st.caption(f"Source: {shared.localize_note(note)}")
         if standings.empty:
             st.info(f"No standings available for {season} yet.")
         else:
@@ -318,8 +328,12 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
     # -------------------------------------------------------------------------
 
     with tabs["Schedule & Scores"]:
-        today = shared.now_utc().strftime("%Y%m%d")
-        scoreboard, sb_note = shared.load_scoreboard(today, league)
+        # 'Today' is the READER's day: the loader pulls the ESPN buckets
+        # covering it and keeps the tips inside it, so a viewer in New
+        # Zealand sees the slate playing on their clock (their evening is
+        # the US's PREVIOUS date) instead of tomorrow's games or nothing.
+        today = shared.local_today(tz)
+        scoreboard, sb_note = shared.load_today_scoreboard(league, str(tz))
         shared.section("Today's games")
         if scoreboard.empty:
             off_note = (
@@ -329,13 +343,22 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                 "full upcoming schedule are below.")
             st.caption(f"No games on {today}: {sb_note}. {off_note}")
         else:
+            # game_id/raw UTC date are internal: the reader gets the local
+            # tip-off column (zoned in the header) in their place.
+            _tip = f"Tip-off ({shared.tz_label(tz)})"
             st.dataframe(
-                scoreboard.rename(columns={
-                    "away": "Away", "home": "Home",
-                    "away_score": "Away pts", "home_score": "Home pts",
-                    "status": "Status",
-                }),
-                width="stretch",
+                scoreboard.drop(columns=["game_id", "date"],
+                                errors="ignore").rename(columns={
+                                    "time": _tip, "away": "Away",
+                                    "home": "Home",
+                                    "away_score": "Away pts",
+                                    "home_score": "Home pts",
+                                    "status": "Status",
+                                })[[
+                                    _tip, "Status", "Away", "Away pts",
+                                    "Home", "Home pts",
+                                ]],
+                width="stretch", hide_index=True,
             )
 
         shared.section(f"{season} schedule & results")
@@ -343,7 +366,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
             st.info(f"No collected schedule for {season} yet: run the collector "
                     f"(`{snapshot_cmd}`).")
         else:
-            st.caption(f"Source: {sched_note}")
+            st.caption(f"Source: {shared.localize_note(sched_note)}")
             # Toolbar: team + venue filters plus a CSV of whatever they pick.
             # Venue options depend on the team (home/away only mean something
             # relative to one), so the two selectboxes use separate keys --
@@ -375,12 +398,9 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
             # above already took its numbers from the unfiltered ones.
             finals = view[view["status"] == "STATUS_FINAL"].sort_values("date")
             _rest_view = view[view["status"] != "STATUS_FINAL"]
-            upcoming = _rest_view[
-                _rest_view["date"].astype(str).str[:10] >= _today
-            ].sort_values("date")
-            stale = _rest_view[
-                _rest_view["date"].astype(str).str[:10] < _today
-            ]
+            _view_day = shared.local_dates(_rest_view["date"], tz)
+            upcoming = _rest_view[_view_day >= _today].sort_values("date")
+            stale = _rest_view[_view_day < _today]
             _venue_words = {"Home": "home", "Away": "away",
                             "Neutral": "neutral-site"}
             _filter_bits = ([] if team_pick == "All teams" else [team_pick]) + (
@@ -411,7 +431,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                 if not finals.empty:
                     recent = finals.sort_values(
                         "date", ascending=False).head(15).copy()
-                    recent["day"] = recent["date"].astype(str).str[:10]
+                    recent["day"] = shared.local_dates(recent["date"], tz)
                     recent["matchup"] = (
                         recent["away_abbrev"] + " @ " + recent["home_abbrev"]
                         + "  " + recent["away_score"].astype(str)
@@ -426,12 +446,15 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                         width="stretch", hide_index=True,
                     )
                 nxt = upcoming.head(25).copy()
-                nxt["day"] = nxt["date"].astype(str).str[:10]
+                # Upcoming rows carry the TIP time, not just the day: what
+                # a reader needs is when it starts on their clock.
+                nxt["day"] = shared.local_dates(nxt["date"], tz, with_time=True)
                 nxt["matchup"] = nxt["away_abbrev"] + " @ " + nxt["home_abbrev"]
                 st.markdown("**Upcoming**")
                 st.dataframe(
                     nxt[["day", "matchup"]].rename(
-                        columns={"day": "Date", "matchup": "Matchup"}
+                        columns={"day": f"Tip-off ({shared.tz_label(tz)})",
+                                 "matchup": "Matchup"}
                     ),
                     width="stretch", hide_index=True,
                 )
@@ -446,7 +469,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                 # Finished season: the full schedule, every completed game with
                 # its score (chronological; the dataframe header sorts too).
                 table = finals.copy()
-                table["Date"] = table["date"].astype(str).str[:10]
+                table["Date"] = shared.local_dates(table["date"], tz)
                 table = table.rename(columns={
                     "away_abbrev": "Away", "away_score": "Away pts",
                     "home_abbrev": "Home", "home_score": "Home pts",
@@ -494,9 +517,9 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                 st.caption(f"No postseason games match {filter_desc} "
                            f"in {season}.")
             else:
-                st.caption(f"Source: {post_note}")
+                st.caption(f"Source: {shared.localize_note(post_note)}")
                 table = post_view.copy().sort_values("date")
-                table["Date"] = table["date"].astype(str).str[:10]
+                table["Date"] = shared.local_dates(table["date"], tz)
                 table["Status"] = (table["status"].astype(str)
                                    .str.replace("STATUS_", "", regex=False)
                                    .str.title())
@@ -552,12 +575,12 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                     continue
                 for row in frame.sort_values(
                         "date", ascending=not is_final).itertuples():
-                    day = str(row.date)[:10]
                     if is_final:
+                        day = shared.local_stamp(row.date, tz, "%Y-%m-%d")
                         label = (f"{day}  {row.away_abbrev} {row.away_score}"
                                  f" @ {row.home_abbrev} {row.home_score}")
                     else:
-                        when = str(row.date)[:16].replace("T", " ")
+                        when = shared.local_stamp(row.date, tz)
                         label = f"{when}  {row.away_abbrev} @ {row.home_abbrev}"
                     if is_post:
                         label += " (PO)"
@@ -577,7 +600,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                          "venue (upcoming). Live from ESPN, cached 15 minutes.")
                 meta, box_rows, plays, note = shared.load_game_summary(
                     game_ids[labels.index(pick)], league)
-                st.caption(f"Source: {note}")
+                st.caption(f"Source: {shared.localize_note(note)}")
                 if meta:
                     away = meta.get("away_abbrev") or "?"
                     home = meta.get("home_abbrev") or "?"
@@ -589,7 +612,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                         shared.render_box_sides(pd.DataFrame(box_rows), meta)
                         shared.render_play_by_play(plays, league)
                     else:
-                        when = str(meta.get("date") or "")[:16].replace("T", " ")
+                        when = shared.local_stamp(meta.get("date"), tz)
                         status = (str(meta.get("status") or "")
                                   .replace("STATUS_", "").replace("_", " ")
                                   .title())
@@ -606,7 +629,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
     # -------------------------------------------------------------------------
 
     with tabs["Awards Ladder"]:
-        st.caption(f"Source: {awards_note}")
+        st.caption(f"Source: {shared.localize_note(awards_note)}")
 
         # Season headline: the SELECTED season's two official awards off
         # ESPN's award index -- MVP first, then Finals MVP -- so the page
@@ -684,7 +707,8 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
             st.caption(
                 f"Series: {fmvp_info['standings']} · Qualifier: appeared in "
                 f"at least {fmvp_info['min_gp']} of the series' "
-                f"{fmvp_info['games']} games · Source: {fmvp_note}")
+                f"{fmvp_info['games']} games · "
+                f"Source: {shared.localize_note(fmvp_note)}")
 
         if not awards_payload.get("races"):
             if int(games_counts.get(season) or 0):
@@ -842,7 +866,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
     # -------------------------------------------------------------------------
 
     with tabs["Court View"]:
-        st.caption(f"Source: {awards_note}")
+        st.caption(f"Source: {shared.localize_note(awards_note)}")
         if not awards_payload.get("leaders"):
             if int(games_counts.get(season) or 0):
                 st.info("No committed leader data yet: run "

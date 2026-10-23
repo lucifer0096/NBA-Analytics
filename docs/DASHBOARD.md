@@ -37,6 +37,19 @@ because Streamlit renders *both* tabs' content in one script run.
   whichever is honest. The same rule applies *across* leagues: an NBA
   label never preselects a WNBA selector (the label shapes never collide,
   `2025-26` vs `2026`, so one `?season=` param serves both).
+- **The reader's clock.** Every displayed game time converts into the
+  browser's IANA time zone (`st.context.timezone`, falling back to UTC
+  when the client reports none -- the tested condition): tip-off columns,
+  fixture labels, game-detail times, Date columns, the *Next tip-off* card,
+  the upcoming/postponed split and the freshness stamps rewritten at
+  render. "Today's games" therefore fetches the ESPN `dates=` buckets that
+  cover the **viewer's** local day and keeps only tips inside it, because
+  ESPN counts a game by a US calendar date: a reader east of the US lives
+  mostly under the PREVIOUS date's slate, which the old single-UTC-date ask
+  never reached (it showed tomorrow's games or nothing). Streamlit's cache
+  is shared across sessions, so the scoreboard's cache key carries the
+  zone; committed CSV exports keep their raw UTC stamps (data, not
+  display).
 - **Offline is the tested state.** `app/test_app_offline.py` forces *every*
   ESPN call to fail (monkeypatches `espn_api._get_json`) and asserts every
   page still renders its league tabs, section tabs, KPI cards, and empty
@@ -61,8 +74,9 @@ per league, with that league's season and data.
    `models/metrics.json`.
 2. **KPI strip**: three quiet metric tiles scoped to the selected season.
    *Games collected* (box-score files for that season, 0 shown honestly
-   when none), *Next tip-off* (first future game in the schedule,
-   otherwise "—" with help text for finished seasons), *Season scoring
+   when none), *Next tip-off* (the first unplayed game from the viewer's
+   local today onward, otherwise "—" with help text for finished
+   seasons), *Season scoring
    leader* (per-game points from the committed awards payload, with
    season-aware help when no games are collected). The old Model
    validation KPI moved to the sidebar expander.
@@ -82,8 +96,12 @@ per league, with that league's season and data.
    note naming both seasons. A **Download standings CSV** button exports both
    conferences with exactly the columns on screen (blanks where ESPN
    omitted a stat, never zeros).
-4. **Schedule & Scores**: live scoreboard for *today* (empty + explanatory
-   caption in the offseason, the normal Oct–Jun-less state), then the
+4. **Schedule & Scores**: live scoreboard for *today in the viewer's time
+   zone* -- the covering ESPN date buckets are fetched and filtered to the
+   reader's local day, the table leads with a zoned **Tip-off** column and
+   keeps neither the internal game id nor the raw UTC stamp (empty +
+   explanatory caption in the offseason, the normal Oct–Jun-less state),
+   then the
    selected season from its own committed file under `data/schedules/`
    (`data/schedules_wnba/` in the WNBA pane; 17 files / 20,394 games for
    the NBA -- 19,194 with final scores -- and 17 years / 3,693 for the
@@ -91,9 +109,11 @@ per league, with that league's season and data.
    `refresh_dashboard_fallbacks.py` (each file carries its own stamp and
    is rewritten only when rows change; a committed season missing locally
    is preserved). A season still running
-   shows the 15 most recent results (day, matchup, final score) and the
-   next 25 fixtures, plus a count of past-dated postponed/canceled rows
-   excluded from both. A finished season renders the full chronological
+   shows the 15 most recent results (local day, matchup, final score) and
+   the next 25 fixtures with their local tip-off times, plus a count of
+   rows the viewer's local date now puts in the past (postponed/canceled
+   rows that never replayed) excluded from both. A finished season renders
+   the full chronological
    table of every completed game with its final score. A toolbar above
    the tables filters the whole tab: **Team** (any club's fixtures, home
    or away) and **Venue** (home/away relative to that team once one is

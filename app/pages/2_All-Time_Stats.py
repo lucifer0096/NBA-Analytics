@@ -38,7 +38,7 @@ def _render_league(league: str) -> None:
                    + ("" if league == "nba" else f" --league {league}"))
 
     alltime, _, window, career_note = shared.load_awards_career(league)
-    st.caption(f"Source: {career_note}")
+    st.caption(f"Source: {shared.localize_note(career_note)}")
     career_leaders = alltime.get("leaders") or {}
     if not career_leaders:
         st.info("No all-time data yet: the career boards are computed from "

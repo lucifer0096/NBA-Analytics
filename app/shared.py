@@ -13,10 +13,12 @@ of implying freshness it doesn't have.
 
 import html
 import json
+import re
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import quote
+from zoneinfo import ZoneInfo
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -337,13 +339,15 @@ def inject_css() -> None:
 
 
 def hero(season_label: str, source_note: str, extra: str = "") -> None:
-    """Accent strip below the title: season pill, gold data-age pill, note."""
+    """Accent strip below the title: season pill, gold data-age pill, note.
+    The note's UTC stamps render on the viewer's clock here (localize_note)
+    because freshness notes are cached with the data they describe."""
     extra_html = f'<span class="na-pill na-pill--gold">{extra}</span>' if extra else ""
     st.markdown(
         f'<div class="na-hero">'
         f'<span class="na-pill">🏀 {season_label}</span>'
         f"{extra_html}"
-        f'<span class="na-sub">{source_note}</span>'
+        f'<span class="na-sub">{localize_note(source_note)}</span>'
         f"</div>",
         unsafe_allow_html=True,
     )
@@ -1415,6 +1419,180 @@ def race_trend_figure(snapshots: list, race: str = "mvp",
     fig.update_xaxes(title_text="Snapshot date")
     fig.update_yaxes(title_text=f"{race.upper()} score")
     return fig
+
+
+# ---------------------------------------------------------------------------
+# Viewer-local time: the browser's clock, never the server's
+# ---------------------------------------------------------------------------
+
+# A committed/live ISO stamp ('2026-10-23T19:18:59Z') inside a freshness note.
+_UTC_STAMP = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?Z")
+
+
+def browser_timezone() -> str:
+    """The IANA zone the browser reports (st.context.timezone, e.g.
+    'Pacific/Auckland'), or '' when there is none -- AppTest, a first
+    paint before the context lands, a client that strips headers. An
+    absent zone means UTC below: never the server's zone, never a guess."""
+    try:
+        return str(st.context.timezone or "")
+    except Exception:
+        return ""
+
+
+def viewer_tz(name: str | None = None):
+    """The zone every displayed time converts into: the browser's IANA
+    zone when it has one, else UTC. `name` overrides it for tests and for
+    the scoreboard's cache key -- Streamlit's cache is shared across
+    sessions, so a cached 'today' has to be keyed by zone, never by
+    whichever viewer's browser filled it first."""
+    if name is None:
+        name = browser_timezone()
+    try:
+        return ZoneInfo(name) if name else timezone.utc
+    except Exception:
+        return timezone.utc
+
+
+def tz_label(tz=None) -> str:
+    """Short zone label for captions and column headers: the abbreviation
+    the viewer's own clock shows right now ('NZDT', or 'UTC' when the
+    browser told us nothing)."""
+    tz = tz or viewer_tz()
+    try:
+        return datetime.now(tz).strftime("%Z") or str(tz)
+    except Exception:
+        return str(tz)
+
+
+def local_today(tz=None) -> str:
+    """'YYYY-MM-DD' of the VIEWER's current calendar day -- the day
+    'Today's games' and the upcoming/postponed split follow, rather than
+    the server's UTC one (which rolls over mid-evening for most of the
+    world and files today's slate under the wrong date)."""
+    tz = tz or viewer_tz()
+    return datetime.now(tz).strftime("%Y-%m-%d")
+
+
+def local_dates(series: pd.Series, tz=None, with_time: bool = False) -> pd.Series:
+    """A schedule's UTC ISO stamps -> the viewer's local calendar date
+    ('YYYY-MM-DD', plus the tip time when with_time). This is what every
+    Date column and the upcoming/postponed split run on: a 23:30Z tip is
+    the NEXT day for an Auckland reader, so filing it by the server's UTC
+    date drops today's fixtures into the postponed bucket. Rows that don't
+    parse keep their own leading characters instead of vanishing -- an
+    honest gap beats a guessed day -- and format="ISO8601" matters because
+    the committed schedules mix 'T23:00Z' and 'T23:30:00Z' spellings that
+    pandas' inference coerces to NaT when they share a column."""
+    tz = tz or viewer_tz()
+    parsed = pd.to_datetime(series, utc=True, errors="coerce",
+                            format="ISO8601")
+    fmt = "%Y-%m-%d %H:%M" if with_time else "%Y-%m-%d"
+    converted = parsed.dt.tz_convert(tz).dt.strftime(fmt)
+    raw = series.astype(str)
+    return converted.where(parsed.notna(),
+                           raw.str[:16] if with_time else raw.str[:10])
+
+
+def local_stamp(value, tz=None, fmt: str = "%Y-%m-%d %H:%M") -> str:
+    """One UTC ISO stamp -> the viewer's local time in `fmt`. Empty or
+    unparseable gives '' / the raw text: a weird value shows itself,
+    never an invented time."""
+    tz = tz or viewer_tz()
+    if value is None or (not isinstance(value, str) and pd.isna(value)):
+        return ""
+    try:
+        parsed = pd.to_datetime(value, utc=True, errors="coerce",
+                                format="ISO8601")
+    except (TypeError, ValueError):
+        parsed = pd.NaT
+    if pd.isna(parsed):
+        return str(value)
+    return parsed.tz_convert(tz).strftime(fmt)
+
+
+def localize_note(text, tz=None) -> str:
+    """Rewrite the UTC stamps inside a freshness note ('... data as of
+    2026-10-23T19:18:59Z') onto the viewer's clock. The notes are cached
+    WITH the data they describe, so the conversion happens here, at
+    render -- never inside a cache every session shares."""
+    tz = tz or viewer_tz()
+
+    def _swap(match) -> str:
+        parsed = pd.to_datetime(match.group(0), utc=True, errors="coerce")
+        if pd.isna(parsed):
+            return match.group(0)
+        return parsed.tz_convert(tz).strftime("%Y-%m-%d %H:%M %Z")
+
+    return _UTC_STAMP.sub(_swap, str(text or ""))
+
+
+def scoreboard_buckets(day_start) -> list:
+    """ESPN `dates=` buckets (YYYYMMDD) that can hold a game starting
+    during the local day beginning at `day_start`.
+
+    ESPN counts a game by a US calendar date (verified: dates=20261023
+    returns tips from 20:00Z to 02:00Z the next day -- one US evening),
+    and every US zone sits behind UTC, so a game's bucket is its UTC date
+    or the day before. A local day therefore spans a UTC date plus its
+    edges: three buckets -- the day before, the day, the day after --
+    cover it for ANY viewer zone. The superset is deliberate, because the
+    loader then keeps only tips inside the local day, which is what makes
+    an Auckland reader's 'today' (almost entirely the PREVIOUS US date's
+    slate) appear at all: the old single-UTC-date ask fetched tomorrow's
+    slate instead and reported no games."""
+    start = day_start.astimezone(timezone.utc)
+    return sorted({(start - timedelta(days=1)).strftime("%Y%m%d"),
+                   start.strftime("%Y%m%d"),
+                   (start + timedelta(days=1)).strftime("%Y%m%d")})
+
+
+def local_day_games(frame: pd.DataFrame, day_start, day_end, tz) -> pd.DataFrame:
+    """Scoreboard rows tipping inside [day_start, day_end), de-duplicated
+    by game (the covering buckets can overlap) and carrying a local
+    `time` column -- the viewer's day, not the server's."""
+    starts = pd.to_datetime(frame["date"], utc=True, errors="coerce",
+                            format="ISO8601")
+    keep = (starts >= pd.Timestamp(day_start)) & (starts < pd.Timestamp(day_end))
+    out = frame[keep].copy()
+    out["time"] = starts[keep].dt.tz_convert(tz).dt.strftime("%Y-%m-%d %H:%M")
+    return out.drop_duplicates(subset="game_id").sort_values("date")
+
+
+@st.cache_data(ttl=60, show_spinner=False)
+def load_today_scoreboard(league: str = "nba", tz_key: str = "UTC") -> tuple:
+    """(today's games DataFrame, note) for TODAY in the VIEWER's day.
+
+    tz_key is the zone name and part of the cache key on purpose:
+    Streamlit's cache is shared across sessions, so neither the day
+    fetched nor the local tip-off column may leak one viewer's clock to
+    another. The covering ESPN buckets are pulled (each itself 60s
+    cached), then filtered to tips inside the local day -- which is why a
+    reader in New Zealand finally sees their own slate: it lives under
+    the PREVIOUS US date, never under the server's UTC date. Empty (not
+    an error) when there are none, the normal offseason state either
+    way."""
+    tz = viewer_tz(tz_key)
+    day_start = datetime.now(tz).replace(hour=0, minute=0, second=0,
+                                         microsecond=0)
+    day_end = day_start + timedelta(days=1)
+    frames, notes = [], []
+    for bucket in scoreboard_buckets(day_start):
+        frame, note = load_scoreboard(bucket, league)
+        if not frame.empty:
+            frames.append(frame)
+        notes.append(note)
+    live = sum(1 for text in notes if str(text).startswith("Live"))
+    if live == len(notes):
+        note = "Live (60s cache)"
+    elif not live:
+        note = "Offline fallback"
+    else:
+        note = "Live (60s cache); one date-bucket unreachable"
+    if not frames:
+        return pd.DataFrame(), note
+    return (local_day_games(pd.concat(frames, ignore_index=True),
+                            day_start, day_end, tz), note)
 
 
 @st.cache_data(ttl=60, show_spinner=False)

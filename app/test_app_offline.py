@@ -1545,3 +1545,213 @@ def test_live_mvp_tracker_absent_for_a_past_season(offline_espn):
             + " ".join(str(c.value) for c in at.caption))
     assert "MVP progress tracker -- live" not in text
     assert "Live ESPN leaders" not in text
+
+
+# ---------------------------------------------------------------------------
+# Viewer-local time: every displayed game time reads the READER's clock
+# ---------------------------------------------------------------------------
+
+def test_viewer_timezone_falls_back_to_utc(monkeypatch):
+    """The zone comes from the browser (st.context.timezone), and when
+    there is none -- AppTest, a client that strips headers, the very first
+    paint -- it is UTC, never the server's zone and never a guess. An
+    unresolvable name degrades to UTC too, so a bad header can't raise."""
+    import shared as shared_module
+
+    monkeypatch.setattr(shared_module, "browser_timezone", lambda: "")
+    assert str(shared_module.viewer_tz()) == "UTC"
+    monkeypatch.setattr(shared_module, "browser_timezone",
+                        lambda: "Pacific/Auckland")
+    assert str(shared_module.viewer_tz()) == "Pacific/Auckland"
+    monkeypatch.setattr(shared_module, "browser_timezone",
+                        lambda: "Nowhere/Not-A-Zone")
+    assert str(shared_module.viewer_tz()) == "UTC"
+    # an explicit name always wins (the scoreboard's cache key path)
+    assert str(shared_module.viewer_tz("Pacific/Auckland")) == "Pacific/Auckland"
+
+
+def test_local_dates_put_tonight_on_the_readers_own_day():
+    """A 23:30Z tip is TOMORROW for an Auckland reader (NZDT is UTC+13),
+    so every Date column and the upcoming/postponed split must convert --
+    filing it by the server's UTC date is what pushed today's slate out of
+    the schedule. Both committed stamp spellings parse (they share a
+    column), and rows that don't parse keep their own text: an honest gap
+    beats a guessed day."""
+    import pandas as pd
+
+    import shared as shared_module
+
+    nz = shared_module.viewer_tz("Pacific/Auckland")
+    utc = shared_module.viewer_tz("UTC")
+    stamps = pd.Series(["2026-10-24T23:30Z",       # minute precision
+                        "2026-10-21T23:30:00Z",    # second precision
+                        "", "bogus"])
+    assert list(shared_module.local_dates(stamps, nz)[:2]) == [
+        "2026-10-25", "2026-10-22"]
+    assert list(shared_module.local_dates(stamps, utc)[:2]) == [
+        "2026-10-24", "2026-10-21"]
+    assert list(shared_module.local_dates(stamps, nz)[2:]) == ["", "bogus"]
+    timed = shared_module.local_dates(stamps, nz, with_time=True)
+    assert timed[0] == "2026-10-25 12:30"
+    assert timed[2] == "" and timed[3] == "bogus"   # unparseable keeps its own text
+
+
+def test_local_stamp_and_note_localization():
+    """A single stamp renders in the viewer's zone -- UTC gives exactly
+    '2026-10-21 23:30', the string the fixture-detail test pins -- and a
+    freshness note's embedded UTC stamps are rewritten AT RENDER (notes are
+    cached with the data they describe, so they convert where they show)."""
+    import shared as shared_module
+
+    nz = shared_module.viewer_tz("Pacific/Auckland")
+    utc = shared_module.viewer_tz("UTC")
+    assert shared_module.local_stamp("2026-10-21T23:30:00Z", utc) == \
+        "2026-10-21 23:30"
+    assert shared_module.local_stamp("2026-10-21T23:30:00Z", nz) == \
+        "2026-10-22 12:30"
+    assert shared_module.local_stamp("", nz) == ""
+    assert shared_module.local_stamp(None, nz) == ""
+    assert shared_module.local_stamp("not a date", nz) == "not a date"
+    note = "Offline fallback: data as of 2026-10-23T19:18:59Z"
+    assert shared_module.localize_note(note, utc) == \
+        "Offline fallback: data as of 2026-10-23 19:18 UTC"
+    assert shared_module.localize_note(note, nz) == \
+        "Offline fallback: data as of 2026-10-24 08:18 NZDT"
+    assert shared_module.localize_note("Live (60s cache)") == \
+        "Live (60s cache)"
+    # a plain date elsewhere in the prose is NOT a stamp, so it stays
+    assert shared_module.localize_note("schedule 2026-10-24 absent", nz) == \
+        "schedule 2026-10-24 absent"
+
+
+def test_scoreboard_buckets_cover_the_local_day_and_filter_to_it():
+    """ESPN counts a game by a US date (verified: dates=20261023 returns
+    tips 20:00Z..02:00Z -- one US evening), so an Auckland day needs the
+    covering buckets -- its slate sits under the PREVIOUS US date -- and
+    only tips inside the local day survive, carrying a local tip-off."""
+    from datetime import datetime, timedelta
+
+    import pandas as pd
+
+    import shared as shared_module
+
+    nz = shared_module.viewer_tz("Pacific/Auckland")
+    day_start = datetime(2026, 10, 25, 0, 0, tzinfo=nz)   # local midnight NZDT
+    day_end = day_start + timedelta(days=1)
+    # local midnight = 2026-10-24 11:00Z, so the covering buckets are the
+    # US dates Oct 23/24/25 -- the Oct 23 slate is the OLD ask's blind spot
+    assert shared_module.scoreboard_buckets(day_start) == [
+        "20261023", "20261024", "20261025"]
+    rows = [
+        {"game_id": "in", "date": "2026-10-24T20:00Z"},   # NZ Oct 25 09:00
+        {"game_id": "in", "date": "2026-10-24T20:00Z"},   # same event, twice
+        {"game_id": "old", "date": "2026-10-23T02:00Z"},  # NZ Oct 23 15:00
+        {"game_id": "new", "date": "2026-10-25T22:00Z"},  # NZ Oct 26 11:00
+    ]
+    out = shared_module.local_day_games(
+        pd.DataFrame(rows), day_start, day_end, nz)
+    assert list(out["game_id"]) == ["in"]
+    assert out.iloc[0]["time"] == "2026-10-25 09:00"
+
+
+def test_load_today_scoreboard_scopes_to_the_viewer_day(monkeypatch):
+    """The loader pulls three covering buckets (the previous US date's
+    slate is always among them -- the old single-UTC-date ask fetched
+    tomorrow's games for a viewer east of the US and reported none), keeps
+    only tips inside the local day, and keys its cache by zone so two
+    viewers never share each other's 'today'. Fetches are stubbed."""
+    from datetime import datetime, timedelta, timezone as datetime_tz
+
+    import pandas as pd
+
+    import shared as shared_module
+
+    key = "Pacific/Auckland"
+    tz = shared_module.viewer_tz(key)
+    day_start = datetime.now(tz).replace(hour=0, minute=0, second=0,
+                                         microsecond=0)
+    inside = day_start + timedelta(hours=9)
+    outside = inside - timedelta(days=3)
+    # stamps are UTC on the wire: convert the local instants before 'Z'
+    inside_utc = inside.astimezone(datetime_tz.utc)
+    outside_utc = outside.astimezone(datetime_tz.utc)
+    requested: list = []
+
+    def _fake(dates, league="nba"):
+        requested.append(dates)
+        rows = [
+            {"game_id": "today", "date": inside_utc.strftime("%Y-%m-%dT%H:%M:00Z"),
+             "status": "STATUS_SCHEDULED", "home": "AAA", "away": "BBB",
+             "home_score": None, "away_score": None},
+            {"game_id": "long-ago",
+             "date": outside_utc.strftime("%Y-%m-%dT%H:%M:00Z"),
+             "status": "STATUS_FINAL", "home": "AAA", "away": "BBB",
+             "home_score": "100", "away_score": "99"},
+        ]
+        return pd.DataFrame(rows), "Live (60s cache)"
+
+    monkeypatch.setattr(shared_module, "load_scoreboard", _fake)
+    shared_module.load_today_scoreboard.clear()
+    try:
+        frame, note = shared_module.load_today_scoreboard("nba", key)
+        # three DISTINCT buckets, including the local midnight's UTC date
+        assert len(requested) == 3 and len(set(requested)) == 3
+        assert day_start.astimezone(datetime_tz.utc).strftime("%Y%m%d") in \
+            requested
+        # only the viewer's day survives, rendered on their clock
+        assert list(frame["game_id"]) == ["today"]
+        assert frame.iloc[0]["time"] == inside.strftime("%Y-%m-%d %H:%M")
+        assert note == "Live (60s cache)"
+        # the zone is part of the cache key: another viewer's clock is a
+        # separate entry (Streamlit's cache is shared across sessions)
+        shared_module.load_today_scoreboard("nba", "UTC")
+        assert len(requested) == 6
+    finally:
+        shared_module.load_today_scoreboard.clear()
+
+
+def test_schedule_today_caption_reads_the_local_date_and_zone(offline_espn):
+    """The Schedule tab's empty state names the READER's day in
+    YYYY-MM-DD (never ESPN's YYYYMMDD bucket format), and the sidebar
+    names the zone it read -- both say UTC here, which is exactly the
+    no-browser-zone contract AppTest exercises."""
+    import re
+
+    import shared as shared_module
+
+    at = _render("app/app.py", offline_espn)
+    captions = " ".join(str(c.value) for c in at.caption)
+    today = shared_module.local_today(shared_module.viewer_tz("UTC"))
+    assert f"No games on {today}:" in captions
+    assert re.search(r"Today \(UTC\): \d{4}-\d{2}-\d{2}", captions)
+    assert not re.search(r"No games on \d{8}", captions), \
+        "the raw YYYYMMDD bucket leaked into the reader's caption"
+
+
+def test_schedule_today_table_leads_with_a_zoned_tipoff(offline_espn,
+                                                        monkeypatch):
+    """With games present the table leads with the local tip-off column,
+    its header naming the zone, and the internal game_id/raw UTC date are
+    not shown -- the reader gets their own clock, not the collector's."""
+    import pandas as pd
+
+    import shared as shared_module
+
+    frame = pd.DataFrame([{
+        "game_id": "401585601", "date": "2026-10-25T23:30:00Z",
+        "status": "STATUS_SCHEDULED", "home": "BOS", "away": "NYK",
+        "home_score": None, "away_score": None,
+        "time": "2026-10-26 12:30",
+    }])
+    monkeypatch.setattr(
+        shared_module, "load_today_scoreboard",
+        lambda league="nba", tz_key="UTC": (frame, "Live (60s cache)"))
+    at = _render("app/app.py", offline_espn)
+    frames = [df.value for df in at.dataframe
+              if hasattr(getattr(df, "value", None), "columns")]
+    today_table = next((f for f in frames if "Tip-off (UTC)" in list(f.columns)),
+                       None)
+    assert today_table is not None, "today's-games table lost its tip-off column"
+    assert "game_id" not in list(today_table.columns)
+    assert "date" not in list(today_table.columns)
+    assert today_table.iloc[0]["Tip-off (UTC)"] == "2026-10-26 12:30"
