@@ -2047,6 +2047,12 @@
    "team_id": 18
   },
   {
+   "player_id": 4897943,
+   "player_name": "Dalton Knecht",
+   "position": "F",
+   "team_id": 18
+  },
+  {
    "player_id": 4433225,
    "player_name": "Tyler Kolek",
    "position": "G",
@@ -2055,12 +2061,6 @@
   {
    "player_id": 4431823,
    "player_name": "Miles McBride",
-   "position": "G",
-   "team_id": 18
-  },
-  {
-   "player_id": 4411057,
-   "player_name": "Kevin McCullar Jr.",
    "position": "G",
    "team_id": 18
   },
@@ -2145,6 +2145,12 @@
   {
    "player_id": 5106270,
    "player_name": "Otega Oweh",
+   "position": "G",
+   "team_id": 25
+  },
+  {
+   "player_id": 4432185,
+   "player_name": "Micah Peavy",
    "position": "G",
    "team_id": 25
   },
@@ -2665,6 +2671,12 @@
    "team_id": 23
   },
   {
+   "player_id": 4709131,
+   "player_name": "Sean Pedulla",
+   "position": "G",
+   "team_id": 23
+  },
+  {
    "player_id": 4279318,
    "player_name": "Daeqwon Plowden",
    "position": "G",
@@ -3115,6 +3127,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-23T17:08:29Z",
+ "_generated_utc": "2026-10-24T06:27:53Z",
  "source": "local"
 }
