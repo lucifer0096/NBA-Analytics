@@ -1666,6 +1666,34 @@ def _game_started(status_type: dict) -> bool:
     return status_type.get("name") in ("STATUS_FINAL", "STATUS_IN_PROGRESS")
 
 
+def _period_label(period):
+    """'Q3' / 'OT' for ESPN's scoreboard period, which ships in TWO shapes
+    (verified live Oct 2026): the live scoreboard answers a bare int (0
+    before tip, 3 in the third quarter, 5+ for overtime) while other
+    payloads carry {'number': 3, 'displayValue': 'Q3'}. 0 is the
+    pre-game placeholder: no quarter has started, so None -- the cell
+    falls back to the status word, never a fake quarter."""
+    number = None
+    if isinstance(period, dict):
+        text = period.get("displayValue")
+        if isinstance(text, str) and text.strip():
+            return text.strip()
+        number = period.get("number")
+    elif isinstance(period, (int, float)):
+        number = period
+    try:
+        number = int(number)
+    except (TypeError, ValueError):
+        return None
+    if number < 1:
+        return None
+    if number == 5:
+        return "OT"
+    if number > 5:
+        return f"{number - 4}OT"
+    return f"Q{number}"
+
+
 @st.cache_data(ttl=60, show_spinner=False)
 def load_scoreboard(dates: str, league: str = "nba") -> tuple:
     """(scoreboard events DataFrame, note) for a YYYYMMDD date -- genuinely
@@ -1684,16 +1712,20 @@ def load_scoreboard(dates: str, league: str = "nba") -> tuple:
             status_body = comp.get("status") or {}
             status_type = status_body.get("type") or {}
             started = _game_started(status_type)
-            period = status_body.get("period")
+            display_clock = status_body.get("displayClock")
             rows.append({
                 "game_id": event.get("id"),
                 "date": event.get("date"),
                 "status": status_type.get("name"),
-                # Live period + clock, kept raw: status_detail() renders
-                # them into the Status cell ('Q3 4:32') at display time.
-                "status_period": (period.get("displayValue")
-                                  if isinstance(period, dict) else None),
-                "status_clock": status_body.get("clock"),
+                # Live period + clock, kept raw-ish for display:
+                # status_detail() composes them into the Status cell
+                # ('Q3 4:32'). displayClock arrives formatted ('4:32.5');
+                # the raw clock is seconds remaining -- either normalizes.
+                "status_period": _period_label(status_body.get("period")),
+                "status_clock": (display_clock
+                                 if isinstance(display_clock, str)
+                                 and ":" in display_clock
+                                 else status_body.get("clock")),
                 "home": sides.get("home", {}).get("team", {}).get("abbreviation"),
                 "away": sides.get("away", {}).get("team", {}).get("abbreviation"),
                 "home_score": (_score_display(sides.get("home", {}).get("score"))

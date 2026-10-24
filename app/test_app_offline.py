@@ -1917,12 +1917,18 @@ def test_load_scoreboard_parses_both_live_score_shapes(monkeypatch):
     import shared as shared_module
 
     def _event(eid, home, away, status=None, date="2026-10-24T23:30:00Z",
-               period=None, clock=None):
+               period=None, clock=None, display_clock=None):
         body = {"type": status or {"name": "STATUS_FINAL"}}
         if period is not None:
-            body["period"] = {"displayValue": period}
+            # ESPN ships periods BOTH ways: a bare int on the live
+            # scoreboard (verified Oct 2026), a displayValue dict in
+            # other payloads. A str test-fixture becomes the dict shape.
+            body["period"] = ({"displayValue": period}
+                              if isinstance(period, str) else period)
         if clock is not None:
             body["clock"] = clock
+        if display_clock is not None:
+            body["displayClock"] = display_clock
         return {"id": eid, "date": date,
                 "competitions": [{
                     "status": body,
@@ -1941,11 +1947,20 @@ def test_load_scoreboard_parses_both_live_score_shapes(monkeypatch):
         _event("4", "0", "0",
                status={"name": "STATUS_SCHEDULED", "state": "pre"},
                date="2026-10-25T00:00:00Z"),
-        # a game in progress: the period + clock ride along for the
-        # Status cell's 'Q3 4:32'
+        # a game in progress, in the LIVE scoreboard's real shape: the
+        # period is a bare int and displayClock arrives formatted -- the
+        # Status cell must still read 'Q3 4:32', quarter AND clock
         _event("5", "91", "87",
                status={"name": "STATUS_IN_PROGRESS", "state": "in"},
-               date="2026-10-24T23:00:00Z", period="Q3", clock=272.5),
+               date="2026-10-24T23:00:00Z", period=3, clock=272.5,
+               display_clock="4:32.5"),
+        # overtime as the int it ships as, and the dict shape too
+        _event("6", "120", "118",
+               status={"name": "STATUS_FINAL", "state": "post"},
+               date="2026-10-24T22:00:00Z", period=5),
+        _event("7", "95", "98",
+               status={"name": "STATUS_FINAL", "state": "post"},
+               date="2026-10-24T21:00:00Z", period="Q4"),
     ]}
     monkeypatch.setattr(espn_module, "get_scoreboard",
                         lambda dates, league="nba": payload)
@@ -1961,12 +1976,16 @@ def test_load_scoreboard_parses_both_live_score_shapes(monkeypatch):
         # neither the dict's float value nor a fabricated 0 leaks on screen
         assert "101.0" not in list(frame["away_score"])
         assert "0" not in list(frame["home_score"])
-        # the live game's REAL period + clock ride along, raw: the Status
-        # cell composes them at display time ('Q3 4:32')
+        # the live game's REAL period + clock ride along, in the live
+        # scoreboard's own shapes (int period, formatted displayClock):
+        # the Status cell still composes them at display ('Q3 4:32')
         live = frame[frame["status"] == "STATUS_IN_PROGRESS"].iloc[0]
-        assert live["status_period"] == "Q3" and live["status_clock"] == 272.5
+        assert live["status_period"] == "Q3" and live["status_clock"] == "4:32.5"
         assert shared_module.status_detail(
             live["status"], live["status_period"],
             live["status_clock"]) == "Q3 4:32"
+        # overtime numbers as 'OT', the dict period shape as its own label
+        assert frame.iloc[5]["status_period"] == "OT"
+        assert frame.iloc[6]["status_period"] == "Q4"
     finally:
         shared_module.load_scoreboard.clear()

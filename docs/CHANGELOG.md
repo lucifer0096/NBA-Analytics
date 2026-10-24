@@ -7,6 +7,18 @@ green and CI green.
 
 ## 2026-10-24
 
+### fix(app): the live Status cell shows its quarter -- ESPN's scoreboard period is a bare int
+
+The clock batch read the period only in the `{'displayValue': 'Q3'}`
+dict shape; a probe against tonight's live slate showed the LIVE
+scoreboard answers `period: 0` / `3` as a **bare int** (plus a
+formatted `displayClock`), so live cells fell back to bare time --
+no quarter. `shared._period_label()` now resolves both shapes ("Q3"
+from the int, "OT"/"2OT" from 5+, None from the pre-game 0) and the
+parser prefers ESPN's formatted `displayClock`. Verified against the
+live payload (2026-10-24); the parser test carries the real live
+shape plus overtime and the dict shape.
+
 ### `ad090cd` feat(app): live clock in the status, numeric tables, Schedule-first landing
 
 *The app shows what it knows, as clocks and numbers.*

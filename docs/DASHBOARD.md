@@ -112,8 +112,11 @@ per league, with that league's season and data.
    zone* -- the covering ESPN date buckets are fetched and filtered to the
    reader's local day, the table leads with a zoned **Tip-off** column and
    keeps neither the internal game id, the raw UTC stamp, nor the raw
-   `STATUS_*` enum (a live game's Status cell shows its REAL period and
-   clock -- "Q3 4:32", ESPN's own numbers on the 60s cache -- and other
+   `STATUS_*` enum (a live game's Status cell shows BOTH its real
+   quarter and clock -- "Q3 4:32", "OT 1:02" past regulation -- parsed
+   from the scoreboard's two period shapes (a bare int on the live
+   feed, a `displayValue` dict elsewhere; ESPN's formatted
+   `displayClock` preferred) on the 60s cache, and other
    states get words -- Scheduled / Final / Postponed -- with the enums
    kept in the CSV exports; scores render as numbers, so the columns
    right-align and header-click sorting is numeric; both of
