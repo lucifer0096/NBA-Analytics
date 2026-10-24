@@ -1563,6 +1563,15 @@ def freshness_age(note, now=None) -> str:
     return f" ({seconds // (24 * 3600)} d ago)"
 
 
+def source_caption(note) -> None:
+    """The one Source line every section ends with: the freshness note
+    localized to the viewer's clock AND aged off the same stamp
+    ('... 08:18 NZDT (2 h ago)') -- so the age rides every caption, not
+    just the hero. Notes without a stamp (a live 'Live (60s cache)') age
+    to nothing."""
+    st.caption(f"Source: {localize_note(note)}{freshness_age(note)}")
+
+
 def scoreboard_buckets(day_start) -> list:
     """ESPN `dates=` buckets (YYYYMMDD) that can hold a game starting
     during the local day beginning at `day_start`.

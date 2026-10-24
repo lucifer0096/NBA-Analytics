@@ -1844,6 +1844,18 @@ def test_freshness_age_reads_the_notes_own_stamp():
     assert age("", now) == "" and age(None, now) == ""
 
 
+def test_source_captions_carry_the_age_too(offline_espn):
+    """The age suffix is not hero-only: every Source line renders through
+    shared.source_caption, so a committed note shows its localized stamp
+    AND its age ('... NZDT (N h ago)') wherever the section sits --
+    while a live stampless note ages to nothing."""
+    at = _render("app/app.py", offline_espn)
+    sources = [str(c.value) for c in at.caption if "Source:" in str(c.value)]
+    assert sources, "the page must caption its sources"
+    assert any(" ago)" in c for c in sources), \
+        "a committed note's Source caption must carry its age"
+
+
 def test_schedule_today_table_leads_with_a_zoned_tipoff(offline_espn,
                                                         monkeypatch):
     """With games present the table leads with the local tip-off column,

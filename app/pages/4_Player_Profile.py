@@ -56,7 +56,7 @@ def _render_league(league: str) -> None:
                 "fetch.")
         return
 
-    st.caption(f"Source: {shared.localize_note(note)}")
+    shared.source_caption(note)
 
     by_name = {}
     for row in players.values():

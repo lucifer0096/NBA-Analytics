@@ -7,6 +7,14 @@ green and CI green.
 
 ## 2026-10-24
 
+### feat(app): the age rides every Source caption
+
+`shared.source_caption()` is now the single Source line every section
+ends with: the freshness note localized to the viewer's clock **and
+aged** off the same stamp -- "(2 h ago)" had been hero-only. The
+Finals-MVP composite caption keeps its inline form and gains the same
+suffix. +1 test (215 total).
+
 ### fix(app): the live Status cell shows its quarter -- ESPN's scoreboard period is a bare int
 
 The clock batch read the period only in the `{'displayValue': 'Q3'}`

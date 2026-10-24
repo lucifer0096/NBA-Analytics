@@ -44,7 +44,7 @@ def _render_league(league: str) -> None:
                 f"with ≥{goat.get('min_career_gp', awards.GOAT_MIN_CAREER_GP)} "
                 f"career games (`{refresh_cmd}`).")
         return
-    st.caption(f"Source: {shared.localize_note(career_note)}")
+    shared.source_caption(career_note)
     st.caption(
         f"Homegrown composite: NOT an official {display} ranking, award, or "
         "any vendor's rating. "

@@ -251,7 +251,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
 
     with tabs["Standings"]:
         standings, note = shared.load_standings(season, league)
-        st.caption(f"Source: {shared.localize_note(note)}")
+        shared.source_caption(note)
         if standings.empty:
             st.info(f"No standings available for {season} yet.")
         else:
@@ -414,14 +414,14 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                     ]],
                 width="stretch", hide_index=True,
             )
-            st.caption(f"Source: {shared.localize_note(sb_note)}")
+            shared.source_caption(sb_note)
 
         shared.section(f"{season} schedule & results")
         if games.empty:
             st.info(f"No collected schedule for {season} yet: run the collector "
                     f"(`{snapshot_cmd}`).")
         else:
-            st.caption(f"Source: {shared.localize_note(sched_note)}")
+            shared.source_caption(sched_note)
             # Toolbar: team + venue filters plus a CSV of whatever they pick.
             # Venue options depend on the team (home/away only mean something
             # relative to one), so the two selectboxes use separate keys --
@@ -576,7 +576,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                 st.caption(f"No postseason games match {filter_desc} "
                            f"in {season}.")
             else:
-                st.caption(f"Source: {shared.localize_note(post_note)}")
+                shared.source_caption(post_note)
                 table = post_view.copy().sort_values("date")
                 table["Date"] = shared.local_dates(table["date"], tz)
                 table["Status"] = table["status"].map(shared.status_label)
@@ -662,7 +662,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                          "cached 15 minutes.")
                 meta, box_rows, plays, note = shared.load_game_summary(
                     game_ids[labels.index(pick)], league)
-                st.caption(f"Source: {shared.localize_note(note)}")
+                shared.source_caption(note)
                 if meta:
                     away = meta.get("away_abbrev") or "?"
                     home = meta.get("home_abbrev") or "?"
@@ -698,7 +698,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
     # -------------------------------------------------------------------------
 
     with tabs["Awards Ladder"]:
-        st.caption(f"Source: {shared.localize_note(awards_note)}")
+        shared.source_caption(awards_note)
 
         # Season headline: the SELECTED season's two official awards off
         # ESPN's award index -- MVP first, then Finals MVP -- so the page
@@ -777,7 +777,8 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                 f"Series: {fmvp_info['standings']} · Qualifier: appeared in "
                 f"at least {fmvp_info['min_gp']} of the series' "
                 f"{fmvp_info['games']} games · "
-                f"Source: {shared.localize_note(fmvp_note)}")
+                f"Source: {shared.localize_note(fmvp_note)}"
+                f"{shared.freshness_age(fmvp_note)}")
 
         if not awards_payload.get("races"):
             if int(games_counts.get(season) or 0):
@@ -936,7 +937,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
     # -------------------------------------------------------------------------
 
     with tabs["Court View"]:
-        st.caption(f"Source: {shared.localize_note(awards_note)}")
+        shared.source_caption(awards_note)
         if not awards_payload.get("leaders"):
             if int(games_counts.get(season) or 0):
                 st.info("No committed leader data yet: run "

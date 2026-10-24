@@ -63,7 +63,9 @@ framing the numbers below it, each note ending with its age, "(2 h
 ago)", computed at render from the same stamp it shows), then the KPI
 strip, then the four section sub-tabs -- **Schedule & Scores first**,
 because the landing view leads with today's slate (reordered together by
-`?tab=`). Everything below exists once
+`?tab=`). Every freshness note ends with its age ("(2 h ago)", computed
+at render from the same stamp it shows) -- the hero line and every
+`Source:` caption alike (`shared.source_caption`). Everything below exists once
 per league, with that league's season and data.
 
 1. **Sidebar**: one season selector per league -- NBA every season from
@@ -399,7 +401,8 @@ All styling is one CSS block in `shared.inject_css()`, CSS-only with no JS:
 - charts rendered through one quiet config (`shared.CHART_CONFIG`): no
   floating Plotly modebar, no Plotly logo,
 - freshness notes ending with their age ("(2 h ago)" -- `freshness_age`,
-  computed at render from the same stamp the note displays),
+  computed at render from the same stamp the note displays) on the hero
+  AND every `Source:` caption (`shared.source_caption`),
 - slot chips, award-race/leader rows as a calm divider list (hover
   restores the card fill), and court cards whose stat tooltips
   are pure CSS (`:hover`), including the image fallback (headshot `<img>`
