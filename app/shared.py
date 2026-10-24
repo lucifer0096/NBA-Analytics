@@ -341,13 +341,16 @@ def inject_css() -> None:
 def hero(season_label: str, source_note: str, extra: str = "") -> None:
     """Accent strip below the title: season pill, gold data-age pill, note.
     The note's UTC stamps render on the viewer's clock here (localize_note)
-    because freshness notes are cached with the data they describe."""
+    because freshness notes are cached with the data they describe -- and
+    the note ends with its age (freshness_age, render-time only), so the
+    glance answers 'how old is this' without arithmetic."""
     extra_html = f'<span class="na-pill na-pill--gold">{extra}</span>' if extra else ""
     st.markdown(
         f'<div class="na-hero">'
         f'<span class="na-pill">🏀 {season_label}</span>'
         f"{extra_html}"
-        f'<span class="na-sub">{localize_note(source_note)}</span>'
+        f'<span class="na-sub">{localize_note(source_note)}'
+        f"{freshness_age(source_note)}</span>"
         f"</div>",
         unsafe_allow_html=True,
     )
@@ -1533,6 +1536,33 @@ def localize_note(text, tz=None) -> str:
     return _UTC_STAMP.sub(_swap, str(text or ""))
 
 
+def freshness_age(note, now=None) -> str:
+    """' (2 h ago)' -- the age of the NEWEST UTC stamp inside a freshness
+    note, computed at render from the same stamp localize_note displays
+    (the suffix can never claim an age the caption doesn't back). '' when
+    the note carries no parseable stamp -- a live 'Live (60s cache)' note
+    has nothing to age. `now` exists for the tests."""
+    stamps = _UTC_STAMP.findall(str(note or ""))
+    if not stamps:
+        return ""
+    try:
+        moment = datetime.fromisoformat(stamps[-1].replace("Z", "+00:00"))
+    except ValueError:
+        return ""
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=timezone.utc)
+    seconds = max(0, int(
+        ((now or datetime.now(timezone.utc))
+         - moment.astimezone(timezone.utc)).total_seconds()))
+    if seconds < 60:
+        return " (just now)"
+    if seconds < 3600:
+        return f" ({seconds // 60} min ago)"
+    if seconds < 48 * 3600:
+        return f" ({seconds // 3600} h ago)"
+    return f" ({seconds // (24 * 3600)} d ago)"
+
+
 def scoreboard_buckets(day_start) -> list:
     """ESPN `dates=` buckets (YYYYMMDD) that can hold a game starting
     during the local day beginning at `day_start`.
@@ -1651,12 +1681,19 @@ def load_scoreboard(dates: str, league: str = "nba") -> tuple:
                 continue
             comp = comps[0]
             sides = {c.get("homeAway"): c for c in comp.get("competitors", [])}
-            status_type = (comp.get("status") or {}).get("type") or {}
+            status_body = comp.get("status") or {}
+            status_type = status_body.get("type") or {}
             started = _game_started(status_type)
+            period = status_body.get("period")
             rows.append({
                 "game_id": event.get("id"),
                 "date": event.get("date"),
                 "status": status_type.get("name"),
+                # Live period + clock, kept raw: status_detail() renders
+                # them into the Status cell ('Q3 4:32') at display time.
+                "status_period": (period.get("displayValue")
+                                  if isinstance(period, dict) else None),
+                "status_clock": status_body.get("clock"),
                 "home": sides.get("home", {}).get("team", {}).get("abbreviation"),
                 "away": sides.get("away", {}).get("team", {}).get("abbreviation"),
                 "home_score": (_score_display(sides.get("home", {}).get("score"))
@@ -1768,6 +1805,40 @@ def status_label(raw) -> str:
     bare = text[7:] if text.startswith("STATUS_") else text
     return _STATUS_WORDS.get(
         bare.upper(), bare.replace("_", " ").capitalize())
+
+
+def _clock_text(clock) -> str:
+    """'4:32' for ESPN's game clock (seconds remaining in the period,
+    sometimes already formatted, tenths trimmed); '' when absent or
+    unparseable -- never an invented time."""
+    if clock is None or clock == "":
+        return ""
+    text = str(clock).strip()
+    if ":" in text:
+        return text.split(".")[0]  # '4:32.5' -> '4:32'
+    try:
+        seconds = int(float(text))
+    except ValueError:
+        return ""
+    if seconds < 0:
+        return ""
+    return f"{seconds // 60}:{seconds % 60:02d}"
+
+
+def status_detail(status, period=None, clock=None) -> str:
+    """The Status cell for a scoreboard row: the REAL period and clock for
+    a game in progress ('Q3 4:32' -- what a viewer watching the score
+    wants, refreshed with the slate's 60s cache), the human word for every
+    other state (Scheduled / Halftime / Final / ...). A missing period or
+    clock falls back to the word: the cell never invents a time."""
+    word = status_label(status)
+    if str(status or "").strip() != "STATUS_IN_PROGRESS":
+        return word
+    parts = [str(period).strip()] if period else []
+    clock_text = _clock_text(clock)
+    if clock_text:
+        parts.append(clock_text)
+    return " ".join(parts) or word
 
 
 def render_box_sides(rows: pd.DataFrame, meta: dict) -> None:

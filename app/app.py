@@ -308,10 +308,23 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                 ).reset_index(drop=True)
                 table.index = table.index + 1
                 display_table = table.rename(columns=renames)
-                keep = ["zone", "Team", "record", "Win%", "Seed", "Streak",
-                        "PF/g", "PA/g", "+/-", "L10"]
+                keep = ["zone", "Team", "record", "Win%", "GB", "Seed",
+                        "Streak", "PF/g", "PA/g", "+/-", "L10"]
                 display_table = display_table[
                     [c for c in keep if c in display_table.columns]]
+                # GB and Win% render as NUMBERS: right-aligned next to the
+                # other numeric columns, and a header click sorts
+                # numerically ('12.5' after '2.5', never before it). ESPN's
+                # '-' leader mark becomes the 0.0 it means; the CSV export
+                # keeps the raw strings.
+                if "GB" in display_table.columns:
+                    display_table["GB"] = pd.to_numeric(
+                        display_table["GB"].replace("-", 0.0),
+                        errors="coerce").astype("Float64")
+                if "Win%" in display_table.columns:
+                    display_table["Win%"] = pd.to_numeric(
+                        display_table["Win%"], errors="coerce").astype(
+                            "Float64")
                 st.dataframe(
                     display_table,
                     width="stretch",
@@ -369,12 +382,24 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
             st.info(f"No games on {today}: {sb_note}. {off_note}")
         else:
             # game_id/raw UTC date are internal: the reader gets the local
-            # tip-off column (zoned in the header) in their place, and the
-            # raw STATUS_* enum becomes words (the enum stays in the CSV
-            # exports -- data, not display).
+            # tip-off column (zoned in the header) in their place; the
+            # Status cell shows a live game's REAL period and clock
+            # ('Q3 4:32') and human words otherwise (the raw STATUS_* enum
+            # stays in the CSV exports -- data, not display); scores
+            # render as numbers, so the columns right-align and sort
+            # numerically -- blanks stay blank, never a fabricated 0.
             _slate = scoreboard.drop(columns=["game_id", "date"],
                                      errors="ignore").copy()
-            _slate["status"] = _slate["status"].map(shared.status_label)
+            for _col in ("status_period", "status_clock"):
+                if _col not in _slate.columns:
+                    _slate[_col] = None
+            _slate["status"] = [
+                shared.status_detail(s, p, c) for s, p, c in zip(
+                    _slate["status"], _slate["status_period"],
+                    _slate["status_clock"])]
+            for _col in ("away_score", "home_score"):
+                _slate[_col] = pd.to_numeric(
+                    _slate[_col], errors="coerce").astype("Int64")
             _tip = f"Tip-off ({shared.tz_label(tz)})"
             st.dataframe(
                 _slate.rename(columns={
@@ -389,6 +414,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                     ]],
                 width="stretch", hide_index=True,
             )
+            st.caption(f"Source: {shared.localize_note(sb_note)}")
 
         shared.section(f"{season} schedule & results")
         if games.empty:
@@ -496,9 +522,13 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                 )
             elif not finals.empty:
                 # Finished season: the full schedule, every completed game with
-                # its score (chronological; the dataframe header sorts too).
+                # its score (chronological; the dataframe header sorts too --
+                # numerically, now that the scores are numbers on screen).
                 table = finals.copy()
                 table["Date"] = shared.local_dates(table["date"], tz)
+                for _col in ("away_score", "home_score"):
+                    table[_col] = pd.to_numeric(
+                        table[_col], errors="coerce").astype("Int64")
                 table = table.rename(columns={
                     "away_abbrev": "Away", "away_score": "Away pts",
                     "home_abbrev": "Home", "home_score": "Home pts",
@@ -550,6 +580,9 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                 table = post_view.copy().sort_values("date")
                 table["Date"] = shared.local_dates(table["date"], tz)
                 table["Status"] = table["status"].map(shared.status_label)
+                for _col in ("away_score", "home_score"):
+                    table[_col] = pd.to_numeric(
+                        table[_col], errors="coerce").astype("Int64")
                 table = table.rename(columns={
                     "away_abbrev": "Away", "away_score": "Away pts",
                     "home_abbrev": "Home", "home_score": "Home pts",
@@ -604,11 +637,12 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                         "date", ascending=not is_final).itertuples():
                     if is_final:
                         day = shared.local_stamp(row.date, tz, "%Y-%m-%d")
-                        label = (f"{day}  {row.away_abbrev} {row.away_score}"
+                        label = (f"{day} · {row.away_abbrev} {row.away_score}"
                                  f" @ {row.home_abbrev} {row.home_score}")
                     else:
                         when = shared.local_stamp(row.date, tz)
-                        label = f"{when}  {row.away_abbrev} @ {row.home_abbrev}"
+                        label = (f"{when} · {row.away_abbrev} "
+                                 f"@ {row.home_abbrev}")
                     if is_post:
                         label += " (PO)"
                     if label in seen:
@@ -623,19 +657,29 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
             else:
                 pick = st.selectbox(
                     "Fixture", labels, index=0, key=f"fixture_{league}",
-                    help="Box score and play-by-play (final), tip-off, TV and "
-                         "venue (upcoming). Live from ESPN, cached 15 minutes.")
+                    help="Box score and play-by-play (final or in progress), "
+                         "tip-off, TV and venue (upcoming). Live from ESPN, "
+                         "cached 15 minutes.")
                 meta, box_rows, plays, note = shared.load_game_summary(
                     game_ids[labels.index(pick)], league)
                 st.caption(f"Source: {shared.localize_note(note)}")
                 if meta:
                     away = meta.get("away_abbrev") or "?"
                     home = meta.get("home_abbrev") or "?"
-                    if meta.get("status") == "STATUS_FINAL":
-                        st.markdown(
-                            f"**{away} {shared.fmt_score(meta.get('away_score'))}"
-                            f" @ {home} "
-                            f"{shared.fmt_score(meta.get('home_score'))}**")
+                    if box_rows:
+                        # Whichever state the game is in: the summary
+                        # endpoint ships the box score + PBP for finals
+                        # AND games in progress, so a live game renders its
+                        # live box -- the status word rides the matchup
+                        # line so a half-played game never reads final.
+                        header = (f"**{away} "
+                                  f"{shared.fmt_score(meta.get('away_score'))}"
+                                  f" @ {home} "
+                                  f"{shared.fmt_score(meta.get('home_score'))}"
+                                  "**")
+                        if meta.get("status") != "STATUS_FINAL":
+                            header += (f" · {shared.status_label(meta.get('status'))}")
+                        st.markdown(header)
                         shared.render_box_sides(pd.DataFrame(box_rows), meta)
                         shared.render_play_by_play(plays, league)
                     else:
@@ -949,7 +993,9 @@ league_tabs = shared.league_tabs()
 
 # ?tab= deep link: the section labels are identical inside both league tabs,
 # so one reorder serves both (requested section first, pinned default after).
-tab_labels = ["Standings", "Schedule & Scores", "Awards Ladder", "Court View"]
+# The landing section is today's slate: Schedule & Scores leads, then the
+# standings, the ladder and the court (?tab= reorders either way).
+tab_labels = ["Schedule & Scores", "Standings", "Awards Ladder", "Court View"]
 deep_tab = st.query_params.get("tab") or ""
 if deep_tab in tab_labels:
     tab_labels = [deep_tab] + [label for label in tab_labels

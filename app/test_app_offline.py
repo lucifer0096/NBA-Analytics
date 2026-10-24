@@ -77,9 +77,9 @@ def test_home_page_renders_offline(offline_espn):
     # call failing.
     assert any("NBA Analytics" in str(t.value) for t in at.title)
     tab_labels = [str(t.label) for t in at.tabs]
-    assert tab_labels == ["NBA", "Standings", "Schedule & Scores",
+    assert tab_labels == ["NBA", "Schedule & Scores", "Standings",
                           "Awards Ladder", "Court View",
-                          "WNBA", "Standings", "Schedule & Scores",
+                          "WNBA", "Schedule & Scores", "Standings",
                           "Awards Ladder", "Court View"]
     # KPI strip is season-scoped: inventory, tip-off, scoring leader -- one
     # strip per league tab (the Model (validation) KPI was removed from
@@ -98,6 +98,8 @@ def test_home_page_falls_back_to_committed_data(offline_espn):
     freshness caption must say 'Offline fallback', never crash -- and the
     committed standings tables (BOTH leagues) carry their team +/- and L10
     columns."""
+    import pandas as pd
+
     at = _render("app/app.py", offline_espn)
     captions = " ".join(str(c.value) for c in at.caption)
     assert "Offline fallback" in captions or "fallback" in captions.lower()
@@ -115,6 +117,12 @@ def test_home_page_falls_back_to_committed_data(offline_espn):
         # '' rather than 0.0 -- committed rows carry the live values).
         diffs = [v for v in table["+/-"].tolist() if v != ""]
         assert diffs and all(str(v).startswith(("+", "-")) for v in diffs)
+        # GB and Win% render as NUMBERS: right-aligned next to the other
+        # numeric columns, a header click sorts them numerically, and
+        # ESPN's '-' leader mark shows as the 0.0 it means.
+        assert "GB" in columns and pd.api.types.is_numeric_dtype(table["GB"])
+        assert not (table["GB"].astype(str) == "-").any()
+        assert pd.api.types.is_numeric_dtype(table["Win%"])
 
 
 def test_sidebar_mentions_model_and_history(offline_espn):
@@ -907,6 +915,48 @@ def test_schedule_game_detail_renders_box_and_pbp(offline_espn, monkeypatch):
                for f in frames)
 
 
+def test_schedule_game_detail_renders_the_live_box_while_in_progress(
+        offline_espn, monkeypatch):
+    """An IN-PROGRESS game resolves its box score and play-by-play from
+    the same live summary endpoint -- the old final-only gate hid a live
+    box the reader could follow the game with. The matchup line carries
+    the status word so a half-played game never reads final, and the box
+    tables reach the screen with their MIN column."""
+    import shared as shared_module
+
+    meta = {"game_id": 2, "status": "STATUS_IN_PROGRESS",
+            "away_abbrev": "MIL", "home_abbrev": "CHI",
+            "away_score": 87, "home_score": 91,
+            "away_id": 2, "home_id": 7,
+            "venue": "United Center", "airings": []}
+    rows = [
+        {"game_id": 2, "team_id": 2, "player_id": 10,
+         "player_name": "Live Guy", "did_not_play": False, "min": 24,
+         "pts": 18, "reb": 5, "ast": 3, "stl": 1, "blk": 0, "to": 1,
+         "plus_minus": 4,
+         "fgm": 7, "fga": 12, "fg3m": 2, "fg3a": 5, "ftm": 2, "fta": 2},
+    ]
+    plays = [
+        {"period": "3rd Quarter", "clock": "4:32",
+         "description": "Live Guy 26' three point jumper",
+         "score": "87:91", "scoring": True},
+    ]
+    monkeypatch.setattr(shared_module, "load_game_summary",
+                        lambda game_id, league="nba": (
+                            meta, rows, plays,
+                            "Live ESPN summary (15 min cache)"))
+
+    at = _render("app/app.py", offline_espn)
+
+    assert not at.exception
+    text = _markdown_text(at)
+    assert "**MIL 87 @ CHI 91** · In progress" in text
+    frames = [df.value for df in at.dataframe
+              if hasattr(getattr(df, "value", None), "columns")]
+    assert any("MIN" in list(f.columns) for f in frames)  # live box rendered
+    assert len(at.warning) == 0
+
+
 def test_schedule_game_detail_upcoming_shows_fixture_info(
         offline_espn, monkeypatch):
     """An UPCOMING fixture has no box score (said honestly), but tip-off,
@@ -1170,9 +1220,9 @@ def test_deep_link_league_reorders_league_tabs(offline_espn):
     at.run()
     assert not at.exception, f"page raised: {at.exception}"
     labels = [str(t.label) for t in at.tabs]
-    assert labels == ["WNBA", "Standings", "Schedule & Scores",
+    assert labels == ["WNBA", "Schedule & Scores", "Standings",
                       "Awards Ladder", "Court View",
-                      "NBA", "Standings", "Schedule & Scores",
+                      "NBA", "Schedule & Scores", "Standings",
                       "Awards Ladder", "Court View"]
     # An unknown league label is ignored, not crashed on.
     plain = AppTest.from_file(str(REPO_ROOT / "app/app.py"),
@@ -1193,9 +1243,9 @@ def test_deep_link_tab_reorders_tabs(offline_espn):
     at.run()
     assert not at.exception, f"page raised: {at.exception}"
     labels = [str(t.label) for t in at.tabs]
-    assert labels == ["NBA", "Court View", "Standings", "Schedule & Scores",
-                      "Awards Ladder", "WNBA", "Court View", "Standings",
-                      "Schedule & Scores", "Awards Ladder"]
+    assert labels == ["NBA", "Court View", "Schedule & Scores", "Standings",
+                      "Awards Ladder", "WNBA", "Court View",
+                      "Schedule & Scores", "Standings", "Awards Ladder"]
 
 
 def test_deep_link_player_opens_profile(offline_espn):
@@ -1726,7 +1776,9 @@ def test_schedule_today_line_reads_the_local_date_and_zone(offline_espn):
     info = " ".join(str(i.value) for i in at.info)
     today = shared_module.local_today(shared_module.viewer_tz("UTC"))
     assert f"No games on {today}:" in info
-    assert re.search(r"Today \(UTC\): \d{4}-\d{2}-\d{2}", _markdown_text(at))
+    hero = _markdown_text(at)
+    assert re.search(r"Today \(UTC\): \d{4}-\d{2}-\d{2}", hero)
+    assert " ago)" in hero  # the freshness note carries its age
     assert not re.search(r"No games on \d{8}", info), \
         "the raw YYYYMMDD bucket leaked into the reader's note"
 
@@ -1753,21 +1805,73 @@ def test_status_label_speaks_words_not_api_enums():
     assert label(float("nan")) == ""          # a missing status stays missing
 
 
+def test_status_detail_puts_the_live_clock_in_the_status_cell():
+    """A game in progress shows its REAL period and clock -- 'Q3 4:32',
+    ESPN's own numbers, riding the slate's 60s cache -- and every other
+    state keeps the human word. A missing period or clock falls back to
+    the word: the cell never invents a time."""
+    import shared as shared_module
+
+    detail = shared_module.status_detail
+    assert detail("STATUS_IN_PROGRESS", "Q3", 272.5) == "Q3 4:32"
+    assert detail("STATUS_IN_PROGRESS", "Q4", "58.9") == "Q4 0:58"
+    assert detail("STATUS_IN_PROGRESS", "Q2", "2:11.4") == "Q2 2:11"
+    assert detail("STATUS_IN_PROGRESS", "Q1", None) == "Q1"
+    assert detail("STATUS_IN_PROGRESS", None, 65) == "1:05"
+    assert detail("STATUS_IN_PROGRESS", None, None) == "In progress"
+    # The clock is a LIVE-game fact: finals/halftime keep their word.
+    assert detail("STATUS_FINAL", "Q4", 1.0) == "Final"
+    assert detail("STATUS_HALFTIME", "Q2", 0) == "Halftime"
+    assert detail("STATUS_SCHEDULED", None, None) == "Scheduled"
+
+
+def test_freshness_age_reads_the_notes_own_stamp():
+    """The hero's age suffix is computed at render from the SAME UTC stamp
+    the note displays -- '(2 h ago)' for a two-hour-old stamp -- and '' for
+    a live note with no stamp at all. The suffix can never claim an age
+    the caption doesn't back."""
+    from datetime import datetime, timezone
+
+    import shared as shared_module
+
+    now = datetime(2026, 10, 24, 10, 0, tzinfo=timezone.utc)
+    age = shared_module.freshness_age
+    assert age("data as of 2026-10-24T08:18Z", now) == " (1 h ago)"
+    assert age("data as of 2026-10-24T09:59:30Z", now) == " (just now)"
+    assert age("data as of 2026-10-24T09:30Z", now) == " (30 min ago)"
+    assert age("data as of 2026-10-22T10:00:00Z", now) == " (2 d ago)"
+    assert age("Live (60s cache)", now) == ""
+    assert age("", now) == "" and age(None, now) == ""
+
+
 def test_schedule_today_table_leads_with_a_zoned_tipoff(offline_espn,
                                                         monkeypatch):
     """With games present the table leads with the local tip-off column,
     its header naming the zone, and the internal game_id/raw UTC date are
-    not shown -- the reader gets their own clock, not the collector's."""
+    not shown -- the reader gets their own clock, not the collector's.
+    A live game's Status cell carries its REAL period and clock
+    ('Q3 4:32'), scores render as numbers, and the slate captions its
+    source like every other section."""
     import pandas as pd
 
     import shared as shared_module
 
-    frame = pd.DataFrame([{
-        "game_id": "401585601", "date": "2026-10-25T23:30:00Z",
-        "status": "STATUS_SCHEDULED", "home": "BOS", "away": "NYK",
-        "home_score": None, "away_score": None,
-        "time": "2026-10-26 12:30",
-    }])
+    frame = pd.DataFrame([
+        {
+            "game_id": "401585601", "date": "2026-10-25T23:30:00Z",
+            "status": "STATUS_SCHEDULED", "home": "BOS", "away": "NYK",
+            "home_score": None, "away_score": None,
+            "time": "2026-10-26 12:30",
+            "status_period": None, "status_clock": None,
+        },
+        {
+            "game_id": "401585602", "date": "2026-10-25T23:00:00Z",
+            "status": "STATUS_IN_PROGRESS", "home": "MIL", "away": "CHI",
+            "home_score": "91", "away_score": "87",
+            "time": "2026-10-26 12:00",
+            "status_period": "Q3", "status_clock": 272.5,
+        },
+    ])
     monkeypatch.setattr(
         shared_module, "load_today_scoreboard",
         lambda league="nba", tz_key="UTC": (frame, "Live (60s cache)"))
@@ -1781,9 +1885,19 @@ def test_schedule_today_table_leads_with_a_zoned_tipoff(offline_espn,
     assert "date" not in list(today_table.columns)
     assert today_table.iloc[0]["Tip-off (UTC)"] == "2026-10-26 12:30"
     # the raw STATUS_* enum is plumbing, not copy: the reader sees words
-    # (Scheduled / Final / ...); the CSV exports keep the enum.
+    # (Scheduled / Final / ...) -- and a live game sees its REAL clock.
     assert today_table.iloc[0]["Status"] == "Scheduled"
+    assert today_table.iloc[1]["Status"] == "Q3 4:32"
     assert not any("STATUS_" in str(v) for v in today_table["Status"])
+    # Scores render as NUMBERS: right-aligned, numerically sortable, and
+    # an unplayed game's cell stays blank -- never a fabricated zero.
+    assert str(today_table["Away pts"].dtype) == "Int64"
+    assert pd.isna(today_table.iloc[0]["Away pts"])
+    assert int(today_table.iloc[1]["Away pts"]) == 87
+    assert int(today_table.iloc[1]["Home pts"]) == 91
+    # The slate captions its source, like every other section.
+    captions = " ".join(str(c.value) for c in at.caption)
+    assert "Source: Live (60s cache)" in captions
 
 
 def test_load_scoreboard_parses_both_live_score_shapes(monkeypatch):
@@ -1802,10 +1916,16 @@ def test_load_scoreboard_parses_both_live_score_shapes(monkeypatch):
     import espn_api as espn_module
     import shared as shared_module
 
-    def _event(eid, home, away, status=None, date="2026-10-24T23:30:00Z"):
+    def _event(eid, home, away, status=None, date="2026-10-24T23:30:00Z",
+               period=None, clock=None):
+        body = {"type": status or {"name": "STATUS_FINAL"}}
+        if period is not None:
+            body["period"] = {"displayValue": period}
+        if clock is not None:
+            body["clock"] = clock
         return {"id": eid, "date": date,
                 "competitions": [{
-                    "status": {"type": status or {"name": "STATUS_FINAL"}},
+                    "status": body,
                     "competitors": [
                         {"homeAway": "home", "score": home,
                          "team": {"abbreviation": "BOS"}},
@@ -1821,6 +1941,11 @@ def test_load_scoreboard_parses_both_live_score_shapes(monkeypatch):
         _event("4", "0", "0",
                status={"name": "STATUS_SCHEDULED", "state": "pre"},
                date="2026-10-25T00:00:00Z"),
+        # a game in progress: the period + clock ride along for the
+        # Status cell's 'Q3 4:32'
+        _event("5", "91", "87",
+               status={"name": "STATUS_IN_PROGRESS", "state": "in"},
+               date="2026-10-24T23:00:00Z", period="Q3", clock=272.5),
     ]}
     monkeypatch.setattr(espn_module, "get_scoreboard",
                         lambda dates, league="nba": payload)
@@ -1836,5 +1961,12 @@ def test_load_scoreboard_parses_both_live_score_shapes(monkeypatch):
         # neither the dict's float value nor a fabricated 0 leaks on screen
         assert "101.0" not in list(frame["away_score"])
         assert "0" not in list(frame["home_score"])
+        # the live game's REAL period + clock ride along, raw: the Status
+        # cell composes them at display time ('Q3 4:32')
+        live = frame[frame["status"] == "STATUS_IN_PROGRESS"].iloc[0]
+        assert live["status_period"] == "Q3" and live["status_clock"] == 272.5
+        assert shared_module.status_detail(
+            live["status"], live["status_period"],
+            live["status_clock"]) == "Q3 4:32"
     finally:
         shared_module.load_scoreboard.clear()

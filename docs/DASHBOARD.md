@@ -59,8 +59,11 @@ because Streamlit renders *both* tabs' content in one script run.
 
 Inside each league tab: the hero line (season pill, the reader's local
 *Today* pill, and the consolidated data freshness -- the page's context,
-framing the numbers below it), then the KPI strip, then the four section
-sub-tabs (reordered together by `?tab=`). Everything below exists once
+framing the numbers below it, each note ending with its age, "(2 h
+ago)", computed at render from the same stamp it shows), then the KPI
+strip, then the four section sub-tabs -- **Schedule & Scores first**,
+because the landing view leads with today's slate (reordered together by
+`?tab=`). Everything below exists once
 per league, with that league's season and data.
 
 1. **Sidebar**: one season selector per league -- NBA every season from
@@ -86,7 +89,7 @@ per league, with that league's season and data.
    awards payload, with
    season-aware help when no games are collected). The old Model
    validation KPI moved to the sidebar expander.
-3. **Standings**: conference tables, W-L combined, Win%, seed, streak,
+3. **Standings**: conference tables, W-L combined, Win%, GB, seed, streak,
    PF/g, PA/g, team **+/-** (signed per-game point differential) and
    **L10** (last-ten record) -- both parsed only when ESPN returns the
    stat, so a missing value renders blank, never a fabricated zero;
@@ -99,18 +102,25 @@ per league, with that league's season and data.
    the 2026-27 table read 0-2 off preseason before tip-off), so a
    season whose regular season hasn't started says so; a failed live
    fetch over a mismatched committed copy shows no table at all, just a
-   note naming both seasons. A **Download standings CSV** button exports both
+   note naming both seasons. GB and Win% render as numbers (right-aligned
+   beside the other numeric columns, header-click sorting numerically;
+   ESPN's "-" leader mark becomes the 0.0 it means). A **Download
+   standings CSV** button exports both
    conferences with exactly the columns on screen (blanks where ESPN
    omitted a stat, never zeros).
 4. **Schedule & Scores**: live scoreboard for *today in the viewer's time
    zone* -- the covering ESPN date buckets are fetched and filtered to the
    reader's local day, the table leads with a zoned **Tip-off** column and
    keeps neither the internal game id, the raw UTC stamp, nor the raw
-   `STATUS_*` enum (statuses render as words -- Scheduled / In progress /
-   Final / Postponed -- with the enums kept in the CSV exports; both of
+   `STATUS_*` enum (a live game's Status cell shows its REAL period and
+   clock -- "Q3 4:32", ESPN's own numbers on the 60s cache -- and other
+   states get words -- Scheduled / Final / Postponed -- with the enums
+   kept in the CSV exports; scores render as numbers, so the columns
+   right-align and header-click sorting is numeric; both of
    ESPN's `score` shapes parse -- bare string or `displayValue` dict --
    and a game that hasn't started shows a blank, never its placeholder
-   zero; empty + explanatory info note in the offseason, the normal
+   zero; the table captions its source like every other section; empty +
+   explanatory info note in the offseason, the normal
    Oct–Jun-less state), then the
    selected season from its own committed file under `data/schedules/`
    (`data/schedules_wnba/` in the WNBA pane; 17 files / 20,394 games for
@@ -151,7 +161,10 @@ per league, with that league's season and data.
    resolves live from ESPN's summary endpoint (cached 15 minutes) into
    both teams' box-score lines (the basic line through the **+/-**
    column, DNP rows marked) plus a
-   period/scoring-filterable play-by-play, while a not-yet-played fixture
+   period/scoring-filterable play-by-play, a game IN PROGRESS renders its
+   live box score and play-by-play the same way (the matchup line carries
+   the status word so a half-played game never reads final), while a
+   not-yet-played fixture
    shows tip-off, status, venue and TV instead of pretending a box score
    exists. Unreachable ESPN degrades to a caption saying why -- the
    committed schedule carries scores, never per-player lines or PBP.
@@ -382,6 +395,8 @@ All styling is one CSS block in `shared.inject_css()`, CSS-only with no JS:
   uppercase section labels on an accent bar with wide spacing,
 - charts rendered through one quiet config (`shared.CHART_CONFIG`): no
   floating Plotly modebar, no Plotly logo,
+- freshness notes ending with their age ("(2 h ago)" -- `freshness_age`,
+  computed at render from the same stamp the note displays),
 - slot chips, award-race/leader rows as a calm divider list (hover
   restores the card fill), and court cards whose stat tooltips
   are pure CSS (`:hover`), including the image fallback (headshot `<img>`
