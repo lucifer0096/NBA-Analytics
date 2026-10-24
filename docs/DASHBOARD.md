@@ -148,11 +148,21 @@ per league, with that league's season and data.
    statuses -- and zero matches says so plainly instead of an empty
    table. Immediately below sits the labeled **{season} postseason**
    section: that season's playoff and play-in rows from their own
-   committed tree (`data/postseason/`, `data/postseason_wnba/`), an
-   identical chronological table with a **Status** column (Final /
+   committed tree (`data/postseason/`, `data/postseason_wnba/`), a
+   **bracket-ordered** rendering -- one bold-labeled table per round
+   (Play-In first, the opening rounds with East before West,
+   Semifinals, Conference Finals, Finals) off each row's `round` field,
+   which the collector captures from ESPN's per-game note
+   ('East 1st Round - Game 3' -> 'East 1st Round') and the display
+   title-cases across eras ('EASTERN CONFERENCE 1st ROUND' ->
+   'Eastern Conference 1st Round'); rows whose round ESPN never served
+   group visibly under 'Round not recorded' and a file carrying no
+   round data keeps the one plain chronological table -- a round is
+   never guessed. Every table keeps the **Status** column (Final /
    Scheduled / In progress / Postponed -- same word mapping as today's
    slate), scoped by the same Team/Venue
-   toolbar, with its own **Download postseason CSV** button and a caption
+   toolbar, with its own **Download postseason CSV** button (the Round
+   column included) and a caption
    stating these rows are display-only -- standings, leaders, GOAT and
    the projection model stay regular-season-only. A season without a
    bracket (or without collected rows) says exactly that

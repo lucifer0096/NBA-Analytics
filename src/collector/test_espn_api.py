@@ -148,6 +148,56 @@ def test_season_label_from_date_boundaries():
     assert parsing.season_label_from_date("2011-10-25T00:00Z") == "2011-12"
 
 
+def test_round_label_splits_off_the_game_number():
+    """ESPN's per-game note headline IS the round ('East 1st Round -
+    Game 3'), across every era's spelling: old seasons shout, the
+    play-in headline trails into the pairing, some games carry no ' -
+    Game N' at all. The segment before the first ' - ' is the round;
+    no note is no round -- never a guess."""
+    label = parsing.round_label
+    assert label("East 1st Round - Game 3") == "East 1st Round"
+    assert label("EASTERN CONFERENCE 1st ROUND - GAME 1") == \
+        "EASTERN CONFERENCE 1st ROUND"
+    assert label("WEST 1ST ROUND - GAME 4") == "WEST 1ST ROUND"
+    assert label("NBA Play-In - East - 7th Place vs 8th Place") == "NBA Play-In"
+    assert label("NBA Finals - Game 5") == "NBA Finals"
+    assert label("West Semifinals – Game 1") == "West Semifinals"  # en dash
+    assert label("First Round — Game 2") == "First Round"          # em dash
+    assert label("WEST 1ST ROUND") == "WEST 1ST ROUND"  # no suffix: itself
+    assert label(None) is None and label("   ") is None
+    assert label(7) is None  # a non-headline payload value stays no-round
+    assert parsing.round_label("West 1st Round") == "West 1st Round"  # idem.
+
+
+def test_parse_schedule_carries_the_round_only_when_one_exists():
+    """A postseason row carries its round segment; a regular-season
+    payload (no note -- every game of it) carries NO round key at all,
+    so the regular schedules tree stays byte-identical to before the
+    field existed."""
+    payload = {"events": [{
+        "id": "401866755", "date": "2026-04-14T23:30:00Z",
+        "competitions": [{
+            "notes": [{"headline": "East 1st Round - Game 2"}],
+            "status": {"type": {"name": "STATUS_FINAL"}},
+            "competitors": [
+                {"homeAway": "home", "score": "127",
+                 "team": {"id": 30, "abbreviation": "CHA"}},
+                {"homeAway": "away", "score": "126",
+                 "team": {"id": 14, "abbreviation": "MIA"}},
+            ],
+        }],
+    }]}
+    rows = parsing.parse_schedule(payload, season="2025-26")
+    assert rows[0]["round"] == "East 1st Round"
+
+    plain = {"events": [dict(payload["events"][0],
+                             competitions=[
+                                 {**payload["events"][0]["competitions"][0],
+                                  "notes": None}])]}
+    row = parsing.parse_schedule(plain, season="2025-26")[0]
+    assert "round" not in row, "a note-less game must not gain a round key"
+
+
 # ---------------------------------------------------------------------------
 # summary / box score
 # ---------------------------------------------------------------------------

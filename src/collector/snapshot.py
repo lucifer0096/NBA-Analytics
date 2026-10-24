@@ -250,10 +250,14 @@ def snapshot_schedule(season: str, team_ids: list, limiter: RateLimiter,
         return out_path
 
     rows = sorted(by_id.values(), key=lambda r: (r["date"] or "", r["game_id"]))
-    fieldnames = list(rows[0].keys()) if rows else [
+    # Ordered union of row keys: postseason rows may carry extras (round)
+    # while other rows (a replayed season, a fetch gap) don't -- the
+    # header must cover both or DictWriter raises on the mixed set.
+    fieldnames = (list(dict.fromkeys(key for row in rows for key in row))
+                  if rows else [
         "game_id", "date", "season", "home_id", "home_abbrev", "home_score",
         "away_id", "away_abbrev", "away_score", "status", "neutral",
-    ]
+    ])
     with open(out_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
@@ -327,7 +331,12 @@ def snapshot_gap_games(season: str, limiter: RateLimiter) -> int:
     with open(out_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         existing = list(reader)
-        fieldnames = reader.fieldnames or list(added[0].keys())
+        fieldnames = list(reader.fieldnames or list(added[0].keys()))
+        # union: added rows may carry keys the existing header predates
+        # (round on the postseason tree) -- DictWriter would raise.
+        for key in dict.fromkeys(k for row in added for k in row):
+            if key not in fieldnames:
+                fieldnames.append(key)
     merged = existing + added
     merged.sort(key=lambda r: (str(r.get("date") or ""),
                                str(r.get("game_id"))))

@@ -9,7 +9,10 @@ Canonical row schemas (these are the contract load_historical.py reads):
 
 game row (parse_schedule):
     game_id, date, season, home_id, home_abbrev, home_score,
-    away_id, away_abbrev, away_score, status, neutral
+    away_id, away_abbrev, away_score, status, neutral,
+    round -- only when ESPN's per-game note names one (postseason
+    payloads; absent key, never an empty placeholder, so the regular
+    schedules tree stays byte-identical)
 
 player-game row (parse_summary):
     game_id, date, team_id, team_abbrev, opponent_id, opponent_abbrev,
@@ -30,6 +33,7 @@ roster row (parse_roster):
     player_id, player_name, position, team_id
 """
 
+import re
 from datetime import datetime
 
 # Box-score label (ESPN's own `labels` array) -> canonical column, plus the
@@ -193,6 +197,23 @@ def parse_teams(payload: dict) -> list:
 # schedule
 # ---------------------------------------------------------------------------
 
+def round_label(headline) -> str | None:
+    """The round a playoff game belongs to, off ESPN's per-game note
+    headline ('East 1st Round - Game 3', 'NBA Play-In - East - 7th Place
+    vs 8th Place', 'NBA Finals - Game 5', old seasons' shouting
+    'EASTERN CONFERENCE 1st ROUND - GAME 1', and one 2023 headline's
+    en-dash 'West Semifinals – Game 1'): the segment before the first
+    SPACED DASH of any sort, which is the round itself -- what trails it
+    is per-game detail (the game number, the play-in pairing). The label
+    keeps ESPN's raw shape; the app title-cases at display. No note
+    (every regular-season game) -> None: no round exists, and none is
+    guessed."""
+    if not isinstance(headline, str) or not headline.strip():
+        return None
+    label = re.split(r"\s+[-–—]\s+", headline.strip(), maxsplit=1)[0].strip()
+    return label or None
+
+
 def parse_schedule(payload: dict, season: str | None = None,
                    league: str = "nba") -> list:
     """One team's schedule payload -> game rows (dedup on game_id happens in
@@ -215,7 +236,7 @@ def parse_schedule(payload: dict, season: str | None = None,
             continue
         home, away = by_side["home"], by_side["away"]
         date_str = event.get("date") or comp.get("date")
-        rows.append({
+        row = {
             "game_id": int(event["id"]),
             "date": date_str,
             "season": season or season_label_from_date(date_str, league),
@@ -227,7 +248,15 @@ def parse_schedule(payload: dict, season: str | None = None,
             "away_score": _score_value(away.get("score")),
             "status": ((comp.get("status") or {}).get("type") or {}).get("name"),
             "neutral": bool(comp.get("neutralSite")),
-        })
+        }
+        # Postseason rows carry their round (ESPN's per-game note); a
+        # regular-season payload has no note and NO round key at all, so
+        # the regular schedule files stay byte-identical.
+        note = (comp.get("notes") or [{}])[0] or {}
+        label = round_label(note.get("headline"))
+        if label:
+            row["round"] = label
+        rows.append(row)
     return rows
 
 

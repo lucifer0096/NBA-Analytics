@@ -7,6 +7,41 @@ green and CI green.
 
 ## 2026-10-24
 
+### feat(postseason): bracket-grouped playoff table -- round data off ESPN's per-game notes
+
+The Schedule tab's postseason section now reads like a bracket: one
+bold-labeled table per round in bracket order (Play-In first, opening
+rounds with East before West, Semifinals, Conference Finals, Finals),
+from a new `round` field every playoff row carries.
+
+- **Collector**: `parse_schedule` captures ESPN's per-game round note
+  (`parsing.round_label` -- the segment before the first spaced dash,
+  en dashes included: `'East 1st Round - Game 3'` -> `'East 1st
+  Round'`) as an **absent key** when no note exists, keeping the
+  regular schedules tree byte-identical; snapshot's two CSV writers
+  take an ordered key union so mixed rows can't raise.
+- **Data**: `backfill_postseason_rounds.py` annotated every committed
+  bracket in one pass -- **1,702 games across 33 seasons (16 NBA /
+  17 WNBA), 0 unknown** -- via 452 ESPN calls (team schedules
+  `seasontype=3`; the scoreboard for play-in games, which answer under
+  no seasontype), then the normal refresh path rewrote the files. A
+  second local-only pass corrected one en-dash-tailed label with zero
+  calls; the script is committed as idempotent maintenance (zero
+  calls on annotated seasons).
+- **App**: `round_display` title-cases the shouting old spellings
+  ('EASTERN CONFERENCE 1st ROUND' -> 'Eastern Conference 1st Round')
+  with acronyms intact; `round_rank` orders the bracket across every
+  era's wording -- semifinals check before finals (the substring
+  hides inside), bare 'East Finals' ranks as a conference's so the
+  league's Finals stays last, the WNBA's four-round era sequences
+  First/Second Round; unlabelled rows group under 'Round not
+  recorded', files with no round data keep the plain table, and the
+  CSV export gains the Round column.
+- Tests: +7 (round labels across eras and dash styles, the
+  absent-key contract, backfill helpers, rank ordering, grouped
+  rendering with exact row conservation). **222 passed**, ruff clean;
+  DASHBOARD.md + COLLECTOR.md updated.
+
 ### feat(app): the age rides every Source caption
 
 `shared.source_caption()` is now the single Source line every section
@@ -123,9 +158,9 @@ Tests: 210 passed (+7 new).
 
 ## Next up (designed, not yet implemented)
 
-- **Bracket-grouped postseason table** (round/series sub-headers) --
-  needs the collector to persist round/series fields first; today's
-  postseason files don't carry them.
+- **Series sub-headers on the bracket** (e.g. "BOS leads 3-2" under
+  each round group) -- rounds shipped 2026-10-24; series records would
+  need ESPN summary calls per playoff game.
 - **Operational check**: confirm the game-night crons fire on their
   first scheduled window (01:40-06:40 and 12:20 UTC).
 - Extend the "(N h ago)" age from the hero to the per-tab Source

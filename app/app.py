@@ -587,18 +587,29 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                     "away_abbrev": "Away", "away_score": "Away pts",
                     "home_abbrev": "Home", "home_score": "Home pts",
                 })
-                st.dataframe(
-                    table[["Date", "Status", "Away", "Away pts",
-                           "Home", "Home pts"]],
-                    width="stretch", hide_index=True,
-                )
+                _cols = ["Date", "Status", "Away", "Away pts",
+                         "Home", "Home pts"]
+                _groups = shared.postseason_round_groups(table)
+                if _groups is None:
+                    st.dataframe(table[_cols], width="stretch",
+                                 hide_index=True)
+                else:
+                    # Bracket order: each round its own labeled table --
+                    # rows keep their date order inside the group, and a
+                    # round the collector could not label stays visibly
+                    # unassigned instead of merging into another round.
+                    for _round_label, _sub in _groups:
+                        st.markdown(f"**{_round_label}**")
+                        st.dataframe(_sub[_cols], width="stretch",
+                                     hide_index=True)
                 post_export = post_view.rename(columns={
                     "date": "Date", "status": "Status", "neutral": "Neutral",
+                    "round": "Round",
                     "away_abbrev": "Away", "away_score": "Away pts",
                     "home_abbrev": "Home", "home_score": "Home pts",
                 })
                 post_export = post_export[[
-                    c for c in ("Date", "Status", "Neutral", "Away",
+                    c for c in ("Date", "Status", "Round", "Neutral", "Away",
                                 "Away pts", "Home", "Home pts")
                     if c in post_export.columns]]
                 st.download_button(
@@ -607,7 +618,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                     file_name=f"{season}_postseason.csv", mime="text/csv",
                     key=f"postseason_csv_{league}",
                     help="Playoffs and play-in fixtures the filters above "
-                         "select, with their scores and status.",
+                         "select, with their round, scores and status.",
                 )
                 st.caption(
                     f"{len(post_finals):,} final · {len(post_upcoming):,} "

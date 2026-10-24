@@ -1856,6 +1856,101 @@ def test_source_captions_carry_the_age_too(offline_espn):
         "a committed note's Source caption must carry its age"
 
 
+def test_round_helpers_order_the_bracket_and_title_the_labels():
+    """Old seasons shout ('EASTERN CONFERENCE 1st ROUND'), new ones don't
+    ('East 1st Round'); both render title case with acronyms intact, and
+    rank puts play-in first, the rounds ascending, conference finals
+    before the Finals, and anything unrecognized last -- honest, never
+    guessed."""
+    import shared as shared_module
+
+    display = shared_module.round_display
+    assert display("EASTERN CONFERENCE 1st ROUND") == \
+        "Eastern Conference 1st Round"
+    assert display("WEST 1ST ROUND") == "West 1st Round"
+    assert display("West 1st Round") == "West 1st Round"  # already right
+    assert display("NBA Play-In") == "NBA Play-In"
+    assert display("WNBA Finals") == "WNBA Finals"
+
+    rank = shared_module.round_rank
+    assert rank("NBA Play-In") == 0
+    assert rank("East 1st Round") == 1
+    assert rank("WEST 1ST ROUND") == 1
+    assert rank("Second Round") == 1     # WNBA's four-round era: opening
+    assert rank("Eastern Conference Semifinals") == 2  # BEFORE finals: the
+    assert rank("East Semifinals") == 2  # substring 'finals' hides inside
+    assert rank("Eastern Conference Finals") == 3   # before plain finals
+    assert rank("East Finals") == 3       # bare conference finals eras:
+    assert rank("WEST FINALS") == 3       # the league's Finals stays last
+    assert rank("NBA Finals") == 4
+    assert rank("WNBA Finals") == 4
+    assert rank("something odd") == 9 and rank("") == 9
+
+    # no round column / no round labels at all -> plain-table mode
+    import pandas as pd
+
+    plain = shared_module.postseason_round_groups(pd.DataFrame(
+        {"Date": ["2026-04-15"], "round": [None]}))
+    assert plain is None
+    assert shared_module.postseason_round_groups(
+        pd.DataFrame({"Date": ["2026-04-15"]})) is None
+
+
+def test_postseason_renders_bracket_grouped_by_round(offline_espn,
+                                                     monkeypatch):
+    """The postseason table groups by round under bold sub-headers in
+    bracket order -- play-in first, East before West, the Finals before
+    an unlabeled round's honest 'Round not recorded' trailing group --
+    one table per round, every row exactly once, date order inside each
+    group."""
+    import pandas as pd
+
+    import shared as shared_module
+
+    def game(gid, date, home, away, label=None):
+        row = {"game_id": str(gid), "date": date, "season": "2025-26",
+               "home_id": 1, "home_abbrev": home, "home_score": "100",
+               "away_id": 2, "away_abbrev": away, "away_score": "99",
+               "status": "STATUS_FINAL", "neutral": "False"}
+        if label:
+            row["round"] = label
+        return row
+
+    frame = pd.DataFrame([
+        game(1, "2026-04-15T23:00:00Z", "NY", "ATL", "NBA Play-In"),
+        game(2, "2026-04-19T00:00:00Z", "NY", "ATL", "East 1st Round"),
+        game(3, "2026-04-19T02:00:00Z", "OKC", "MIN", "WEST 1ST ROUND"),
+        game(6, "2026-05-28T00:00:00Z", "NY", "BOS", "East Finals"),
+        game(7, "2026-05-29T00:00:00Z", "OKC", "DEN", "West Finals"),
+        game(4, "2026-06-05T00:00:00Z", "NY", "SA", "NBA Finals"),
+        game(5, "2026-04-22T00:00:00Z", "BOS", "CLE"),  # round unlabeled
+    ])
+    monkeypatch.setattr(
+        shared_module, "load_postseason_schedule",
+        lambda season, league="nba": (
+            frame, "data as of 2026-10-24T00:00:00Z"))
+
+    at = _render("app/app.py", offline_espn)
+
+    assert not at.exception
+    text = _markdown_text(at)
+    headers = ["**NBA Play-In**", "**East 1st Round**", "**West 1st Round**",
+               "**East Finals**", "**West Finals**", "**NBA Finals**",
+               "**Round not recorded**"]
+    for header in headers:
+        assert header in text, header
+    order = [text.index(h) for h in headers]
+    assert order == sorted(order), "groups must render in bracket order"
+    frames = [df.value for df in at.dataframe
+              if hasattr(getattr(df, "value", None), "columns")]
+    groups = [f for f in frames
+              if {"Date", "Away", "Home", "Status"} <= set(f.columns)]
+    # both league panes render the same monkeypatched bracket: 7 each
+    assert len(groups) == 14, "one table per round, per league pane"
+    assert sum(len(f) for f in groups) == 2 * len(frame), \
+        "every row exactly once -- no drops, no duplicates"
+
+
 def test_schedule_today_table_leads_with_a_zoned_tipoff(offline_espn,
                                                         monkeypatch):
     """With games present the table leads with the local tip-off column,

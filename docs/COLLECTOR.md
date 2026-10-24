@@ -47,7 +47,7 @@ returned 200). `espn_api._HEADERS` is the one place this is encoded.
 ```
 data/raw/{season}/              # the WNBA's tree mirrors under data/raw_wnba/{year}/
 ├── schedule.csv        # every regular-season game: id, date, teams, scores, status
-├── postseason.csv      # playoffs + play-in (seasons with a bracket only; a bracketless season writes no file at all)
+├── postseason.csv      # playoffs + play-in (seasons with a bracket only; a bracketless season writes no file at all; each row carries its round)
 └── games/
     └── {game_id}.json  # {"game": meta, "players": [...]}, PARSED rows, one file per FINAL REGULAR-SEASON game
 data/raw/                # per league: data/raw/ and data/raw_wnba/
@@ -70,7 +70,15 @@ The postseason is collected **in the same run, into its own file**:
 bracket answers 0 games, skipped without a failure), the play-in gap probe
 merges the games ESPN files under no seasontype at all, and refresh copies
 the rows to their own committed trees (`data/postseason/`,
-`data/postseason_wnba/`). Box scores stay regular-season-only by design --
+`data/postseason_wnba/`). Every playoff row carries its **round**
+(`round`), parsed from ESPN's per-game note headline
+(`parsing.round_label`: the segment before the first spaced dash --
+'East 1st Round - Game 3' -> 'East 1st Round', en dashes too; no note,
+no key, so the regular schedules tree stays byte-identical).
+`backfill_postseason_rounds.py` annotated the seasons committed before
+the field existed (team schedules + the scoreboard for play-in games,
+which answer under no seasontype; idempotent -- zero ESPN calls once a
+season is annotated). Box scores stay regular-season-only by design --
 no computed view reads a per-player postseason line, so playoff rows can
 never enter a frame that says regular season. The Schedule tab's labeled
 Postseason section is the one consumer.

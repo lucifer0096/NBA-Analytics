@@ -1572,6 +1572,78 @@ def source_caption(note) -> None:
     st.caption(f"Source: {localize_note(note)}{freshness_age(note)}")
 
 
+def round_display(label) -> str:
+    """Pretty bracket text for a round label: ESPN keeps old seasons
+    shouting ('EASTERN CONFERENCE 1st ROUND') and new ones title case
+    ('East 1st Round') -- both render title-cased with acronyms restored
+    ('NBA Finals' never becomes 'Nba Finals'; '1st' never '1St')."""
+    text = str(label).title()
+    text = re.sub(r"(\d)(St|Nd|Rd|Th)\b",
+                  lambda m: m.group(1) + m.group(2).lower(), text)
+    for casing, acronym in (("Nba", "NBA"), ("Wnba", "WNBA")):
+        text = re.sub(rf"\b{casing}\b", acronym, text)
+    return text
+
+
+def round_rank(label) -> int:
+    """Bracket order for a round label: play-in first, the rounds
+    ascending, the Finals last -- and anything unrecognized trails
+    after everything: its own honest label, never dropped, never
+    guessed into a round it is not.
+
+    The label spellings span ESPN's eras, verified across every
+    committed season: 'semifinals' checks BEFORE the finals family
+    (the substring 'finals' hides inside it), a conference's finals
+    ('Eastern Conference Finals', or the eras' bare 'East Finals' /
+    'WEST FINALS') ranks below the league's, and the WNBA's four-round
+    era ('First Round' -> 'Second Round' -> ...) keeps both opening
+    rounds at one rank, sequenced by the label sort."""
+    text = str(label or "").lower()
+    if not text.strip():
+        return 9
+    if "play-in" in text or "play in" in text:
+        return 0
+    if "semifinal" in text or "semi-final" in text or "semis" in text:
+        return 2
+    if ("conference final" in text
+            or ("finals" in text and ("east" in text or "west" in text))):
+        return 3  # a conference's finals, never the league's
+    if "finals" in text:
+        return 4
+    if any(part in text for part in ("1st round", "first round",
+                                     "second round", "round of 16")):
+        return 1
+    return 9
+
+
+def postseason_round_groups(frame: pd.DataFrame) -> list | None:
+    """Bracket grouping for a postseason table: [(round text, subframe)]
+    in bracket order, or None when the frame carries no round data at
+    all (a season committed before the collector captured it) -- the
+    caller then renders the one plain table it always has. Every row
+    lands in exactly one group, groups keep the frame's existing (date)
+    order, and rounds ESPN left blank group under 'Round not recorded':
+    an honest gap on screen, not a guessed round."""
+    if "round" not in frame.columns:
+        return None
+    raw = frame["round"]
+    text = raw.astype(str).str.strip()
+    present = raw.notna() & ~text.str.lower().isin(("", "nan", "none"))
+    if not present.any():
+        return None
+    values = raw.tolist()
+    oks = present.tolist()
+    ranks = [round_rank(v) if ok else 9 for v, ok in zip(values, oks)]
+    labels = [round_display(v) if ok else "Round not recorded"
+              for v, ok in zip(values, oks)]
+    groups = []
+    for rank, label in sorted(set(zip(ranks, labels))):
+        keep = [r == rank and lab == label
+                for r, lab in zip(ranks, labels)]
+        groups.append((label, frame[keep]))
+    return groups
+
+
 def scoreboard_buckets(day_start) -> list:
     """ESPN `dates=` buckets (YYYYMMDD) that can hold a game starting
     during the local day beginning at `day_start`.
