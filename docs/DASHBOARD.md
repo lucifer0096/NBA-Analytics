@@ -420,6 +420,16 @@ All styling is one CSS block in `shared.inject_css()`, CSS-only with no JS:
 - every color derived from Streamlit's own theme tokens
   (`--primary-color`, `--secondary-background-color`, `--text-color`), so
   a theme change can't break contrast;
+- small screens: nothing is fixed-width (every table/chart takes
+  `width="stretch"` with native horizontal scroll), the hero/court/
+  bench strips wrap (`flex-wrap`) and race rows carry `min-width: 0`
+  bodies; the profile card's stat grid auto-fits
+  (`repeat(auto-fit, minmax(84px, 1fr))`) instead of forcing three
+  columns on a phone, the name banner wraps long names, and one
+  `@media (max-width: 640px)` block trims the fixed paddings and the
+  shot-chart card width -- audited in code, with contrast verified
+  against the pinned dark theme (smallest captions ≈7:1); real-device
+  QA remains in the backlog;
 - all transitions/animations disabled under
   `prefers-reduced-motion: reduce`.
 

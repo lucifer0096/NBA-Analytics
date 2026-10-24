@@ -191,7 +191,8 @@ div[data-testid="stMetric"] {
 .na-pcorner--tr { top: 8px; right: 10px; max-width: 45%; }
 .na-phead { display: flex; justify-content: center; padding-top: 22px; }
 .na-pname {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
+  display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: center; gap: 8px;
   font-weight: 800; font-size: 1.05rem; text-transform: uppercase;
   letter-spacing: 0.05em;
   background: linear-gradient(90deg, #7d1524, var(--na-accent) 45%, #7d1524);
@@ -213,7 +214,8 @@ div[data-testid="stMetric"] {
   text-transform: uppercase; opacity: 0.8;
 }
 .na-pspec {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+  display: grid; gap: 6px;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
   margin-top: 10px; padding-top: 9px;
   border-top: 1px dashed rgba(245, 197, 66, 0.45);
 }
@@ -326,6 +328,18 @@ div[data-testid="stMetric"] {
 [data-testid="stDataFrame"] { border-radius: 10px; overflow: hidden; }
 [data-testid="stPlotlyChart"] { border-radius: 10px; }
 [data-testid="stExpander"] details { border-radius: 10px; }
+
+/* Small screens (the responsive pass): the grids and strips already
+   adapt on their own (auto-fit, flex-wrap), so this only trims fixed
+   paddings and the shot-chart card width for one-column comfort.
+   Audited in code, not on a device -- real-phone QA stays open. */
+@media (max-width: 640px) {
+  .na-hero { padding: 10px 12px; gap: 8px; }
+  .na-section { margin: 20px 0 8px; }
+  .na-court-card { width: 92px; }
+  [data-testid="stMetric"] { padding: 10px 12px; }
+  .na-race-row { padding: 6px 8px; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }

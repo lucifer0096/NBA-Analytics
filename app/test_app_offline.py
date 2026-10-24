@@ -1951,6 +1951,21 @@ def test_postseason_renders_bracket_grouped_by_round(offline_espn,
         "every row exactly once -- no drops, no duplicates"
 
 
+def test_css_carries_the_responsive_and_motion_rules():
+    """The UI pass's small-screen affordances pinned as CSS content:
+    grids auto-fit, the name banner wraps, one narrow media query
+    trims fixed paddings, and motion dies under prefers-reduced-motion
+    (the audit is code-level -- no browser available to eyeball it)."""
+    import shared as shared_module
+
+    css = shared_module.CSS
+    assert "repeat(auto-fit, minmax(" in css, "stat grid must adapt"
+    assert "@media (max-width: 640px)" in css, "narrow-screen rules"
+    assert ".na-pname" in css and "flex-wrap: wrap" in css, \
+        "long player names must wrap on narrow cards"
+    assert "@media (prefers-reduced-motion: reduce)" in css
+
+
 def test_schedule_today_table_leads_with_a_zoned_tipoff(offline_espn,
                                                         monkeypatch):
     """With games present the table leads with the local tip-off column,

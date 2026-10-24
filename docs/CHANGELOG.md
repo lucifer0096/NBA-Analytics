@@ -7,6 +7,28 @@ green and CI green.
 
 ## 2026-10-24
 
+### feat(ui): the responsive pass -- small-screen audit + fixes, in code
+
+A static CSS/code audit of every custom style (no browser available to
+eyeball -- stated honestly, device QA stays in the backlog):
+
+- the profile card's stat grid auto-fits
+  (`repeat(auto-fit, minmax(84px, 1fr))`) instead of forcing three
+  columns on a 360 px screen, and the name banner wraps long names;
+- one `@media (max-width: 640px)` block trims fixed paddings (hero
+  strip, section labels, metric tiles, race rows) and narrows the
+  shot-chart cards -- the only fixed-width elements in the app;
+- verified already-responsive, untouched: the hero/court/bench strips
+  (`flex-wrap`), race rows (`min-width: 0` bodies), every table and
+  chart (`width="stretch"` + native horizontal scroll), and the
+  Streamlit-native stacking of `st.columns` and tabs;
+- contrast verified against the pinned dark theme (#E8ECF1 on
+  #0B0F17): the smallest captions at 0.66 opacity compute ≈7:1 --
+  no opacity churn needed.
+
++1 test pinning the rules; DASHBOARD.md's UI-pass section documents
+the small-screen behaviour.
+
 ### feat(postseason): bracket-grouped playoff table -- round data off ESPN's per-game notes
 
 The Schedule tab's postseason section now reads like a bracket: one
