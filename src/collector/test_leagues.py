@@ -65,6 +65,20 @@ def test_award_config_per_league():
         1997: 4, 1998: 4, 1999: 4, 2000: 4, 2001: 6, 2002: 6}
 
 
+def test_race_award_names_map_all_five_races_to_official_honours():
+    """Each league's race_award_names maps the five homegrown races to
+    ESPN's EXACT award names -- and every one of those names is also an
+    official honours key (the ROY winner scores on the GOAT ladder), so
+    the string the official-vs-algorithm verdict matches on can't drift
+    from the honours table the GOAT formula prints verbatim."""
+    for league in ("nba", "wnba"):
+        cfg = leagues.cfg(league)
+        names = cfg["race_award_names"]
+        assert set(names) == {"mvp", "dpoy", "sixth_man", "mip", "roy"}
+        assert names["roy"] == "Rookie of the Year"
+        assert all(name in cfg["honours_weights"] for name in names.values())
+
+
 def test_data_paths_never_collide_and_nba_keeps_historical_names():
     # The NBA keeps the pre-WNBA file names (no 246MB rename); every WNBA
     # file carries '_wnba'.

@@ -635,6 +635,86 @@ def test_build_payload_envelope(tmp_path):
     assert len(pts) == 4                             # DNP guy excluded
 
 
+def test_season_start_year_reads_both_label_shapes():
+    """A season's START year is the rookie clock for both leagues: the
+    NBA's split labels key off their first four digits, the WNBA's
+    single-year labels ARE their start year -- and ESPN's debut and draft
+    years are start-year values on both (debut 2025 = the 2025-26 season)."""
+    assert awards.season_start_year("2025-26") == 2025
+    assert awards.season_start_year("2010-11") == 2010
+    assert awards.season_start_year("1999-00") == 1999
+    assert awards.season_start_year("2026") == 2026
+
+
+def test_roy_rows_ranks_only_the_rookies_by_pure_impact():
+    """The ROY ladder ranks EXACTLY the given rookies (the refresh's debut
+    set) by impact per game with no team-record scaling: a veteran who
+    outscored everyone never ranks, a rookie below the games-played bar
+    never ranks, the score is the raw impact -- and an empty/None roster
+    is an honest empty race, never a guess that fills with veterans."""
+    players = [
+        {"player_id": 1, "player_name": "Veteran", "team_abbrev": "AAA",
+         "gp": 8, "pts": 400, "reb": 64, "ast": 80, "fgm": 200, "fga": 400},
+        {"player_id": 2, "player_name": "Rookie", "team_abbrev": "BBB",
+         "gp": 8, "pts": 160, "reb": 40, "ast": 32, "fgm": 60, "fga": 130},
+        {"player_id": 3, "player_name": "Cup Note", "team_abbrev": "CCC",
+         "gp": 2, "pts": 30, "reb": 10, "ast": 6},
+    ]
+    rows = awards.roy_rows(players, {2, 3}, min_gp=4)
+    # The veteran's 66.0 impact dwarfs the rookie's, but he isn't in the
+    # set; the third player is, but 2 GP clears no 4-game bar.
+    assert [r["player_name"] for r in rows] == ["Rookie"]
+    assert rows[0]["rank"] == 1
+    assert rows[0]["score"] == 27.75        # (160 + 0.75*40 + 32)/8
+    assert (rows[0]["ppg"], rows[0]["rpg"], rows[0]["apg"]) == (20.0, 5.0, 4.0)
+    assert rows[0]["fgp"] == 46.2
+    assert "wins" not in rows[0] and "win_pct" not in rows[0]
+    # The set is the whole gate: list everyone and both qualified players
+    # rank by score (the refresh never hands it a veteran).
+    listed = awards.roy_rows(players, {1, 2, 3}, min_gp=4)
+    assert [r["player_name"] for r in listed] == ["Veteran", "Rookie"]
+    assert awards.roy_rows(players, None, 1) == []
+    assert awards.roy_rows(players, set(), 1) == []
+
+
+def test_build_payload_roy_race_joins_only_with_rookie_identities(tmp_path):
+    """Box scores can't say who is a rookie, so the payload carries the
+    ROY race only when the caller supplies the identities: with them the
+    race lands ranked (qualifier and all), an empty set is a real 'no
+    rookies' answer (present, empty), and without them the payload keeps
+    EXACTLY its four historical races."""
+    games = {}
+    for i in range(1, 9):
+        games[i] = [
+            _box(1, "Vet", "BOS", starter=True, minutes=30, pts=30, reb=8,
+                 ast=6),
+            _box(2, "Rookie", "BOS", minutes=30, pts=20, reb=5, ast=4),
+            # DNP rows never count: only game 8 gives him gp=1.
+            _box(3, "Cup Note", "NYK", dnp=(i <= 7), minutes=10, pts=5,
+                 reb=1, ast=1),
+        ]
+    _write_games(tmp_path, "2012-13", games)
+    _write_schedule(tmp_path, "2012-13", [
+        ("STATUS_FINAL", "BOS", "NYK", "110.0", "100.0") for _ in range(8)
+    ])
+
+    plain = awards.build_payload("2012-13", raw_dir=str(tmp_path))
+    assert set(plain["races"]) == {"mvp", "dpoy", "sixth_man", "mip"}
+
+    payload = awards.build_payload("2012-13", raw_dir=str(tmp_path),
+                                   rookies={2, 3})
+    assert set(payload["races"]) == {"mvp", "dpoy", "sixth_man", "mip",
+                                     "roy"}
+    roy = payload["races"]["roy"]
+    assert [r["player_name"] for r in roy] == ["Rookie"]  # 1 GP < 8
+    assert roy[0]["score"] == 27.75       # pure impact, no win% multiplier
+    assert payload["min_games"] == 8      # the same qualifier as MVP
+
+    empty = awards.build_payload("2012-13", raw_dir=str(tmp_path),
+                                 rookies=set())
+    assert empty["races"]["roy"] == []    # an honest empty, still present
+
+
 # ---------------------------------------------------------------------------
 # Finals MVP: the season formula, applied to a playoff series
 # ---------------------------------------------------------------------------

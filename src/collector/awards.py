@@ -150,15 +150,15 @@ STAT_LABELS = {"pts": "Points", "reb": "Rebounds", "ast": "Assists",
 STAT_ABBR = {"pts": "PPG", "reb": "RPG", "ast": "APG", "stl": "SPG",
              "blk": "BPG", "fg3m": "3PM", "plus_minus": "+/-", "fgp": "FG%",
              "fg3p": "3P%", "ftp": "FT%", "efg": "eFG%", "ts": "TS%"}
-# Display-only maps for the Finals MVP calculator's rows and verdict (the
-# calculator reuses the race-row look but is NOT a sidebar race -- RACES
-# below stays the four collected races, and the collector never writes a
-# "finals_mvp" race).
+# The races below are the FIVE collected races (the collector writes all
+# five into every payload); "finals_mvp" is display-only -- the Finals
+# calculator reuses the race-row look but the collector never writes a
+# "finals_mvp" race.
 RACE_LABELS = {"mvp": "MVP race", "dpoy": "DPOY race",
                "sixth_man": "6th Man race", "mip": "MIP race",
-               "finals_mvp": "Finals MVP"}
+               "roy": "ROY race", "finals_mvp": "Finals MVP"}
 RACE_EMOJI = {"mvp": "🏆", "dpoy": "🛡️", "sixth_man": "🪑", "mip": "📈",
-              "finals_mvp": "🏆"}
+              "roy": "🌟", "finals_mvp": "🏆"}
 RACE_FORMULAS = {
     "mvp": ("Impact per game (PTS + 0.75·REB + 1.0·AST) scaled by the "
             "team's win percentage, 0.6× floor to 1.0× at a perfect record."),
@@ -168,6 +168,9 @@ RACE_FORMULAS = {
                   "players who started at most 40% of their games."),
     "mip": ("Year-over-year change in per-game impact vs the previous "
             "season; both seasons must clear the games-played qualifier."),
+    "roy": ("Impact per game (PTS + 0.75·REB + 1.0·AST), no team-record "
+            "scaling -- the award goes to the best rookie, not the best "
+            "team's."),
 }
 
 # The Finals MVP formula is the season MVP formula applied to a playoff
@@ -248,6 +251,16 @@ def previous_season(season: str, league: str = "nba") -> str:
     start = int(season[:4])
     prev_start = start - 1
     return f"{prev_start}-{(prev_start + 1) % 100:02d}"
+
+
+def season_start_year(season: str) -> int:
+    """The year a season STARTS: '2025-26' -> 2025, '2010-11' -> 2010 (the
+    NBA's split labels), '2026' -> 2026 (the WNBA's single-year labels).
+
+    The rookie identity keys off it for BOTH labels: ESPN's debut year and
+    draft class are start-year values (a debut in 2025 is the 2025-26
+    season; the WNBA's 2026 draft plays the 2026 season)."""
+    return int(str(season).split("-", 1)[0])
 
 
 def min_games_for(max_team_games: int) -> int:
@@ -462,6 +475,37 @@ def mvp_rows(players: list, records: dict, min_gp: int) -> list:
             "win_pct": round(win_pct, 3),
             "fgp": _pct(p.get("fgm"), p.get("fga")),
             "score": round(score, 2),
+        })
+    rows.sort(key=lambda r: (-r["score"], -r["ppg"], r["player_name"] or ""))
+    return _ranked(rows)
+
+
+def roy_rows(players: list, rookies: set, min_gp: int) -> list:
+    """ROY ladder: (pts + 0.75*reb + 1.0*ast)/gp -- NO team-record scaling.
+
+    The award goes to the best rookie, not the best team's, so unlike the
+    MVP formula there is no win-percentage multiplier here. `rookies` is
+    the set of player ids whose first season in the league IS this season
+    (the committed race takes ESPN debut records off the all-history
+    index; the live tracker substitutes ESPN's draft class) -- anyone
+    outside it never ranks, and an empty/None set honestly yields an empty
+    race rather than ranking veterans."""
+    rows = []
+    if not rookies:
+        return rows
+    for p in players:
+        if p["player_id"] not in rookies or p["gp"] < min_gp:
+            continue
+        rows.append({
+            "player_id": p["player_id"],
+            "player_name": p["player_name"],
+            "team_abbrev": p["team_abbrev"],
+            "gp": p["gp"],
+            "ppg": _per_game(p, "pts"),
+            "rpg": _per_game(p, "reb"),
+            "apg": _per_game(p, "ast"),
+            "fgp": _pct(p.get("fgm"), p.get("fga")),
+            "score": round(_impact(p), 2),
         })
     rows.sort(key=lambda r: (-r["score"], -r["ppg"], r["player_name"] or ""))
     return _ranked(rows)
@@ -713,9 +757,17 @@ def _ranked(rows: list, size: int = RACE_SIZE) -> list:
 
 
 def build_payload(season: str, raw_dir: str = None,
-                  league: str = "nba") -> dict:
+                  league: str = "nba", rookies: set = None) -> dict:
     """Everything data/dashboard_awards.json carries, or {} when the season
-    has no collected games (caller keeps the previous file untouched)."""
+    has no collected games (caller keeps the previous file untouched).
+
+    `rookies` -- player ids whose first season in the league IS this one
+    (the refresh passes ESPN debut years off the all-history build) --
+    adds the ROY race to the payload. Without it (None) the payload keeps
+    its four races: box scores alone can't tell a rookie from a ten-year
+    vet, and guessing from first appearance in the collected window would
+    crown 2010 call-ups as rookies. An empty set is a real answer too --
+    the race lands, empty, and the dashboard says so."""
     raw = raw_dir or leagues.raw_dir(league)
     players = aggregate_players(season, raw_dir=raw, league=league)
     if not players:
@@ -732,16 +784,19 @@ def build_payload(season: str, raw_dir: str = None,
                     if prev_players else {})
     min_gp_prev = min_games_for(max_games_played(prev_records))
 
+    races = {
+        "mvp": mvp_rows(players, records, min_gp),
+        "dpoy": dpoy_rows(players, records, min_gp),
+        "sixth_man": sixth_man_rows(players, records, min_gp),
+        "mip": mip_rows(players, prev_players, min_gp, min_gp_prev),
+    }
+    if rookies is not None:
+        races["roy"] = roy_rows(players, rookies, min_gp)
     return {
         "season": season,
         "prev_season": prev_label if prev_players else None,
         "min_games": min_gp,
-        "races": {
-            "mvp": mvp_rows(players, records, min_gp),
-            "dpoy": dpoy_rows(players, records, min_gp),
-            "sixth_man": sixth_man_rows(players, records, min_gp),
-            "mip": mip_rows(players, prev_players, min_gp, min_gp_prev),
-        },
+        "races": races,
         "leaders": leader_rows(players, min_gp),
     }
 

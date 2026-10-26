@@ -16,8 +16,8 @@ WNBA 2010 -> upcoming):
                           season's schedule from the committed MULTI-SEASON
                           envelope: every completed game with its final score
                           (finished seasons render the full table)
-- **Awards Ladder**    -- MVP / DPOY / 6th Man / MIP races plus per-game stat
-                          leaders incl. 3PM and shooting splits
+- **Awards Ladder**    -- MVP / ROY / DPOY / 6th Man / MIP races plus per-game
+                          stat leaders incl. 3PM and shooting splits
                           (src/collector/awards.py, committed as
                           data/dashboard_awards.json): transparent homegrown
                           metrics, explicitly NOT official league voting --
@@ -705,22 +705,28 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                                    "the collector stores it as a final result.")
 
     # -------------------------------------------------------------------------
-    # Awards Ladder: MVP / DPOY / 6th Man / MIP races + season stat leaders
+    # Awards Ladder: MVP / ROY / DPOY / 6th Man / MIP races + season stat
+    # leaders
     # -------------------------------------------------------------------------
 
     with tabs["Awards Ladder"]:
         shared.source_caption(awards_note)
 
-        # Season headline: the SELECTED season's two official awards off
-        # ESPN's award index -- MVP first, then Finals MVP -- so the page
-        # opens on who actually won, not on a scoring leader. Unconditional
-        # (an unannounced season renders honest pending rows), and the
-        # stat leaders stay below the races where they were.
+        # Season headline: the SELECTED season's official awards off
+        # ESPN's award index -- MVP, then Rookie of the Year, then Finals
+        # MVP -- so the page opens on who actually won, not on a scoring
+        # leader. Unconditional (an unannounced season renders honest
+        # pending rows), and the stat leaders stay below the races where
+        # they were.
         shared.section("Official season awards")
         official_top = shared.load_official_winners(season, league)
         st.markdown(
             shared.season_award_row_html(
                 "MVP", (official_top.get("mvp") or [None])[0]),
+            unsafe_allow_html=True)
+        st.markdown(
+            shared.season_award_row_html(
+                "ROY", (official_top.get("roy") or [None])[0]),
             unsafe_allow_html=True)
         finals_top = next((r for r in shared.load_finals_mvp(league)[0]
                            if r.get("season") == season), None)
@@ -757,6 +763,30 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
             st.caption(
                 f"MVP race is homegrown math, not official {display} "
                 f"voting: {awards.RACE_FORMULAS['mvp']} · {live_note}")
+
+            # Live in-season ROY race: the same gate and look as the MVP
+            # tracker above, and the same movement arrows off the committed
+            # snapshots (the ROY trend chart below covers the trend, so it
+            # is never drawn twice). Each candidate's profile decides the
+            # draft class (one cached call that also names the row); no
+            # standings call -- the ROY formula scales by nothing but the
+            # games the rookie played.
+            shared.section("ROY progress tracker -- live")
+            roy_rows, roy_note = shared.load_live_rookie_race(season, league)
+            if roy_rows:
+                snapshots, _ = shared.load_race_history(season, league)
+                moves = shared.race_movement(snapshots, "roy")
+                for row in roy_rows[:shared.LIVE_ROY_SHOW]:
+                    st.markdown(shared.race_row_html(
+                        row, "roy",
+                        moves.get(int(row["player_id"]), 0), league),
+                        unsafe_allow_html=True)
+            else:
+                st.info(roy_note)
+            st.caption(
+                f"{awards.RACE_LABELS['roy']} is homegrown math, not "
+                f"official {display} voting: {awards.RACE_FORMULAS['roy']}"
+                f" · {roy_note}")
 
         # Finals MVP calculator: the season MVP formula on the selected
         # season's Finals series, beside the same official winner the
@@ -821,7 +851,18 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                                f"{awards.RACE_LABELS.get(key, key)}")
                 rows = races.get(key) or []
                 if not rows:
-                    if key == "mip":
+                    if key == "roy" and key not in races:
+                        # Only the ROY race can be absent from a payload
+                        # (rookie identities need the all-history index):
+                        # it says what is missing instead of pretending a
+                        # qualifier gap.
+                        st.caption(
+                            "No ROY race in this build: rookie identities "
+                            "come from the all-history index (ESPN debut "
+                            "records), which no refresh has landed yet -- "
+                            "the box scores alone can't say who a rookie is."
+                        )
+                    elif key == "mip":
                         season_label = str(awards_payload.get("season", ""))
                         prev = (awards_payload.get("prev_season")
                                 or awards.previous_season(season_label, league))
@@ -846,10 +887,23 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                     f"not official {display} voting: "
                     f"{awards.RACE_FORMULAS.get(key, '')}"
                 )
+                if key == "roy" and key in races:
+                    # The score's math is the formula above; WHO counts as
+                    # a rookie is a data question, so it gets its own line:
+                    # the committed race reads ESPN debut records, and the
+                    # live tracker confirms with ESPN's draft class.
+                    st.caption(
+                        "Rookie identity: first season in the league per "
+                        "ESPN career debut records (the live tracker above "
+                        "confirms with ESPN's draft class). A rookie not "
+                        "yet in the all-history index joins the race once "
+                        "he is."
+                    )
 
             with col_l:
                 _race("mvp")
                 _race("sixth_man")
+                _race("roy")
             with col_r:
                 _race("dpoy")
                 _race("mip")
@@ -873,12 +927,33 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                     f"MVP race trend: {race_note} -- a line and the ladders' "
                     "rank arrows need at least two snapshots.")
 
+            # The same score-over-time line for the ROY race, drawn only
+            # when this build carries the race (rookie identities landed)
+            # and only with two+ snapshots to plot -- otherwise the honest
+            # caption, never a one-point chart.
+            if "roy" in races:
+                roy_trend = shared.race_trend_figure(snapshots, "roy")
+                if roy_trend.data:
+                    shared.section("ROY race trend")
+                    st.plotly_chart(roy_trend, width="stretch",
+                                    config=shared.CHART_CONFIG)
+                    st.caption(
+                        f"ROY score across {race_note}: the top "
+                        f"{shared.RACE_TREND_TOP} of the latest snapshot, "
+                        "and the ladder arrows compare its last two. "
+                        "refresh_dashboard_fallbacks.py records one "
+                        "snapshot per daily run.")
+                else:
+                    st.caption(
+                        f"ROY race trend: {race_note} -- a line and the "
+                        "ladders' rank arrows need at least two snapshots.")
+
             # Official vs algorithm: each race's homegrown #1 next to the
             # season's ACTUAL award winner from ESPN's award index -- a
             # transparent scorecard, not official voting on either side.
             shared.section("Official vs algorithm winners")
             official_here = shared.load_official_winners(season, league)
-            for race_key in ("mvp", "dpoy", "sixth_man", "mip"):
+            for race_key in ("mvp", "dpoy", "sixth_man", "mip", "roy"):
                 st.markdown(
                     shared.official_vs_algo_row_html(
                         race_key, official_here.get(race_key) or [],

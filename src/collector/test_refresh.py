@@ -417,8 +417,8 @@ def test_refresh_awards_preserves_history_when_raw_is_partial(
     import history
 
     monkeypatch.setattr(awards, "build_payload",
-                        lambda season, raw_dir=None, league="nba":
-                        _fresh_payload(season))
+                        lambda season, raw_dir=None, league="nba",
+                        rookies=None: _fresh_payload(season))
     captured = {}
 
     def _boom(window_players, cache=None, live=True):
@@ -460,8 +460,8 @@ def test_refresh_awards_window_metadata_spans_merged_seasons(
     import history
 
     monkeypatch.setattr(awards, "build_payload",
-                        lambda season, raw_dir=None, league="nba":
-                        _fresh_payload(season))
+                        lambda season, raw_dir=None, league="nba",
+                        rookies=None: _fresh_payload(season))
     real_players = json.loads(
         (REPO_ROOT / "data" / "dashboard_players.json").read_text(
             encoding="utf-8"))
@@ -499,6 +499,81 @@ def test_refresh_awards_window_metadata_spans_merged_seasons(
     assert written["finals_mvp"]["2025"][0]["player_name"] == "Sample Winner"
     assert written["official_winners"]["2025"]["mvp"][0]["player_name"] == \
         "Sample Winner"
+
+
+def test_refresh_awards_wires_debut_records_into_the_roy_race(
+        isolated, monkeypatch):
+    """Rookie identities flow into every rebuilt payload from the debut
+    records, in the refresh's documented order: the fresh history build's
+    entries (which reach below the index's 41-GP gate -- this season's
+    rookies) merged over the committed index's stable facts (the fallback
+    when history fails), each season filtered to ITS OWN start-year
+    rookies. With debut records nowhere the call degrades to an explicit
+    None -- the four box-score races still build, no rookies guessed from
+    first appearance in the window."""
+    import awards
+    import history
+
+    # A local season so labels aren't empty (its box content never
+    # matters: build_payload is stubbed to CAPTURE the rookie set).
+    game = isolated["raw"] / "2024-25" / "games" / "1.json"
+    game.parent.mkdir(parents=True)
+    game.write_text("{}", encoding="utf-8")
+
+    def _write_index(players: dict) -> None:
+        # Each scenario starts from ITS OWN committed index: a successful
+        # history run rewrites the real file (both stub rows sit below the
+        # index's 41-GP gate, so scenario 1 empties it).
+        (isolated["data"] / "dashboard_players.json").write_text(
+            json.dumps({"players": players}), encoding="utf-8")
+
+    # Committed state: an envelope (so the window pool comes from the
+    # players projection) and an index whose only debut is a 2010 vet --
+    # nobody's rookie in 2024-25.
+    (isolated["data"] / "dashboard_awards.json").write_text(json.dumps(
+        {"seasons": {"2010-11": {"season": "2010-11",
+                                 "races": {"mvp": []}, "leaders": {}}}}),
+        encoding="utf-8")
+    _write_index({"11": {"player_id": 11, "debut": 2010, "gp": 800},
+                  "12": {"player_id": 12, "gp": 5}})
+
+    captured = {}
+
+    def _capture(season, raw_dir=None, league="nba", rookies=None):
+        captured[season] = rookies
+        return _fresh_payload(season)
+
+    monkeypatch.setattr(awards, "build_payload", _capture)
+    monkeypatch.setattr(history, "build", lambda window_players, cache=None,
+                        live=True: {
+                            "players": [{"player_id": 13, "debut": 2024,
+                                         "gp": 12},
+                                        {"player_id": 14, "debut": 2023}],
+                            "honours": {}, "champions": {},
+                            "meta": {"pool": len(window_players)},
+                            "stamp": "x"})
+
+    refresh.refresh_awards(["2024-25"])
+    # 2024-25's start year is 2024: hist's fresh rookie joins, the
+    # committed index's 2010 veteran and its debut-less row don't.
+    assert captured["2024-25"] == {13}
+
+    # History failed -> the committed index is the stable fallback: its
+    # debut years still feed the race (an empty set for this season is an
+    # honest 'no rookies known', not a None guess).
+    captured.clear()
+    _write_index({"11": {"player_id": 11, "debut": 2010, "gp": 800},
+                  "12": {"player_id": 12, "gp": 5}})
+    monkeypatch.setattr(history, "build", _raise("offline"))
+    refresh.refresh_awards(["2024-25"])
+    assert captured["2024-25"] == set()
+
+    # No debut records anywhere -> None: build_payload then ships the four
+    # box-score races only, and the refresh's own note says why.
+    captured.clear()
+    _write_index({"11": {"player_id": 11, "gp": 800}})
+    refresh.refresh_awards(["2024-25"])
+    assert captured["2024-25"] is None
 
 
 # ---------------------------------------------------------------------------
@@ -660,8 +735,8 @@ def test_refresh_awards_career_build_failure_keeps_previous_career(
     import history
 
     monkeypatch.setattr(awards, "build_payload",
-                        lambda season, raw_dir=None, league="nba":
-                        _fresh_payload(season))
+                        lambda season, raw_dir=None, league="nba",
+                        rookies=None: _fresh_payload(season))
     real_players = json.loads(
         (REPO_ROOT / "data" / "dashboard_players.json").read_text(
             encoding="utf-8"))

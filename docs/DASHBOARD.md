@@ -184,10 +184,11 @@ per league, with that league's season and data.
    exists. Unreachable ESPN degrades to a caption saying why -- the
    committed schedule carries scores, never per-player lines or PBP.
 5. **Awards Ladder**: opens with the selected season's **official
-   season awards** headline (MVP first, then Finals MVP, both off
-   ESPN's award index, honest pending rows until announced), so the
-   page leads with the actual winners. While the selected season is the
-   one being played, the headline is followed by the **MVP progress
+   season awards** headline (MVP, then Rookie of the Year, then Finals
+   MVP, all off ESPN's award index, honest pending rows until
+   announced), so the page leads with the actual winners. While the
+   selected season is the one being played, the headline is followed by
+   the **MVP progress
    tracker -- live**: ESPN's leaderboards pick the candidate pool (the
    top 30 each of PTS/REB/AST, deduped by $ref id -- the deep WNBA
    boards answer past ESPN's own limit, so the per-category cap is what
@@ -206,6 +207,18 @@ per league, with that league's season and data.
    ranked vs the qualifier, and ESPN unreachable renders its honest
    note instead of a race. A finished season skips the tracker
    entirely -- its race is the committed one below, never re-fetched.
+   Beside it, under the SAME gate, the **ROY progress tracker -- live**:
+   each candidate's core athlete profile carries his **draft class**
+   (rookie = drafted in the season's START year -- the 2025 draft plays
+   2025-26, the 2026 WNBA draft plays 2026), and only the confirmed
+   rookies' own season totals feed the committed ROY formula at the same
+   in-season qualifier -- with no standings call at all (the formula
+   scales by nothing but games played, so the burst stays leaders + one
+   profile per candidate + one totals call per confirmed rookie; the
+   draft profile also names each rendered row). The note states the
+   draft class and the qualifier verbatim; an undrafted first-year
+   player carries no draft year on ESPN, so his rookie status can't be
+   confirmed -- skipped and said in the note, never guessed.
    Straight below sits the **Finals MVP calculator -- official vs
    formula**: the season MVP
    formula re-applied to the selected season's Finals series (per-game
@@ -223,8 +236,8 @@ per league, with that league's season and data.
    an unreachable ESPN, a series with no completed games, or a
    pre-2025 WNBA best-of-5 mid-series (its generic block is
    indistinguishable from the semis) each render their honest note
-   instead of a guess. Then the selected season's MVP / DPOY / 6th
-   Man / MIP races in two columns, then a stat-leaders
+   instead of a guess. Then the selected season's MVP / ROY / DPOY /
+   6th Man / MIP races in two columns, then a stat-leaders
    strip behind a PTS/REB/AST/STL/BLK/**3PM**/**+/-** radio (top-10 per-game rates, each row
    carrying the FG/3P made-attempt splits + FG%). Every row is a real
    headshot over a team-logo CSS fallback with the race's stat line and
@@ -233,17 +246,26 @@ per league, with that league's season and data.
    per league, keyed by season for every collected year NBA 2010-11 →
    present / WNBA 2010 → present); each
    race's caption prints its exact formula verbatim plus the "not
-   official NBA voting" ("... WNBA voting" in the WNBA pane) disclaimer. An empty race names the missing prior
-   season instead of inventing a winner, and a season with no collected
+   official NBA voting" ("... WNBA voting" in the WNBA pane) disclaimer.
+   An empty race names the missing prior
+   season instead of inventing a winner, a payload that never carried the
+   ROY race says so outright instead of pretending a qualifier gap
+   (rookie identities need the all-history index -- never guessed from
+   first appearance in the collected window), the ROY race's own caption
+   adds the **rookie-identity rule** beside the formula (first season in
+   the league per ESPN debut records, confirmed live by the draft class),
+   and a season with no collected
    games gets a "no collected games yet" note instead of substituted
    races. Ladder rows carry a **rank-movement arrow** (green ▲ / red ▼
    with the places gained or lost) comparing the last two daily race
-   snapshots, and an **MVP race trend** chart draws the current leaders'
-   scores across those snapshots (top 6 of the latest, absent scores
+   snapshots, and **MVP / ROY race trend** charts draw the current
+   leaders' scores across those snapshots (each only when the build
+   carries that race; top 6 of the latest, absent scores
    left as gaps). With fewer than two snapshots both degrade to a caption
    saying exactly that -- movement and trends are never invented.
    Between the races and the stat leaders sits the
-   **official-vs-algorithm scorecard**: one row per race pairing the
+   **official-vs-algorithm scorecard**: one row per race (MVP, DPOY,
+   6th Man, MIP, ROY) pairing the
    season's actual award winner from ESPN's award index ("Official:
    ...") with the race's homegrown #1 above ("Algorithm #1: ..."), and a
    verdict slot -- green ✓ agree / red ✗ differs, a dash while ESPN
@@ -455,6 +477,6 @@ rule applied to whole folders).
 | `data/dashboard_positions.json` | same (local position map) | Court View formation |
 | `data/dashboard_awards.json` | same (local award math: every collected season's races/leaders, all-time boards, all-history GOAT ladder) | KPI scoring leader, Awards Ladder, Court View, All-Time Stats, GOAT Rankings |
 | `data/dashboard_players.json` | same (`history.py` all-history index: careers, honours, GOAT ranks, position/jersey, per-season Finals MVP winners, official race winners) | Player Profile, Awards Ladder (Finals MVP tracker, official-vs-algorithm verdicts) |
-| `data/races/{season}.json` | same (daily race snapshots: one per UTC day, written only while a race moves; a finished season freezes after its first) | Ladder movement arrows, MVP race trend |
+| `data/races/{season}.json` | same (daily race snapshots: one per UTC day, written only while a race moves; a finished season freezes after its first) | Ladder movement arrows, MVP/ROY race trends |
 | `data/processed/dashboard_leaderboards.json` | same (local totals + shooting splits) | committed artifact only; no page reads it since Season Leaders was removed |
 | `models/metrics.json`, `models/proj_model.txt` | `train.py` | Sidebar Model & History mention (headline) |

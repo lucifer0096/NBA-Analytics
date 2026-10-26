@@ -13,8 +13,8 @@ tabs read, committed here (the same pattern as FPL-Analytics' refresh script):
     data/races/{season}.json         daily race snapshots -> the Awards
                                      Ladder's movement arrows + trend
     data/dashboard_positions.json    current player -> position map
-    data/dashboard_awards.json       every collected season's MVP/DPOY/6th-Man/
-                                     MIP races + stat leaders, plus the
+    data/dashboard_awards.json       every collected season's MVP/ROY/DPOY/6th-
+                                     Man/MIP races + stat leaders, plus the
                                      all-NBA-history all-time boards, GOAT
                                      ladder (official honours) and the
                                      per-season games-collected inventory
@@ -615,8 +615,8 @@ def _write_players(career: dict, history: dict) -> None:
     official honour, carrying his career line, per-season log (the
     progression graph), official honours + points, championships and -- when
     he made the ladder -- GOAT rank/score, plus the per-season Finals MVP
-    winners map and the four races' official winners map (the Awards
-    Ladder's tracker and official-vs-algorithm verdicts). Written only
+    winners map and the five races' official winners map (the Awards
+    Ladder's headline rows and official-vs-algorithm verdicts). Written only
     after a successful history build so a failed fetch never degrades a
     committed file."""
     import awards
@@ -704,12 +704,17 @@ def refresh_awards(seasons_to_try: list) -> dict:
     all-league-history all-time boards, GOAT ladder (official honours) and
     the per-season games inventory.
 
-    Season payloads/games counts are pure-local; the all-history half runs
+    Season payloads/games counts are pure-local apart from the ROY race's
+    rookie identities (ESPN debut years, off the all-history build or the
+    committed index of the last one); the all-history half runs
     through history.py (ESPN + its cache, already switched to LEAGUE by
     set_league). When THAT fails the previous career sections and the
     dashboard_players file are kept, and the freshly computed season races
     still land -- a window-only ladder sneaking in on a bad network day
-    would mislead far more than a stale-but-labelled one.
+    would mislead far more than a stale-but-labelled one. With no debut
+    records anywhere the four box-score races still build and the ROY race
+    joins on the next successful careers refresh (never guessed from first
+    appearance in the collected window: that would crown 2010 call-ups).
 
     CI SURVIVAL (why merged state exists): every CI checkout has data/raw/
     for the CURRENT season only, so rebuilding `seasons` from scratch would
@@ -734,29 +739,15 @@ def refresh_awards(seasons_to_try: list) -> dict:
         print("  no collected games for any candidate season -- skipping awards")
         return {}
 
-    season_payloads = []
-    for season in labels:
-        try:
-            payload = awards.build_payload(season, league=LEAGUE)
-        except Exception as exc:  # noqa: BLE001 -- one bad season must not kill the build
-            print(f"  WARNING [{season}]: awards build failed "
-                  f"({type(exc).__name__}: {exc}) -- keeping its previous payload")
-            continue
-        if payload:
-            season_payloads.append(payload)
-    rebuilt = {p["season"]: p for p in season_payloads}
-    merged_seasons = {**{label: rows for label, rows in prior_seasons.items()
-                         if label not in rebuilt}, **rebuilt}
-    if not merged_seasons:
-        return {}
-    if season_payloads:
-        _record_race_history(season_payloads)
-
+    # Window pool + the all-history build FIRST: the ROY race needs each
+    # season's rookies (ESPN debut years), which only the all-history build
+    # or the committed index from a previous one can supply -- box scores
+    # can't tell a rookie from a ten-year vet.
+    players_payload = _read_json(_dash("dashboard_players.json"), {})
     if prior_seasons and not set(prior_seasons) <= set(labels):
         # Partial local raw (every CI run): reuse the committed player
         # projection as the window pool -- it already carries career lines,
         # seasons, peak and team for everyone the box scan would find.
-        players_payload = _read_json(_dash("dashboard_players.json"), {})
         window_players = list((players_payload.get("players") or {}).values())
         print(f"  window pool: {len(window_players)} committed players "
               "(raw covers one season only)")
@@ -775,6 +766,45 @@ def refresh_awards(seasons_to_try: list) -> dict:
         except Exception as exc:  # noqa: BLE001 -- collector must stay resumable
             print(f"  all-history fetch failed ({type(exc).__name__}: {exc}) -- "
                   "keeping the previous career sections/players file")
+
+    # {player_id: debut year} for the rookies: the committed index's
+    # records first (stable facts, still the fallback when history just
+    # failed), then hist's fresh entries win -- the all-history build
+    # reaches players below the index's 41-GP gate, i.e. this season's
+    # rookies.
+    debut_of: dict = {}
+    for pid, row in (players_payload.get("players") or {}).items():
+        if row.get("debut"):
+            debut_of[int(row.get("player_id") or pid)] = int(row["debut"])
+    for row in (hist or {}).get("players") or []:
+        if row.get("debut"):
+            debut_of[int(row["player_id"])] = int(row["debut"])
+    if not debut_of:
+        print("  no debut records anywhere -- this pass builds the four "
+              "box-score races; the ROY race joins on the next careers "
+              "refresh")
+
+    season_payloads = []
+    for season in labels:
+        rookies = ({pid for pid, debut in debut_of.items()
+                    if debut == awards.season_start_year(season)}
+                   if debut_of else None)
+        try:
+            payload = awards.build_payload(season, league=LEAGUE,
+                                           rookies=rookies)
+        except Exception as exc:  # noqa: BLE001 -- one bad season must not kill the build
+            print(f"  WARNING [{season}]: awards build failed "
+                  f"({type(exc).__name__}: {exc}) -- keeping its previous payload")
+            continue
+        if payload:
+            season_payloads.append(payload)
+    rebuilt = {p["season"]: p for p in season_payloads}
+    merged_seasons = {**{label: rows for label, rows in prior_seasons.items()
+                         if label not in rebuilt}, **rebuilt}
+    if not merged_seasons:
+        return {}
+    if season_payloads:
+        _record_race_history(season_payloads)
 
     # Career half: freshly built when history succeeded, else whatever the
     # committed envelope already carries (its window/alltime/goat/career_note).

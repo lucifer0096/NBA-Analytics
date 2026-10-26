@@ -50,7 +50,11 @@ here so the dashboard only ever displays what the data supports:
   debutYear (verified Sep 2026), so their debut derives from the first row
   itself (_fetch_athlete's disclosed fallback): the check reduces to "rows
   exist" there, which holds because ESPN's WNBA season data begins at the
-  league's 1997 inception;
+  league's 1997 inception. NBA profiles carry debutYear only through the
+  2020 debut class (verified live Oct 2026 -- later careers omit the key),
+  and those modern careers are fully covered by ESPN's web stats, so their
+  debut derives from the first row too (rows keyed by the season's END
+  year, hence -1) and the check holds exactly (= debutYear + 1);
 - untrusted rows -> ``seasons: None`` (blank) and peak falls back to the best
   collected season, else ``None`` (component dropped on the ladder);
 - championships are counted only for trusted careers whose rows start in
@@ -417,7 +421,7 @@ def honours(cache: dict, live: bool = True, now: datetime = None) -> tuple:
     meta) over every award type ESPN carries for the current league (20
     types for the NBA, 15 for the WNBA -- see leagues.cfg). The third
     element is the per-season Finals MVP feed behind the dashboard's
-    tracker and the fourth the four races' OFFICIAL winners (league cfg's
+    tracker and the fourth the five races' OFFICIAL winners (league cfg's
     race_award_names) behind the official-vs-algorithm verdicts: winners
     kept per season instead of folded into the career counts."""
     now = now or _now()
@@ -598,7 +602,21 @@ def _fetch_athlete(pid: int, now: datetime) -> dict | None:
     if not info.get("displayName") and line is None and not rows:
         return None
     debut = info.get("debutYear")
-    if not debut and LEAGUE == "wnba":
+    if not debut and LEAGUE == "nba":
+        # ESPN's NBA profiles carry debutYear ONLY through the 2020 debut
+        # class (verified live Oct 2026 AND across every cached bundle:
+        # 0 of 1,809 carry a debut past 2020, while 2021+ careers omit
+        # the key entirely -- e.g. Flagg's profile has draft data but no
+        # debutYear). Those modern careers are fully covered by ESPN's web
+        # stats, so their first per-season row IS the career start -- rows
+        # are keyed by the season's END year (LeBron debut 2003 -> first
+        # row 2004; Haliburton 2020 -> 2021), hence the -1. The rows-
+        # start-late hazard the NBA rule exists for (Kareem's rows begin
+        # 1976, debut 1969) can't bite here: those pre-1977 careers all
+        # carry debutYear and never reach this branch, and the derived
+        # value satisfies the trust check exactly (min = debut + 1).
+        debut = (min(row[0] for row in rows) - 1) if rows else None
+    elif not debut and LEAGUE == "wnba":
         # ESPN's WNBA athletes carry NO debutYear (verified across the whole
         # pool, Sep 2026). The NBA rule needs an independent career start to
         # catch ESPN starting some pre-1977 row sets late; the WNBA's
@@ -633,17 +651,19 @@ def _fetch_athlete(pid: int, now: datetime) -> dict | None:
 def _entry_age_ok(entry: dict, now: datetime) -> bool:
     """Active players refresh weekly; players whose last season row predates
     the previous season are treated as static (6-month re-read still catches
-    a comeback). Partial entries always refetch, so do pre-upgrade WNBA
-    bundles that predate the debut fallback in _fetch_athlete (complete
-    bundles always have rows, so the debut resolves on the first build),
-    and bundles predating the position/jersey vitals (key absent = one
+    a comeback). Partial entries always refetch, as do complete bundles
+    WITHOUT a debut, in either league (they predate _fetch_athlete's
+    rows-derived fallback, so one refetch resolves the debut from the rows --
+    ESPN simply omits debutYear on post-2020 NBA profiles and has never
+    carried it for WNBA athletes; complete bundles always have rows), and
+    bundles predating the position/jersey vitals (key absent = one
     refetch upgrades them; an explicit None is a real ESPN absence and
     ages normally)."""
     if not entry.get("complete"):
         return False
     if "position" not in entry:
         return False
-    if LEAGUE == "wnba" and entry.get("debut") is None:
+    if entry.get("debut") is None:
         return False
     ttl = ATHLETE_TTL_DAYS
     years = [row[0] for row in entry.get("rows") or []]
@@ -888,7 +908,7 @@ def build(window_players: list, cache: dict = None, live: bool = True) -> dict:
              "team_id": champions.get(year)}
             for pid in pids]
 
-    # The four races' OFFICIAL winners (ESPN's award index again) for the
+    # The five races' OFFICIAL winners (ESPN's award index again) for the
     # dashboard's official-vs-algorithm verdicts: same per-season shape
     # with names resolved off the same bundles, per race this time.
     official_rows = {}

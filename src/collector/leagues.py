@@ -158,13 +158,14 @@ _CONFIG = {
         "min_unique_teams": 30,      # a healthy current-franchise list
         "honours_weights": GOAT_HONOURS_WEIGHTS,
         "honours_labels": GOAT_HONOUR_LABELS,
-        # The four homegrown races' OFFICIAL counterparts (ESPN's exact
+        # The five homegrown races' OFFICIAL counterparts (ESPN's exact
         # award names, the honours table's own strings): the Awards
         # Ladder's official-vs-algorithm verdicts match on these.
         "race_award_names": {"mvp": "MVP",
                              "dpoy": "Defensive Player of the Year",
                              "sixth_man": "Sixth Man of the Year",
-                             "mip": "Most Improved Player"},
+                             "mip": "Most Improved Player",
+                             "roy": "Rookie of the Year"},
         "official_overrides": True,  # NBA legends' verified record patches
         # No verified champion overlay: ESPN's Finals-MVP team refs cover
         # 1970 on (earlier titles come from OFFICIAL_CHAMPIONSHIPS).
@@ -188,12 +189,13 @@ _CONFIG = {
                                       # breaks the guard
         "honours_weights": WNBA_GOAT_HONOURS_WEIGHTS,
         "honours_labels": WNBA_GOAT_HONOUR_LABELS,
-        # Same four races' official counterparts as the NBA table (exact
+        # Same five races' official counterparts as the NBA table (exact
         # ESPN names); the sixth-man award is the WNBA's "Sixth Player".
         "race_award_names": {"mvp": "MVP",
                              "dpoy": "Defensive Player of the Year",
                              "sixth_man": "Sixth Player of the Year",
-                             "mip": "Most Improved Player"},
+                             "mip": "Most Improved Player",
+                             "roy": "Rookie of the Year"},
         "official_overrides": False,
         # {season: ESPN team id} for the six seasons whose Finals-MVP
         # detail omits the winner's team ref (verified live Sep 2026).

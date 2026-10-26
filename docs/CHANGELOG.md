@@ -5,6 +5,67 @@ behind each batch. Automated `data:` collector refreshes are omitted --
 they carry no code change. Every batch below landed with its tests
 green and CI green.
 
+## 2026-10-26
+
+### feat(roy): the Rookie of the Year race -- full MVP parity on the Awards Ladder
+
+The dashboard's flagship ladder had no homegrown ROY counterpart -- the
+rookie award existed only as a GOAT-honours weight. Five surfaces now
+mirror the MVP's, each honest about the one question box scores can't
+answer: WHO is a rookie.
+
+- **Collector**: `race_award_names.roy = "Rookie of the Year"` in both
+  league configs -- `history.py`'s generic name mapping picks up every
+  season's official ROY winner with zero parser change (ESPN award type
+  35; the committed award cache already carries the full history).
+- `awards.roy_rows` ranks exactly the given rookie set by pure impact
+  per game, `(PTS + 0.75·REB + 1.0·AST)/GP` -- **no win-percentage
+  scaling** (the award goes to the best rookie, not the best team's) --
+  at the season's own games-played qualifier. `build_payload` gains a
+  `rookies` parameter and only then writes the race: box scores can't
+  tell a rookie from a ten-year vet, and first appearance in the
+  collected window would crown 2010 call-ups.
+- `refresh_dashboard_fallbacks` builds the all-history index BEFORE the
+  season payloads and injects each season's start-year debuters
+  (fresh history entries win over the committed index, which stays the
+  fallback when history fails; no debut records anywhere ships the four
+  box-score races and says why).
+- The identity source needed a fix first: ESPN carries `debutYear` on
+  NBA athlete profiles ONLY through the 2020 debut class (verified live
+  Oct 2026 -- later profiles omit the key entirely, e.g. Flagg's), so
+  every rookie pool came out empty. The rows-derived debut fallback now
+  extends to the NBA (rows are keyed by the season's END year: first
+  row 2004 = the 2003-04 debut, hence -1), complete-but-debut-less
+  bundles refetch once in either league to pick it up, and the career
+  trust check lands exactly on the derived boundary.
+- **Awards Ladder**: headline now reads MVP → **ROY** → Finals MVP
+  (honest pending rows until announced), plus the fifth race block with
+  its verbatim formula, a dedicated **rookie-identity caption** (ESPN
+  debut records; live tracker confirms with the draft class), the
+  official-vs-algorithm verdict row, and a **ROY trend chart** over the
+  daily snapshots with the same two-snapshot honesty and movement
+  arrows as MVP.
+- **Live tracker**: a **ROY progress tracker** beside the MVP's, same
+  gate (only while the season is being played). ESPN's leaderboards
+  pick the candidates; each candidate's athlete profile supplies the
+  draft class (rookie = drafted in the season's START year -- the 2025
+  draft plays 2025-26, the 2026 WNBA draft plays 2026; the draft
+  endpoints 404 on both ESPN hosts, so the profile is the authoritative
+  source) and the rendered row's name. Only confirmed rookies' own
+  season totals feed the committed formula at the in-season qualifier,
+  with no standings call. Undrafted first-year players (no draft year
+  on ESPN) are skipped and said in the note, never guessed -- and
+  rookies below the committed index's 41-GP gate (missing from the
+  race's debut data until indexed) are covered here.
+
++11 tests (roy rows/season-start-year/payload units, the refresh's
+three identity paths, the fifth official-winner pin -- 2025-26 Cooper
+Flagg -- the cfg name guard, headline/trend/verdict/identity/live app
+assertions, `race_meta`'s record-free line, the live tracker's
+draft-class filter unit, and the debut fallback on BOTH league paths);
+docs (README, DASHBOARD, COLLECTOR, DEPLOYMENT) updated to the
+five-race surface.
+
 ## 2026-10-24
 
 ### feat(ui): the responsive pass -- small-screen audit + fixes, in code
@@ -183,8 +244,6 @@ Tests: 210 passed (+7 new).
 - **Series sub-headers on the bracket** (e.g. "BOS leads 3-2" under
   each round group) -- rounds shipped 2026-10-24; series records would
   need ESPN summary calls per playoff game.
-- **Operational check**: confirm the game-night crons fire on their
-  first scheduled window (01:40-06:40 and 12:20 UTC).
 - Extend the "(N h ago)" age from the hero to the per-tab Source
   captions.
 - Mobile / responsive visual QA at phone widths (Streamlit-native

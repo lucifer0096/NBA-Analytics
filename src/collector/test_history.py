@@ -100,9 +100,13 @@ def test_honours_wnba_verified_champion_overlay_fills_espn_gaps(monkeypatch):
 
 
 def test_fetch_athlete_debut_fallback_wnba_vs_nba(monkeypatch):
-    """ESPN gives WNBA athletes no debutYear (verified Sep 2026): the debut
-    derives from the first row year, so the trust rule can run at all; the
-    NBA path is untouched -- no marker, no debut, honestly untrusted."""
+    """Neither league's profile here carries debutYear -- the marker WNBA
+    athletes have never had (verified Sep 2026) and that post-2020 NBA
+    careers stopped getting (verified live Oct 2026: profiles omit the key
+    entirely) -- so the debut derives from the first per-season row, keyed
+    by the SINGLE year on the WNBA (2019 -> 2019) and by the season's END
+    year on the NBA (first row 2019 = the 2018-19 debut -> 2018), and both
+    land exactly on the trust check."""
     rows = [[2019, 1, "ATL", 30], [2020, 1, "ATL", 32],
             [2021, 2, "NYL", 28]]
     monkeypatch.setattr(history, "_get",
@@ -126,8 +130,8 @@ def test_fetch_athlete_debut_fallback_wnba_vs_nba(monkeypatch):
         for name, value in saved.items():
             setattr(history, name, value)
     nba_entry = history._fetch_athlete(1, now)
-    assert nba_entry["debut"] is None           # NBA: no marker, no invention
-    assert not history._trusted(nba_entry)
+    assert nba_entry["debut"] == 2018           # END-keyed rows, minus one
+    assert history._trusted(nba_entry)          # 2019 <= 2018 + 1 exactly
 
 
 def test_fetch_athlete_stores_position_and_jersey(monkeypatch):
@@ -153,9 +157,12 @@ def test_fetch_athlete_stores_position_and_jersey(monkeypatch):
     assert bare["position"] is None and bare["jersey"] is None
 
 
-def test_entry_age_ok_refetches_pre_debut_wnba_bundles(monkeypatch):
-    """Pre-upgrade WNBA bundles (complete but debut-less) refetch once so
-    the trust rule can run; fresh NBA bundles with a debut stay cached."""
+def test_entry_age_ok_refetches_pre_debut_bundles(monkeypatch):
+    """Complete but debut-less bundles refetch ONCE, in either league (they
+    predate _fetch_athlete's rows-derived fallback -- ESPN never carried
+    debutYear for WNBA athletes and stopped for post-2020 NBA careers), so
+    the trust rule can run; once resolved the bundle ages normally on both
+    the WNBA and NBA paths."""
     now = history._now()
     stamp = history._iso(now)
     # Vitals keys present (that absence is the OTHER upgrade trigger --
@@ -177,6 +184,8 @@ def test_entry_age_ok_refetches_pre_debut_wnba_bundles(monkeypatch):
         for name, value in saved.items():
             setattr(history, name, value)
     assert history._entry_age_ok(fresh, now)               # NBA path unchanged
+    assert not history._entry_age_ok(dict(fresh, debut=None),
+                                     now)                  # same one-shot rule
 
 
 def test_entry_age_ok_refetches_pre_vitals_bundles():
@@ -274,15 +283,19 @@ def test_build_offline_from_committed_cache(monkeypatch):
     top = finals[2026][0]
     assert top["player_name"] == "Jalen Brunson"
     assert top["team_id"] == 18
-    # The official side of the verdicts: the four races' winners per
-    # season from the same index (2025-26: SGA MVP, Wemby DPOY).
+    # The official side of the verdicts: the five races' winners per
+    # season from the same index (2025-26: SGA MVP, Wemby DPOY, Cooper
+    # Flagg ROY -- the award index has carried the rookie award since
+    # 1953, mapped by cfg's exact name).
     official = result["official_winners"]
     assert official and 2026 in official
-    assert set(official[2026]) >= {"mvp", "dpoy", "sixth_man", "mip"}
+    assert set(official[2026]) >= {"mvp", "dpoy", "sixth_man", "mip", "roy"}
     assert {r["player_name"] for r in official[2026]["mvp"]} == \
         {"Shai Gilgeous-Alexander"}
     assert {r["player_name"] for r in official[2026]["dpoy"]} == \
         {"Victor Wembanyama"}
+    assert {r["player_name"] for r in official[2026]["roy"]} == \
+        {"Cooper Flagg"}
     # Official-record ring counts land on careers ESPN's champion index
     # can't vouch for, and meta counts them for the on-screen caption.
     assert by_pid[4145]["championships"] == 6   # Kareem (rows start 1976)

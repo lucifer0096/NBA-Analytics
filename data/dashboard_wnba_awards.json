@@ -11331,6 +11331,128 @@
       "score": 5.0,
       "rank": 10
      }
+    ],
+    "roy": [
+     {
+      "player_id": 4433730,
+      "player_name": "Paige Bueckers",
+      "team_abbrev": "DAL",
+      "gp": 36,
+      "ppg": 19.2,
+      "rpg": 3.9,
+      "apg": 5.4,
+      "fgp": 47.7,
+      "score": 27.57,
+      "rank": 1
+     },
+     {
+      "player_id": 4898384,
+      "player_name": "Kiki Iriafen",
+      "team_abbrev": "WSH",
+      "gp": 44,
+      "ppg": 13.3,
+      "rpg": 8.5,
+      "apg": 1.6,
+      "fgp": 48.8,
+      "score": 21.25,
+      "rank": 2
+     },
+     {
+      "player_id": 4433524,
+      "player_name": "Sonia Citron",
+      "team_abbrev": "WSH",
+      "gp": 44,
+      "ppg": 14.9,
+      "rpg": 4.0,
+      "apg": 2.4,
+      "fgp": 47.0,
+      "score": 20.26,
+      "rank": 3
+     },
+     {
+      "player_id": 4790264,
+      "player_name": "Janelle Salaun",
+      "team_abbrev": "GS",
+      "gp": 37,
+      "ppg": 11.0,
+      "rpg": 4.9,
+      "apg": 1.2,
+      "fgp": 40.6,
+      "score": 15.87,
+      "rank": 4
+     },
+     {
+      "player_id": 5208981,
+      "player_name": "Leila Lacan",
+      "team_abbrev": "CON",
+      "gp": 27,
+      "ppg": 9.6,
+      "rpg": 2.2,
+      "apg": 3.4,
+      "fgp": 47.7,
+      "score": 14.64,
+      "rank": 5
+     },
+     {
+      "player_id": 4433514,
+      "player_name": "Saniya Rivers",
+      "team_abbrev": "CON",
+      "gp": 42,
+      "ppg": 8.8,
+      "rpg": 2.8,
+      "apg": 2.7,
+      "fgp": 40.7,
+      "score": 13.63,
+      "rank": 6
+     },
+     {
+      "player_id": 4684384,
+      "player_name": "Aneesah Morrow",
+      "team_abbrev": "CON",
+      "gp": 41,
+      "ppg": 7.7,
+      "rpg": 6.9,
+      "apg": 0.5,
+      "fgp": 37.5,
+      "score": 13.33,
+      "rank": 7
+     },
+     {
+      "player_id": 5274110,
+      "player_name": "Monique Akoa Makani",
+      "team_abbrev": "PHX",
+      "gp": 41,
+      "ppg": 7.7,
+      "rpg": 2.2,
+      "apg": 2.7,
+      "fgp": 43.0,
+      "score": 12.05,
+      "rank": 8
+     },
+     {
+      "player_id": 5220150,
+      "player_name": "Dominique Malonga",
+      "team_abbrev": "SEA",
+      "gp": 42,
+      "ppg": 7.7,
+      "rpg": 4.6,
+      "apg": 0.9,
+      "fgp": 55.1,
+      "score": 12.03,
+      "rank": 9
+     },
+     {
+      "player_id": 4682797,
+      "player_name": "Luisa Geiselsoder",
+      "team_abbrev": "DAL",
+      "gp": 28,
+      "ppg": 6.9,
+      "rpg": 4.8,
+      "apg": 1.6,
+      "fgp": 42.5,
+      "score": 11.99,
+      "rank": 10
+     }
     ]
    },
    "leaders": {
@@ -13600,6 +13722,128 @@
       "apg_prev": 0.8,
       "delta_ppg": 5.9,
       "score": 7.54,
+      "rank": 10
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 4433791,
+      "player_name": "Olivia Miles",
+      "team_abbrev": "MIN",
+      "gp": 40,
+      "ppg": 19.8,
+      "rpg": 4.7,
+      "apg": 6.0,
+      "fgp": 49.2,
+      "score": 29.21,
+      "rank": 1
+     },
+     {
+      "player_id": 4698736,
+      "player_name": "Flau'jae Johnson",
+      "team_abbrev": "SEA",
+      "gp": 42,
+      "ppg": 14.9,
+      "rpg": 4.8,
+      "apg": 2.9,
+      "fgp": 40.2,
+      "score": 21.44,
+      "rank": 2
+     },
+     {
+      "player_id": 4565505,
+      "player_name": "Kiki Rice",
+      "team_abbrev": "TOR",
+      "gp": 28,
+      "ppg": 13.4,
+      "rpg": 3.7,
+      "apg": 3.5,
+      "fgp": 47.2,
+      "score": 19.62,
+      "rank": 3
+     },
+     {
+      "player_id": 4594786,
+      "player_name": "Sydney Taylor",
+      "team_abbrev": "CHI",
+      "gp": 37,
+      "ppg": 13.6,
+      "rpg": 1.7,
+      "apg": 2.0,
+      "fgp": 41.9,
+      "score": 16.87,
+      "rank": 4
+     },
+     {
+      "player_id": 4433790,
+      "player_name": "Azzi Fudd",
+      "team_abbrev": "DAL",
+      "gp": 30,
+      "ppg": 13.1,
+      "rpg": 1.7,
+      "apg": 1.8,
+      "fgp": 45.6,
+      "score": 16.23,
+      "rank": 5
+     },
+     {
+      "player_id": 5345444,
+      "player_name": "Laura Juskaite",
+      "team_abbrev": "TOR",
+      "gp": 44,
+      "ppg": 11.2,
+      "rpg": 4.2,
+      "apg": 1.8,
+      "fgp": 46.9,
+      "score": 16.17,
+      "rank": 6
+     },
+     {
+      "player_id": 5345320,
+      "player_name": "Pauline Astier",
+      "team_abbrev": "NY",
+      "gp": 45,
+      "ppg": 9.4,
+      "rpg": 2.8,
+      "apg": 3.4,
+      "fgp": 54.9,
+      "score": 14.84,
+      "rank": 7
+     },
+     {
+      "player_id": 4703609,
+      "player_name": "Charlisse Leger-Walker",
+      "team_abbrev": "CON",
+      "gp": 44,
+      "ppg": 7.2,
+      "rpg": 2.5,
+      "apg": 3.7,
+      "fgp": 37.9,
+      "score": 12.77,
+      "rank": 8
+     },
+     {
+      "player_id": 4704180,
+      "player_name": "Georgia Amoore",
+      "team_abbrev": "WSH",
+      "gp": 44,
+      "ppg": 7.0,
+      "rpg": 1.4,
+      "apg": 3.4,
+      "fgp": 37.2,
+      "score": 11.43,
+      "rank": 9
+     },
+     {
+      "player_id": 5105737,
+      "player_name": "Lauren Betts",
+      "team_abbrev": "WSH",
+      "gp": 44,
+      "ppg": 6.4,
+      "rpg": 4.6,
+      "apg": 1.2,
+      "fgp": 52.4,
+      "score": 11.05,
       "rank": 10
      }
     ]
@@ -15873,6 +16117,128 @@
       "score": 4.47,
       "rank": 10
      }
+    ],
+    "roy": [
+     {
+      "player_id": 4433403,
+      "player_name": "Caitlin Clark",
+      "team_abbrev": "IND",
+      "gp": 40,
+      "ppg": 19.2,
+      "rpg": 5.7,
+      "apg": 8.4,
+      "fgp": 41.7,
+      "score": 31.91,
+      "rank": 1
+     },
+     {
+      "player_id": 4433402,
+      "player_name": "Angel Reese",
+      "team_abbrev": "CHI",
+      "gp": 34,
+      "ppg": 13.6,
+      "rpg": 13.1,
+      "apg": 1.9,
+      "fgp": 39.1,
+      "score": 25.28,
+      "rank": 2
+     },
+     {
+      "player_id": 4433630,
+      "player_name": "Rickea Jackson",
+      "team_abbrev": "LA",
+      "gp": 40,
+      "ppg": 13.4,
+      "rpg": 3.9,
+      "apg": 1.5,
+      "fgp": 45.6,
+      "score": 17.76,
+      "rank": 3
+     },
+     {
+      "player_id": 4433405,
+      "player_name": "Kamilla Cardoso",
+      "team_abbrev": "CHI",
+      "gp": 32,
+      "ppg": 9.8,
+      "rpg": 7.9,
+      "apg": 1.7,
+      "fgp": 52.1,
+      "score": 17.42,
+      "rank": 4
+     },
+     {
+      "player_id": 4433408,
+      "player_name": "Aaliyah Edwards",
+      "team_abbrev": "WSH",
+      "gp": 34,
+      "ppg": 7.6,
+      "rpg": 5.6,
+      "apg": 1.4,
+      "fgp": 49.0,
+      "score": 13.21,
+      "rank": 5
+     },
+     {
+      "player_id": 2566110,
+      "player_name": "Julie Vanloo",
+      "team_abbrev": "WSH",
+      "gp": 40,
+      "ppg": 7.3,
+      "rpg": 1.6,
+      "apg": 4.3,
+      "fgp": 34.6,
+      "score": 12.89,
+      "rank": 6
+     },
+     {
+      "player_id": 4683006,
+      "player_name": "Leonie Fiebich",
+      "team_abbrev": "NY",
+      "gp": 41,
+      "ppg": 6.5,
+      "rpg": 3.0,
+      "apg": 1.7,
+      "fgp": 47.5,
+      "score": 10.47,
+      "rank": 7
+     },
+     {
+      "player_id": 4432865,
+      "player_name": "Jacy Sheldon",
+      "team_abbrev": "DAL",
+      "gp": 40,
+      "ppg": 5.4,
+      "rpg": 2.0,
+      "apg": 2.5,
+      "fgp": 38.6,
+      "score": 9.44,
+      "rank": 8
+     },
+     {
+      "player_id": 5209660,
+      "player_name": "Sevgi Uzun",
+      "team_abbrev": "DAL",
+      "gp": 40,
+      "ppg": 4.4,
+      "rpg": 1.6,
+      "apg": 3.0,
+      "fgp": 34.2,
+      "score": 8.57,
+      "rank": 9
+     },
+     {
+      "player_id": 4398907,
+      "player_name": "Kate Martin",
+      "team_abbrev": "LV",
+      "gp": 34,
+      "ppg": 2.6,
+      "rpg": 1.6,
+      "apg": 0.9,
+      "fgp": 30.7,
+      "score": 4.63,
+      "rank": 10
+     }
     ]
    },
    "leaders": {
@@ -18142,6 +18508,128 @@
       "apg_prev": 2.5,
       "delta_ppg": 3.8,
       "score": 4.42,
+      "rank": 10
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 4432831,
+      "player_name": "Aliyah Boston",
+      "team_abbrev": "IND",
+      "gp": 40,
+      "ppg": 14.4,
+      "rpg": 8.4,
+      "apg": 2.2,
+      "fgp": 57.8,
+      "score": 22.96,
+      "rank": 1
+     },
+     {
+      "player_id": 4433635,
+      "player_name": "Diamond Miller",
+      "team_abbrev": "MIN",
+      "gp": 32,
+      "ppg": 12.1,
+      "rpg": 3.5,
+      "apg": 2.5,
+      "fgp": 40.3,
+      "score": 17.24,
+      "rank": 2
+     },
+     {
+      "player_id": 4398938,
+      "player_name": "Dorka Juhasz",
+      "team_abbrev": "MIN",
+      "gp": 38,
+      "ppg": 6.0,
+      "rpg": 6.5,
+      "apg": 2.6,
+      "fgp": 47.2,
+      "score": 13.46,
+      "rank": 3
+     },
+     {
+      "player_id": 4432830,
+      "player_name": "Jordan Horston",
+      "team_abbrev": "SEA",
+      "gp": 36,
+      "ppg": 6.9,
+      "rpg": 5.1,
+      "apg": 1.6,
+      "fgp": 36.7,
+      "score": 12.32,
+      "rank": 4
+     },
+     {
+      "player_id": 5130672,
+      "player_name": "Ivana Dojkic",
+      "team_abbrev": "SEA",
+      "gp": 23,
+      "ppg": 6.5,
+      "rpg": 1.7,
+      "apg": 2.8,
+      "fgp": 40.3,
+      "score": 10.65,
+      "rank": 5
+     },
+     {
+      "player_id": 4595910,
+      "player_name": "Haley Jones",
+      "team_abbrev": "ATL",
+      "gp": 40,
+      "ppg": 3.7,
+      "rpg": 2.4,
+      "apg": 2.3,
+      "fgp": 33.7,
+      "score": 7.79,
+      "rank": 6
+     },
+     {
+      "player_id": 4594527,
+      "player_name": "Dulcy Fankam Mendjiadeu",
+      "team_abbrev": "SEA",
+      "gp": 34,
+      "ppg": 3.9,
+      "rpg": 4.4,
+      "apg": 0.4,
+      "fgp": 52.3,
+      "score": 7.58,
+      "rank": 7
+     },
+     {
+      "player_id": 4422424,
+      "player_name": "Li Meng",
+      "team_abbrev": "WSH",
+      "gp": 34,
+      "ppg": 5.6,
+      "rpg": 1.1,
+      "apg": 1.0,
+      "fgp": 37.8,
+      "score": 7.41,
+      "rank": 8
+     },
+     {
+      "player_id": 4398899,
+      "player_name": "Grace Berger",
+      "team_abbrev": "IND",
+      "gp": 36,
+      "ppg": 4.2,
+      "rpg": 1.6,
+      "apg": 1.9,
+      "fgp": 44.9,
+      "score": 7.22,
+      "rank": 9
+     },
+     {
+      "player_id": 5017721,
+      "player_name": "Sika Kone",
+      "team_abbrev": "CHI",
+      "gp": 20,
+      "ppg": 3.6,
+      "rpg": 3.0,
+      "apg": 0.5,
+      "fgp": 53.2,
+      "score": 6.31,
       "rank": 10
      }
     ]
@@ -20415,6 +20903,128 @@
       "score": 5.41,
       "rank": 10
      }
+    ],
+    "roy": [
+     {
+      "player_id": 4398674,
+      "player_name": "Rhyne Howard",
+      "team_abbrev": "ATL",
+      "gp": 34,
+      "ppg": 16.2,
+      "rpg": 4.5,
+      "apg": 2.8,
+      "fgp": 36.1,
+      "score": 22.46,
+      "rank": 1
+     },
+     {
+      "player_id": 4398776,
+      "player_name": "NaLyssa Smith",
+      "team_abbrev": "IND",
+      "gp": 32,
+      "ppg": 13.5,
+      "rpg": 7.9,
+      "apg": 1.4,
+      "fgp": 41.9,
+      "score": 20.87,
+      "rank": 2
+     },
+     {
+      "player_id": 4398911,
+      "player_name": "Shakira Austin",
+      "team_abbrev": "WSH",
+      "gp": 36,
+      "ppg": 8.7,
+      "rpg": 6.4,
+      "apg": 0.9,
+      "fgp": 54.7,
+      "score": 14.42,
+      "rank": 3
+     },
+     {
+      "player_id": 4398779,
+      "player_name": "Queen Egbo",
+      "team_abbrev": "IND",
+      "gp": 33,
+      "ppg": 7.2,
+      "rpg": 6.3,
+      "apg": 0.9,
+      "fgp": 44.2,
+      "score": 12.93,
+      "rank": 4
+     },
+     {
+      "player_id": 2327695,
+      "player_name": "Rebekah Gardner",
+      "team_abbrev": "CHI",
+      "gp": 36,
+      "ppg": 8.4,
+      "rpg": 3.3,
+      "apg": 1.3,
+      "fgp": 53.8,
+      "score": 12.22,
+      "rank": 5
+     },
+     {
+      "player_id": 4398729,
+      "player_name": "Emily Engstler",
+      "team_abbrev": "IND",
+      "gp": 35,
+      "ppg": 5.2,
+      "rpg": 5.2,
+      "apg": 1.5,
+      "fgp": 39.6,
+      "score": 10.51,
+      "rank": 6
+     },
+     {
+      "player_id": 3156318,
+      "player_name": "Kristy Wallace",
+      "team_abbrev": "ATL",
+      "gp": 29,
+      "ppg": 6.6,
+      "rpg": 2.3,
+      "apg": 2.2,
+      "fgp": 40.7,
+      "score": 10.48,
+      "rank": 7
+     },
+     {
+      "player_id": 4398915,
+      "player_name": "Naz Hillmon",
+      "team_abbrev": "ATL",
+      "gp": 34,
+      "ppg": 4.4,
+      "rpg": 5.1,
+      "apg": 1.2,
+      "fgp": 48.0,
+      "score": 9.41,
+      "rank": 8
+     },
+     {
+      "player_id": 4398751,
+      "player_name": "Destanni Henderson",
+      "team_abbrev": "IND",
+      "gp": 36,
+      "ppg": 5.3,
+      "rpg": 1.6,
+      "apg": 2.5,
+      "fgp": 40.1,
+      "score": 8.97,
+      "rank": 9
+     },
+     {
+      "player_id": 4874475,
+      "player_name": "Nikolina Milic",
+      "team_abbrev": "MIN",
+      "gp": 31,
+      "ppg": 6.0,
+      "rpg": 3.0,
+      "apg": 0.7,
+      "fgp": 54.8,
+      "score": 8.96,
+      "rank": 10
+     }
     ]
    },
    "leaders": {
@@ -22686,6 +23296,92 @@
       "score": 4.18,
       "rank": 10
      }
+    ],
+    "roy": [
+     {
+      "player_id": 4282173,
+      "player_name": "Michaela Onyenwere",
+      "team_abbrev": "NY",
+      "gp": 32,
+      "ppg": 8.6,
+      "rpg": 2.9,
+      "apg": 0.6,
+      "fgp": 39.9,
+      "score": 11.36,
+      "rank": 1
+     },
+     {
+      "player_id": 4066553,
+      "player_name": "Aari McDonald",
+      "team_abbrev": "ATL",
+      "gp": 30,
+      "ppg": 6.3,
+      "rpg": 1.6,
+      "apg": 2.0,
+      "fgp": 32.2,
+      "score": 9.49,
+      "rank": 2
+     },
+     {
+      "player_id": 4398988,
+      "player_name": "Charli Collier",
+      "team_abbrev": "DAL",
+      "gp": 28,
+      "ppg": 3.4,
+      "rpg": 3.6,
+      "apg": 0.2,
+      "fgp": 46.5,
+      "score": 6.38,
+      "rank": 3
+     },
+     {
+      "player_id": 4790266,
+      "player_name": "Awak Kuier",
+      "team_abbrev": "DAL",
+      "gp": 16,
+      "ppg": 2.4,
+      "rpg": 2.4,
+      "apg": 0.6,
+      "fgp": 30.8,
+      "score": 4.77,
+      "rank": 4
+     },
+     {
+      "player_id": 4066548,
+      "player_name": "DiJonai Carrington",
+      "team_abbrev": "CON",
+      "gp": 25,
+      "ppg": 2.8,
+      "rpg": 1.9,
+      "apg": 0.5,
+      "fgp": 32.6,
+      "score": 4.76,
+      "rank": 5
+     },
+     {
+      "player_id": 4281190,
+      "player_name": "Dana Evans",
+      "team_abbrev": "CHI",
+      "gp": 29,
+      "ppg": 3.3,
+      "rpg": 0.4,
+      "apg": 1.0,
+      "fgp": 34.2,
+      "score": 4.59,
+      "rank": 6
+     },
+     {
+      "player_id": 4281253,
+      "player_name": "DiDi Richards",
+      "team_abbrev": "NY",
+      "gp": 31,
+      "ppg": 2.3,
+      "rpg": 1.1,
+      "apg": 0.8,
+      "fgp": 42.2,
+      "score": 3.89,
+      "rank": 7
+     }
     ]
    },
    "leaders": {
@@ -24955,6 +25651,128 @@
       "apg_prev": 3.1,
       "delta_ppg": 3.9,
       "score": 6.51,
+      "rank": 10
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 4280892,
+      "player_name": "Chennedy Carter",
+      "team_abbrev": "ATL",
+      "gp": 16,
+      "ppg": 17.4,
+      "rpg": 2.2,
+      "apg": 3.4,
+      "fgp": 47.3,
+      "score": 22.56,
+      "rank": 1
+     },
+     {
+      "player_id": 4281929,
+      "player_name": "Satou Sabally",
+      "team_abbrev": "DAL",
+      "gp": 16,
+      "ppg": 13.9,
+      "rpg": 7.8,
+      "apg": 2.5,
+      "fgp": 36.8,
+      "score": 22.19,
+      "rank": 2
+     },
+     {
+      "player_id": 4066585,
+      "player_name": "Crystal Dangerfield",
+      "team_abbrev": "MIN",
+      "gp": 21,
+      "ppg": 16.2,
+      "rpg": 2.0,
+      "apg": 3.6,
+      "fgp": 47.1,
+      "score": 21.27,
+      "rank": 3
+     },
+     {
+      "player_id": 4001679,
+      "player_name": "Julie Allemand",
+      "team_abbrev": "IND",
+      "gp": 22,
+      "ppg": 8.5,
+      "rpg": 4.5,
+      "apg": 5.8,
+      "fgp": 45.9,
+      "score": 17.77,
+      "rank": 4
+     },
+     {
+      "player_id": 4065850,
+      "player_name": "Jazmine Jones",
+      "team_abbrev": "NY",
+      "gp": 20,
+      "ppg": 10.8,
+      "rpg": 4.0,
+      "apg": 2.2,
+      "fgp": 40.4,
+      "score": 16.09,
+      "rank": 5
+     },
+     {
+      "player_id": 4065760,
+      "player_name": "Tyasha Harris",
+      "team_abbrev": "DAL",
+      "gp": 21,
+      "ppg": 6.8,
+      "rpg": 1.2,
+      "apg": 2.8,
+      "fgp": 43.3,
+      "score": 10.5,
+      "rank": 6
+     },
+     {
+      "player_id": 3907789,
+      "player_name": "Te'a Cooper",
+      "team_abbrev": "LA",
+      "gp": 20,
+      "ppg": 7.0,
+      "rpg": 1.0,
+      "apg": 2.0,
+      "fgp": 45.1,
+      "score": 9.7,
+      "rank": 7
+     },
+     {
+      "player_id": 4066534,
+      "player_name": "Ruthy Hebard",
+      "team_abbrev": "CHI",
+      "gp": 22,
+      "ppg": 5.7,
+      "rpg": 3.9,
+      "apg": 0.3,
+      "fgp": 68.2,
+      "score": 8.93,
+      "rank": 8
+     },
+     {
+      "player_id": 4420318,
+      "player_name": "Ezi Magbegor",
+      "team_abbrev": "SEA",
+      "gp": 22,
+      "ppg": 6.5,
+      "rpg": 2.5,
+      "apg": 0.3,
+      "fgp": 56.9,
+      "score": 8.7,
+      "rank": 9
+     },
+     {
+      "player_id": 4065879,
+      "player_name": "Jocelyn Willoughby",
+      "team_abbrev": "NY",
+      "gp": 22,
+      "ppg": 5.8,
+      "rpg": 2.4,
+      "apg": 0.9,
+      "fgp": 35.8,
+      "score": 8.53,
       "rank": 10
      }
     ]
@@ -27228,6 +28046,128 @@
       "score": 6.75,
       "rank": 10
      }
+    ],
+    "roy": [
+     {
+      "player_id": 3904577,
+      "player_name": "Arike Ogunbowale",
+      "team_abbrev": "DAL",
+      "gp": 33,
+      "ppg": 19.1,
+      "rpg": 2.4,
+      "apg": 3.2,
+      "fgp": 38.8,
+      "score": 24.12,
+      "rank": 1
+     },
+     {
+      "player_id": 3917450,
+      "player_name": "Napheesa Collier",
+      "team_abbrev": "MIN",
+      "gp": 34,
+      "ppg": 13.1,
+      "rpg": 6.6,
+      "apg": 2.6,
+      "fgp": 49.0,
+      "score": 20.54,
+      "rank": 2
+     },
+     {
+      "player_id": 3913903,
+      "player_name": "Teaira McCowan",
+      "team_abbrev": "IND",
+      "gp": 34,
+      "ppg": 10.0,
+      "rpg": 9.0,
+      "apg": 0.2,
+      "fgp": 51.7,
+      "score": 16.99,
+      "rank": 3
+     },
+     {
+      "player_id": 4065870,
+      "player_name": "Jackie Young",
+      "team_abbrev": "LV",
+      "gp": 34,
+      "ppg": 6.6,
+      "rpg": 3.3,
+      "apg": 4.5,
+      "fgp": 32.2,
+      "score": 13.57,
+      "rank": 4
+     },
+     {
+      "player_id": 3904553,
+      "player_name": "AD Durr",
+      "team_abbrev": "NY",
+      "gp": 18,
+      "ppg": 9.7,
+      "rpg": 1.6,
+      "apg": 1.7,
+      "fgp": 46.7,
+      "score": 12.65,
+      "rank": 5
+     },
+     {
+      "player_id": 4038379,
+      "player_name": "Marine Johannes",
+      "team_abbrev": "NY",
+      "gp": 19,
+      "ppg": 7.2,
+      "rpg": 1.8,
+      "apg": 2.4,
+      "fgp": 43.6,
+      "score": 10.92,
+      "rank": 6
+     },
+     {
+      "player_id": 3916514,
+      "player_name": "Kalani Brown",
+      "team_abbrev": "LA",
+      "gp": 28,
+      "ppg": 5.1,
+      "rpg": 3.5,
+      "apg": 0.6,
+      "fgp": 47.8,
+      "score": 8.38,
+      "rank": 7
+     },
+     {
+      "player_id": 3142086,
+      "player_name": "Brianna Turner",
+      "team_abbrev": "PHX",
+      "gp": 29,
+      "ppg": 4.0,
+      "rpg": 4.1,
+      "apg": 0.5,
+      "fgp": 53.8,
+      "score": 7.66,
+      "rank": 8
+     },
+     {
+      "player_id": 3906753,
+      "player_name": "Natisha Hiedeman",
+      "team_abbrev": "CON",
+      "gp": 20,
+      "ppg": 3.6,
+      "rpg": 1.5,
+      "apg": 1.9,
+      "fgp": 41.4,
+      "score": 6.67,
+      "rank": 9
+     },
+     {
+      "player_id": 3922628,
+      "player_name": "Kennedy Burke",
+      "team_abbrev": "IND",
+      "gp": 31,
+      "ppg": 4.4,
+      "rpg": 1.5,
+      "apg": 0.7,
+      "fgp": 38.5,
+      "score": 6.15,
+      "rank": 10
+     }
     ]
    },
    "leaders": {
@@ -29497,6 +30437,128 @@
       "apg_prev": 1.9,
       "delta_ppg": 1.6,
       "score": 3.75,
+      "rank": 10
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 3149391,
+      "player_name": "A'ja Wilson",
+      "team_abbrev": "LV",
+      "gp": 33,
+      "ppg": 20.7,
+      "rpg": 8.0,
+      "apg": 2.2,
+      "fgp": 46.2,
+      "score": 28.91,
+      "rank": 1
+     },
+     {
+      "player_id": 3058902,
+      "player_name": "Diamond DeShields",
+      "team_abbrev": "CHI",
+      "gp": 34,
+      "ppg": 14.4,
+      "rpg": 4.9,
+      "apg": 2.2,
+      "fgp": 42.5,
+      "score": 20.24,
+      "rank": 2
+     },
+     {
+      "player_id": 3142191,
+      "player_name": "Kelsey Mitchell",
+      "team_abbrev": "IND",
+      "gp": 34,
+      "ppg": 12.7,
+      "rpg": 1.8,
+      "apg": 2.7,
+      "fgp": 34.6,
+      "score": 16.74,
+      "rank": 3
+     },
+     {
+      "player_id": 3146151,
+      "player_name": "Ariel Atkins",
+      "team_abbrev": "WSH",
+      "gp": 29,
+      "ppg": 11.3,
+      "rpg": 2.4,
+      "apg": 2.1,
+      "fgp": 43.2,
+      "score": 15.13,
+      "rank": 4
+     },
+     {
+      "player_id": 3142010,
+      "player_name": "Azura Stevens",
+      "team_abbrev": "DAL",
+      "gp": 34,
+      "ppg": 8.9,
+      "rpg": 4.6,
+      "apg": 1.3,
+      "fgp": 43.0,
+      "score": 13.6,
+      "rank": 5
+     },
+     {
+      "player_id": 3142327,
+      "player_name": "Kia Nurse",
+      "team_abbrev": "NY",
+      "gp": 34,
+      "ppg": 9.1,
+      "rpg": 2.4,
+      "apg": 1.6,
+      "fgp": 40.2,
+      "score": 12.51,
+      "rank": 6
+     },
+     {
+      "player_id": 3142948,
+      "player_name": "Victoria Vivians",
+      "team_abbrev": "IND",
+      "gp": 34,
+      "ppg": 8.9,
+      "rpg": 3.1,
+      "apg": 1.2,
+      "fgp": 40.4,
+      "score": 12.45,
+      "rank": 7
+     },
+     {
+      "player_id": 3142328,
+      "player_name": "Gabby Williams",
+      "team_abbrev": "CHI",
+      "gp": 34,
+      "ppg": 7.3,
+      "rpg": 4.3,
+      "apg": 1.6,
+      "fgp": 43.2,
+      "score": 12.13,
+      "rank": 8
+     },
+     {
+      "player_id": 3142250,
+      "player_name": "Jordin Canada",
+      "team_abbrev": "SEA",
+      "gp": 33,
+      "ppg": 5.7,
+      "rpg": 1.5,
+      "apg": 3.3,
+      "fgp": 35.7,
+      "score": 10.08,
+      "rank": 9
+     },
+     {
+      "player_id": 3142055,
+      "player_name": "Myisha Hines-Allen",
+      "team_abbrev": "WSH",
+      "gp": 24,
+      "ppg": 3.8,
+      "rpg": 2.9,
+      "apg": 0.4,
+      "fgp": 45.0,
+      "score": 6.32,
       "rank": 10
      }
     ]
@@ -31770,6 +32832,128 @@
       "score": 6.74,
       "rank": 10
      }
+    ],
+    "roy": [
+     {
+      "player_id": 2988756,
+      "player_name": "Brittney Sykes",
+      "team_abbrev": "ATL",
+      "gp": 34,
+      "ppg": 13.9,
+      "rpg": 4.1,
+      "apg": 1.9,
+      "fgp": 40.8,
+      "score": 18.88,
+      "rank": 1
+     },
+     {
+      "player_id": 3058901,
+      "player_name": "Allisha Gray",
+      "team_abbrev": "DAL",
+      "gp": 34,
+      "ppg": 13.0,
+      "rpg": 3.9,
+      "apg": 1.3,
+      "fgp": 38.1,
+      "score": 17.25,
+      "rank": 2
+     },
+     {
+      "player_id": 3065570,
+      "player_name": "Kelsey Plum",
+      "team_abbrev": "SA",
+      "gp": 31,
+      "ppg": 8.5,
+      "rpg": 1.9,
+      "apg": 3.4,
+      "fgp": 34.6,
+      "score": 13.4,
+      "rank": 3
+     },
+     {
+      "player_id": 3058888,
+      "player_name": "Kaela Davis",
+      "team_abbrev": "DAL",
+      "gp": 33,
+      "ppg": 6.1,
+      "rpg": 1.4,
+      "apg": 1.0,
+      "fgp": 38.9,
+      "score": 8.11,
+      "rank": 4
+     },
+     {
+      "player_id": 3099736,
+      "player_name": "Stephanie Talbot",
+      "team_abbrev": "PHX",
+      "gp": 34,
+      "ppg": 4.4,
+      "rpg": 2.7,
+      "apg": 1.6,
+      "fgp": 41.5,
+      "score": 7.98,
+      "rank": 5
+     },
+     {
+      "player_id": 2284331,
+      "player_name": "Emma Cannon",
+      "team_abbrev": "PHX",
+      "gp": 34,
+      "ppg": 4.4,
+      "rpg": 3.6,
+      "apg": 0.3,
+      "fgp": 49.1,
+      "score": 7.37,
+      "rank": 6
+     },
+     {
+      "player_id": 2235933,
+      "player_name": "Yvonne Turner",
+      "team_abbrev": "PHX",
+      "gp": 34,
+      "ppg": 5.1,
+      "rpg": 1.0,
+      "apg": 1.1,
+      "fgp": 41.0,
+      "score": 6.93,
+      "rank": 7
+     },
+     {
+      "player_id": 887,
+      "player_name": "Sami Whitcomb",
+      "team_abbrev": "SEA",
+      "gp": 33,
+      "ppg": 4.5,
+      "rpg": 1.7,
+      "apg": 1.0,
+      "fgp": 36.1,
+      "score": 6.76,
+      "rank": 8
+     },
+     {
+      "player_id": 3058893,
+      "player_name": "Shatori Walker-Kimbrough",
+      "team_abbrev": "WSH",
+      "gp": 27,
+      "ppg": 4.4,
+      "rpg": 1.1,
+      "apg": 0.4,
+      "fgp": 37.1,
+      "score": 5.65,
+      "rank": 9
+     },
+     {
+      "player_id": 4038352,
+      "player_name": "Nayo Raincock-Ekunwe",
+      "team_abbrev": "NY",
+      "gp": 32,
+      "ppg": 3.7,
+      "rpg": 1.8,
+      "apg": 0.2,
+      "fgp": 52.6,
+      "score": 5.27,
+      "rank": 10
+     }
     ]
    },
    "leaders": {
@@ -34039,6 +35223,128 @@
       "apg_prev": 0.2,
       "delta_ppg": 4.7,
       "score": 5.94,
+      "rank": 10
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 2998928,
+      "player_name": "Breanna Stewart",
+      "team_abbrev": "SEA",
+      "gp": 34,
+      "ppg": 18.3,
+      "rpg": 9.3,
+      "apg": 3.4,
+      "fgp": 45.7,
+      "score": 28.61,
+      "rank": 1
+     },
+     {
+      "player_id": 2998927,
+      "player_name": "Moriah Jefferson",
+      "team_abbrev": "SA",
+      "gp": 34,
+      "ppg": 13.9,
+      "rpg": 2.1,
+      "apg": 4.2,
+      "fgp": 42.6,
+      "score": 19.67,
+      "rank": 2
+     },
+     {
+      "player_id": 2999035,
+      "player_name": "Aerial Powers",
+      "team_abbrev": "DAL",
+      "gp": 32,
+      "ppg": 10.4,
+      "rpg": 2.7,
+      "apg": 1.1,
+      "fgp": 39.4,
+      "score": 13.54,
+      "rank": 3
+     },
+     {
+      "player_id": 2984237,
+      "player_name": "Imani McGee-Stafford",
+      "team_abbrev": "CHI",
+      "gp": 31,
+      "ppg": 6.7,
+      "rpg": 5.6,
+      "apg": 0.6,
+      "fgp": 55.4,
+      "score": 11.49,
+      "rank": 4
+     },
+     {
+      "player_id": 2984741,
+      "player_name": "Tiffany Mitchell",
+      "team_abbrev": "IND",
+      "gp": 34,
+      "ppg": 8.6,
+      "rpg": 1.7,
+      "apg": 1.4,
+      "fgp": 36.1,
+      "score": 11.25,
+      "rank": 5
+     },
+     {
+      "player_id": 2999140,
+      "player_name": "Bria Holmes",
+      "team_abbrev": "ATL",
+      "gp": 33,
+      "ppg": 7.5,
+      "rpg": 2.6,
+      "apg": 1.2,
+      "fgp": 43.5,
+      "score": 10.66,
+      "rank": 6
+     },
+     {
+      "player_id": 2999101,
+      "player_name": "Jonquel Jones",
+      "team_abbrev": "CON",
+      "gp": 34,
+      "ppg": 6.8,
+      "rpg": 3.7,
+      "apg": 0.6,
+      "fgp": 53.1,
+      "score": 10.25,
+      "rank": 7
+     },
+     {
+      "player_id": 2998929,
+      "player_name": "Morgan Tuck",
+      "team_abbrev": "CON",
+      "gp": 25,
+      "ppg": 6.9,
+      "rpg": 2.9,
+      "apg": 1.1,
+      "fgp": 41.3,
+      "score": 10.2,
+      "rank": 8
+     },
+     {
+      "player_id": 2987891,
+      "player_name": "Courtney Williams",
+      "team_abbrev": "CON",
+      "gp": 25,
+      "ppg": 6.2,
+      "rpg": 3.0,
+      "apg": 1.2,
+      "fgp": 41.0,
+      "score": 9.72,
+      "rank": 9
+     },
+     {
+      "player_id": 2998938,
+      "player_name": "Kahleah Copper",
+      "team_abbrev": "WSH",
+      "gp": 30,
+      "ppg": 6.2,
+      "rpg": 3.1,
+      "apg": 0.8,
+      "fgp": 41.7,
+      "score": 9.3,
       "rank": 10
      }
     ]
@@ -36312,6 +37618,128 @@
       "score": 5.51,
       "rank": 10
      }
+    ],
+    "roy": [
+     {
+      "player_id": 2987869,
+      "player_name": "Jewell Loyd",
+      "team_abbrev": "SEA",
+      "gp": 34,
+      "ppg": 10.7,
+      "rpg": 3.5,
+      "apg": 1.9,
+      "fgp": 41.1,
+      "score": 15.27,
+      "rank": 1
+     },
+     {
+      "player_id": 3888042,
+      "player_name": "Ana Dabovic",
+      "team_abbrev": "LA",
+      "gp": 24,
+      "ppg": 8.8,
+      "rpg": 1.6,
+      "apg": 1.9,
+      "fgp": 44.6,
+      "score": 11.89,
+      "rank": 2
+     },
+     {
+      "player_id": 993,
+      "player_name": "Ramu Tokashiki",
+      "team_abbrev": "SEA",
+      "gp": 30,
+      "ppg": 8.2,
+      "rpg": 3.3,
+      "apg": 0.8,
+      "fgp": 41.5,
+      "score": 11.45,
+      "rank": 3
+     },
+     {
+      "player_id": 2590093,
+      "player_name": "Kiah Stokes",
+      "team_abbrev": "NY",
+      "gp": 34,
+      "ppg": 5.8,
+      "rpg": 6.4,
+      "apg": 0.8,
+      "fgp": 54.7,
+      "score": 11.39,
+      "rank": 4
+     },
+     {
+      "player_id": 2529122,
+      "player_name": "Chelsea Gray",
+      "team_abbrev": "CON",
+      "gp": 34,
+      "ppg": 6.9,
+      "rpg": 2.3,
+      "apg": 2.7,
+      "fgp": 42.4,
+      "score": 11.34,
+      "rank": 5
+     },
+     {
+      "player_id": 2529203,
+      "player_name": "Natalie Achonwa",
+      "team_abbrev": "IND",
+      "gp": 28,
+      "ppg": 8.0,
+      "rpg": 3.5,
+      "apg": 0.6,
+      "fgp": 55.0,
+      "score": 11.17,
+      "rank": 6
+     },
+     {
+      "player_id": 2566210,
+      "player_name": "Brittany Boyd-Jones",
+      "team_abbrev": "NY",
+      "gp": 30,
+      "ppg": 6.6,
+      "rpg": 2.7,
+      "apg": 2.3,
+      "fgp": 39.1,
+      "score": 10.96,
+      "rank": 7
+     },
+     {
+      "player_id": 2566106,
+      "player_name": "Dearica Hamby",
+      "team_abbrev": "SA",
+      "gp": 31,
+      "ppg": 6.1,
+      "rpg": 4.1,
+      "apg": 0.7,
+      "fgp": 35.4,
+      "score": 9.88,
+      "rank": 8
+     },
+     {
+      "player_id": 2968408,
+      "player_name": "Clarissa dos Santos",
+      "team_abbrev": "CHI",
+      "gp": 31,
+      "ppg": 5.3,
+      "rpg": 4.6,
+      "apg": 0.7,
+      "fgp": 46.1,
+      "score": 9.45,
+      "rank": 9
+     },
+     {
+      "player_id": 2529137,
+      "player_name": "Natasha Cloud",
+      "team_abbrev": "WSH",
+      "gp": 34,
+      "ppg": 3.6,
+      "rpg": 2.8,
+      "apg": 3.4,
+      "fgp": 32.3,
+      "score": 9.07,
+      "rank": 10
+     }
     ]
    },
    "leaders": {
@@ -38581,6 +40009,128 @@
       "apg_prev": 1.0,
       "delta_ppg": 3.0,
       "score": 4.83,
+      "rank": 10
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 2529047,
+      "player_name": "Odyssey Sims",
+      "team_abbrev": "TUL",
+      "gp": 34,
+      "ppg": 16.7,
+      "rpg": 2.8,
+      "apg": 4.2,
+      "fgp": 40.6,
+      "score": 23.03,
+      "rank": 1
+     },
+     {
+      "player_id": 2529950,
+      "player_name": "Chiney Ogwumike",
+      "team_abbrev": "CON",
+      "gp": 31,
+      "ppg": 15.5,
+      "rpg": 8.5,
+      "apg": 0.6,
+      "fgp": 53.6,
+      "score": 22.52,
+      "rank": 2
+     },
+     {
+      "player_id": 2529205,
+      "player_name": "Kayla McBride",
+      "team_abbrev": "SA",
+      "gp": 34,
+      "ppg": 13.0,
+      "rpg": 2.3,
+      "apg": 1.7,
+      "fgp": 40.6,
+      "score": 16.45,
+      "rank": 3
+     },
+     {
+      "player_id": 2529140,
+      "player_name": "Alyssa Thomas",
+      "team_abbrev": "CON",
+      "gp": 34,
+      "ppg": 10.0,
+      "rpg": 5.1,
+      "apg": 1.5,
+      "fgp": 43.4,
+      "score": 15.34,
+      "rank": 4
+     },
+     {
+      "player_id": 2529185,
+      "player_name": "Bria Hartley",
+      "team_abbrev": "WSH",
+      "gp": 34,
+      "ppg": 9.7,
+      "rpg": 2.1,
+      "apg": 3.1,
+      "fgp": 38.0,
+      "score": 14.35,
+      "rank": 5
+     },
+     {
+      "player_id": 3102551,
+      "player_name": "Anna Cruz",
+      "team_abbrev": "NY",
+      "gp": 34,
+      "ppg": 7.7,
+      "rpg": 3.5,
+      "apg": 3.6,
+      "fgp": 46.2,
+      "score": 13.87,
+      "rank": 6
+     },
+     {
+      "player_id": 2529196,
+      "player_name": "Shoni Schimmel",
+      "team_abbrev": "ATL",
+      "gp": 34,
+      "ppg": 8.3,
+      "rpg": 2.2,
+      "apg": 3.6,
+      "fgp": 37.4,
+      "score": 13.62,
+      "rank": 7
+     },
+     {
+      "player_id": 2529603,
+      "player_name": "Jamierra Faulkner",
+      "team_abbrev": "CHI",
+      "gp": 34,
+      "ppg": 7.9,
+      "rpg": 2.0,
+      "apg": 3.5,
+      "fgp": 36.2,
+      "score": 12.86,
+      "rank": 8
+     },
+     {
+      "player_id": 2955898,
+      "player_name": "Damiris Dantas",
+      "team_abbrev": "MIN",
+      "gp": 30,
+      "ppg": 6.0,
+      "rpg": 5.1,
+      "apg": 1.2,
+      "fgp": 51.1,
+      "score": 11.03,
+      "rank": 9
+     },
+     {
+      "player_id": 2529183,
+      "player_name": "Stefanie Dolson",
+      "team_abbrev": "WSH",
+      "gp": 34,
+      "ppg": 6.0,
+      "rpg": 4.4,
+      "apg": 1.2,
+      "fgp": 49.2,
+      "score": 10.52,
       "rank": 10
      }
     ]
@@ -40854,6 +42404,128 @@
       "score": 7.17,
       "rank": 10
      }
+    ],
+    "roy": [
+     {
+      "player_id": 2491877,
+      "player_name": "Elena Delle Donne",
+      "team_abbrev": "CHI",
+      "gp": 30,
+      "ppg": 18.1,
+      "rpg": 5.6,
+      "apg": 1.8,
+      "fgp": 42.6,
+      "score": 24.04,
+      "rank": 1
+     },
+     {
+      "player_id": 2490553,
+      "player_name": "Brittney Griner",
+      "team_abbrev": "PHX",
+      "gp": 27,
+      "ppg": 12.6,
+      "rpg": 6.3,
+      "apg": 1.0,
+      "fgp": 55.6,
+      "score": 18.42,
+      "rank": 2
+     },
+     {
+      "player_id": 2491205,
+      "player_name": "Skylar Diggins",
+      "team_abbrev": "TUL",
+      "gp": 32,
+      "ppg": 8.5,
+      "rpg": 1.9,
+      "apg": 3.8,
+      "fgp": 32.8,
+      "score": 13.77,
+      "rank": 3
+     },
+     {
+      "player_id": 2490773,
+      "player_name": "Alex Bentley",
+      "team_abbrev": "ATL",
+      "gp": 34,
+      "ppg": 8.3,
+      "rpg": 1.4,
+      "apg": 2.8,
+      "fgp": 39.8,
+      "score": 12.12,
+      "rank": 4
+     },
+     {
+      "player_id": 2491346,
+      "player_name": "Kelsey Bone",
+      "team_abbrev": "NY",
+      "gp": 34,
+      "ppg": 6.9,
+      "rpg": 5.4,
+      "apg": 0.7,
+      "fgp": 46.0,
+      "score": 11.7,
+      "rank": 5
+     },
+     {
+      "player_id": 2490769,
+      "player_name": "Tayler Hill",
+      "team_abbrev": "WSH",
+      "gp": 34,
+      "ppg": 6.5,
+      "rpg": 1.7,
+      "apg": 1.5,
+      "fgp": 32.8,
+      "score": 9.25,
+      "rank": 6
+     },
+     {
+      "player_id": 2325265,
+      "player_name": "Angel Goodrich",
+      "team_abbrev": "TUL",
+      "gp": 31,
+      "ppg": 4.4,
+      "rpg": 1.8,
+      "apg": 2.9,
+      "fgp": 42.3,
+      "score": 8.7,
+      "rank": 7
+     },
+     {
+      "player_id": 3027368,
+      "player_name": "Emma Meesseman",
+      "team_abbrev": "WSH",
+      "gp": 34,
+      "ppg": 4.4,
+      "rpg": 3.1,
+      "apg": 1.2,
+      "fgp": 44.6,
+      "score": 7.96,
+      "rank": 8
+     },
+     {
+      "player_id": 2490794,
+      "player_name": "Layshia Clarendon",
+      "team_abbrev": "IND",
+      "gp": 30,
+      "ppg": 4.2,
+      "rpg": 1.8,
+      "apg": 1.8,
+      "fgp": 33.1,
+      "score": 7.38,
+      "rank": 9
+     },
+     {
+      "player_id": 2490528,
+      "player_name": "Tierra Ruffin-Pratt",
+      "team_abbrev": "WSH",
+      "gp": 34,
+      "ppg": 4.4,
+      "rpg": 2.8,
+      "apg": 0.8,
+      "fgp": 35.9,
+      "score": 7.27,
+      "rank": 10
+     }
     ]
    },
    "leaders": {
@@ -43123,6 +44795,128 @@
       "apg_prev": 0.4,
       "delta_ppg": 7.3,
       "score": 9.19,
+      "rank": 10
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 1068,
+      "player_name": "Nneka Ogwumike",
+      "team_abbrev": "LA",
+      "gp": 34,
+      "ppg": 13.6,
+      "rpg": 7.3,
+      "apg": 1.2,
+      "fgp": 53.5,
+      "score": 20.21,
+      "rank": 1
+     },
+     {
+      "player_id": 1053,
+      "player_name": "Glory Johnson",
+      "team_abbrev": "TUL",
+      "gp": 34,
+      "ppg": 11.5,
+      "rpg": 6.8,
+      "apg": 1.1,
+      "fgp": 48.2,
+      "score": 17.76,
+      "rank": 2
+     },
+     {
+      "player_id": 1084,
+      "player_name": "Samantha Prahalis",
+      "team_abbrev": "PHX",
+      "gp": 30,
+      "ppg": 10.8,
+      "rpg": 3.0,
+      "apg": 4.2,
+      "fgp": 35.2,
+      "score": 17.26,
+      "rank": 3
+     },
+     {
+      "player_id": 1049,
+      "player_name": "Riquna Williams",
+      "team_abbrev": "TUL",
+      "gp": 34,
+      "ppg": 10.1,
+      "rpg": 2.4,
+      "apg": 2.0,
+      "fgp": 34.4,
+      "score": 13.94,
+      "rank": 4
+     },
+     {
+      "player_id": 1054,
+      "player_name": "Tiffany Hayes",
+      "team_abbrev": "ATL",
+      "gp": 34,
+      "ppg": 8.6,
+      "rpg": 3.1,
+      "apg": 2.1,
+      "fgp": 39.0,
+      "score": 13.08,
+      "rank": 5
+     },
+     {
+      "player_id": 1110,
+      "player_name": "Shekinna Stricklen",
+      "team_abbrev": "SEA",
+      "gp": 34,
+      "ppg": 7.7,
+      "rpg": 4.2,
+      "apg": 1.1,
+      "fgp": 39.3,
+      "score": 11.9,
+      "rank": 6
+     },
+     {
+      "player_id": 1074,
+      "player_name": "Shenise Johnson",
+      "team_abbrev": "SA",
+      "gp": 34,
+      "ppg": 5.6,
+      "rpg": 3.9,
+      "apg": 1.4,
+      "fgp": 36.4,
+      "score": 9.89,
+      "rank": 7
+     },
+     {
+      "player_id": 1048,
+      "player_name": "Aneika Henry-Morello",
+      "team_abbrev": "ATL",
+      "gp": 34,
+      "ppg": 4.8,
+      "rpg": 4.1,
+      "apg": 0.4,
+      "fgp": 46.8,
+      "score": 8.29,
+      "rank": 8
+     },
+     {
+      "player_id": 1101,
+      "player_name": "Devereaux Peters",
+      "team_abbrev": "MIN",
+      "gp": 34,
+      "ppg": 4.6,
+      "rpg": 3.3,
+      "apg": 1.0,
+      "fgp": 56.0,
+      "score": 8.11,
+      "rank": 9
+     },
+     {
+      "player_id": 1085,
+      "player_name": "Avery Warley-Talbert",
+      "team_abbrev": "PHX",
+      "gp": 28,
+      "ppg": 3.1,
+      "rpg": 5.7,
+      "apg": 0.2,
+      "fgp": 47.1,
+      "score": 7.51,
       "rank": 10
      }
     ]
@@ -45396,6 +47190,128 @@
       "score": 5.2,
       "rank": 10
      }
+    ],
+    "roy": [
+     {
+      "player_id": 956,
+      "player_name": "Maya Moore",
+      "team_abbrev": "MIN",
+      "gp": 34,
+      "ppg": 13.2,
+      "rpg": 4.6,
+      "apg": 2.6,
+      "fgp": 43.9,
+      "score": 19.32,
+      "rank": 1
+     },
+     {
+      "player_id": 1017,
+      "player_name": "Liz Cambage",
+      "team_abbrev": "TUL",
+      "gp": 34,
+      "ppg": 11.2,
+      "rpg": 4.6,
+      "apg": 0.5,
+      "fgp": 51.1,
+      "score": 15.12,
+      "rank": 2
+     },
+     {
+      "player_id": 1014,
+      "player_name": "Danielle Robinson",
+      "team_abbrev": "SA",
+      "gp": 34,
+      "ppg": 7.9,
+      "rpg": 2.2,
+      "apg": 3.8,
+      "fgp": 45.4,
+      "score": 13.39,
+      "rank": 3
+     },
+     {
+      "player_id": 981,
+      "player_name": "Courtney Vandersloot",
+      "team_abbrev": "CHI",
+      "gp": 35,
+      "ppg": 6.5,
+      "rpg": 2.0,
+      "apg": 3.8,
+      "fgp": 39.3,
+      "score": 11.76,
+      "rank": 4
+     },
+     {
+      "player_id": 1018,
+      "player_name": "Kayla Pedersen",
+      "team_abbrev": "TUL",
+      "gp": 34,
+      "ppg": 6.6,
+      "rpg": 3.5,
+      "apg": 1.7,
+      "fgp": 40.2,
+      "score": 10.97,
+      "rank": 5
+     },
+     {
+      "player_id": 1016,
+      "player_name": "Danielle Adams",
+      "team_abbrev": "SA",
+      "gp": 34,
+      "ppg": 8.4,
+      "rpg": 2.9,
+      "apg": 0.4,
+      "fgp": 43.0,
+      "score": 10.96,
+      "rank": 6
+     },
+     {
+      "player_id": 1008,
+      "player_name": "Jasmine Thomas",
+      "team_abbrev": "WSH",
+      "gp": 34,
+      "ppg": 6.4,
+      "rpg": 2.1,
+      "apg": 1.9,
+      "fgp": 35.3,
+      "score": 9.9,
+      "rank": 7
+     },
+     {
+      "player_id": 1013,
+      "player_name": "Jantel Lavender",
+      "team_abbrev": "LA",
+      "gp": 34,
+      "ppg": 6.4,
+      "rpg": 3.0,
+      "apg": 0.4,
+      "fgp": 50.0,
+      "score": 9.1,
+      "rank": 8
+     },
+     {
+      "player_id": 974,
+      "player_name": "Danielle McCray",
+      "team_abbrev": "CON",
+      "gp": 34,
+      "ppg": 5.9,
+      "rpg": 2.3,
+      "apg": 1.2,
+      "fgp": 39.9,
+      "score": 8.79,
+      "rank": 9
+     },
+     {
+      "player_id": 1012,
+      "player_name": "Jenna O'Hea",
+      "team_abbrev": "LA",
+      "gp": 34,
+      "ppg": 4.4,
+      "rpg": 1.4,
+      "apg": 1.2,
+      "fgp": 43.4,
+      "score": 6.57,
+      "rank": 10
+     }
     ]
    },
    "leaders": {
@@ -47506,7 +49422,129 @@
       "rank": 10
      }
     ],
-    "mip": []
+    "mip": [],
+    "roy": [
+     {
+      "player_id": 918,
+      "player_name": "Tina Charles",
+      "team_abbrev": "CON",
+      "gp": 34,
+      "ppg": 15.5,
+      "rpg": 11.7,
+      "apg": 1.5,
+      "fgp": 48.7,
+      "score": 25.81,
+      "rank": 1
+     },
+     {
+      "player_id": 881,
+      "player_name": "Monica Wright",
+      "team_abbrev": "MIN",
+      "gp": 34,
+      "ppg": 11.1,
+      "rpg": 2.9,
+      "apg": 1.5,
+      "fgp": 37.0,
+      "score": 14.73,
+      "rank": 2
+     },
+     {
+      "player_id": 882,
+      "player_name": "Epiphanny Prince",
+      "team_abbrev": "CHI",
+      "gp": 34,
+      "ppg": 9.8,
+      "rpg": 2.0,
+      "apg": 2.7,
+      "fgp": 42.7,
+      "score": 14.03,
+      "rank": 3
+     },
+     {
+      "player_id": 951,
+      "player_name": "Natasha Lacy",
+      "team_abbrev": "TUL",
+      "gp": 18,
+      "ppg": 5.6,
+      "rpg": 2.1,
+      "apg": 3.1,
+      "fgp": 47.5,
+      "score": 10.26,
+      "rank": 4
+     },
+     {
+      "player_id": 915,
+      "player_name": "Kelsey Griffin",
+      "team_abbrev": "CON",
+      "gp": 34,
+      "ppg": 4.4,
+      "rpg": 4.7,
+      "apg": 1.1,
+      "fgp": 35.0,
+      "score": 9.0,
+      "rank": 5
+     },
+     {
+      "player_id": 928,
+      "player_name": "Kalana Greene",
+      "team_abbrev": "NYL",
+      "gp": 34,
+      "ppg": 4.4,
+      "rpg": 1.6,
+      "apg": 0.9,
+      "fgp": 46.4,
+      "score": 6.51,
+      "rank": 6
+     },
+     {
+      "player_id": 950,
+      "player_name": "Marion Jones",
+      "team_abbrev": "TUL",
+      "gp": 34,
+      "ppg": 3.3,
+      "rpg": 1.6,
+      "apg": 0.6,
+      "fgp": 52.5,
+      "score": 4.99,
+      "rank": 7
+     },
+     {
+      "player_id": 954,
+      "player_name": "Jayne Appel-Marinelli",
+      "team_abbrev": "SAS",
+      "gp": 34,
+      "ppg": 2.8,
+      "rpg": 2.1,
+      "apg": 0.4,
+      "fgp": 53.5,
+      "score": 4.77,
+      "rank": 8
+     },
+     {
+      "player_id": 900,
+      "player_name": "Andrea  Riley",
+      "team_abbrev": "LOS",
+      "gp": 34,
+      "ppg": 2.9,
+      "rpg": 0.6,
+      "apg": 0.9,
+      "fgp": 30.3,
+      "score": 4.28,
+      "rank": 9
+     },
+     {
+      "player_id": 936,
+      "player_name": "Jene  Morris",
+      "team_abbrev": "IND",
+      "gp": 34,
+      "ppg": 2.1,
+      "rpg": 0.4,
+      "apg": 0.4,
+      "fgp": 42.4,
+      "score": 2.78,
+      "rank": 10
+     }
+    ]
    },
    "leaders": {
     "pts": [
@@ -49225,6 +51263,6 @@
   "2011": 205,
   "2010": 204
  },
- "_generated_utc": "2026-10-25T06:52:10Z",
+ "_generated_utc": "2026-10-26T07:52:29Z",
  "source": "local"
 }

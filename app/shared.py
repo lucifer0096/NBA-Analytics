@@ -485,6 +485,12 @@ def race_meta(race: str, row: dict) -> str:
         fg = (f" · {row['fgp']}% FG" if row.get("fgp") is not None else "")
         return (f"{team} · {gp} GP · {row.get('ppg', 0)} PPG · "
                 f"{row.get('rpg', 0)} RPG · {row.get('apg', 0)} APG{rec}{fg}")
+    if race == "roy":
+        # Same counting line as MVP, minus the record: the ROY formula has
+        # no win-percentage scaling, so the row carries no W-L either.
+        fg = (f" · {row['fgp']}% FG" if row.get("fgp") is not None else "")
+        return (f"{team} · {gp} GP · {row.get('ppg', 0)} PPG · "
+                f"{row.get('rpg', 0)} RPG · {row.get('apg', 0)} APG{fg}")
     if race == "dpoy":
         opp = (f" · {row['opp_pg']} opp pts/g"
                if row.get("opp_pg") is not None else "")
@@ -1369,7 +1375,7 @@ def load_race_history(season: str, league: str = "nba") -> tuple:
     return (snapshots, note)
 
 
-RACE_TREND_TOP = 6  # players the MVP trend figure tracks (latest top N)
+RACE_TREND_TOP = 6  # players each race's trend figure tracks (latest top N)
 
 
 def race_movement(snapshots: list, race: str) -> dict:
@@ -2196,6 +2202,7 @@ def load_players(league: str = "nba") -> tuple:
 FINAL_MVP_SHOW = 10  # Finals MVP tracker rows rendered (current season first)
 FINALS_MVP_FORMULA_SHOW = 5  # calculator formula rows under the verdict row
 LIVE_MVP_SHOW = 10  # live in-season MVP tracker rows rendered
+LIVE_ROY_SHOW = 10  # live in-season ROY tracker rows rendered
 
 
 @st.cache_data(ttl=300, show_spinner=False)
@@ -2404,6 +2411,91 @@ def load_live_mvp_race(season: str, league: str = "nba") -> tuple:
     return (ranked, note)
 
 
+@st.cache_data(ttl=600, show_spinner=False)
+def load_live_rookie_race(season: str, league: str = "nba") -> tuple:
+    """(ranked rows, note) -- the LIVE in-season Rookie of the Year race
+    for the season being played right now: ESPN's leaderboards pick the
+    candidates, each candidate's athlete PROFILE decides rookie status
+    (draft year == the season's START year -- the 2025 draft plays 2025-26,
+    the 2026 WNBA draft plays 2026), and the confirmed rookies' own season
+    totals feed the SAME formula the committed ROY race ranks by (one
+    in-season qualifier: the MVP tracker's rule). No standings call: the
+    ROY formula has no team-record scaling, so the burst stays leaders +
+    one profile per candidate + one totals call per confirmed rookie.
+
+    Honest states, never another season's race: ESPN unreachable (leaders
+    or profiles), an empty leaderboard, and no drafted rookie with a game
+    among the candidates. Undrafted first-year players carry no draft year
+    on ESPN, so their rookie status can't be confirmed -- skipped and said
+    in the note, never guessed. Draft profiles also carry each rendered
+    row's name, so rows render without extra calls."""
+    import espn_api
+    import parsing
+
+    start = awards.season_start_year(season)
+    try:
+        year = espn_api.season_param(season, league)
+        candidates = parsing.parse_leader_candidates(
+            espn_api.get_leaders(year, league, limit=50))
+    except Exception as exc:
+        return ([], f"Live ROY race unavailable: ESPN unreachable from "
+                    f"this session ({type(exc).__name__})")
+    if not candidates:
+        return ([], "Live ROY race has no candidates yet: ESPN's "
+                    "leaderboards answered empty.")
+    # Team ids -> the abbrevs the ladder rows carry, off the committed
+    # franchise list for this league (same mapping as the MVP tracker).
+    abbrevs = {int(t["team_id"]): t.get("abbrev") for t in
+               (_read_fallback("dashboard_teams.json", league)
+                .get("teams") or []) if t.get("team_id")}
+    rows: list = []
+    profiles_seen = 0
+    undrafted = 0
+    for candidate in candidates:
+        profile = live_athlete_profile(candidate["player_id"], league)
+        if not profile:
+            continue                    # unreachable: skipped, counted below
+        profiles_seen += 1
+        draft_year = int((profile.get("draft") or {}).get("year") or 0)
+        if not draft_year:
+            undrafted += 1              # no draft data on ESPN: unknown
+            continue
+        if draft_year != start:
+            continue                    # a veteran on the leaderboards
+        line = live_athlete_line(candidate["player_id"], year, league)
+        if not line or not line.get("gp"):
+            continue                    # drafted this year, hasn't played
+        rows.append({**line, "starts": 0, "minutes": 0,
+                     "player_id": candidate["player_id"],
+                     "player_name": (profile.get("displayName")
+                                     or profile.get("fullName")
+                                     or f"Player {candidate['player_id']}"),
+                     "team_abbrev": abbrevs.get(candidate["team_id"] or 0)
+                     or ""})
+    if profiles_seen == 0:
+        return ([], "Live ROY race unavailable: ESPN athlete profiles are "
+                    "unreachable from this session, so no candidate's "
+                    "draft class could be confirmed.")
+    if not rows:
+        return ([], f"Live ROY race has no candidates yet: no player from "
+                    f"ESPN's {start} draft class is on the leaderboards "
+                    f"with a game played"
+                    + (f" ({undrafted} leader(s) carried no draft data)"
+                       if undrafted else "")
+                    + ".")
+    qualifier = awards.in_season_min_gp(
+        max(int(r.get("gp") or 0) for r in rows))
+    ranked = awards.roy_rows(rows, {int(r["player_id"]) for r in rows},
+                             qualifier)
+    note = (f"Live ESPN leaders + draft classes + season totals (10 min "
+            f"cache): {len(candidates)} candidates, {len(ranked)} drafted "
+            f"rookie(s) ranked (qualifier: ≥{qualifier} GP) · rookies = "
+            f"ESPN's {start} draft class"
+            + (f" · {undrafted} leader(s) without draft data skipped"
+               if undrafted else ""))
+    return (ranked, note)
+
+
 @st.cache_data(ttl=3600, show_spinner=False)
 def live_athlete_line(player_id: int, year: int, league: str = "nba") -> dict:
     """One live candidate's season totals (cached an hour: the tracker's
@@ -2421,17 +2513,28 @@ def live_athlete_line(player_id: int, year: int, league: str = "nba") -> dict:
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
-def live_athlete_name(player_id: int, league: str = "nba") -> str:
-    """A live candidate's display name -- the leaders/statistics payloads
-    carry ids and $refs only, so RENDERED rows pay one profile call each
-    (cached an hour, never the whole candidate pool). 'Player {id}' keeps
-    a profile hiccup from blanking a rendered row."""
+def live_athlete_profile(player_id: int, league: str = "nba") -> dict:
+    """One live candidate's athlete profile (cached an hour: the name AND
+    the draft class come off this ONE call, so the MVP tracker's row-name
+    lookups and the ROY tracker's rookie filter share the same fetch).
+    An unreachable athlete answers {} -- callers keep their honest
+    fallbacks ('Player {id}', unconfirmed rookie status), never a guess."""
     import espn_api
 
     try:
-        profile = espn_api.get_athlete(player_id, league)
+        return espn_api.get_athlete(player_id, league) or {}
     except Exception:
-        profile = {}
+        return {}
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def live_athlete_name(player_id: int, league: str = "nba") -> str:
+    """A live candidate's display name -- the leaders/statistics payloads
+    carry ids and $refs only, so RENDERED rows pay one profile call each
+    (cached an hour through live_athlete_profile, never the whole
+    candidate pool). 'Player {id}' keeps a profile hiccup from blanking a
+    rendered row."""
+    profile = live_athlete_profile(player_id, league)
     return (profile.get("displayName") or profile.get("fullName")
             or f"Player {player_id}")
 
@@ -2448,7 +2551,7 @@ def load_official_winners(season: str, league: str = "nba") -> dict:
     """{race: [{player_id, player_name}...]} for the season LABEL's year --
     the official side of the Awards Ladder's official-vs-algorithm
     verdicts, off the committed index's `official_winners` map (history
-    build: ESPN's award index, the four race awards' winners per season).
+    build: ESPN's award index, the five race awards' winners per season).
     An empty dict is an honest gap (the award isn't announced yet, or the
     season predates the index) -- never another season's data."""
     year = str(espn_api.season_param(season, league))

@@ -159,6 +159,47 @@ def test_home_awards_tab_shows_races_and_formula_captions(offline_espn):
     assert "snapshot" in captions
 
 
+def test_home_awards_tab_roy_race_progression_and_verdict(offline_espn):
+    """Full MVP parity for the ROY race on the Awards Ladder, all off the
+    committed payload: the race block with its verbatim formula, the
+    rookie-identity caption (the score's math is NOT the identity rule),
+    the daily-snapshot trend (drawn from 2+ snapshots, else the honest
+    caption), and the fifth official-vs-algorithm verdict row."""
+    if not (REPO_ROOT / "data" / "dashboard_awards.json").exists():
+        pytest.skip("dashboard_awards.json not committed yet")
+    at = _render("app/app.py", offline_espn)
+    # Select the COMPLETED season explicitly: the sidebar's default is the
+    # season being played, whose payload is honestly empty until games are
+    # collected. This one (2025-26) carries the full five-race ladder.
+    at.selectbox(key="season_nba").select("2025-26").run()
+    assert not at.exception, f"page raised: {at.exception}"
+    captions = " ".join(str(c.value) for c in at.caption)
+    text = f"{_markdown_text(at)} {captions}"
+    import awards as awards_module
+
+    assert "ROY race" in text
+    assert awards_module.RACE_FORMULAS["roy"] in captions
+    # The trend either drew lines from >=2 committed snapshots or said
+    # exactly what is missing -- both paths name the race and snapshots.
+    assert "ROY race trend" in text and "snapshot" in captions
+    assert "Official vs algorithm winners" in text
+    # The selected season's payload carries the race: its identity
+    # caption must be on screen too (the score's math is NOT the identity
+    # rule), and the verdict pairs the official winner with the #1.
+    seasons = (_committed_awards().get("seasons") or {})
+    if "roy" in (seasons.get("2025-26") or {}).get("races") or {}:
+        assert "Rookie identity" in captions
+    players = {}
+    ppath = REPO_ROOT / "data" / "dashboard_players.json"
+    if ppath.exists():
+        with open(ppath, encoding="utf-8") as f:
+            players = json.load(f)
+    roy = ((players.get("official_winners") or {}).get("2026")
+           or {}).get("roy")
+    if roy:
+        assert f"Official: {roy[0]['player_name']}" in text
+
+
 def test_home_awards_tab_shows_finals_mvp_tracker(offline_espn):
     """The Awards Ladder's official Finals MVP tracker renders off the
     committed index: section header, the real winner (2025-26: Jalen
@@ -293,6 +334,39 @@ def test_home_awards_tab_headline_opens_with_official_mvp(offline_espn):
     head = text.index("Official season awards")
     assert head < text.index("MVP race")
     assert head < text.index("Season stat leaders")
+
+
+def test_home_awards_tab_headline_carries_the_roy_row(offline_espn):
+    """Between the MVP and Finals MVP rows the headline carries the
+    SELECTED season's official Rookie of the Year off the same award
+    index -- a winner row when ESPN has announced one (2025-26: Cooper
+    Flagg), an honest pending row when not -- and either way BEFORE the
+    homegrown race ladders, where the tab's page leads with who actually
+    won."""
+    path = REPO_ROOT / "data" / "dashboard_players.json"
+    payload = {}
+    if path.exists():
+        with open(path, encoding="utf-8") as f:
+            payload = json.load(f)
+    at = _render("app/app.py", offline_espn)
+    # The sidebar's default is the season being played (honest pending
+    # rows); the announced winner needs the COMPLETED season selected.
+    at.selectbox(key="season_nba").select("2025-26").run()
+    assert not at.exception, f"page raised: {at.exception}"
+    text = (f"{_markdown_text(at)} "
+            + " ".join(str(c.value) for c in at.caption))
+    assert "Official season awards" in text
+    head = text.index("Official season awards")
+    # The row renders its 'ROY' label either way: the winner row puts it
+    # in the score slot, the pending row in the name slot.
+    assert head < text.index("ROY", head)
+    roy = ((payload.get("official_winners") or {}).get("2026")
+           or {}).get("roy")
+    if roy:
+        # Announced: the winner is named inside the headline, before the
+        # race whose label repeats later in the verdict.
+        named = text.index(roy[0]["player_name"], head)
+        assert named < text.index("ROY race")
 
 
 def _committed_awards() -> dict:
@@ -638,6 +712,39 @@ def test_race_movement_and_mvp_trend_chart():
     assert list(fig.data[0].y) == [40.0, 42.0]
     assert list(fig.data[2].y) == [None, 30.0]  # C absent earlier: gap
     assert shared_module.race_trend_figure(snaps[:1], "mvp").data == ()
+
+    # The ROY race rides the SAME generic movement/trend code: the daily
+    # projection records every payload race, so its arrows and lines need
+    # no special-casing, and a race no snapshot carries reports nothing.
+    roy_snaps = [
+        {"date": "2026-10-20", "races": {"roy": [
+            {"player_id": 5, "player_name": "R", "rank": 1,
+             "score": 30.0}]}},
+        {"date": "2026-10-21", "races": {"roy": [
+            {"player_id": 5, "player_name": "R", "rank": 1,
+             "score": 32.0}]}},
+    ]
+    assert shared_module.race_movement(roy_snaps, "roy") == {5: 0}
+    roy_fig = shared_module.race_trend_figure(roy_snaps, "roy")
+    assert [t.name for t in roy_fig.data] == ["R"]
+    assert list(roy_fig.data[0].y) == [30.0, 32.0]
+    assert shared_module.race_trend_figure(snaps, "roy").data == ()
+
+
+def test_race_meta_roy_line_has_no_record_fragment():
+    """The ROY stat line reads team/games/PPG/RPG/APG (+ FG% when the box
+    scores carry attempts) with NO W-L fragment: the formula scales by
+    nothing, so the row carries no record to show -- and a row without
+    attempts keeps its line instead of printing an invented 0.0%."""
+    import shared as shared_module
+
+    line = shared_module.race_meta("roy", {
+        "team_abbrev": "BOS", "gp": 8, "ppg": 25.0, "rpg": 6.3, "apg": 5.0,
+        "fgp": 46.1, "wins": 5, "losses": 3, "win_pct": 0.625})
+    assert line == "BOS · 8 GP · 25.0 PPG · 6.3 RPG · 5.0 APG · 46.1% FG"
+    assert "5-3" not in line and "0.625" not in line
+    assert shared_module.race_meta("roy", {"gp": 3}) == \
+        "— · 3 GP · 0 PPG · 0 RPG · 0 APG"
 
 
 def test_race_row_html_movement_arrows():
@@ -1595,6 +1702,124 @@ def test_live_mvp_tracker_absent_for_a_past_season(offline_espn):
             + " ".join(str(c.value) for c in at.caption))
     assert "MVP progress tracker -- live" not in text
     assert "Live ESPN leaders" not in text
+    assert "ROY progress tracker -- live" not in text
+    assert "Live ROY race" not in text
+
+
+def test_live_roy_tracker_honest_offline(offline_espn):
+    """On the season being played right now (selected explicitly, like the
+    MVP tracker above -- the sidebar default follows the collector's
+    inventory, this gate follows the calendar), every ESPN call failing
+    leaves the ROY section with its honest note (never a stack trace,
+    never another year's rookies) and the verbatim ROY formula in the
+    caption."""
+    import shared as shared_module
+
+    shared_module.load_live_rookie_race.clear()
+    at = _render("app/app.py", offline_espn)
+    at.selectbox(key="season_nba").select(
+        shared_module.current_season_label("nba")).run()
+    assert not at.exception
+    text = (f"{_markdown_text(at)} "
+            + " ".join(str(c.value) for c in at.caption))
+    assert "ROY progress tracker -- live" in text
+    assert "ROY race is homegrown math, not official NBA voting" in text
+    import awards as awards_module
+
+    assert awards_module.RACE_FORMULAS["roy"] in text
+    infos = " ".join(str(i.value) for i in at.info)
+    assert "Live ROY race unavailable: ESPN unreachable" in infos
+    assert len(at.warning) == 0
+
+
+def test_live_roy_tracker_renders_synthetic_rows(monkeypatch, offline_espn):
+    """With a stubbed live race the tracker renders its rookie rows over
+    the real race-row widgets (rank medal, stat line, score), and the
+    caption states formula AND the live note (the draft class that defined
+    a rookie + the in-season qualifier) together."""
+    import shared as shared_module
+
+    rows = [{"player_id": 7, "player_name": "Rookie One",
+             "team_abbrev": "DAL", "gp": 4, "ppg": 24.5, "rpg": 6.0,
+             "apg": 5.0, "fgp": 47.2, "score": 34.6, "rank": 1},
+            {"player_id": 8, "player_name": "Rookie Two",
+             "team_abbrev": "WAS", "gp": 4, "ppg": 21.0, "rpg": 8.5,
+             "apg": 3.0, "fgp": 44.0, "score": 31.9, "rank": 2}]
+    note = ("Live ESPN leaders + draft classes + season totals (10 min "
+            "cache): 2 candidates, 2 drafted rookies ranked (qualifier: "
+            "≥2 GP) · rookies = ESPN's 2026 draft class")
+
+    monkeypatch.setattr(shared_module, "load_live_rookie_race",
+                        lambda season, league="nba": (rows, note))
+    at = _render("app/app.py", offline_espn)
+    assert not at.exception
+    text = (f"{_markdown_text(at)} "
+            + " ".join(str(c.value) for c in at.caption))
+    assert "ROY progress tracker -- live" in text
+    assert "Rookie One" in text and "Rookie Two" in text
+    assert "24.5 PPG" in text and "34.6" in text   # stat line + score
+    assert "rookies = ESPN's 2026 draft class" in text
+    assert len(at.warning) == 0
+
+
+def test_live_rookie_race_filters_candidates_by_draft_class(monkeypatch):
+    """The live ROY race's identity rule, unit-tested end to end through
+    the real function: the leaderboards pick the candidates, each
+    candidate's PROFILE decides rookie status (draft year == the season's
+    start year), a veteran and an undrafted player never rank (the
+    undrafted one is COUNTED in the note -- no draft data, no guess), and
+    only the confirmed rookie's own totals feed the committed formula at
+    the derived in-season qualifier."""
+    import espn_api
+    import shared as shared_module
+
+    shared_module.load_live_rookie_race.clear()
+    monkeypatch.setattr(espn_api, "get_leaders", lambda year, league,
+                        limit=50: {"categories": [{"name": "pointsPerGame",
+                                                   "leaders": [
+            {"value": 30.0,
+             "athlete": {"$ref": ".../athletes/7"},
+             "team": {"$ref": ".../teams/5"}},
+            {"value": 25.0,
+             "athlete": {"$ref": ".../athletes/8"},
+             "team": {"$ref": ".../teams/6"}},
+            {"value": 20.0,
+             "athlete": {"$ref": ".../athletes/9"},
+             "team": {"$ref": ".../teams/7"}},
+        ]}]})
+    monkeypatch.setattr(shared_module, "live_athlete_profile",
+                        lambda pid, league="nba": {
+                            7: {"displayName": "Rookie One",
+                                "draft": {"year": 2026}},       # rookie
+                            8: {"displayName": "Veteran Guy",
+                                "draft": {"year": 2015}},       # 11-year vet
+                            9: {"displayName": "Undrafted Kid"},  # no draft
+                        }[pid])
+    monkeypatch.setattr(shared_module, "live_athlete_line",
+                        lambda pid, year, league="nba": {
+                            7: {"gp": 5, "pts": 150, "reb": 40, "ast": 25,
+                                "fgm": 55, "fga": 120},
+                            8: {"gp": 5, "pts": 200, "reb": 50, "ast": 30},
+                            9: {"gp": 5, "pts": 90, "reb": 20, "ast": 15},
+                        }[pid])
+
+    try:
+        rows, note = shared_module.load_live_rookie_race("2026-27", "nba")
+    finally:
+        shared_module.load_live_rookie_race.clear()
+
+    assert [(r["player_id"], r["player_name"]) for r in rows] == \
+        [(7, "Rookie One")]
+    # Committed formula: (150 + 0.75*40 + 25)/5 -- no standings involved.
+    assert rows[0]["score"] == 41.0 and rows[0]["rank"] == 1
+    assert rows[0]["ppg"] == 30.0 and rows[0]["fgp"] == 45.8
+    # The note states every rule it applied: pool, ranked count, the
+    # qualifier bar, the draft class, and the skipped-undrafted count.
+    assert "3 candidates" in note
+    assert "1 drafted rookie(s) ranked" in note
+    assert "qualifier: ≥3 GP" in note
+    assert "rookies = ESPN's 2026 draft class" in note
+    assert "1 leader(s) without draft data skipped" in note
 
 
 # ---------------------------------------------------------------------------
