@@ -606,7 +606,7 @@
    "opponent_id": 18,
    "is_home": false,
    "position": "F",
-   "projected_points": 23.8680522108
+   "projected_points": 23.4309350054
   },
   {
    "game_id": "401909879",
@@ -1552,7 +1552,7 @@
    "opponent_id": 14,
    "is_home": true,
    "position": "F",
-   "projected_points": 52.7411728021
+   "projected_points": 51.5726753928
   },
   {
    "game_id": "401909884",
@@ -1860,7 +1860,7 @@
    "opponent_id": 14,
    "is_home": true,
    "position": "G",
-   "projected_points": 26.4325547923
+   "projected_points": 26.4352530543
   },
   {
    "game_id": "401909884",
@@ -1918,17 +1918,6 @@
    "projected_points": 24.7236187947
   },
   {
-   "game_id": "401909883",
-   "date": "2026-10-28T23:00Z",
-   "season": "2026-27",
-   "player_id": 4278562,
-   "team_id": 8,
-   "opponent_id": 30,
-   "is_home": true,
-   "position": "F",
-   "projected_points": 24.5732616574
-  },
-  {
    "game_id": "401909881",
    "date": "2026-10-28T23:00Z",
    "season": "2026-27",
@@ -1938,6 +1927,17 @@
    "is_home": false,
    "position": "F",
    "projected_points": 24.1974485702
+  },
+  {
+   "game_id": "401909883",
+   "date": "2026-10-28T23:00Z",
+   "season": "2026-27",
+   "player_id": 4278562,
+   "team_id": 8,
+   "opponent_id": 30,
+   "is_home": true,
+   "position": "F",
+   "projected_points": 24.0498281568
   },
   {
    "game_id": "401909882",
@@ -2193,6 +2193,17 @@
    "projected_points": 14.7341595765
   },
   {
+   "game_id": "401909881",
+   "date": "2026-10-28T23:00Z",
+   "season": "2026-27",
+   "player_id": 5149077,
+   "team_id": 1,
+   "opponent_id": 14,
+   "is_home": true,
+   "position": "G",
+   "projected_points": 14.7050442771
+  },
+  {
    "game_id": "401909883",
    "date": "2026-10-28T23:00Z",
    "season": "2026-27",
@@ -2202,17 +2213,6 @@
    "is_home": false,
    "position": "C",
    "projected_points": 14.5875686962
-  },
-  {
-   "game_id": "401909881",
-   "date": "2026-10-28T23:00Z",
-   "season": "2026-27",
-   "player_id": 5149077,
-   "team_id": 1,
-   "opponent_id": 14,
-   "is_home": true,
-   "position": "G",
-   "projected_points": 14.4976813527
   },
   {
    "game_id": "401909884",
@@ -5765,7 +5765,7 @@
    "opponent_id": 13,
    "is_home": true,
    "position": "G",
-   "projected_points": 36.716926482
+   "projected_points": 36.2103664564
   },
   {
    "game_id": "401909892",
@@ -5831,7 +5831,7 @@
    "opponent_id": 13,
    "is_home": true,
    "position": "F",
-   "projected_points": 23.1100531097
+   "projected_points": 23.1399272659
   },
   {
    "game_id": "401909892",
@@ -6128,7 +6128,7 @@
    "opponent_id": 5,
    "is_home": true,
    "position": "F",
-   "projected_points": 53.4504528716
+   "projected_points": 52.2819554623
   },
   {
    "game_id": "401909894",
@@ -6304,7 +6304,7 @@
    "opponent_id": 5,
    "is_home": true,
    "position": "G",
-   "projected_points": 26.2224691733
+   "projected_points": 26.3069293664
   },
   {
    "game_id": "401909893",
@@ -6458,7 +6458,7 @@
    "opponent_id": 5,
    "is_home": true,
    "position": "G",
-   "projected_points": 13.8286748735
+   "projected_points": 14.0531732565
   },
   {
    "game_id": "401909893",
@@ -6865,7 +6865,7 @@
    "opponent_id": 22,
    "is_home": false,
    "position": "G",
-   "projected_points": 43.6440314197
+   "projected_points": 43.9932989649
   },
   {
    "game_id": "401909895",
@@ -6887,7 +6887,7 @@
    "opponent_id": 22,
    "is_home": false,
    "position": "F",
-   "projected_points": 35.1389629762
+   "projected_points": 35.0008508557
   },
   {
    "game_id": "401909895",
@@ -6920,7 +6920,7 @@
    "opponent_id": 22,
    "is_home": false,
    "position": "F",
-   "projected_points": 27.360446388
+   "projected_points": 26.9756407197
   },
   {
    "game_id": "401909895",
@@ -7976,7 +7976,7 @@
    "opponent_id": 17,
    "is_home": false,
    "position": "F",
-   "projected_points": 24.3658150864
+   "projected_points": 23.8918440763
   },
   {
    "game_id": "401909278",
@@ -9269,23 +9269,23 @@
    "game_id": "401909284",
    "date": "2026-10-31T00:00Z",
    "season": "2026-27",
-   "player_id": 2991139,
-   "team_id": 12,
-   "opponent_id": 16,
-   "is_home": false,
-   "position": "G",
-   "projected_points": 33.5703739562
-  },
-  {
-   "game_id": "401909284",
-   "date": "2026-10-31T00:00Z",
-   "season": "2026-27",
    "player_id": 4396907,
    "team_id": 12,
    "opponent_id": 16,
    "is_home": false,
    "position": "G",
    "projected_points": 33.419092015
+  },
+  {
+   "game_id": "401909284",
+   "date": "2026-10-31T00:00Z",
+   "season": "2026-27",
+   "player_id": 2991139,
+   "team_id": 12,
+   "opponent_id": 16,
+   "is_home": false,
+   "position": "G",
+   "projected_points": 33.0638139306
   },
   {
    "game_id": "401909283",
@@ -9527,7 +9527,7 @@
    "opponent_id": 16,
    "is_home": false,
    "position": "F",
-   "projected_points": 21.6107120995
+   "projected_points": 21.6405862557
   },
   {
    "game_id": "401909284",
@@ -11848,7 +11848,7 @@
    "opponent_id": 3,
    "is_home": false,
    "position": "F",
-   "projected_points": 53.4024615386
+   "projected_points": 52.2339641294
   },
   {
    "game_id": "401909898",
@@ -11925,7 +11925,7 @@
    "opponent_id": 3,
    "is_home": false,
    "position": "G",
-   "projected_points": 25.9902654716
+   "projected_points": 26.0769431668
   },
   {
    "game_id": "401909898",
@@ -12013,7 +12013,7 @@
    "opponent_id": 3,
    "is_home": false,
    "position": "G",
-   "projected_points": 14.324827064
+   "projected_points": 14.549325447
   },
   {
    "game_id": "401909898",
@@ -12244,7 +12244,7 @@
    "opponent_id": 23,
    "is_home": true,
    "position": "G",
-   "projected_points": 45.4244139407
+   "projected_points": 45.9830434445
   },
   {
    "game_id": "401909901",
@@ -12321,7 +12321,7 @@
    "opponent_id": 23,
    "is_home": true,
    "position": "F",
-   "projected_points": 38.0190912533
+   "projected_points": 37.7656193146
   },
   {
    "game_id": "401909900",
@@ -12445,6 +12445,17 @@
    "projected_points": 29.2516891853
   },
   {
+   "game_id": "401909899",
+   "date": "2026-11-01T00:00Z",
+   "season": "2026-27",
+   "player_id": 4903027,
+   "team_id": 29,
+   "opponent_id": 23,
+   "is_home": true,
+   "position": "F",
+   "projected_points": 29.166667014
+  },
+  {
    "game_id": "401909901",
    "date": "2026-11-01T00:00Z",
    "season": "2026-27",
@@ -12454,17 +12465,6 @@
    "is_home": true,
    "position": "G",
    "projected_points": 29.1491550004
-  },
-  {
-   "game_id": "401909899",
-   "date": "2026-11-01T00:00Z",
-   "season": "2026-27",
-   "player_id": 4903027,
-   "team_id": 29,
-   "opponent_id": 23,
-   "is_home": true,
-   "position": "F",
-   "projected_points": 29.1292910559
   },
   {
    "game_id": "401909900",
@@ -14510,7 +14510,7 @@
    "opponent_id": 9,
    "is_home": false,
    "position": "G",
-   "projected_points": 34.4094534071
+   "projected_points": 33.9028933815
   },
   {
    "game_id": "401909905",
@@ -14587,7 +14587,7 @@
    "opponent_id": 9,
    "is_home": false,
    "position": "F",
-   "projected_points": 22.4991477617
+   "projected_points": 22.5290219179
   },
   {
    "game_id": "401909905",
@@ -15621,7 +15621,7 @@
    "opponent_id": 11,
    "is_home": false,
    "position": "F",
-   "projected_points": 50.052401794
+   "projected_points": 48.8839043847
   },
   {
    "game_id": "401909909",
@@ -15995,7 +15995,7 @@
    "opponent_id": 11,
    "is_home": false,
    "position": "G",
-   "projected_points": 25.2906013702
+   "projected_points": 25.3772790655
   },
   {
    "game_id": "401909908",
@@ -16053,17 +16053,6 @@
    "projected_points": 23.6207947409
   },
   {
-   "game_id": "401909908",
-   "date": "2026-11-03T00:30Z",
-   "season": "2026-27",
-   "player_id": 4278562,
-   "team_id": 8,
-   "opponent_id": 30,
-   "is_home": false,
-   "position": "F",
-   "projected_points": 22.9253011287
-  },
-  {
    "game_id": "401909911",
    "date": "2026-11-03T00:30Z",
    "season": "2026-27",
@@ -16084,6 +16073,17 @@
    "is_home": true,
    "position": "F",
    "projected_points": 22.5513503998
+  },
+  {
+   "game_id": "401909908",
+   "date": "2026-11-03T00:30Z",
+   "season": "2026-27",
+   "player_id": 4278562,
+   "team_id": 8,
+   "opponent_id": 30,
+   "is_home": false,
+   "position": "F",
+   "projected_points": 22.4513301186
   },
   {
    "game_id": "401909912",
@@ -16460,6 +16460,17 @@
    "projected_points": 12.8900732798
   },
   {
+   "game_id": "401909909",
+   "date": "2026-11-03T00:30Z",
+   "season": "2026-27",
+   "player_id": 5149077,
+   "team_id": 1,
+   "opponent_id": 11,
+   "is_home": false,
+   "position": "G",
+   "projected_points": 12.6866408288
+  },
+  {
    "game_id": "401909910",
    "date": "2026-11-03T00:30Z",
    "season": "2026-27",
@@ -16502,17 +16513,6 @@
    "is_home": true,
    "position": "C",
    "projected_points": 12.5110458445
-  },
-  {
-   "game_id": "401909909",
-   "date": "2026-11-03T00:30Z",
-   "season": "2026-27",
-   "player_id": 5149077,
-   "team_id": 1,
-   "opponent_id": 11,
-   "is_home": false,
-   "position": "G",
-   "projected_points": 12.4621424458
   },
   {
    "game_id": "401909910",
@@ -17579,7 +17579,7 @@
    "opponent_id": 3,
    "is_home": true,
    "position": "G",
-   "projected_points": 46.5004779488
+   "projected_points": 47.0591074526
   },
   {
    "game_id": "401909915",
@@ -17623,7 +17623,7 @@
    "opponent_id": 3,
    "is_home": true,
    "position": "F",
-   "projected_points": 38.4653905004
+   "projected_points": 38.2119185617
   },
   {
    "game_id": "401909914",
@@ -17744,7 +17744,7 @@
    "opponent_id": 3,
    "is_home": true,
    "position": "F",
-   "projected_points": 28.9425927916
+   "projected_points": 28.8753146481
   },
   {
    "game_id": "401909913",
@@ -19955,7 +19955,7 @@
    "opponent_id": 28,
    "is_home": true,
    "position": "G",
-   "projected_points": 33.9760365359
+   "projected_points": 33.4694765103
   },
   {
    "game_id": "401909919",
@@ -20142,7 +20142,7 @@
    "opponent_id": 28,
    "is_home": true,
    "position": "F",
-   "projected_points": 21.9836563724
+   "projected_points": 22.0135305287
   },
   {
    "game_id": "401909920",
@@ -21000,7 +21000,7 @@
    "opponent_id": 27,
    "is_home": false,
    "position": "F",
-   "projected_points": 49.752513582
+   "projected_points": 48.5840161728
   },
   {
    "game_id": "401909923",
@@ -21154,7 +21154,7 @@
    "opponent_id": 27,
    "is_home": false,
    "position": "G",
-   "projected_points": 25.2906013702
+   "projected_points": 25.3772790655
   },
   {
    "game_id": "401909923",
@@ -21179,17 +21179,6 @@
    "projected_points": 23.5095184308
   },
   {
-   "game_id": "401909922",
-   "date": "2026-11-05T00:00Z",
-   "season": "2026-27",
-   "player_id": 4278562,
-   "team_id": 8,
-   "opponent_id": 20,
-   "is_home": true,
-   "position": "F",
-   "projected_points": 22.7670842131
-  },
-  {
    "game_id": "401909923",
    "date": "2026-11-05T00:00Z",
    "season": "2026-27",
@@ -21199,6 +21188,17 @@
    "is_home": true,
    "position": "C",
    "projected_points": 22.6695078992
+  },
+  {
+   "game_id": "401909922",
+   "date": "2026-11-05T00:00Z",
+   "season": "2026-27",
+   "player_id": 4278562,
+   "team_id": 8,
+   "opponent_id": 20,
+   "is_home": true,
+   "position": "F",
+   "projected_points": 22.2436507125
   },
   {
    "game_id": "401909922",
@@ -21352,7 +21352,7 @@
    "opponent_id": 27,
    "is_home": false,
    "position": "G",
-   "projected_points": 12.3508661358
+   "projected_points": 12.5753645188
   },
   {
    "game_id": "401909922",
@@ -22958,7 +22958,7 @@
    "opponent_id": 11,
    "is_home": true,
    "position": "G",
-   "projected_points": 44.6174861307
+   "projected_points": 45.1761156345
   },
   {
    "game_id": "401909927",
@@ -23024,7 +23024,7 @@
    "opponent_id": 11,
    "is_home": true,
    "position": "F",
-   "projected_points": 36.3913159908
+   "projected_points": 36.2068800565
   },
   {
    "game_id": "401909927",
@@ -23112,7 +23112,7 @@
    "opponent_id": 11,
    "is_home": true,
    "position": "F",
-   "projected_points": 28.132118876
+   "projected_points": 27.8584700342
   },
   {
    "game_id": "401909929",
@@ -25983,7 +25983,7 @@
    "opponent_id": 14,
    "is_home": true,
    "position": "G",
-   "projected_points": 33.3224101253
+   "projected_points": 32.8158500997
   },
   {
    "game_id": "401909935",
@@ -26071,7 +26071,7 @@
    "opponent_id": 14,
    "is_home": true,
    "position": "F",
-   "projected_points": 22.6314019224
+   "projected_points": 22.6612760786
   },
   {
    "game_id": "401909935",
@@ -27105,7 +27105,7 @@
    "opponent_id": 27,
    "is_home": true,
    "position": "F",
-   "projected_points": 48.8569835735
+   "projected_points": 47.6884861643
   },
   {
    "game_id": "401909288",
@@ -27226,7 +27226,7 @@
    "opponent_id": 27,
    "is_home": true,
    "position": "G",
-   "projected_points": 25.6876418129
+   "projected_points": 25.7721020061
   },
   {
    "game_id": "401909287",
@@ -27405,6 +27405,17 @@
    "projected_points": 11.6862088067
   },
   {
+   "game_id": "401909287",
+   "date": "2026-11-07T00:00Z",
+   "season": "2026-27",
+   "player_id": 5149077,
+   "team_id": 1,
+   "opponent_id": 27,
+   "is_home": true,
+   "position": "G",
+   "projected_points": 11.6518729034
+  },
+  {
    "game_id": "401909288",
    "date": "2026-11-07T00:00Z",
    "season": "2026-27",
@@ -27414,17 +27425,6 @@
    "is_home": false,
    "position": "C",
    "projected_points": 10.953813497
-  },
-  {
-   "game_id": "401909287",
-   "date": "2026-11-07T00:00Z",
-   "season": "2026-27",
-   "player_id": 5149077,
-   "team_id": 1,
-   "opponent_id": 27,
-   "is_home": true,
-   "position": "G",
-   "projected_points": 10.867909849
   },
   {
    "game_id": "401909288",
@@ -28249,7 +28249,7 @@
    "opponent_id": 25,
    "is_home": true,
    "position": "G",
-   "projected_points": 43.8797847724
+   "projected_points": 44.2290523177
   },
   {
    "game_id": "401909293",
@@ -28315,7 +28315,7 @@
    "opponent_id": 25,
    "is_home": true,
    "position": "F",
-   "projected_points": 34.3855708309
+   "projected_points": 34.2474587103
   },
   {
    "game_id": "401909292",
@@ -28472,17 +28472,6 @@
    "projected_points": 26.7102380355
   },
   {
-   "game_id": "401909291",
-   "date": "2026-11-07T01:00Z",
-   "season": "2026-27",
-   "player_id": 4903027,
-   "team_id": 29,
-   "opponent_id": 25,
-   "is_home": true,
-   "position": "F",
-   "projected_points": 26.6824321412
-  },
-  {
    "game_id": "401909292",
    "date": "2026-11-07T01:00Z",
    "season": "2026-27",
@@ -28514,6 +28503,17 @@
    "is_home": true,
    "position": "F",
    "projected_points": 26.4247043026
+  },
+  {
+   "game_id": "401909291",
+   "date": "2026-11-07T01:00Z",
+   "season": "2026-27",
+   "player_id": 4903027,
+   "team_id": 29,
+   "opponent_id": 25,
+   "is_home": true,
+   "position": "F",
+   "projected_points": 26.4087832993
   },
   {
    "game_id": "401909290",
@@ -30911,7 +30911,7 @@
    "opponent_id": 17,
    "is_home": true,
    "position": "F",
-   "projected_points": 49.709978351
+   "projected_points": 48.5414809418
   },
   {
    "game_id": "401909939",
@@ -30966,7 +30966,7 @@
    "opponent_id": 17,
    "is_home": true,
    "position": "G",
-   "projected_points": 24.6665317425
+   "projected_points": 24.866481759
   },
   {
    "game_id": "401909939",
@@ -31076,7 +31076,7 @@
    "opponent_id": 17,
    "is_home": true,
    "position": "G",
-   "projected_points": 10.9810138817
+   "projected_points": 11.7649769361
   },
   {
    "game_id": "401909939",
@@ -33650,7 +33650,7 @@
    "opponent_id": 13,
    "is_home": true,
    "position": "F",
-   "projected_points": 21.2128098283
+   "projected_points": 20.6893763277
   },
   {
    "game_id": "401909946",
@@ -35190,7 +35190,7 @@
    "opponent_id": 3,
    "is_home": true,
    "position": "G",
-   "projected_points": 31.6263524672
+   "projected_points": 31.1197924416
   },
   {
    "game_id": "401909950",
@@ -35322,7 +35322,7 @@
    "opponent_id": 3,
    "is_home": true,
    "position": "F",
-   "projected_points": 20.5681363309
+   "projected_points": 20.5980104871
   },
   {
    "game_id": "401909950",
@@ -35905,7 +35905,7 @@
    "opponent_id": 13,
    "is_home": true,
    "position": "F",
-   "projected_points": 46.9902779399
+   "projected_points": 45.8217805307
   },
   {
    "game_id": "401909952",
@@ -36092,7 +36092,7 @@
    "opponent_id": 13,
    "is_home": true,
    "position": "G",
-   "projected_points": 24.3297612566
+   "projected_points": 24.5297112731
   },
   {
    "game_id": "401909953",
@@ -36191,7 +36191,7 @@
    "opponent_id": 27,
    "is_home": true,
    "position": "F",
-   "projected_points": 20.2422259303
+   "projected_points": 20.0120943276
   },
   {
    "game_id": "401909954",
@@ -36406,23 +36406,23 @@
    "game_id": "401909952",
    "date": "2026-11-10T00:00Z",
    "season": "2026-27",
+   "player_id": 5149077,
+   "team_id": 1,
+   "opponent_id": 13,
+   "is_home": true,
+   "position": "G",
+   "projected_points": 10.6814086211
+  },
+  {
+   "game_id": "401909952",
+   "date": "2026-11-10T00:00Z",
+   "season": "2026-27",
    "player_id": 4592691,
    "team_id": 13,
    "opponent_id": 1,
    "is_home": false,
    "position": "F",
    "projected_points": 10.5102838402
-  },
-  {
-   "game_id": "401909952",
-   "date": "2026-11-10T00:00Z",
-   "season": "2026-27",
-   "player_id": 5149077,
-   "team_id": 1,
-   "opponent_id": 13,
-   "is_home": true,
-   "position": "G",
-   "projected_points": 9.8974455668
   },
   {
    "game_id": "401909954",
@@ -37060,7 +37060,7 @@
    "opponent_id": 28,
    "is_home": false,
    "position": "G",
-   "projected_points": 42.3413499551
+   "projected_points": 42.6906175003
   },
   {
    "game_id": "401909955",
@@ -37071,7 +37071,7 @@
    "opponent_id": 28,
    "is_home": false,
    "position": "F",
-   "projected_points": 32.2139111956
+   "projected_points": 32.075799075
   },
   {
    "game_id": "401909955",
@@ -37121,23 +37121,23 @@
    "game_id": "401909955",
    "date": "2026-11-10T00:30Z",
    "season": "2026-27",
-   "player_id": 4903027,
-   "team_id": 29,
-   "opponent_id": 28,
-   "is_home": false,
-   "position": "F",
-   "projected_points": 23.5191170827
-  },
-  {
-   "game_id": "401909955",
-   "date": "2026-11-10T00:30Z",
-   "season": "2026-27",
    "player_id": 5112087,
    "team_id": 29,
    "opponent_id": 28,
    "is_home": false,
    "position": "F",
    "projected_points": 23.3643647011
+  },
+  {
+   "game_id": "401909955",
+   "date": "2026-11-10T00:30Z",
+   "season": "2026-27",
+   "player_id": 4903027,
+   "team_id": 29,
+   "opponent_id": 28,
+   "is_home": false,
+   "position": "F",
+   "projected_points": 23.0541768512
   },
   {
    "game_id": "401909955",
@@ -39766,7 +39766,7 @@
    "opponent_id": 21,
    "is_home": false,
    "position": "G",
-   "projected_points": 30.3215245276
+   "projected_points": 29.814964502
   },
   {
    "game_id": "401909962",
@@ -39898,7 +39898,7 @@
    "opponent_id": 21,
    "is_home": false,
    "position": "F",
-   "projected_points": 19.9733650748
+   "projected_points": 20.0032392311
   },
   {
    "game_id": "401909963",
@@ -42373,7 +42373,7 @@
    "opponent_id": 7,
    "is_home": true,
    "position": "G",
-   "projected_points": 41.8888460212
+   "projected_points": 42.447475525
   },
   {
    "game_id": "401909969",
@@ -42450,7 +42450,7 @@
    "opponent_id": 7,
    "is_home": true,
    "position": "F",
-   "projected_points": 33.0226326698
+   "projected_points": 32.7691607311
   },
   {
    "game_id": "401909969",
@@ -42582,7 +42582,7 @@
    "opponent_id": 7,
    "is_home": true,
    "position": "F",
-   "projected_points": 23.6015846386
+   "projected_points": 23.3279357968
   },
   {
    "game_id": "401909970",
@@ -45228,23 +45228,23 @@
    "game_id": "401909977",
    "date": "2026-11-13T00:00Z",
    "season": "2026-27",
-   "player_id": 4278562,
-   "team_id": 8,
-   "opponent_id": 27,
-   "is_home": false,
-   "position": "F",
-   "projected_points": 19.2607308729
-  },
-  {
-   "game_id": "401909977",
-   "date": "2026-11-13T00:00Z",
-   "season": "2026-27",
    "player_id": 4433621,
    "team_id": 8,
    "opponent_id": 27,
    "is_home": false,
    "position": "C",
    "projected_points": 19.2460929073
+  },
+  {
+   "game_id": "401909977",
+   "date": "2026-11-13T00:00Z",
+   "season": "2026-27",
+   "player_id": 4278562,
+   "team_id": 8,
+   "opponent_id": 27,
+   "is_home": false,
+   "position": "F",
+   "projected_points": 19.0800617608
   },
   {
    "game_id": "401909977",
@@ -47356,7 +47356,7 @@
    "opponent_id": 4,
    "is_home": false,
    "position": "F",
-   "projected_points": 48.013153175
+   "projected_points": 46.8446557657
   },
   {
    "game_id": "401909300",
@@ -47367,7 +47367,7 @@
    "opponent_id": 3,
    "is_home": false,
    "position": "G",
-   "projected_points": 40.9731563713
+   "projected_points": 41.5317858751
   },
   {
    "game_id": "401909298",
@@ -47403,17 +47403,6 @@
    "projected_points": 33.4003189552
   },
   {
-   "game_id": "401909300",
-   "date": "2026-11-14T01:00Z",
-   "season": "2026-27",
-   "player_id": 5041935,
-   "team_id": 29,
-   "opponent_id": 3,
-   "is_home": false,
-   "position": "F",
-   "projected_points": 32.2544531285
-  },
-  {
    "game_id": "401909298",
    "date": "2026-11-14T01:00Z",
    "season": "2026-27",
@@ -47423,6 +47412,17 @@
    "is_home": true,
    "position": "G",
    "projected_points": 32.1721678615
+  },
+  {
+   "game_id": "401909300",
+   "date": "2026-11-14T01:00Z",
+   "season": "2026-27",
+   "player_id": 5041935,
+   "team_id": 29,
+   "opponent_id": 3,
+   "is_home": false,
+   "position": "F",
+   "projected_points": 32.0009811898
   },
   {
    "game_id": "401909299",
@@ -47527,23 +47527,23 @@
    "game_id": "401909300",
    "date": "2026-11-14T01:00Z",
    "season": "2026-27",
-   "player_id": 4903027,
-   "team_id": 29,
-   "opponent_id": 3,
-   "is_home": false,
-   "position": "F",
-   "projected_points": 22.5717746779
-  },
-  {
-   "game_id": "401909300",
-   "date": "2026-11-14T01:00Z",
-   "season": "2026-27",
    "player_id": 4869780,
    "team_id": 3,
    "opponent_id": 29,
    "is_home": true,
    "position": "C",
    "projected_points": 22.2101759696
+  },
+  {
+   "game_id": "401909300",
+   "date": "2026-11-14T01:00Z",
+   "season": "2026-27",
+   "player_id": 4903027,
+   "team_id": 29,
+   "opponent_id": 3,
+   "is_home": false,
+   "position": "F",
+   "projected_points": 22.1070548845
   },
   {
    "game_id": "401909300",
@@ -47587,7 +47587,7 @@
    "opponent_id": 4,
    "is_home": false,
    "position": "G",
-   "projected_points": 21.1984257912
+   "projected_points": 21.4005933099
   },
   {
    "game_id": "401909299",
@@ -47843,6 +47843,17 @@
    "projected_points": 10.9164084033
   },
   {
+   "game_id": "401909299",
+   "date": "2026-11-14T01:00Z",
+   "season": "2026-27",
+   "player_id": 5149077,
+   "team_id": 1,
+   "opponent_id": 4,
+   "is_home": false,
+   "position": "G",
+   "projected_points": 10.3527325578
+  },
+  {
    "game_id": "401909300",
    "date": "2026-11-14T01:00Z",
    "season": "2026-27",
@@ -47863,17 +47874,6 @@
    "is_home": false,
    "position": "F",
    "projected_points": 9.7149110615
-  },
-  {
-   "game_id": "401909299",
-   "date": "2026-11-14T01:00Z",
-   "season": "2026-27",
-   "player_id": 5149077,
-   "team_id": 1,
-   "opponent_id": 4,
-   "is_home": false,
-   "position": "G",
-   "projected_points": 9.4037324174
   },
   {
    "game_id": "401909300",
@@ -49633,7 +49633,7 @@
    "opponent_id": 25,
    "is_home": true,
    "position": "G",
-   "projected_points": 29.930175381
+   "projected_points": 29.543054202
   },
   {
    "game_id": "401909304",
@@ -50755,7 +50755,7 @@
    "opponent_id": 17,
    "is_home": true,
    "position": "G",
-   "projected_points": 40.7204267785
+   "projected_points": 41.2790562823
   },
   {
    "game_id": "401909984",
@@ -50799,7 +50799,7 @@
    "opponent_id": 17,
    "is_home": true,
    "position": "F",
-   "projected_points": 32.5914460302
+   "projected_points": 32.3379740915
   },
   {
    "game_id": "401909982",
@@ -50898,7 +50898,7 @@
    "opponent_id": 17,
    "is_home": true,
    "position": "F",
-   "projected_points": 23.377213229
+   "projected_points": 23.1035643872
   },
   {
    "game_id": "401909982",
@@ -50992,23 +50992,23 @@
    "game_id": "401909982",
    "date": "2026-11-15T01:00Z",
    "season": "2026-27",
-   "player_id": 4278562,
-   "team_id": 8,
-   "opponent_id": 14,
-   "is_home": false,
-   "position": "F",
-   "projected_points": 19.8479945164
-  },
-  {
-   "game_id": "401909982",
-   "date": "2026-11-15T01:00Z",
-   "season": "2026-27",
    "player_id": 3064482,
    "team_id": 14,
    "opponent_id": 8,
    "is_home": true,
    "position": "F",
    "projected_points": 19.7253758535
+  },
+  {
+   "game_id": "401909982",
+   "date": "2026-11-15T01:00Z",
+   "season": "2026-27",
+   "player_id": 4278562,
+   "team_id": 8,
+   "opponent_id": 14,
+   "is_home": false,
+   "position": "F",
+   "projected_points": 19.6673254042
   },
   {
    "game_id": "401909982",
@@ -52669,7 +52669,7 @@
    "opponent_id": 30,
    "is_home": true,
    "position": "G",
-   "projected_points": 30.0320248115
+   "projected_points": 29.5254647859
   },
   {
    "game_id": "401909987",
@@ -52779,7 +52779,7 @@
    "opponent_id": 30,
    "is_home": true,
    "position": "F",
-   "projected_points": 19.4731856153
+   "projected_points": 19.5030597715
   },
   {
    "game_id": "401909987",
@@ -54594,7 +54594,7 @@
    "opponent_id": 15,
    "is_home": false,
    "position": "F",
-   "projected_points": 43.889657623
+   "projected_points": 42.7211602137
   },
   {
    "game_id": "401909992",
@@ -54671,7 +54671,7 @@
    "opponent_id": 15,
    "is_home": false,
    "position": "G",
-   "projected_points": 21.5514363298
+   "projected_points": 21.7536038485
   },
   {
    "game_id": "401909992",
@@ -54754,23 +54754,23 @@
    "game_id": "401909992",
    "date": "2026-11-16T01:00Z",
    "season": "2026-27",
+   "player_id": 5149077,
+   "team_id": 1,
+   "opponent_id": 15,
+   "is_home": false,
+   "position": "G",
+   "projected_points": 10.0769145224
+  },
+  {
+   "game_id": "401909992",
+   "date": "2026-11-16T01:00Z",
+   "season": "2026-27",
    "player_id": 5082206,
    "team_id": 15,
    "opponent_id": 1,
    "is_home": true,
    "position": "G",
    "projected_points": 9.8147433045
-  },
-  {
-   "game_id": "401909992",
-   "date": "2026-11-16T01:00Z",
-   "season": "2026-27",
-   "player_id": 5149077,
-   "team_id": 1,
-   "opponent_id": 15,
-   "is_home": false,
-   "position": "G",
-   "projected_points": 9.292951468
   },
   {
    "game_id": "401909992",
@@ -55386,7 +55386,7 @@
    "opponent_id": 27,
    "is_home": false,
    "position": "G",
-   "projected_points": 39.8323207119
+   "projected_points": 40.3909502157
   },
   {
    "game_id": "401909996",
@@ -55430,7 +55430,7 @@
    "opponent_id": 27,
    "is_home": false,
    "position": "F",
-   "projected_points": 30.9396376099
+   "projected_points": 30.7552016757
   },
   {
    "game_id": "401909995",
@@ -55565,17 +55565,6 @@
    "projected_points": 22.6627149782
   },
   {
-   "game_id": "401909996",
-   "date": "2026-11-17T00:00Z",
-   "season": "2026-27",
-   "player_id": 4903027,
-   "team_id": 29,
-   "opponent_id": 27,
-   "is_home": false,
-   "position": "F",
-   "projected_points": 22.0619350432
-  },
-  {
    "game_id": "401909994",
    "date": "2026-11-17T00:00Z",
    "season": "2026-27",
@@ -55596,6 +55585,17 @@
    "is_home": false,
    "position": "F",
    "projected_points": 21.8347063261
+  },
+  {
+   "game_id": "401909996",
+   "date": "2026-11-17T00:00Z",
+   "season": "2026-27",
+   "player_id": 4903027,
+   "team_id": 29,
+   "opponent_id": 27,
+   "is_home": false,
+   "position": "F",
+   "projected_points": 21.7175867082
   },
   {
    "game_id": "401909995",
@@ -58392,6 +58392,6 @@
    "projected_points": 3.1336283312
   }
  ],
- "_generated_utc": "2026-10-27T06:52:06Z",
+ "_generated_utc": "2026-10-27T18:04:11Z",
  "source": "local"
 }
