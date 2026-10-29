@@ -1411,6 +1411,12 @@
    "team_id": 13
   },
   {
+   "player_id": 4596528,
+   "player_name": "Lawson Lovering",
+   "position": "C",
+   "team_id": 13
+  },
+  {
    "player_id": 4278580,
    "player_name": "Sandro Mamukelashvili",
    "position": "F",
@@ -2145,12 +2151,6 @@
   {
    "player_id": 4900671,
    "player_name": "Ajay Mitchell",
-   "position": "G",
-   "team_id": 25
-  },
-  {
-   "player_id": 5106270,
-   "player_name": "Otega Oweh",
    "position": "G",
    "team_id": 25
   },
@@ -3133,6 +3133,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-28T07:24:09Z",
+ "_generated_utc": "2026-10-29T07:40:04Z",
  "source": "local"
 }
