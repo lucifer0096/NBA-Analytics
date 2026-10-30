@@ -613,6 +613,12 @@
    "team_id": 5
   },
   {
+   "player_id": 5106261,
+   "player_name": "Ernest Udeh Jr.",
+   "position": "C",
+   "team_id": 5
+  },
+  {
    "player_id": 4576087,
    "player_name": "Peyton Watson",
    "position": "G",
@@ -1353,6 +1359,12 @@
   {
    "player_id": 5254165,
    "player_name": "Keaton Wagler",
+   "position": "G",
+   "team_id": 12
+  },
+  {
+   "player_id": 4683935,
+   "player_name": "Blake Wesley",
    "position": "G",
    "team_id": 12
   },
@@ -3133,6 +3145,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-29T07:40:04Z",
+ "_generated_utc": "2026-10-30T07:43:51Z",
  "source": "local"
 }
