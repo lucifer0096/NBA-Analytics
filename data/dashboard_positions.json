@@ -2113,6 +2113,12 @@
    "team_id": 18
   },
   {
+   "player_id": 4397018,
+   "player_name": "Ochai Agbaji",
+   "position": "G",
+   "team_id": 25
+  },
+  {
    "player_id": 4684208,
    "player_name": "Brooks Barnhizer",
    "position": "F",
@@ -3145,6 +3151,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-30T07:43:51Z",
+ "_generated_utc": "2026-10-31T07:30:51Z",
  "source": "local"
 }
