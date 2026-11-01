@@ -2113,12 +2113,6 @@
    "team_id": 18
   },
   {
-   "player_id": 4397018,
-   "player_name": "Ochai Agbaji",
-   "position": "G",
-   "team_id": 25
-  },
-  {
    "player_id": 4684208,
    "player_name": "Brooks Barnhizer",
    "position": "F",
@@ -2953,6 +2947,12 @@
    "team_id": 26
   },
   {
+   "player_id": 4683736,
+   "player_name": "Kobe Bufkin",
+   "position": "G",
+   "team_id": 26
+  },
+  {
    "player_id": 4683766,
    "player_name": "Isaiah Collier",
    "position": "G",
@@ -2980,12 +2980,6 @@
    "player_id": 4397077,
    "player_name": "Jaxson Hayes",
    "position": "C",
-   "team_id": 26
-  },
-  {
-   "player_id": 4396963,
-   "player_name": "Blake Hinson",
-   "position": "F",
    "team_id": 26
   },
   {
@@ -3151,6 +3145,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-10-31T07:30:51Z",
+ "_generated_utc": "2026-11-01T08:09:02Z",
  "source": "local"
 }
