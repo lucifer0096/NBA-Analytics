@@ -1905,7 +1905,7 @@
   {
    "player_id": 4397136,
    "player_name": "Saddiq Bey",
-   "position": "G",
+   "position": "F",
    "team_id": 3
   },
   {
@@ -3145,6 +3145,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-01T08:09:02Z",
+ "_generated_utc": "2026-11-02T08:16:47Z",
  "source": "local"
 }
