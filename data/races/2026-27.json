@@ -19,6 +19,199 @@
     "mip": [],
     "roy": []
    }
+  },
+  {
+   "date": "2026-11-03",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 4431678,
+      "player_name": "Tyrese Maxey",
+      "rank": 1,
+      "score": 35.6
+     },
+     {
+      "player_id": 4066457,
+      "player_name": "Austin Reaves",
+      "rank": 2,
+      "score": 28.07
+     },
+     {
+      "player_id": 3202,
+      "player_name": "Kevin Durant",
+      "rank": 3,
+      "score": 26.42
+     },
+     {
+      "player_id": 5175737,
+      "player_name": "Yaxel Lendeborg",
+      "rank": 4,
+      "score": 26.03
+     },
+     {
+      "player_id": 4432639,
+      "player_name": "Jabari Smith Jr.",
+      "rank": 5,
+      "score": 24.25
+     },
+     {
+      "player_id": 4684740,
+      "player_name": "Amen Thompson",
+      "rank": 6,
+      "score": 23.01
+     },
+     {
+      "player_id": 4433287,
+      "player_name": "Brandon Miller",
+      "rank": 7,
+      "score": 22.59
+     },
+     {
+      "player_id": 4432816,
+      "player_name": "LaMelo Ball",
+      "rank": 8,
+      "score": 21.65
+     },
+     {
+      "player_id": 4433136,
+      "player_name": "Walker Kessler",
+      "rank": 9,
+      "score": 21.15
+     },
+     {
+      "player_id": 4278039,
+      "player_name": "Nickeil Alexander-Walker",
+      "rank": 10,
+      "score": 21.05
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 4433136,
+      "player_name": "Walker Kessler",
+      "rank": 1,
+      "score": 2.75
+     },
+     {
+      "player_id": 4869342,
+      "player_name": "Dyson Daniels",
+      "rank": 2,
+      "score": 2.75
+     },
+     {
+      "player_id": 4431678,
+      "player_name": "Tyrese Maxey",
+      "rank": 3,
+      "score": 2.56
+     },
+     {
+      "player_id": 4433249,
+      "player_name": "Moussa Diabate",
+      "rank": 4,
+      "score": 2.46
+     },
+     {
+      "player_id": 4433192,
+      "player_name": "Tari Eason",
+      "rank": 5,
+      "score": 2.28
+     },
+     {
+      "player_id": 3202,
+      "player_name": "Kevin Durant",
+      "rank": 6,
+      "score": 2.16
+     },
+     {
+      "player_id": 4433247,
+      "player_name": "Jonathan Kuminga",
+      "rank": 7,
+      "score": 2.1
+     },
+     {
+      "player_id": 3907498,
+      "player_name": "Matisse Thybulle",
+      "rank": 8,
+      "score": 1.9
+     },
+     {
+      "player_id": 4433287,
+      "player_name": "Brandon Miller",
+      "rank": 9,
+      "score": 1.9
+     },
+     {
+      "player_id": 4397002,
+      "player_name": "Ayo Dosunmu",
+      "rank": 10,
+      "score": 1.63
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 3135045,
+      "player_name": "Grayson Allen",
+      "rank": 1,
+      "score": 16.84
+     },
+     {
+      "player_id": 4397183,
+      "player_name": "Aaron Wiggins",
+      "rank": 2,
+      "score": 15.59
+     },
+     {
+      "player_id": 4066436,
+      "player_name": "De'Anthony Melton",
+      "rank": 3,
+      "score": 12.88
+     },
+     {
+      "player_id": 4433192,
+      "player_name": "Tari Eason",
+      "rank": 4,
+      "score": 12.47
+     },
+     {
+      "player_id": 4351851,
+      "player_name": "Anfernee Simons",
+      "rank": 5,
+      "score": 12.38
+     },
+     {
+      "player_id": 4592829,
+      "player_name": "Quenton Jackson",
+      "rank": 6,
+      "score": 12.25
+     },
+     {
+      "player_id": 4278580,
+      "player_name": "Sandro Mamukelashvili",
+      "rank": 7,
+      "score": 11.84
+     },
+     {
+      "player_id": 4397014,
+      "player_name": "Quentin Grimes",
+      "rank": 8,
+      "score": 10.75
+     },
+     {
+      "player_id": 4397020,
+      "player_name": "Luguentz Dort",
+      "rank": 9,
+      "score": 10.69
+     },
+     {
+      "player_id": 5106060,
+      "player_name": "Jarace Walker",
+      "rank": 10,
+      "score": 10.47
+     }
+    ],
+    "mip": [],
+    "roy": []
+   }
   }
  ]
 }
