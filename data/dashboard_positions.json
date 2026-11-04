@@ -1843,12 +1843,6 @@
    "team_id": 16
   },
   {
-   "player_id": 4592699,
-   "player_name": "Enrique Freeman",
-   "position": "F",
-   "team_id": 16
-  },
-  {
    "player_id": 3032976,
    "player_name": "Rudy Gobert",
    "position": "C",
@@ -3145,6 +3139,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-02T08:16:47Z",
+ "_generated_utc": "2026-11-04T08:00:16Z",
  "source": "local"
 }
