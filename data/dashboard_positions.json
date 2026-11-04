@@ -2179,6 +2179,12 @@
    "team_id": 25
   },
   {
+   "player_id": 4433159,
+   "player_name": "Dalen Terry",
+   "position": "G",
+   "team_id": 25
+  },
+  {
    "player_id": 5159925,
    "player_name": "Nikola Topic",
    "position": "G",
@@ -3139,6 +3145,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-04T08:00:16Z",
+ "_generated_utc": "2026-11-04T19:46:33Z",
  "source": "local"
 }
