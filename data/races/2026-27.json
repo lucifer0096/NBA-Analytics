@@ -212,6 +212,199 @@
     "mip": [],
     "roy": []
    }
+  },
+  {
+   "date": "2026-11-05",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3945274,
+      "player_name": "Luka Doncic",
+      "rank": 1,
+      "score": 47.92
+     },
+     {
+      "player_id": 5104157,
+      "player_name": "Victor Wembanyama",
+      "rank": 2,
+      "score": 37.27
+     },
+     {
+      "player_id": 4431678,
+      "player_name": "Tyrese Maxey",
+      "rank": 3,
+      "score": 34.67
+     },
+     {
+      "player_id": 4278073,
+      "player_name": "Shai Gilgeous-Alexander",
+      "rank": 4,
+      "score": 34.03
+     },
+     {
+      "player_id": 3032977,
+      "player_name": "Giannis Antetokounmpo",
+      "rank": 5,
+      "score": 32.53
+     },
+     {
+      "player_id": 4432166,
+      "player_name": "Cade Cunningham",
+      "rank": 6,
+      "score": 32.26
+     },
+     {
+      "player_id": 3917376,
+      "player_name": "Jaylen Brown",
+      "rank": 7,
+      "score": 29.41
+     },
+     {
+      "player_id": 4066457,
+      "player_name": "Austin Reaves",
+      "rank": 8,
+      "score": 28.02
+     },
+     {
+      "player_id": 4433134,
+      "player_name": "Scottie Barnes",
+      "rank": 9,
+      "score": 27.48
+     },
+     {
+      "player_id": 3136195,
+      "player_name": "Karl-Anthony Towns",
+      "rank": 10,
+      "score": 26.58
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 5104157,
+      "player_name": "Victor Wembanyama",
+      "rank": 1,
+      "score": 5.41
+     },
+     {
+      "player_id": 4433136,
+      "player_name": "Walker Kessler",
+      "rank": 2,
+      "score": 3.15
+     },
+     {
+      "player_id": 4432166,
+      "player_name": "Cade Cunningham",
+      "rank": 3,
+      "score": 2.75
+     },
+     {
+      "player_id": 5211175,
+      "player_name": "Zaccharie Risacher",
+      "rank": 4,
+      "score": 2.52
+     },
+     {
+      "player_id": 5104155,
+      "player_name": "Bilal Coulibaly",
+      "rank": 5,
+      "score": 2.46
+     },
+     {
+      "player_id": 4869342,
+      "player_name": "Dyson Daniels",
+      "rank": 6,
+      "score": 2.44
+     },
+     {
+      "player_id": 2991139,
+      "player_name": "Kris Dunn",
+      "rank": 7,
+      "score": 2.43
+     },
+     {
+      "player_id": 4278049,
+      "player_name": "Daniel Gafford",
+      "rank": 8,
+      "score": 2.31
+     },
+     {
+      "player_id": 4433134,
+      "player_name": "Scottie Barnes",
+      "rank": 9,
+      "score": 2.3
+     },
+     {
+      "player_id": 4431678,
+      "player_name": "Tyrese Maxey",
+      "rank": 10,
+      "score": 2.27
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 4397136,
+      "player_name": "Saddiq Bey",
+      "rank": 1,
+      "score": 18.28
+     },
+     {
+      "player_id": 3135045,
+      "player_name": "Grayson Allen",
+      "rank": 2,
+      "score": 17.69
+     },
+     {
+      "player_id": 4869780,
+      "player_name": "Derik Queen",
+      "rank": 3,
+      "score": 16.84
+     },
+     {
+      "player_id": 4397183,
+      "player_name": "Aaron Wiggins",
+      "rank": 4,
+      "score": 15.75
+     },
+     {
+      "player_id": 4066354,
+      "player_name": "Payton Pritchard",
+      "rank": 5,
+      "score": 15.5
+     },
+     {
+      "player_id": 3448,
+      "player_name": "Brook Lopez",
+      "rank": 6,
+      "score": 15.28
+     },
+     {
+      "player_id": 5254165,
+      "player_name": "Keaton Wagler",
+      "rank": 7,
+      "score": 14.66
+     },
+     {
+      "player_id": 4601025,
+      "player_name": "Pelle Larsson",
+      "rank": 8,
+      "score": 13.59
+     },
+     {
+      "player_id": 4395626,
+      "player_name": "Tre Jones",
+      "rank": 9,
+      "score": 13.16
+     },
+     {
+      "player_id": 4433083,
+      "player_name": "Cam Spencer",
+      "rank": 10,
+      "score": 12.94
+     }
+    ],
+    "mip": [],
+    "roy": []
+   }
   }
  ]
 }
