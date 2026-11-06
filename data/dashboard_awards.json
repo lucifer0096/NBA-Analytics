@@ -50168,30 +50168,6 @@
       "rank": 3
      },
      {
-      "player_id": 4395628,
-      "player_name": "Zion Williamson",
-      "team_abbrev": "NO",
-      "gp": 8,
-      "total": 21,
-      "per_game": 2.6,
-      "mpg": 33.0,
-      "ppg": 21.5,
-      "rpg": 5.1,
-      "apg": 2.6,
-      "spg": 2.6,
-      "bpg": 0.6,
-      "fgm": 62,
-      "fga": 102,
-      "fg3m": 3,
-      "fg3a": 7,
-      "fgp": 60.8,
-      "fg3p": 42.9,
-      "ftp": 76.3,
-      "efg": 62.3,
-      "ts": 67.2,
-      "rank": 4
-     },
-     {
       "player_id": 4251,
       "player_name": "Paul George",
       "team_abbrev": "BOS",
@@ -50213,6 +50189,30 @@
       "ftp": 80.8,
       "efg": 56.6,
       "ts": 59.9,
+      "rank": 4
+     },
+     {
+      "player_id": 4395628,
+      "player_name": "Zion Williamson",
+      "team_abbrev": "NO",
+      "gp": 8,
+      "total": 20,
+      "per_game": 2.5,
+      "mpg": 33.0,
+      "ppg": 21.5,
+      "rpg": 5.1,
+      "apg": 2.6,
+      "spg": 2.5,
+      "bpg": 0.6,
+      "fgm": 62,
+      "fga": 102,
+      "fg3m": 3,
+      "fg3a": 7,
+      "fgp": 60.8,
+      "fg3p": 42.9,
+      "ftp": 76.3,
+      "efg": 62.3,
+      "ts": 67.2,
       "rank": 5
      },
      {
@@ -51084,6 +51084,6 @@
   "2011-12": 990,
   "2010-11": 1230
  },
- "_generated_utc": "2026-11-06T11:30:41Z",
+ "_generated_utc": "2026-11-06T19:26:37Z",
  "source": "local"
 }
