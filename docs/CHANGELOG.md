@@ -7,6 +7,25 @@ green and CI green.
 
 ## 2026-11-07
 
+### feat(awards): name the ESPN-vs-app split on the Awards Ladder
+
+In-season the tab rendered two MVP ladders with near-identical rows and
+no way to tell them apart at a glance -- the live ESPN tracker up top,
+the committed app race further down. The labels now say which is which:
+
+- The live sections are **"MVP progress tracker -- ESPN, live"** and
+  **"ROY progress tracker -- ESPN, live"** (source + freshness in the
+  header; placement unchanged -- they stay at the top of the tab, and
+  past seasons still skip them entirely).
+- The five committed ladders now sit under one group header,
+  **"Calculated races -- the app's own math"** -- everything under it
+  is computed here from collected box scores, nothing fetched live.
+  Individual race labels (MVP race, ROY race, ...) are unchanged, so
+  captions, trend links and docs keep their names.
+
+README, DASHBOARD and DEPLOYMENT quote the labels verbatim; all three
+updated in the same commit.
+
 ### feat(awards): MVP/ROY/MIP rank by Game Score -- the whole box score, not just PTS+REB+AST
 
 The three impact races priced counting volume only (`PTS + 0.75·REB +

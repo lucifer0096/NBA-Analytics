@@ -246,6 +246,7 @@ def test_home_awards_tab_shows_races_and_formula_captions(offline_espn):
     captions = " ".join(str(c.value) for c in at.caption)
     text = f"{_markdown_text(at)} {captions}"
     assert "MVP race" in text
+    assert "Calculated races -- the app's own math" in text
     assert "not official nba voting" in captions.lower()
     if (REPO_ROOT / "data" / "dashboard_wnba_awards.json").exists():
         assert "not official wnba voting" in captions.lower()
@@ -1740,7 +1741,7 @@ def test_live_mvp_tracker_honest_offline(offline_espn):
     assert not at.exception
     text = (f"{_markdown_text(at)} "
             + " ".join(str(c.value) for c in at.caption))
-    assert "MVP progress tracker -- live" in text
+    assert "MVP progress tracker -- ESPN, live" in text
     assert "MVP race is homegrown math, not official NBA voting" in text
     import awards as awards_module
 
@@ -1779,7 +1780,7 @@ def test_live_mvp_tracker_renders_synthetic_rows(monkeypatch, offline_espn):
     assert not at.exception
     text = (f"{_markdown_text(at)} "
             + " ".join(str(c.value) for c in at.caption))
-    assert "MVP progress tracker -- live" in text
+    assert "MVP progress tracker -- ESPN, live" in text
     assert "Live Guy" in text and "Second Live" in text
     assert "31.0 PPG" in text and "33.7" in text   # stat line + score
     assert "≥1 GP" in text                          # the live note
@@ -1798,9 +1799,9 @@ def test_live_mvp_tracker_absent_for_a_past_season(offline_espn):
     assert not at.exception
     text = (f"{_markdown_text(at)} "
             + " ".join(str(c.value) for c in at.caption))
-    assert "MVP progress tracker -- live" not in text
+    assert "MVP progress tracker -- ESPN, live" not in text
     assert "Live ESPN leaders" not in text
-    assert "ROY progress tracker -- live" not in text
+    assert "ROY progress tracker -- ESPN, live" not in text
     assert "Live ROY race" not in text
 
 
@@ -1820,7 +1821,7 @@ def test_live_roy_tracker_honest_offline(offline_espn):
     assert not at.exception
     text = (f"{_markdown_text(at)} "
             + " ".join(str(c.value) for c in at.caption))
-    assert "ROY progress tracker -- live" in text
+    assert "ROY progress tracker -- ESPN, live" in text
     assert "ROY race is homegrown math, not official NBA voting" in text
     import awards as awards_module
 
@@ -1853,7 +1854,7 @@ def test_live_roy_tracker_renders_synthetic_rows(monkeypatch, offline_espn):
     assert not at.exception
     text = (f"{_markdown_text(at)} "
             + " ".join(str(c.value) for c in at.caption))
-    assert "ROY progress tracker -- live" in text
+    assert "ROY progress tracker -- ESPN, live" in text
     assert "Rookie One" in text and "Rookie Two" in text
     assert "24.5 PPG" in text and "34.6" in text   # stat line + score
     assert "rookies = ESPN's 2026 draft class" in text

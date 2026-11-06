@@ -200,8 +200,8 @@ per league, with that league's season and data.
    MVP, all off ESPN's award index, honest pending rows until
    announced), so the page leads with the actual winners. While the
    selected season is the one being played, the headline is followed by
-   the **MVP progress
-   tracker -- live**: ESPN's leaderboards pick the candidate pool (the
+   the **MVP progress tracker -- ESPN, live**: ESPN's leaderboards pick
+   the candidate pool (the
    top 30 each of PTS/REB/AST, deduped by $ref id -- the deep WNBA
    boards answer past ESPN's own limit, so the per-category cap is what
    keeps one render from firing 150 athlete calls), their season
@@ -219,7 +219,8 @@ per league, with that league's season and data.
    ranked vs the qualifier, and ESPN unreachable renders its honest
    note instead of a race. A finished season skips the tracker
    entirely -- its race is the committed one below, never re-fetched.
-   Beside it, under the SAME gate, the **ROY progress tracker -- live**:
+   Beside it, under the SAME gate, the **ROY progress tracker -- ESPN,
+   live**:
    each candidate's core athlete profile carries his **draft class**
    (rookie = drafted in the season's START year -- the 2025 draft plays
    2025-26, the 2026 WNBA draft plays 2026), and only the confirmed
@@ -248,8 +249,9 @@ per league, with that league's season and data.
    an unreachable ESPN, a series with no completed games, or a
    pre-2025 WNBA best-of-5 mid-series (its generic block is
    indistinguishable from the semis) each render their honest note
-   instead of a guess. Then the selected season's MVP / ROY / DPOY /
-   6th Man / MIP races in two columns, then a stat-leaders
+   instead of a guess. Then, under **Calculated races -- the app's own
+   math**, the selected season's MVP / ROY / DPOY / 6th Man / MIP races
+   in two columns, then a stat-leaders
    strip behind a PTS/REB/AST/STL/BLK/**3PM**/**+/-** radio (top-10 per-game rates, each row
    carrying the FG/3P made-attempt splits + FG%). Every row is a real
    headshot over a team-logo CSS fallback with the race's stat line and

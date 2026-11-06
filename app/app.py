@@ -818,7 +818,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
         # daily snapshots; the MVP trend chart below already covers the
         # trend, so it is never drawn twice.
         if season == shared.current_season_label(league):
-            shared.section("MVP progress tracker -- live")
+            shared.section("MVP progress tracker -- ESPN, live")
             live_rows, live_note = shared.load_live_mvp_race(season, league)
             if live_rows:
                 snapshots, _ = shared.load_race_history(season, league)
@@ -843,7 +843,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
             # draft class (one cached call that also names the row); no
             # standings call -- the ROY formula scales by nothing but the
             # games the rookie played.
-            shared.section("ROY progress tracker -- live")
+            shared.section("ROY progress tracker -- ESPN, live")
             roy_rows, roy_note = shared.load_live_rookie_race(season, league)
             if roy_rows:
                 snapshots, _ = shared.load_race_history(season, league)
@@ -911,6 +911,10 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
             # delta between the last two snapshots) and the MVP trend below.
             snapshots, race_note = shared.load_race_history(season, league)
             moves = {key: shared.race_movement(snapshots, key) for key in races}
+            # The ESPN-vs-app split, named: the live ESPN trackers sit at
+            # the top of the tab; everything under this header is computed
+            # HERE from collected box scores (the five race ladders below).
+            shared.section("Calculated races -- the app's own math")
             col_l, col_r = st.columns(2)
 
             def _race(key: str) -> None:
