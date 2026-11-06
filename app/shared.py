@@ -1233,6 +1233,33 @@ def load_standings(season: str, league: str = "nba") -> tuple:
             f"{season}")
 
 
+@st.cache_data(ttl=600, show_spinner=False)
+def load_injuries(league: str = "nba") -> tuple:
+    """(injuries DataFrame, note) for the CURRENT season's report.
+
+    Live-first from ESPN's /injuries endpoint (600s cache), committed
+    data/dashboard[_wnba]_injuries.json as the offline fallback. The
+    report is CURRENT-only -- ESPN publishes no per-season history there
+    -- so rows never come from another season, and a structurally-valid
+    live empty (the offseason answer: nobody hurt) is returned as the
+    honest empty rather than being papered over with stale committed
+    rows. A shape change RAISES out of the parser and falls back."""
+    try:
+        import parsing
+
+        rows = parsing.parse_injuries(espn_api.get_injuries(league))
+    except Exception:
+        payload = _read_fallback("dashboard_injuries.json", league)
+        committed = payload.get("injuries") or []
+        if committed:
+            return pd.DataFrame(committed), data_age_note(payload, False)
+        return (pd.DataFrame(),
+                "Live injury report fetch failed and no committed report "
+                "exists (regenerate with `python src/collector/"
+                "refresh_dashboard_fallbacks.py`)")
+    return pd.DataFrame(rows), data_age_note({}, True)
+
+
 @st.cache_data(ttl=300, show_spinner=False)
 def load_schedule(season: str, league: str = "nba") -> tuple:
     """(games DataFrame, note). Local-first: the selected season's OWN file

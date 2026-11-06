@@ -87,6 +87,49 @@ def test_parse_teams_fixture():
     assert bulls["abbrev"] == "CHI"
 
 
+def test_parse_injuries_flattens_team_groups_to_report_rows():
+    """ESPN's team-grouped /injuries payload -> flat rows carrying athlete,
+    team, status, the SHORT report line and the report date (verified live
+    Nov 2026 shape). The long comment is dropped as table noise; a missing
+    field stays None, never invented."""
+    rows = parsing.parse_injuries({
+        "injuries": [
+            {"id": "1", "displayName": "Atlanta Hawks", "injuries": [
+                {"status": "Day-To-Day", "date": "2026-11-05T01:19Z",
+                 "shortComment": "Newell won't return, a left great toe "
+                                 "hyperextension, reports say.",
+                 "longComment": "a much longer paragraph of detail",
+                 "athlete": {"displayName": "Asa Newell"}},
+                {"status": "Out", "athlete": {"displayName": "Jalen Johnson"}},
+            ]},
+            {"id": "2", "displayName": "Boston Celtics", "injuries": []},
+        ],
+    })
+    assert rows == [
+        {"player_name": "Asa Newell", "team": "Atlanta Hawks",
+         "status": "Day-To-Day",
+         "detail": "Newell won't return, a left great toe hyperextension, "
+                   "reports say.",
+         "date": "2026-11-05T01:19Z"},
+        {"player_name": "Jalen Johnson", "team": "Atlanta Hawks",
+         "status": "Out", "detail": None, "date": None},
+    ]
+
+
+def test_parse_injuries_empty_is_honest_and_shape_change_raises():
+    """A present-but-empty report is the offseason answer (nobody hurt)
+    and parses to []; a payload WITHOUT the injuries field RAISES -- a
+    shape change must fall back to the committed report in the app and
+    keep it in the refresh, never render as 'nobody hurt'."""
+    assert parsing.parse_injuries({"injuries": []}) == []
+    assert parsing.parse_injuries(
+        {"injuries": [{"displayName": "Team", "injuries": []}]}) == []
+    with pytest.raises(ValueError):
+        parsing.parse_injuries({"status": {"code": 200}})
+    with pytest.raises(ValueError):
+        parsing.parse_injuries({})
+
+
 # ---------------------------------------------------------------------------
 # WAF header rotation (the runner-side 403 fix)
 # ---------------------------------------------------------------------------
@@ -462,6 +505,25 @@ def test_core_api_and_live_endpoint_urls(monkeypatch):
     assert ".pvt" not in "".join(asked)
     with pytest.raises(ValueError):
         espn_api.core_api("nbaall")
+
+
+def test_injuries_endpoint_url(monkeypatch):
+    """The report comes from site.api's /injuries path with the league slug
+    swapped -- current-season only, no season param (the endpoint has no
+    per-season history, which is why the tab says so for a past season)."""
+    asked = []
+
+    def _capture(url):
+        asked.append(url)
+        return {}
+
+    monkeypatch.setattr(espn_api, "_get_json", _capture)
+    espn_api.get_injuries("nba")
+    assert asked[-1] == (
+        "https://site.api.espn.com/apis/site/v2/sports/basketball/nba"
+        "/injuries")
+    espn_api.get_injuries("wnba")
+    assert asked[-1].endswith("/basketball/wnba/injuries")
 
 
 def test_parse_leader_candidates_dedupes_refs_and_caps_depth():

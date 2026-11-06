@@ -162,3 +162,29 @@ def test_race_histories_are_ordered_capped_and_well_formed():
                     assert {"player_id", "player_name", "rank", "score"} \
                         <= set(row), (path.name, race)
                     assert isinstance(row["score"], (int, float))
+
+
+def test_injury_report_rows_carry_the_fields_the_tab_reads():
+    """The committed report's rows keep exactly the keys the Injuries tab
+    reads (player, team, status, detail, date): a merge that dropped one
+    would blank a column or sort the row into nowhere. detail/date may be
+    None -- the UI's honest blanks -- but never invented text, and every
+    row names a player and a team. The NBA's report must be committed;
+    the WNBA's is optional until its first successful fetch lands one."""
+    for name, required in (("dashboard_injuries.json", True),
+                           ("dashboard_wnba_injuries.json", False)):
+        path = DATA_DIR / name
+        if not path.exists():
+            assert not required, f"{name} must be committed"
+            continue
+        payload = _load(path)
+        assert payload["source"] in ("espn", "local")
+        assert payload.get("_generated_utc")
+        rows = payload.get("injuries")
+        assert isinstance(rows, list)
+        for row in rows:
+            assert isinstance(row, dict)
+            assert row.get("player_name"), name
+            assert row.get("team"), name
+            assert {"player_name", "team", "status", "detail", "date"} \
+                <= set(row), (name, sorted(row))

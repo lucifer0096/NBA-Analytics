@@ -6,6 +6,9 @@ tabs read, committed here (the same pattern as FPL-Analytics' refresh script):
 
     data/dashboard_teams.json        team list (ids/abbrevs/names)
     data/dashboard_standings.json    latest available season's standings
+    data/dashboard_injuries.json     current injury report (ESPN's
+                                     /injuries -- current-season only,
+                                     no per-season history exists)
     data/dashboard_schedule.json     thin index: which per-season files exist
     data/schedules/{season}.json     one season's schedule + final scores
                                      (the app reads only the selected
@@ -310,6 +313,32 @@ def _write_season_file(label: str, rows: list, stamp: str = None,
     with open(os.path.join(target, f"{label}.json"), "w",
               encoding="utf-8") as f:
         json.dump(payload, f, separators=(",", ":"))
+
+
+def refresh_injuries() -> dict:
+    """The CURRENT injury report (data/dashboard[_wnba]_injuries.json)
+    straight from ESPN's /injuries endpoint.
+
+    A failed fetch keeps the committed report and only warns -- an outage
+    must not blank the tab (the same keep-and-warn rule as the team list).
+    ESPN answering with a structurally valid EMPTY list is the offseason
+    answer ('nobody is hurt') and gets written as such, while a payload
+    parse_injuries can't recognize RAISES, keeping the committed rows
+    instead of silently writing an empty over them."""
+    path = _dash("dashboard_injuries.json")
+    try:
+        rows = parsing.parse_injuries(espn_api.get_injuries(LEAGUE))
+    except Exception as e:  # noqa: BLE001 -- tolerate, keep the report
+        kept = _read_json(path, {})
+        if kept.get("injuries"):
+            print(f"  WARNING: injuries fetch failed ({type(e).__name__}: "
+                  f"{e}) -- keeping the committed report")
+            return kept
+        print(f"  WARNING: injuries fetch failed ({type(e).__name__}: {e}) "
+              "and no committed report exists -- retried next run")
+        return {}
+    _write(path, _stamp({"injuries": rows}, "espn"))
+    return {"injuries": rows}
 
 
 def refresh_schedule(season: str) -> dict:
@@ -939,6 +968,7 @@ def main(argv=None) -> None:
         print(f"Refreshing dashboard fallbacks ({leagues.display(LEAGUE)})...")
         refresh_teams()
         refresh_standings(standings_candidates())
+        refresh_injuries()
         refresh_schedule(current)
         refresh_postseason_schedule()
         refresh_positions()

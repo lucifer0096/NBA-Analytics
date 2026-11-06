@@ -3,7 +3,7 @@ fresh-checkout/deploy condition: every live ESPN call forced to fail, no
 data/raw/ needed (committed data/dashboard_* fallbacks only). No network.
 
 Pins the contract that would otherwise rot silently: every page renders,
-the two league tabs (NBA | WNBA) each nest the four home sections, the
+the two league tabs (NBA | WNBA) each nest the five home sections, the
 KPI cards exist per league, and the fallback-failure path shows an honest
 empty state rather than a stack trace -- including the not-yet-started
 season (2026-27) showing empty states instead of another year's data.
@@ -71,16 +71,16 @@ def test_committed_data_json_is_parseable():
 def test_home_page_renders_offline(offline_espn):
     at = _render("app/app.py", offline_espn)
     assert not at.exception
-    # Title + the two league tabs, each nesting the four home sections
+    # Title + the two league tabs, each nesting the five home sections
     # (All-Time/GOAT/Profile moved to left-nav pages; Court View moved
-    # here from the deleted Model & History page) even with every live
-    # call failing.
+    # here from the deleted Model & History page; Injuries added under
+    # the season selector) even with every live call failing.
     assert any("NBA Analytics" in str(t.value) for t in at.title)
     tab_labels = [str(t.label) for t in at.tabs]
     assert tab_labels == ["NBA", "Schedule & Scores", "Standings",
-                          "Awards Ladder", "Court View",
+                          "Injuries", "Awards Ladder", "Court View",
                           "WNBA", "Schedule & Scores", "Standings",
-                          "Awards Ladder", "Court View"]
+                          "Injuries", "Awards Ladder", "Court View"]
     # KPI strip is season-scoped: inventory, tip-off, scoring leader -- one
     # strip per league tab (the Model (validation) KPI was removed from
     # this page). NBA's three come first, then WNBA's.
@@ -123,6 +123,103 @@ def test_home_page_falls_back_to_committed_data(offline_espn):
         assert "GB" in columns and pd.api.types.is_numeric_dtype(table["GB"])
         assert not (table["GB"].astype(str) == "-").any()
         assert pd.api.types.is_numeric_dtype(table["Win%"])
+
+
+def test_home_injuries_tab_renders_honest_state(offline_espn):
+    """The Injuries tab renders an honest state with every live call
+    failing: the committed report's rows behind an 'Offline fallback'
+    source line once the refresh has landed one, otherwise the
+    fetch-failed note -- never a stack trace, never another season's
+    rows under the header."""
+    at = _render("app/app.py", offline_espn)
+    assert "Injuries" in [str(t.label) for t in at.tabs]
+    captions = " ".join(str(c.value) for c in at.caption)
+    infos = " ".join(str(i.value) for i in at.info)
+    assert ("Offline fallback" in captions
+            or "fetch failed" in captions
+            or "fetch failed" in infos)
+
+
+def test_home_injuries_tab_orders_out_first_and_stamps_the_report_time(
+        monkeypatch, offline_espn):
+    """The report table sorts Out first (then status severity, team and
+    player), keeps an unknown status text instead of dropping it, and
+    stamps ESPN's report time on the viewer's clock -- a missing date
+    stays blank, never invented."""
+    import pandas as pd
+
+    import shared
+
+    rows = pd.DataFrame([
+        {"player_name": "B Day", "team": "ATL", "status": "Day-To-Day",
+         "detail": "day to day", "date": "2026-11-05T01:19Z"},
+        {"player_name": "C Mystery", "team": "BOS",
+         "status": "Something New", "detail": None, "date": None},
+        {"player_name": "A Out", "team": "ATL", "status": "Out",
+         "detail": "out", "date": "2026-11-04T23:00Z"},
+    ])
+    monkeypatch.setattr(shared, "load_injuries",
+                        lambda league="nba": (rows, "Live (600s cache)"))
+    at = _render("app/app.py", offline_espn)
+    frames = [df.value for df in at.dataframe
+              if hasattr(getattr(df, "value", None), "columns")]
+    inj = next((f for f in frames if "Status" in list(f.columns)), None)
+    assert inj is not None, "the injuries table must render"
+    assert list(inj["Player"]) == ["A Out", "B Day", "C Mystery"]
+    assert list(inj["Status"])[0] == "Out"
+    assert list(inj["Updated"])[0] != ""     # stamped on the viewer's clock
+    assert list(inj["Updated"])[2] == ""     # missing date stays blank
+
+
+def test_home_injuries_tab_past_season_says_no_history(offline_espn):
+    """A past season never wears the current report: with an earlier
+    season selected the tab says the report covers the season being
+    played only, instead of showing today's injuries under a 2025-26
+    header."""
+    at = _render("app/app.py", offline_espn)
+    at.selectbox(key="season_nba").select("2025-26").run()
+    assert not at.exception, f"page raised: {at.exception}"
+    infos = " ".join(str(i.value) for i in at.info)
+    assert "no per-season history" in infos
+
+
+def test_load_injuries_live_first_and_committed_fallback(monkeypatch):
+    """Live answers -> its rows and the Live note; a structurally-valid
+    live EMPTY is the offseason answer (never stale committed rows);
+    a fetch failure falls back to the committed report with its own age,
+    or the honest no-committed-report note when there is none."""
+    import shared
+
+    raw = {"injuries": [
+        {"displayName": "Atlanta Hawks", "injuries": [
+            {"status": "Out", "shortComment": "out a week",
+             "athlete": {"displayName": "Live Player"}}]}]}
+    monkeypatch.setattr(shared.espn_api, "get_injuries",
+                        lambda league="nba": raw)
+    shared.load_injuries.clear()
+    try:
+        df, note = shared.load_injuries("nba")
+        assert list(df["player_name"]) == ["Live Player"]
+        assert note.startswith("Live")
+
+        monkeypatch.setattr(shared.espn_api, "get_injuries",
+                            lambda league="nba": {"injuries": []})
+        shared.load_injuries.clear()
+        df, note = shared.load_injuries("nba")
+        assert df.empty and note.startswith("Live")
+
+        def _boom(*args, **kwargs):
+            raise OSError("network disabled for test")
+
+        monkeypatch.setattr(shared.espn_api, "get_injuries", _boom)
+        shared.load_injuries.clear()
+        df, note = shared.load_injuries("nba")
+        if df.empty:
+            assert "fetch failed" in note
+        else:
+            assert note.startswith("Offline fallback")
+    finally:
+        shared.load_injuries.clear()  # never leak synthetic rows
 
 
 def test_sidebar_mentions_model_and_history(offline_espn):
@@ -1319,7 +1416,7 @@ def test_deep_link_season_preselects_sidebar(offline_espn):
 
 def test_deep_link_league_reorders_league_tabs(offline_espn):
     """?league=wnba renders the WNBA league tab FIRST (st.tabs has no
-    programmatic selection) while each tab keeps its own four nested
+    programmatic selection) while each tab keeps its own five nested
     sections in the pinned order -- the label -> element map keeps them
     matched."""
     at = AppTest.from_file(str(REPO_ROOT / "app/app.py"), default_timeout=30)
@@ -1328,9 +1425,9 @@ def test_deep_link_league_reorders_league_tabs(offline_espn):
     assert not at.exception, f"page raised: {at.exception}"
     labels = [str(t.label) for t in at.tabs]
     assert labels == ["WNBA", "Schedule & Scores", "Standings",
-                      "Awards Ladder", "Court View",
+                      "Injuries", "Awards Ladder", "Court View",
                       "NBA", "Schedule & Scores", "Standings",
-                      "Awards Ladder", "Court View"]
+                      "Injuries", "Awards Ladder", "Court View"]
     # An unknown league label is ignored, not crashed on.
     plain = AppTest.from_file(str(REPO_ROOT / "app/app.py"),
                               default_timeout=30)
@@ -1351,8 +1448,9 @@ def test_deep_link_tab_reorders_tabs(offline_espn):
     assert not at.exception, f"page raised: {at.exception}"
     labels = [str(t.label) for t in at.tabs]
     assert labels == ["NBA", "Court View", "Schedule & Scores", "Standings",
-                      "Awards Ladder", "WNBA", "Court View",
-                      "Schedule & Scores", "Standings", "Awards Ladder"]
+                      "Injuries", "Awards Ladder", "WNBA", "Court View",
+                      "Schedule & Scores", "Standings", "Injuries",
+                      "Awards Ladder"]
 
 
 def test_deep_link_player_opens_profile(offline_espn):

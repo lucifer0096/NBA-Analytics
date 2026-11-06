@@ -5,6 +5,86 @@ behind each batch. Automated `data:` collector refreshes are omitted --
 they carry no code change. Every batch below landed with its tests
 green and CI green.
 
+## 2026-11-06
+
+### fix(awards): the early-season scoring bar hid Luka -- Maxey topped the tile at 8 GP while the actual leader sat at 7
+
+The ranking itself was never wrong (per-game rate, ties by total): the
+QUALIFIER was. `min_games_for` floored every in-progress season at 8 GP,
+so the 2026-27 leaders stayed empty until Nov 3, and on Nov 3-4 -- Luka
+Doncic at 7 GP (38.5 PPG) while Tyrese Maxey had 8 -- the KPI tile read
+**Maxey 29.1** as "Season scoring leader" with Luka silently excluded.
+ESPN's own PPG list carried Luka throughout; our committed data shows
+him jumping straight to #1 (38.5) the day he hit 8 GP (Nov 5).
+
+- The bar now tracks the season for its first 16 team games: half the
+  busiest team's games, rounded UP, floored at 1 -- `in_season_min_gp`,
+  the same rule the live MVP/ROY trackers already used (opening night
+  ranks whoever played; the caption always states the bar). From 16
+  team games on it is the ORIGINAL formula, so every completed season
+  keeps its byte-identical qualifier (82 -> 41, 66 -> 33, and the int()
+  rounding unchanged: 73 -> 36).
+- One rule feeds every committed race (MVP/DPOY/6th-Man/MIP/ROY), every
+  stat-leader category and the on-screen "needs >=N GP" captions -- the
+  committed ladder and the live tracker now agree bar-for-bar during
+  the season (the old test that pinned the live bar strictly below the
+  committed one asserts equality instead).
+- This batch ships the rebuilt 2026-27 payload under the new bar (123
+  box scores collected locally exactly the way the cron does: Luka #1
+  at 38.5, Curry visible at 7 GP, Maxey back to #5), while every past
+  season's payload is content-identical -- verified against HEAD: only
+  2026-27 changed, 2025-26 keeps its 41-GP bar.
+
+### feat(injuries): an Injuries tab per league -- ESPN's current report, live-first
+
+The fifth home tab (between Standings and the Awards Ladder) shows
+ESPN's current injury report: one table of Status | Player | Team |
+Detail | Updated, sorted Out first by status severity then team and
+player (unknown status text is kept and sorted last, never dropped),
+with ESPN's short report note as the Detail and the report's own
+timestamp rendered on the viewer's clock (missing date stays blank).
+
+- `espn_api.get_injuries` + `parsing.parse_injuries` flatten the
+  team-grouped `/injuries` payload (long comments dropped as table
+  noise); a payload without the `injuries` field RAISES, so a shape
+  change falls back instead of rendering "nobody is hurt".
+- `refresh_dashboard_fallbacks` writes `data/dashboard_injuries.json`
+  (WNBA: `_wnba`) on every run: a failed fetch or unrecognized shape
+  keeps the committed report (an outage never blanks the tab), while
+  ESPN's own empty answer -- the offseason state -- is written as such.
+- The app loader is live-first (600s cache) with the committed file as
+  the offline fallback, and since the endpoint has NO per-season
+  history a past season selected in the sidebar says exactly that
+  instead of wearing today's rows under its header.
+
+### refactor(ui): a declutter pass over the Home tabs -- one fact per surface
+
+Reviewed every rendered element of all five tabs (element dump first,
+then the code) and removed what said the same thing twice:
+
+- **Awards Ladder**: the wrapper caption ("Homegrown transparent
+  metrics... Each race's caption states the exact formula") -- every
+  race caption below already prints exactly that, verbatim; the
+  headline caption's "-- the same source as the honours and the tracker
+  below" clause and the verdict's "(the honours' own source)" -- the
+  source is now named once per caption, not cross-referenced twice.
+- **Finals MVP shown twice**: the selected season's row appeared in the
+  headline AND as the tracker's first row -- the tracker now lists the
+  seasons around the selected one (the headline owns its own), so a
+  pending dash no longer renders twice for the current season either.
+- **Court View**: "positions are ESPN's coarse G/F/C..." printed twice
+  in adjacent captions (render caption + formation note) -- the
+  formation note keeps only the formation, the optimizer provenance and
+  the PG/SG -> G mapping; the WNBA variant's broken "src/model/'s"
+  wording fixed on the way.
+- **MIP empty state**: "it compares against 2025-26, which has no
+  collected box scores in this build" contradicted the sidebar's own
+  1,231-game inventory for 2025-26 -- it now says the refresh didn't
+  collect them (the daily run gathers the current season).
+- Schedule & Scores and Standings were reviewed and left alone: their
+  Today-vs-Upcoming and headline-vs-table overlap is the featured/list
+  pattern, not duplication.
+
 ## 2026-10-26
 
 ### feat(roy): the Rookie of the Year race -- full MVP parity on the Awards Ladder

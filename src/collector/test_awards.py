@@ -103,13 +103,23 @@ def test_goat_formula_per_league_prints_every_weight():
     assert len(awards.honours_weights("wnba")) == 15
 
 
-def test_min_games_floor():
-    # Floored at 8 so early-season runs still produce a race.
-    assert awards.min_games_for(0) == 8
-    assert awards.min_games_for(10) == 8
-    # After that it's half the games any team played.
+def test_min_games_tracks_the_season_before_it_hits_the_old_floor():
+    """Early season the bar tracks the season itself (half the busiest
+    team's games, rounded up, floored at 1 -- the live tracker's rule):
+    a rigid 8-game floor hid real leaders (Luka at 7 GP, 38.5 PPG in
+    early Nov 2026 while Maxey topped the tile with 8). From 16 team
+    games the ORIGINAL formula takes over, byte-identical for every
+    completed season."""
+    assert awards.min_games_for(0) == 1
+    assert awards.min_games_for(1) == 1    # opening night
+    assert awards.min_games_for(4) == 2
+    assert awards.min_games_for(10) == 5   # the Nov-2026 window: 5, not 8
+    assert awards.min_games_for(15) == 8   # ceil(7.5): meets the old floor
+    assert awards.min_games_for(16) == 8   # int(0.5 * 16): old rule, unchanged
+    # From here it's half the games any team played, as always.
     assert awards.min_games_for(82) == 41
     assert awards.min_games_for(100) == 50
+    assert awards.min_games_for(73) == 36  # int() rounding, unchanged
 
 
 def test_team_records_parses_float_scores_and_skips_non_final(tmp_path):
@@ -610,7 +620,8 @@ def test_build_payload_envelope(tmp_path):
     payload = awards.build_payload("2012-13", raw_dir=str(tmp_path))
     assert payload["season"] == "2012-13"
     assert payload["prev_season"] is None             # 2011-12 not collected
-    assert payload["min_games"] == 8                  # max(8, 0.5*8)
+    assert payload["min_games"] == 4                  # ceil(8/2): the
+    # season's own bar (an 8-game season tracks itself, no rigid floor)
     assert payload["races"]["mip"] == []              # needs the prior season
 
     mvp = payload["races"]["mvp"]
@@ -706,9 +717,9 @@ def test_build_payload_roy_race_joins_only_with_rookie_identities(tmp_path):
     assert set(payload["races"]) == {"mvp", "dpoy", "sixth_man", "mip",
                                      "roy"}
     roy = payload["races"]["roy"]
-    assert [r["player_name"] for r in roy] == ["Rookie"]  # 1 GP < 8
+    assert [r["player_name"] for r in roy] == ["Rookie"]  # 1 GP < 4
     assert roy[0]["score"] == 27.75       # pure impact, no win% multiplier
-    assert payload["min_games"] == 8      # the same qualifier as MVP
+    assert payload["min_games"] == 4      # the same qualifier as MVP
 
     empty = awards.build_payload("2012-13", raw_dir=str(tmp_path),
                                  rookies=set())
@@ -821,10 +832,11 @@ def test_aggregate_series_games_sums_and_skips():
 
 
 def test_in_season_min_gp_scales_with_the_schedule():
-    """The live tracker's qualifier is the season rule (min_games_for:
-    half the schedule, floor 8) rescaled for a season still being played:
-    half the busiest team's games, rounded UP, floored at 1 so opening
-    night ranks whoever played instead of printing an empty race."""
+    """Half the busiest team's games, rounded UP, floored at 1 so opening
+    night ranks whoever played instead of printing an empty race. This is
+    the live tracker's qualifier all season AND min_games_for's own bar
+    for the season's first 16 team games (its old rigid 8-floor locked
+    October shut)."""
     assert awards.in_season_min_gp(0) == 1
     assert awards.in_season_min_gp(1) == 1    # opening night
     assert awards.in_season_min_gp(2) == 1
@@ -833,6 +845,5 @@ def test_in_season_min_gp_scales_with_the_schedule():
     assert awards.in_season_min_gp(7) == 4
     assert awards.in_season_min_gp(44) == 22  # full WNBA season
     assert awards.in_season_min_gp(82) == 41  # full NBA season
-    # Same half-the-schedule shape as the committed rule, without its
-    # early-season emptiness (floor 8 would lock an October race shut).
-    assert awards.in_season_min_gp(10) == 5 < awards.min_games_for(10)
+    # The committed rule now adopts this exact bar early in the season.
+    assert awards.in_season_min_gp(10) == awards.min_games_for(10) == 5

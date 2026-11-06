@@ -263,6 +263,17 @@ def get_scoreboard(dates: str, league: str = "nba") -> dict:
     return _get_json(f"{site_api(league)}/scoreboard?dates={dates}")
 
 
+def get_injuries(league: str = "nba") -> dict:
+    """The league's CURRENT injury report -- team-grouped rows carrying the
+    athlete, status, report comments and report date (verified live Nov
+    2026: 29 NBA teams / 91 rows, statuses 'Out' and 'Day-To-Day').
+
+    Current-season only: this endpoint publishes no per-season history, so
+    the app's tab says so instead of showing the current report under a
+    past season's header."""
+    return _get_json(f"{site_api(league)}/injuries")
+
+
 def get_leaders(season: int, league: str = "nba", limit: int = 50) -> dict:
     """Every per-category leaderboard for the season ENDING in `season`
     (NBA) / the season `season` (WNBA), regular season (types=2) -- the

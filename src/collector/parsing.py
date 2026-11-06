@@ -375,6 +375,38 @@ def parse_standings(payload: dict) -> list:
     return list(seen.values())
 
 
+def parse_injuries(payload: dict) -> list:
+    """ESPN's team-grouped /injuries payload -> flat report rows.
+
+    Shape (verified live Nov 2026): {"injuries": [{id, displayName (team),
+    injuries: [{status, shortComment, date, athlete: {displayName, ...}}]}
+    ...]}. The SHORT comment is the actionable report line ("won't return
+    ... due to a left great toe hyperextension"); the long one is dropped
+    as table noise. Missing fields stay missing -- never invented.
+
+    A payload without the 'injuries' field RAISES: a shape change must
+    fall back to the committed report (or warn in the refresh), never
+    render as the honest empty 'nobody is hurt'."""
+    if not isinstance(payload, dict) or "injuries" not in payload:
+        raise ValueError("injuries payload has no 'injuries' field")
+    rows: list = []
+    for team in payload.get("injuries") or []:
+        if not isinstance(team, dict):
+            continue
+        for row in team.get("injuries") or []:
+            if not isinstance(row, dict):
+                continue
+            athlete = row.get("athlete") or {}
+            rows.append({
+                "player_name": athlete.get("displayName"),
+                "team": team.get("displayName"),
+                "status": row.get("status"),
+                "detail": row.get("shortComment"),
+                "date": row.get("date"),
+            })
+    return rows
+
+
 # ---------------------------------------------------------------------------
 # live leaders + per-athlete season totals (the in-season MVP tracker)
 # ---------------------------------------------------------------------------

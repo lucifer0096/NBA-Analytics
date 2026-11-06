@@ -1,0 +1,349 @@
+{
+ "injuries": [
+  {
+   "player_name": "Matilde Villa",
+   "team": "Atlanta Dream",
+   "status": "Out",
+   "detail": "Villa (coach's decision) has been ruled out for Wednesday's game against New York.",
+   "date": "2026-09-23T22:50Z"
+  },
+  {
+   "player_name": "Brionna Jones",
+   "team": "Atlanta Dream",
+   "status": "Out",
+   "detail": "Jones will miss the remainder of the season after sustaining a left leg injury against the Sun on Aug. 13, Annie Costabile of The Athletic reports.",
+   "date": "2026-09-17T16:08Z"
+  },
+  {
+   "player_name": "DiJonai Carrington",
+   "team": "Chicago Sky",
+   "status": "Out",
+   "detail": "Carrington (foot) has been ruled out for Thursday's game against the Mystics.",
+   "date": "2026-09-23T21:28Z"
+  },
+  {
+   "player_name": "Aicha Coulibaly",
+   "team": "Chicago Sky",
+   "status": "Out",
+   "detail": "Coulibaly (knee) is out for Thursday's game against the Mystics",
+   "date": "2026-09-23T21:27Z"
+  },
+  {
+   "player_name": "Azura Stevens",
+   "team": "Chicago Sky",
+   "status": "Out",
+   "detail": "Stevens (knee) is out for Thursday's game against the Mystics",
+   "date": "2026-09-23T21:25Z"
+  },
+  {
+   "player_name": "Natasha Cloud",
+   "team": "Chicago Sky",
+   "status": "Out",
+   "detail": "Cloud (knee) is out for Thursday's game against the Mystics.",
+   "date": "2026-09-23T21:22Z"
+  },
+  {
+   "player_name": "Skylar Diggins",
+   "team": "Chicago Sky",
+   "status": "Out",
+   "detail": "Diggins (knee) will miss the remainder of the 2026 WNBA season, Sara Jane Gamelli of BallisLife.com reports.",
+   "date": "2026-09-01T14:17Z"
+  },
+  {
+   "player_name": "Rickea Jackson",
+   "team": "Chicago Sky",
+   "status": "Out",
+   "detail": "The Sky announced Tuesday that Jackson will miss the remainder of the season after suffering a torn ACL in her left knee during Sunday's 86-79 win over the Lynx.",
+   "date": "2026-05-19T13:54Z"
+  },
+  {
+   "player_name": "Rayah Marshall",
+   "team": "Connecticut Sun",
+   "status": "Out",
+   "detail": "Marshall has been ruled out for the remainder of Thursday's game against the Tempo due to a right knee injury.",
+   "date": "2026-09-25T00:21Z"
+  },
+  {
+   "player_name": "Olivia Nelson-Ododa",
+   "team": "Connecticut Sun",
+   "status": "Out",
+   "detail": "Nelson-Ododa (knee) is out for Thursday's game against the Tempo.",
+   "date": "2026-09-23T20:54Z"
+  },
+  {
+   "player_name": "Saniya Rivers",
+   "team": "Connecticut Sun",
+   "status": "Out",
+   "detail": "Rivers (ankle) is out for Thursday's game against the Tempo.",
+   "date": "2026-09-23T20:51Z"
+  },
+  {
+   "player_name": "Brittney Griner",
+   "team": "Connecticut Sun",
+   "status": "Out",
+   "detail": "Griner (knee) is out for Thursday's game against the Tempo.",
+   "date": "2026-09-23T20:49Z"
+  },
+  {
+   "player_name": "Kennedy Burke",
+   "team": "Connecticut Sun",
+   "status": "Out",
+   "detail": "The Sun announced Monday that Burke suffered a sprained AC joint in the FIBA World Cup and will miss the rest of the season.",
+   "date": "2026-09-14T19:53Z"
+  },
+  {
+   "player_name": "Alanna Smith",
+   "team": "Dallas Wings",
+   "status": "Out",
+   "detail": "Smith (lower leg) is out for Game 3 of the first round of the playoffs against Golden State on Friday.",
+   "date": "2026-10-01T23:48Z"
+  },
+  {
+   "player_name": "Azzi Fudd",
+   "team": "Dallas Wings",
+   "status": "Out",
+   "detail": "Fudd will undergo an arthroscopic procedure to address her right knee soreness and will be sidelined for the remainder of the 2026 season.",
+   "date": "2026-08-19T20:10Z"
+  },
+  {
+   "player_name": "Costanza Verona",
+   "team": "Dallas Wings",
+   "status": "Out",
+   "detail": "Verona's contract was temporarily suspended by the Wings Saturday.",
+   "date": "2026-08-08T19:59Z"
+  },
+  {
+   "player_name": "Iliana Rupert",
+   "team": "Golden State Valkyries",
+   "status": "Out",
+   "detail": "Rupert is pregnant, and the Valkyries have filed for a replacement contract ahead of the 2026 season, Alexa Philippou of ESPN.com reports Thursday.",
+   "date": "2026-05-07T15:18Z"
+  },
+  {
+   "player_name": "Aliyah Boston",
+   "team": "Indiana Fever",
+   "status": "Out",
+   "detail": "out",
+   "date": "2026-10-28T16:15Z"
+  },
+  {
+   "player_name": "Tyasha Harris",
+   "team": "Indiana Fever",
+   "status": "Out",
+   "detail": "Harris (leg) will miss the rest of the season, WNBA reporter Kareem Copeland reports.",
+   "date": "2026-09-26T19:21Z"
+  },
+  {
+   "player_name": "NaLyssa Smith",
+   "team": "Las Vegas Aces",
+   "status": "Out",
+   "detail": "The Aces announced Thursday that Smith will be sidelined for the rest of the season after suffering a non-contact left leg injury during Sunday's game versus the Tempo, per Chelsea Leite of TSN.",
+   "date": "2026-08-27T19:29Z"
+  },
+  {
+   "player_name": "Ndjakalenga Mwenentanda",
+   "team": "Los Angeles Sparks",
+   "status": "Out",
+   "detail": "Mwenentanda (coach's decision) has been ruled out for Thursday's game against Golden State.",
+   "date": "2026-09-25T01:12Z"
+  },
+  {
+   "player_name": "Shyanne Sellers",
+   "team": "Los Angeles Sparks",
+   "status": "Out",
+   "detail": "Sellers (coach's decision) is out for Thursday's game against the Valkyries.",
+   "date": "2026-09-25T01:08Z"
+  },
+  {
+   "player_name": "Cameron Brink",
+   "team": "Los Angeles Sparks",
+   "status": "Out",
+   "detail": "Brink (ankle) is listed as out for Thursday's game against Golden State.",
+   "date": "2026-09-24T00:25Z"
+  },
+  {
+   "player_name": "Aaliyah Nye",
+   "team": "Los Angeles Sparks",
+   "status": "Out",
+   "detail": "Nye (ankle) has been ruled out for Thursday's game against Golden State.",
+   "date": "2026-09-24T00:13Z"
+  },
+  {
+   "player_name": "Anastasiia Olairi Kosu",
+   "team": "Minnesota Lynx",
+   "status": "Out",
+   "detail": "Kosu (foot) has been ruled out for Tuesday's Game 2 of the first round of the playoffs against the Liberty.",
+   "date": "2026-09-28T21:13Z"
+  },
+  {
+   "player_name": "Elena Buenavida",
+   "team": "Minnesota Lynx",
+   "status": "Out",
+   "detail": "Buenavida (coach's decision) is out for Thursday's game against the Fever.",
+   "date": "2026-09-24T23:30Z"
+  },
+  {
+   "player_name": "Satou Sabally",
+   "team": "New York Liberty",
+   "status": "Out",
+   "detail": "out",
+   "date": "2026-11-06T09:01Z"
+  },
+  {
+   "player_name": "Elizabeth Balogun",
+   "team": "New York Liberty",
+   "status": "Out",
+   "detail": "Balogun (not with team) is out for Wednesday's game against the Dream.",
+   "date": "2026-09-22T21:05Z"
+  },
+  {
+   "player_name": "Kara Dunn",
+   "team": "Phoenix Mercury",
+   "status": "Out",
+   "detail": "Dunn (coach's decision) is listed as out for Thursday's game against the Aces.",
+   "date": "2026-09-25T01:38Z"
+  },
+  {
+   "player_name": "Kelsey Plum",
+   "team": "Phoenix Mercury",
+   "status": "Out",
+   "detail": "Plum (leg) will miss the remainder of the 2026 WNBA season, Alexa Philippou of ESPN.com reports.",
+   "date": "2026-08-31T14:46Z"
+  },
+  {
+   "player_name": "Jovana Nogic",
+   "team": "Phoenix Mercury",
+   "status": "Out",
+   "detail": "Nogic (not injury related) intends to play professionally in Russia and won't return to Phoenix this season, Aya Abdeen of TheIXSports.com reports.",
+   "date": "2026-06-28T00:25Z"
+  },
+  {
+   "player_name": "Holly Winterburn",
+   "team": "Portland Fire",
+   "status": "Out",
+   "detail": "Winterburn (back) has been ruled out for Tuesday's game against Golden State.",
+   "date": "2026-09-23T01:22Z"
+  },
+  {
+   "player_name": "Nyadiew Puoch",
+   "team": "Portland Fire",
+   "status": "Out",
+   "detail": "Puoch (knee) is listed as out for Tuesday's game against Golden State.",
+   "date": "2026-09-23T01:07Z"
+  },
+  {
+   "player_name": "Teja Oblak",
+   "team": "Portland Fire",
+   "status": "Out",
+   "detail": "Oblak (knee) has been ruled out for Tuesday's game against the Valkyries.",
+   "date": "2026-09-21T23:56Z"
+  },
+  {
+   "player_name": "Luisa Geiselsoder",
+   "team": "Portland Fire",
+   "status": "Out",
+   "detail": "Geiselsoder (personal) won't return this season, according to Sean Highkin of RoseGardenReport.com.",
+   "date": "2026-08-08T22:37Z"
+  },
+  {
+   "player_name": "Sarah Ashlee Barker",
+   "team": "Portland Fire",
+   "status": "Out",
+   "detail": "The Fire announced Friday that Barker will undergo surgery to repair a torn ACL and will miss the remainder of the 2026 campaign.",
+   "date": "2026-07-24T15:18Z"
+  },
+  {
+   "player_name": "Sania Feagin",
+   "team": "Portland Fire",
+   "status": "Out",
+   "detail": "Feagin (knee) was diagnosed with a torn left ACL on Thursday and will miss the rest of the 2026 campaign, WNBA reporter Kareem Copeland reports.",
+   "date": "2026-07-09T23:15Z"
+  },
+  {
+   "player_name": "Taina Mair",
+   "team": "Seattle Storm",
+   "status": "Out",
+   "detail": "Mair (coach's decision) has been ruled out for Wednesday's game against the Wings.",
+   "date": "2026-09-24T01:19Z"
+  },
+  {
+   "player_name": "Zia Cooke",
+   "team": "Seattle Storm",
+   "status": "Out",
+   "detail": "Cooke (knee) has been ruled out for Wednesday's game against Dallas.",
+   "date": "2026-09-23T00:06Z"
+  },
+  {
+   "player_name": "Katie Lou Samuelson",
+   "team": "Seattle Storm",
+   "status": "Out",
+   "detail": "The Storm announced Friday that Samuelson underwent successful left knee surgery and will miss the remainder of the season.",
+   "date": "2026-09-11T18:10Z"
+  },
+  {
+   "player_name": "Ezi Magbegor",
+   "team": "Seattle Storm",
+   "status": "Out",
+   "detail": "out",
+   "date": "2026-09-10T18:26Z"
+  },
+  {
+   "player_name": "Nyara Sabally",
+   "team": "Toronto Tempo",
+   "status": "Out",
+   "detail": "Sabally recently underwent arthroscopic left knee surgery but is expected to make a full recovery ahead of the 2027 season, Ian Finlayson of Sportsnet.ca reports.",
+   "date": "2026-10-27T19:07Z"
+  },
+  {
+   "player_name": "Kamila Borkowska",
+   "team": "Toronto Tempo",
+   "status": "Out",
+   "detail": "Borkowska (coach's decision) is out for Thursday's game against the Sun.",
+   "date": "2026-09-24T22:34Z"
+  },
+  {
+   "player_name": "Maria Gakdeng",
+   "team": "Toronto Tempo",
+   "status": "Out",
+   "detail": "Gakdeng is out for Thursday's game against the Sun as a coach's decision.",
+   "date": "2026-09-24T22:33Z"
+  },
+  {
+   "player_name": "Maria Conde",
+   "team": "Toronto Tempo",
+   "status": "Out",
+   "detail": "Conde (back) is out for Thursday's game against the Sun.",
+   "date": "2026-09-24T18:24Z"
+  },
+  {
+   "player_name": "Temi Fagbenle",
+   "team": "Toronto Tempo",
+   "status": "Out",
+   "detail": "Fagbenle (personal) is out for Thursday's game against the Sun.",
+   "date": "2026-09-23T20:56Z"
+  },
+  {
+   "player_name": "Marina Mabrey",
+   "team": "Toronto Tempo",
+   "status": "Out",
+   "detail": "Mabrey (hip) will miss the final four games of the 2026 season, Zulfi Sheikh of Sportsnet reports.",
+   "date": "2026-09-16T16:07Z"
+  },
+  {
+   "player_name": "Aneesah Morrow",
+   "team": "Toronto Tempo",
+   "status": "Out",
+   "detail": "Morrow (knee) will miss the rest of the 2026 season, Chelsea Leite of TSN reports.",
+   "date": "2026-08-23T21:12Z"
+  },
+  {
+   "player_name": "Brittney Sykes",
+   "team": "Toronto Tempo",
+   "status": "Out",
+   "detail": "Sykes (foot) will miss the remainder of the 2026 season, Chelsea Leite of TSN reports.",
+   "date": "2026-08-23T21:07Z"
+  }
+ ],
+ "_generated_utc": "2026-11-06T10:34:32Z",
+ "source": "espn"
+}

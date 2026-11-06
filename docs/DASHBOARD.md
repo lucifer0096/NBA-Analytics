@@ -183,7 +183,19 @@ per league, with that league's season and data.
    shows tip-off, status, venue and TV instead of pretending a box score
    exists. Unreachable ESPN degrades to a caption saying why -- the
    committed schedule carries scores, never per-player lines or PBP.
-5. **Awards Ladder**: opens with the selected season's **official
+5. **Injuries**: ESPN's CURRENT injury report (site.api `/injuries`,
+   live-first with a 600 s cache and `data/dashboard_injuries.json` as
+   the committed fallback) as one table -- Status, Player, Team, Detail
+   (ESPN's short report note; the long comment is dropped as noise),
+   Updated (the report's own timestamp on the viewer's clock) -- sorted
+   Out first by status severity, then team and player, with unknown
+   status text kept and sorted last, never dropped. The endpoint has no
+   per-season history, so a past season selected in the sidebar says
+   exactly that instead of wearing today's report under its header; an
+   empty answer between seasons is the honest empty (the refresh writes
+   ESPN's own empty as such), while a failed fetch or an unrecognized
+   shape keeps the committed report instead of blanking the tab.
+6. **Awards Ladder**: opens with the selected season's **official
    season awards** headline (MVP, then Rookie of the Year, then Finals
    MVP, all off ESPN's award index, honest pending rows until
    announced), so the page leads with the actual winners. While the
@@ -270,24 +282,26 @@ per league, with that league's season and data.
    ...") with the race's homegrown #1 above ("Algorithm #1: ..."), and a
    verdict slot -- green ✓ agree / red ✗ differs, a dash while ESPN
    hasn't announced that season's award yet. The caption keeps both
-   sides' provenance explicit (official = the honours' own source,
+   sides' provenance explicit (official = ESPN's award index,
    algorithm = the transparent formula, never official voting), and a
    season the index hasn't reached prints its honest gap instead of a
    name.
    Below the races, the tab also carries the **official Finals MVP
    tracker**: one race-row per season from ESPN's award index (trophy
    slot, real headshot, winner, franchise, `Finals MVP` score slot) --
-   current season first, then the previous ones (latest 10 shown), with
-   the current season rendered as an honest "not awarded yet" pending
-   row until ESPN publishes a winner (offseason or Finals in progress,
-   verified live Oct 2026: WNBA 2026 is 404 until the Finals end). The
+   latest 10 seasons around the SELECTED one (its own row lives in the
+   headline above, so the same winner never appears twice in one tab),
+   with the current season rendered as an honest "not awarded yet"
+   pending row when it isn't the selected one (offseason or Finals in
+   progress, verified live Oct 2026: WNBA 2026 is 404 until the Finals
+   end). The
    winners ride the committed `dashboard_players.json`'s `finals_mvp`
    map (written by `history.py` next to the honours), team names
    resolve off the committed franchise list (an unknown id keeps the
    row season-only), and the caption prints the index's season coverage
    and file age -- official ESPN award history, unlike the homegrown
    races above.
-6. **Court View** (fourth tab, moved here from the deleted Model &
+7. **Court View** (fifth tab, moved here from the deleted Model &
    History page): the selected stat's leaders on a CSS-only hardwood court
    (gradient markings, no images). Rank order fills a 2 G / 2 F / 1 C
    formation from the committed roster map, C row first under the basket;
@@ -471,6 +485,7 @@ rule applied to whole folders).
 |---|---|---|
 | `data/dashboard_teams.json` | `refresh_dashboard_fallbacks.py` (live) | Teams-source hero note, team labels |
 | `data/dashboard_standings.json` | same (live, zero-record gated) | Standings tab |
+| `data/dashboard_injuries.json` | same (live `/injuries` -- current-season only, kept on fetch failure or shape change) | Injuries tab |
 | `data/schedules/{season}.json` | same (local `schedule.csv` files, one per season across all 17; the WNBA's under `data/schedules_wnba/`) | Schedule tab, KPI next tip-off |
 | `data/postseason/{season}.json` | same (local `postseason.csv` files: playoffs + play-in, one per season with a bracket; the WNBA's under `data/postseason_wnba/`) | Schedule tab's Postseason section (its one consumer) |
 | `data/dashboard_schedule.json` | same (thin season index: labels + game counts + current season) | Sidebar default season, schedule fallback messages |

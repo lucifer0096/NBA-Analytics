@@ -648,6 +648,50 @@ def test_refresh_teams_keeps_committed_on_fetch_failure(isolated, monkeypatch):
     assert on_disk == committed  # untouched, nothing raised
 
 
+def test_refresh_injuries_writes_report_and_degrades_honestly(
+        isolated, monkeypatch):
+    """The current injury report lands as data/dashboard_injuries.json
+    with the stamp envelope; a fetch failure OR an unrecognized shape
+    keeps the committed rows (an outage never blanks the tab, a shape
+    change never writes an empty over real rows), while ESPN's own empty
+    answer -- nobody hurt, between seasons -- is written as such."""
+    payload = {"injuries": [
+        {"displayName": "Atlanta Hawks", "injuries": [
+            {"status": "Out", "shortComment": "out a week",
+             "date": "2026-11-05T01:19Z",
+             "athlete": {"displayName": "Some Player"}}]}]}
+    monkeypatch.setattr(refresh.espn_api, "get_injuries",
+                        lambda league="nba": payload)
+    made = refresh.refresh_injuries()
+    assert [r["player_name"] for r in made["injuries"]] == ["Some Player"]
+    on_disk = json.loads((isolated["data"] / "dashboard_injuries.json")
+                         .read_text(encoding="utf-8"))
+    assert on_disk["injuries"] == made["injuries"]
+    assert on_disk["source"] == "espn" and on_disk["_generated_utc"]
+
+    committed = {"injuries": made["injuries"],
+                 "_generated_utc": "2026-11-04T00:00:00Z", "source": "espn"}
+    (isolated["data"] / "dashboard_injuries.json").write_text(
+        json.dumps(committed), encoding="utf-8")
+
+    monkeypatch.setattr(refresh.espn_api, "get_injuries", _raise())
+    assert refresh.refresh_injuries() == committed
+
+    monkeypatch.setattr(refresh.espn_api, "get_injuries",
+                        lambda league="nba": {"status": {"code": 200}})
+    assert refresh.refresh_injuries() == committed
+    on_disk = json.loads((isolated["data"] / "dashboard_injuries.json")
+                         .read_text(encoding="utf-8"))
+    assert on_disk == committed  # still the real rows, never an empty
+
+    monkeypatch.setattr(refresh.espn_api, "get_injuries",
+                        lambda league="nba": {"injuries": []})
+    assert refresh.refresh_injuries() == {"injuries": []}
+    on_disk = json.loads((isolated["data"] / "dashboard_injuries.json")
+                         .read_text(encoding="utf-8"))
+    assert on_disk["injuries"] == []  # ESPN's empty IS the answer
+
+
 def test_refresh_positions_corrupt_raw_and_failed_fetch_keeps_committed(
         isolated, monkeypatch):
     committed = {"players": [{"player_id": 7, "position": "G"}],

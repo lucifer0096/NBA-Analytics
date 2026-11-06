@@ -265,17 +265,28 @@ def season_start_year(season: str) -> int:
 
 def min_games_for(max_team_games: int) -> int:
     """Rate-title qualifier: half the games any team played (so the bar grows
-    naturally as the season progresses), floored at 8 so early-season runs
-    still produce a race instead of an empty tab."""
-    return max(8, int(0.5 * max_team_games))
+    naturally as the season progresses).
+
+    While the season is still tipping off (the busiest team under 16
+    games) the bar tracks its own progress at half, rounded up -- the SAME
+    rule the live tracker uses (in_season_min_gp) -- because a rigid 8-game
+    floor hid exactly the early-season leaders people came to see: in
+    early Nov 2026 Luka Doncic (7 GP, 38.5 PPG) was absent from the tile
+    while Tyrese Maxey (8 GP) topped it, and the whole tab stayed empty
+    until Nov 3. From 16 team games on the formula is the original one, so
+    every completed season keeps its byte-identical bar (82 -> 41,
+    66 -> 33)."""
+    return max(1, min(8, in_season_min_gp(max_team_games)),
+               int(0.5 * max_team_games))
 
 
 def in_season_min_gp(max_team_games: int) -> int:
-    """The LIVE tracker's qualifier, the season rule (min_games_for: half
-    the schedule) scaled to a season still being played: half the busiest
-    team's games, rounded UP, floored at 1 -- opening night still ranks
-    whoever played instead of printing an empty race (the verbatim note
-    always states the bar, so a 1-game race never reads as a full one)."""
+    """Half the busiest team's games, rounded UP, floored at 1 -- opening
+    night still ranks whoever played instead of printing an empty race
+    (the verbatim note always states the bar, so a 1-game race never reads
+    as a full one). This is the live tracker's qualifier all season, and
+    min_games_for's own bar for the season's first 16 team games (its old
+    rigid 8-game floor used to lock October shut)."""
     return max(1, -(-int(max_team_games) // 2))
 
 

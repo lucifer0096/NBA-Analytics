@@ -2,9 +2,10 @@
 
 Run: streamlit run app/app.py
 
-Two league tabs (NBA | WNBA); inside each league tab the four sections nest
-as sub-tabs. Standings and Schedule are live-first from ESPN's free APIs
-with committed offline fallbacks (see shared.py for the contract), while the
+Two league tabs (NBA | WNBA); inside each league tab the five sections nest
+as sub-tabs. Standings, Schedule and Injuries are live-first from ESPN's
+free APIs with committed offline fallbacks (see shared.py for the
+contract), while the
 Awards Ladder and Court View are computed locally from the collected box
 scores and follow that league's season selector (NBA 2010-11 -> upcoming;
 WNBA 2010 -> upcoming):
@@ -16,6 +17,12 @@ WNBA 2010 -> upcoming):
                           season's schedule from the committed MULTI-SEASON
                           envelope: every completed game with its final score
                           (finished seasons render the full table)
+- **Injuries**         -- ESPN's CURRENT injury report (live-first, committed
+                          data/dashboard_injuries.json fallback): Out-first
+                          table with the report note and its timestamp on the
+                          viewer's clock; a past season says the report has
+                          no per-season history instead of wearing today's
+                          rows under its header
 - **Awards Ladder**    -- MVP / ROY / DPOY / 6th Man / MIP races plus per-game
                           stat leaders incl. 3PM and shooting splits
                           (src/collector/awards.py, committed as
@@ -357,6 +364,71 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                 key=f"standings_csv_{league}",
                 help="Both conferences with the columns shown above.",
             )
+
+    # -------------------------------------------------------------------------
+    # Injuries: ESPN's CURRENT report -- live-first (600s cache) with the
+    # committed data/dashboard[_wnba]_injuries.json as the offline fallback.
+    # The endpoint has no per-season history, so a past season says exactly
+    # that instead of wearing the current report under its header.
+    # -------------------------------------------------------------------------
+
+    with tabs["Injuries"]:
+        current = shared.current_season_label(league)
+        if season != current:
+            st.info(
+                f"ESPN's injury report covers the season being played "
+                f"({current}) only: no per-season history exists for "
+                f"{season}, so this tab shows nothing rather than the "
+                "current report under a past season's header."
+            )
+        else:
+            inj, inj_note = shared.load_injuries(league)
+            shared.source_caption(inj_note)
+            if inj.empty:
+                st.info(
+                    f"No players on ESPN's current {display} injury "
+                    "report -- it answers empty between seasons."
+                    if inj_note.startswith("Live")
+                    else "The live injury report is unreachable and no "
+                         "committed report exists yet (see the source "
+                         "line above)."
+                )
+            else:
+                table = inj.copy()
+                # Severity order -- Out first, then the rarer statuses,
+                # then team/player inside each -- with unknown status text
+                # kept and sorted last, never dropped.
+                _severity = {"Out": 0, "Doubtful": 1, "Questionable": 2,
+                             "Day-To-Day": 3}
+                table["_order"] = (
+                    table["status"].map(
+                        lambda s: _severity.get(str(s), 4))
+                    if "status" in table.columns else 4
+                )
+                table = (
+                    table.sort_values(["_order", "team", "player_name"],
+                                      na_position="last")
+                    .drop(columns="_order").reset_index(drop=True)
+                )
+                table.index = table.index + 1
+                # ESPN's report timestamp on the viewer's clock (the page's
+                # time rule), blank when the field is missing.
+                table["Updated"] = table["date"].map(
+                    lambda d: shared.local_stamp(d, tz))
+                out_n = int((table["status"].astype(str) == "Out").sum())
+                st.dataframe(
+                    table.rename(columns={
+                        "player_name": "Player", "team": "Team",
+                        "status": "Status", "detail": "Detail",
+                    })[["Status", "Player", "Team", "Detail", "Updated"]],
+                    width="stretch", hide_index=True,
+                )
+                st.caption(
+                    f"{len(table)} players on the report ({out_n} out) · "
+                    "Out first, then by status, team and player · Detail "
+                    "is ESPN's report note; Updated is its timestamp on "
+                    "your clock."
+                )
 
     # -------------------------------------------------------------------------
     # Schedule & Scores: today live + the selected season's results w/ scores
@@ -734,8 +806,7 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                     unsafe_allow_html=True)
         st.caption(
             "Official winners from ESPN's award index for the selected "
-            "season -- the same source as the honours and the tracker "
-            "below. A dash means the award isn't announced yet."
+            "season. A dash means the award isn't announced yet."
         )
 
         # Live in-season MVP race: only while the selected season is the
@@ -834,10 +905,6 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                     "leaders appear once the season starts."
                 )
         else:
-            st.caption(
-                f"Homegrown transparent metrics, not official {display} voting. "
-                "Each race's caption states the exact formula it ranks by."
-            )
             races = awards_payload.get("races") or {}
             # Daily race snapshots feed the ladders' movement arrows (rank
             # delta between the last two snapshots) and the MVP trend below.
@@ -868,7 +935,8 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                                 or awards.previous_season(season_label, league))
                         st.caption(
                             f"No MIP race yet: it compares against {prev}, "
-                            "which has no collected box scores in this build."
+                            "whose box scores this refresh didn't collect "
+                            "(the daily run gathers the current season)."
                         )
                     else:
                         st.caption(
@@ -960,10 +1028,10 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
                         (races.get(race_key) or [None])[0]),
                     unsafe_allow_html=True)
             st.caption(
-                "Official winner: ESPN's award index (the honours' own "
-                "source); algorithm winner: the homegrown race's #1 above "
-                "(transparent formula, not official voting). ✓ same "
-                "player, ✗ different, dash not announced yet."
+                "Official winner: ESPN's award index; algorithm winner: "
+                "the homegrown race's #1 above (transparent formula, "
+                "not official voting). ✓ same player, ✗ different, "
+                "dash not announced yet."
             )
 
             shared.section("📈 Season stat leaders")
@@ -1005,16 +1073,21 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
         # winner is announced.
         shared.section("🏆 Finals MVP")
         finals_rows, finals_note = shared.load_finals_mvp(league)
-        decided_rows = [r for r in finals_rows if not r.get("pending")]
-        if not decided_rows:
+        if not [r for r in finals_rows if not r.get("pending")]:
             st.info("No Finals MVP seasons in the committed index yet: "
                     f"regenerate it with `{refresh_cmd}`.")
-        for row in finals_rows[:shared.FINAL_MVP_SHOW]:
+        # The headline above already carries the SELECTED season's row --
+        # the index covers the seasons around it, never the same fact
+        # twice in one tab.
+        others = [r for r in finals_rows
+                  if str(r.get("season")) != str(season)]
+        for row in others[:shared.FINAL_MVP_SHOW]:
             st.markdown(shared.finals_mvp_row_html(row, league),
                         unsafe_allow_html=True)
-        if len(finals_rows) > shared.FINAL_MVP_SHOW:
+        if len(others) > shared.FINAL_MVP_SHOW:
             st.caption(f"Showing the {shared.FINAL_MVP_SHOW} most recent "
-                       f"of {len(finals_rows)} seasons: the award index "
+                       f"of {len(finals_rows)} seasons ({season} itself "
+                       "is in the headline above): the award index "
                        "carries the full history.")
         st.caption(finals_note)
 
@@ -1061,15 +1134,14 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
             if league == "wnba":
                 court_note = (
                     "Formation 2 G · 2 F · 1 C mirrors a traditional starting "
-                    "lineup (src/model/'s optimizer and projections are "
-                    "NBA-only); positions are ESPN's coarse G/F/C roster "
-                    "buckets, so PG/SG land in G and SF/PF in F.")
+                    "lineup (the optimizer and projections under src/model/ "
+                    "are NBA-only); PG/SG land in G and SF/PF in F.")
             else:
                 court_note = (
                     "Formation 2 G · 2 F · 1 C mirrors a traditional starting "
                     "lineup (the backend optimizer lives in "
-                    "src/model/optimizer.py); positions are ESPN's coarse "
-                    "G/F/C roster buckets, so PG/SG land in G and SF/PF in F.")
+                    "src/model/optimizer.py); PG/SG land in G and SF/PF "
+                    "in F.")
             st.caption(court_note)
 
 
@@ -1081,8 +1153,10 @@ league_tabs = shared.league_tabs()
 # ?tab= deep link: the section labels are identical inside both league tabs,
 # so one reorder serves both (requested section first, pinned default after).
 # The landing section is today's slate: Schedule & Scores leads, then the
-# standings, the ladder and the court (?tab= reorders either way).
-tab_labels = ["Schedule & Scores", "Standings", "Awards Ladder", "Court View"]
+# standings, the injuries, the ladder and the court (?tab= reorders either
+# way).
+tab_labels = ["Schedule & Scores", "Standings", "Injuries",
+              "Awards Ladder", "Court View"]
 deep_tab = st.query_params.get("tab") or ""
 if deep_tab in tab_labels:
     tab_labels = [deep_tab] + [label for label in tab_labels
