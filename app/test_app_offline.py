@@ -5,8 +5,7 @@ data/raw/ needed (committed data/dashboard_* fallbacks only). No network.
 Pins the contract that would otherwise rot silently: every page renders,
 the two league tabs (NBA | WNBA) each nest the five home sections, the
 KPI cards exist per league, and the fallback-failure path shows an honest
-empty state rather than a stack trace -- including the not-yet-started
-season (2026-27) showing empty states instead of another year's data.
+empty state rather than a stack trace.
 """
 
 import json

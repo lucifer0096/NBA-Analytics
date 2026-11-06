@@ -376,10 +376,11 @@ def _render_league(league: str, season: str, tab_labels: list) -> None:
         current = shared.current_season_label(league)
         if season != current:
             st.info(
-                f"ESPN's injury report covers the season being played "
-                f"({current}) only: no per-season history exists for "
-                f"{season}, so this tab shows nothing rather than the "
-                "current report under a past season's header."
+                "ESPN's injury report is current-state only -- no "
+                "per-season history exists, so it can't be scoped to "
+                f"{season} (ESPN's current season label is {current}). "
+                "This tab shows nothing rather than wearing today's "
+                "rows under a past season's header."
             )
         else:
             inj, inj_note = shared.load_injuries(league)

@@ -5,6 +5,21 @@ behind each batch. Automated `data:` collector refreshes are omitted --
 they carry no code change. Every batch below landed with its tests
 green and CI green.
 
+## 2026-11-07
+
+### fix(injuries): the past-season box stops claiming a season is "being played"
+
+Offseason edge found on review: ESPN's current-season label rolls past
+the season the sidebar defaults to (WNBA in November: report label
+2027, selected 2026), and the Injuries tab's past-season box then read
+"covers the season being played (2027) only" while nothing was being
+played. It now says the report is current-state only, names ESPN's
+current label, and keeps the same honest empty. Docs: the `/injuries`
+season-param finding (any `season=` is ignored -- verified Nov 2026,
+byte-identical rows) logged in KNOWN-ISSUES with its guards, the new
+file added to COLLECTOR's table, and the stale "not-yet-started
+2026-27" clause dropped from the app-test module docstring.
+
 ## 2026-11-06
 
 ### fix(awards): the early-season scoring bar hid Luka -- Maxey topped the tile at 8 GP while the actual leader sat at 7

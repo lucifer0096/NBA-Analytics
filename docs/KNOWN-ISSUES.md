@@ -227,3 +227,52 @@ season's last game and the playoffs' first (capped at 7), merging
 deduped `game_id`s -- idempotent, converging to zero calls once the
 play-in games close the gap, and a no-op for any season whose
 postseason file doesn't exist yet (bracketless seasons included).
+
+## 2026-11-07 — the stat-leader qualifier's rigid 8-GP floor hid the early-season leader
+
+`min_games_for` was `max(8, int(0.5 * max_team_games))`, so every
+in-progress season sat behind a rigid 8-GP bar until the busiest team
+hit 16 games. The 2026-27 leaders rendered **empty for Nov 1-2**, and
+on Nov 3-4 the KPI tile read **Tyrese Maxey, 29.1** as "Season scoring
+leader" (8 GP) while Luka Doncic -- 7 GP, 38.5 PPG, #1 on ESPN's own
+PPG list the entire time -- was silently excluded; he surfaced at #1
+(38.5) the day he hit 8 GP (Nov 5). The ranking was never wrong
+(per-game rate, ties by total, name): only the bar was, and the
+exclusion was invisible because the tile still rendered someone.
+
+**Guard**: `min_games_for` now returns
+`max(1, min(8, in_season_min_gp(T)), int(0.5 * T))` -- for the
+season's first 16 team games the bar IS the live tracker's rule
+(`in_season_min_gp`: half the busiest team's games, rounded up, floored
+at 1), and from 16 team games on the formula is byte-identical to the
+old one (82 -> 41, 66 -> 33, `int()` rounding unchanged: 73 -> 36), so
+no completed season's payload moves (verified against HEAD: only the
+in-progress season changed). One value feeds every committed race,
+every stat-leader category and the on-screen "needs >=N GP" captions,
+so the committed ladder and the live tracker can no longer disagree on
+the bar. Pinned by `test_min_games_tracks_the_season_before_it_hits_the_old_floor`
+and `test_in_season_min_gp`'s equality line (the old test that pinned
+the live bar strictly BELOW the committed one now asserts equality).
+
+## 2026-11-07 — ESPN's /injuries is current-state only: any season param is ignored
+
+`site.api.../{league}/injuries` answers the team-grouped report for
+NOW, and a `season` selector does nothing: `?season=2024` returns the
+identical 29-team / 94-row NBA payload -- every athlete, status, date
+and comment equal, only the response `timestamp` moved 9 seconds
+(verified live Nov 2026). There is no historical route, so a past
+season can never be scoped, and the report itself ages between seasons
+(the WNBA's Nov 2026 answer is the Sep 23 end-of-season rest report --
+still ESPN's current reply, dated on every row).
+
+**Guard**: the Injuries tab keys off `current_season_label` and any
+other selected season gets an honest "no per-season history" box
+instead of wearing the current rows under its header;
+`parse_injuries` RAISES on a payload without the `injuries` field (a
+shape change must fall back, never render as "nobody is hurt"), the
+refresh keeps the committed report on fetch failure or shape change and
+writes ESPN's OWN empty answer as the offseason state, and the app
+loader is live-first (600s) over `data/dashboard[_wnba]_injuries.json`.
+Pinned by `test_injuries_endpoint_url`, `test_parse_injuries_*`,
+`test_refresh_injuries_writes_report_and_degrades_honestly` and the
+app's offline / past-season / ordering tests.
