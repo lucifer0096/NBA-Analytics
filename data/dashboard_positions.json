@@ -115,12 +115,6 @@
    "team_id": 2
   },
   {
-   "player_id": 5142621,
-   "player_name": "Chris Cenac Jr.",
-   "position": "F",
-   "team_id": 2
-  },
-  {
    "player_id": 3195,
    "player_name": "Mike Conley",
    "position": "G",
@@ -323,6 +317,12 @@
    "player_name": "Danny Wolf",
    "position": "F",
    "team_id": 17
+  },
+  {
+   "player_id": 5176517,
+   "player_name": "Michael Ajayi",
+   "position": "F",
+   "team_id": 30
   },
   {
    "player_id": 3135045,
@@ -571,12 +571,6 @@
    "team_id": 5
   },
   {
-   "player_id": 5177362,
-   "player_name": "Riley Minix",
-   "position": "F",
-   "team_id": 5
-  },
-  {
    "player_id": 3908809,
    "player_name": "Donovan Mitchell",
    "position": "G",
@@ -585,6 +579,12 @@
   {
    "player_id": 4432158,
    "player_name": "Evan Mobley",
+   "position": "C",
+   "team_id": 5
+  },
+  {
+   "player_id": 4702134,
+   "player_name": "Norchad Omier",
    "position": "C",
    "team_id": 5
   },
@@ -1131,12 +1131,6 @@
   {
    "player_id": 4684740,
    "player_name": "Amen Thompson",
-   "position": "G",
-   "team_id": 10
-  },
-  {
-   "player_id": 5105837,
-   "player_name": "Bruce Thornton",
    "position": "G",
    "team_id": 10
   },
@@ -2887,6 +2881,12 @@
    "team_id": 28
   },
   {
+   "player_id": 4411057,
+   "player_name": "Kevin McCullar Jr.",
+   "position": "G",
+   "team_id": 28
+  },
+  {
    "player_id": 5093267,
    "player_name": "Collin Murray-Boyles",
    "position": "F",
@@ -3145,6 +3145,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-04T19:46:33Z",
+ "_generated_utc": "2026-11-06T08:30:56Z",
  "source": "local"
 }

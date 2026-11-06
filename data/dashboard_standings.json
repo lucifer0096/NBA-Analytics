@@ -32,6 +32,21 @@
    "last_ten": "1-7"
   },
   {
+   "team_id": 19,
+   "team": "Orlando Magic",
+   "conference": "Eastern Conference",
+   "avg_points_against": 115.0,
+   "avg_points_for": 105.5,
+   "differential": -9.5,
+   "games_behind": "5.5",
+   "losses": 6,
+   "playoff_seed": 12,
+   "streak": "L3",
+   "win_percent": ".250",
+   "wins": 2,
+   "last_ten": "2-6"
+  },
+  {
    "team_id": 17,
    "team": "Brooklyn Nets",
    "conference": "Eastern Conference",
@@ -55,8 +70,23 @@
    "differential": -11.1,
    "games_behind": "5",
    "losses": 6,
-   "playoff_seed": 10,
+   "playoff_seed": 9,
    "streak": "L5",
+   "win_percent": ".333",
+   "wins": 3,
+   "last_ten": "3-6"
+  },
+  {
+   "team_id": 14,
+   "team": "Miami Heat",
+   "conference": "Eastern Conference",
+   "avg_points_against": 122.6,
+   "avg_points_for": 116.0,
+   "differential": -6.6,
+   "games_behind": "5",
+   "losses": 6,
+   "playoff_seed": 10,
+   "streak": "L1",
    "win_percent": ".333",
    "wins": 3,
    "last_ten": "3-6"
@@ -75,36 +105,6 @@
    "win_percent": ".333",
    "wins": 3,
    "last_ten": "3-6"
-  },
-  {
-   "team_id": 19,
-   "team": "Orlando Magic",
-   "conference": "Eastern Conference",
-   "avg_points_against": 114.7,
-   "avg_points_for": 105.7,
-   "differential": -9.0,
-   "games_behind": "5",
-   "losses": 5,
-   "playoff_seed": 12,
-   "streak": "L2",
-   "win_percent": ".286",
-   "wins": 2,
-   "last_ten": "2-5"
-  },
-  {
-   "team_id": 14,
-   "team": "Miami Heat",
-   "conference": "Eastern Conference",
-   "avg_points_against": 122.9,
-   "avg_points_for": 118.0,
-   "differential": -4.9,
-   "games_behind": "4.5",
-   "losses": 5,
-   "playoff_seed": 9,
-   "streak": "W1",
-   "win_percent": ".375",
-   "wins": 3,
-   "last_ten": "3-5"
   },
   {
    "team_id": 28,
@@ -275,16 +275,16 @@
    "team_id": 21,
    "team": "Phoenix Suns",
    "conference": "Western Conference",
-   "avg_points_against": 124.3,
-   "avg_points_for": 113.3,
-   "differential": -11.0,
-   "games_behind": "4.5",
+   "avg_points_against": 121.4,
+   "avg_points_for": 113.9,
+   "differential": -7.5,
+   "games_behind": "4",
    "losses": 5,
    "playoff_seed": 12,
-   "streak": "L4",
-   "win_percent": ".167",
-   "wins": 1,
-   "last_ten": "1-5"
+   "streak": "W1",
+   "win_percent": ".286",
+   "wins": 2,
+   "last_ten": "2-5"
   },
   {
    "team_id": 3,
@@ -335,16 +335,16 @@
    "team_id": 9,
    "team": "Golden State Warriors",
    "conference": "Western Conference",
-   "avg_points_against": 114.6,
-   "avg_points_for": 117.5,
-   "differential": 2.9,
-   "games_behind": "1.5",
+   "avg_points_against": 113.0,
+   "avg_points_for": 117.8,
+   "differential": 4.8,
+   "games_behind": "1",
    "losses": 3,
-   "playoff_seed": 8,
-   "streak": "W5",
-   "win_percent": ".625",
-   "wins": 5,
-   "last_ten": "5-3"
+   "playoff_seed": 7,
+   "streak": "W6",
+   "win_percent": ".667",
+   "wins": 6,
+   "last_ten": "6-3"
   },
   {
    "team_id": 16,
@@ -355,7 +355,7 @@
    "differential": 11.2,
    "games_behind": "1",
    "losses": 3,
-   "playoff_seed": 7,
+   "playoff_seed": 8,
    "streak": "W2",
    "win_percent": ".667",
    "wins": 6,
@@ -452,6 +452,6 @@
    "last_ten": "7-2"
   }
  ],
- "_generated_utc": "2026-11-05T08:30:25Z",
+ "_generated_utc": "2026-11-06T08:30:56Z",
  "source": "espn"
 }
