@@ -568,6 +568,321 @@
      }
     ]
    }
+  },
+  {
+   "date": "2026-11-06",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3975,
+      "player_name": "Stephen Curry",
+      "rank": 1,
+      "score": 21.99
+     },
+     {
+      "player_id": 3202,
+      "player_name": "Kevin Durant",
+      "rank": 2,
+      "score": 18.58
+     },
+     {
+      "player_id": 1966,
+      "player_name": "LeBron James",
+      "rank": 3,
+      "score": 17.76
+     },
+     {
+      "player_id": 3468,
+      "player_name": "Russell Westbrook",
+      "rank": 4,
+      "score": 17.51
+     },
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 5,
+      "score": 17.05
+     },
+     {
+      "player_id": 6450,
+      "player_name": "Kawhi Leonard",
+      "rank": 6,
+      "score": 15.48
+     },
+     {
+      "player_id": 2779,
+      "player_name": "Chris Paul",
+      "rank": 7,
+      "score": 15.1
+     },
+     {
+      "player_id": 4258,
+      "player_name": "DeMarcus Cousins",
+      "rank": 8,
+      "score": 14.84
+     },
+     {
+      "player_id": 6589,
+      "player_name": "Draymond Green",
+      "rank": 9,
+      "score": 14.69
+     },
+     {
+      "player_id": 3012,
+      "player_name": "Kyle Lowry",
+      "rank": 10,
+      "score": 14.24
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 4262,
+      "player_name": "Hassan Whiteside",
+      "rank": 1,
+      "score": 3.83
+     },
+     {
+      "player_id": 3015,
+      "player_name": "Paul Millsap",
+      "rank": 2,
+      "score": 2.94
+     },
+     {
+      "player_id": 3032976,
+      "player_name": "Rudy Gobert",
+      "rank": 3,
+      "score": 2.72
+     },
+     {
+      "player_id": 3442,
+      "player_name": "DeAndre Jordan",
+      "rank": 4,
+      "score": 2.53
+     },
+     {
+      "player_id": 6450,
+      "player_name": "Kawhi Leonard",
+      "rank": 5,
+      "score": 2.49
+     },
+     {
+      "player_id": 4257,
+      "player_name": "Derrick Favors",
+      "rank": 6,
+      "score": 2.36
+     },
+     {
+      "player_id": 3012,
+      "player_name": "Kyle Lowry",
+      "rank": 7,
+      "score": 2.21
+     },
+     {
+      "player_id": 6585,
+      "player_name": "Andre Drummond",
+      "rank": 8,
+      "score": 2.2
+     },
+     {
+      "player_id": 3102531,
+      "player_name": "Kristaps Porzingis",
+      "rank": 9,
+      "score": 2.11
+     },
+     {
+      "player_id": 6589,
+      "player_name": "Draymond Green",
+      "rank": 10,
+      "score": 2.1
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 6579,
+      "player_name": "Will Barton",
+      "rank": 1,
+      "score": 15.8
+     },
+     {
+      "player_id": 3973,
+      "player_name": "Darren Collison",
+      "rank": 2,
+      "score": 15.37
+     },
+     {
+      "player_id": 165,
+      "player_name": "Jamal Crawford",
+      "rank": 3,
+      "score": 14.57
+     },
+     {
+      "player_id": 6447,
+      "player_name": "Enes Freedom",
+      "rank": 4,
+      "score": 13.89
+     },
+     {
+      "player_id": 2389,
+      "player_name": "Al Jefferson",
+      "rank": 5,
+      "score": 13.63
+     },
+     {
+      "player_id": 4239,
+      "player_name": "Evan Turner",
+      "rank": 6,
+      "score": 13.29
+     },
+     {
+      "player_id": 4299,
+      "player_name": "Jeremy Lin",
+      "rank": 7,
+      "score": 13.27
+     },
+     {
+      "player_id": 3554,
+      "player_name": "Omri Casspi",
+      "rank": 8,
+      "score": 12.89
+     },
+     {
+      "player_id": 4385,
+      "player_name": "Mirza Teletovic",
+      "rank": 9,
+      "score": 12.78
+     },
+     {
+      "player_id": 3032979,
+      "player_name": "Dennis Schroder",
+      "rank": 10,
+      "score": 12.62
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 2999547,
+      "player_name": "Gary Harris",
+      "rank": 1,
+      "score": 5.51
+     },
+     {
+      "player_id": 3064290,
+      "player_name": "Aaron Gordon",
+      "rank": 2,
+      "score": 5.0
+     },
+     {
+      "player_id": 3419,
+      "player_name": "Mario Chalmers",
+      "rank": 3,
+      "score": 4.72
+     },
+     {
+      "player_id": 2489530,
+      "player_name": "Troy Daniels",
+      "rank": 4,
+      "score": 4.57
+     },
+     {
+      "player_id": 3231,
+      "player_name": "Ramon Sessions",
+      "rank": 5,
+      "score": 4.43
+     },
+     {
+      "player_id": 6591,
+      "player_name": "Maurice Harkless",
+      "rank": 6,
+      "score": 4.42
+     },
+     {
+      "player_id": 2774,
+      "player_name": "Ian Mahinmi",
+      "rank": 7,
+      "score": 4.27
+     },
+     {
+      "player_id": 2797,
+      "player_name": "Marvin Williams",
+      "rank": 8,
+      "score": 4.19
+     },
+     {
+      "player_id": 4267,
+      "player_name": "Cole Aldrich",
+      "rank": 9,
+      "score": 4.14
+     },
+     {
+      "player_id": 6447,
+      "player_name": "Enes Freedom",
+      "rank": 10,
+      "score": 3.7
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 3136195,
+      "player_name": "Karl-Anthony Towns",
+      "rank": 1,
+      "score": 14.31
+     },
+     {
+      "player_id": 3135048,
+      "player_name": "Jahlil Okafor",
+      "rank": 2,
+      "score": 11.39
+     },
+     {
+      "player_id": 3102531,
+      "player_name": "Kristaps Porzingis",
+      "rank": 3,
+      "score": 9.99
+     },
+     {
+      "player_id": 3112335,
+      "player_name": "Nikola Jokic",
+      "rank": 4,
+      "score": 9.61
+     },
+     {
+      "player_id": 3136776,
+      "player_name": "D'Angelo Russell",
+      "rank": 5,
+      "score": 8.06
+     },
+     {
+      "player_id": 3892818,
+      "player_name": "Emmanuel Mudiay",
+      "rank": 6,
+      "score": 7.54
+     },
+     {
+      "player_id": 3136193,
+      "player_name": "Devin Booker",
+      "rank": 7,
+      "score": 7.48
+     },
+     {
+      "player_id": 3133628,
+      "player_name": "Myles Turner",
+      "rank": 8,
+      "score": 7.36
+     },
+     {
+      "player_id": 2991282,
+      "player_name": "Willie Cauley-Stein",
+      "rank": 9,
+      "score": 7.32
+     },
+     {
+      "player_id": 2530530,
+      "player_name": "T.J. McConnell",
+      "rank": 10,
+      "score": 5.92
+     }
+    ]
+   }
   }
  ]
 }

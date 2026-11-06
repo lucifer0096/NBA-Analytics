@@ -7,6 +7,48 @@ green and CI green.
 
 ## 2026-11-07
 
+### feat(awards): MVP/ROY/MIP rank by Game Score -- the whole box score, not just PTS+REB+AST
+
+The three impact races priced counting volume only (`PTS + 0.75·REB +
+1.0·AST` per game): identical points read identical whether they came
+on 12 or 24 shots, and steals, blocks, turnovers and fouls moved no
+score. They now rank by **Hollinger Game Score** -- the published
+box-score formula, implemented from one `GMSC_WEIGHTS` dict whose
+weights also RENDER the on-screen caption (the goat_formula rule:
+what's printed is what's computed):
+
+- **MVP / Finals MVP**: Game Score per game x the same win-percentage
+  multiplier (0.6x floor, 1.0x at a perfect record). The Finals
+  calculator inherits by construction -- `finals_mvp_rows` IS `mvp_rows`
+  over series aggregates -- and its caption is rendered from the same
+  helper, so the two can't diverge.
+- **ROY**: Game Score per game, still no team-record scaling (the award
+  goes to the best rookie, not the best team's).
+- **MIP**: year-over-year change in Game Score per **36 minutes**: a
+  rotation bump alone (same totals over more minutes) now reads as what
+  it is -- no improvement -- while genuine per-minute growth ranks.
+  Seasons with no recorded minutes are skipped, never compared at an
+  invented rate.
+- The GOAT ladder's peak term keeps its original impact-per-game
+  definition (its caption describes it in prose); DPOY and 6th-Man are
+  untouched -- this batch changes exactly the three races it names.
+- Aggregates now sum personal fouls too (`RACE_SUM_STATS`, Game Score's
+  -0.4/foul term) without leaking a key into history's career lines.
+  The live MVP/ROY trackers call the same row functions, so they inherit
+  automatically, and `parse_athlete_stats` now returns the full Game
+  Score input set (ftm/fta/oreb/dreb/stl/blk/pf/to -- each name verified
+  present on ESPN's season-statistics payload, Nov 2026).
+- Race history notes the switch honestly: today's snapshot is the first
+  under the new formula, so each trend shows one visible step there
+  (older snapshots keep the formula they were recorded under) and
+  movement arrows can show one day of formula-induced movement.
+- Both leagues' payloads were rebuilt locally the way cron runs it: NBA
+  2026-27 MVP Luka 28.65 (Wemby #2), 2025-26 Jokic 25.63, WNBA 2026
+  A'ja Wilson 20.58 -- plus the usual local-rebuild drift in the
+  `dashboard_*` artifacts (including the leaderboard season, which the
+  runner rebuilds as 2026-27 since raw/ is gitignored there); next cron
+  reconciles.
+
 ### fix(injuries): the past-season box stops claiming a season is "being played"
 
 Offseason edge found on review: ESPN's current-season label rolls past

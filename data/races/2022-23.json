@@ -568,6 +568,321 @@
      }
     ]
    }
+  },
+  {
+   "date": "2026-11-06",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3032977,
+      "player_name": "Giannis Antetokounmpo",
+      "rank": 1,
+      "score": 24.5
+     },
+     {
+      "player_id": 3059318,
+      "player_name": "Joel Embiid",
+      "rank": 2,
+      "score": 24.38
+     },
+     {
+      "player_id": 3112335,
+      "player_name": "Nikola Jokic",
+      "rank": 3,
+      "score": 23.04
+     },
+     {
+      "player_id": 3945274,
+      "player_name": "Luka Doncic",
+      "rank": 4,
+      "score": 22.08
+     },
+     {
+      "player_id": 4065648,
+      "player_name": "Jayson Tatum",
+      "rank": 5,
+      "score": 20.92
+     },
+     {
+      "player_id": 4278073,
+      "player_name": "Shai Gilgeous-Alexander",
+      "rank": 6,
+      "score": 20.45
+     },
+     {
+      "player_id": 6583,
+      "player_name": "Anthony Davis",
+      "rank": 7,
+      "score": 20.0
+     },
+     {
+      "player_id": 6606,
+      "player_name": "Damian Lillard",
+      "rank": 8,
+      "score": 19.58
+     },
+     {
+      "player_id": 3202,
+      "player_name": "Kevin Durant",
+      "rank": 9,
+      "score": 19.48
+     },
+     {
+      "player_id": 1966,
+      "player_name": "LeBron James",
+      "rank": 10,
+      "score": 19.07
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 4277961,
+      "player_name": "Jaren Jackson Jr.",
+      "rank": 1,
+      "score": 3.49
+     },
+     {
+      "player_id": 4278067,
+      "player_name": "Nic Claxton",
+      "rank": 2,
+      "score": 3.03
+     },
+     {
+      "player_id": 3059318,
+      "player_name": "Joel Embiid",
+      "rank": 3,
+      "score": 2.63
+     },
+     {
+      "player_id": 3934719,
+      "player_name": "OG Anunoby",
+      "rank": 4,
+      "score": 2.52
+     },
+     {
+      "player_id": 3448,
+      "player_name": "Brook Lopez",
+      "rank": 5,
+      "score": 2.44
+     },
+     {
+      "player_id": 4351852,
+      "player_name": "Mitchell Robinson",
+      "rank": 6,
+      "score": 2.39
+     },
+     {
+      "player_id": 6583,
+      "player_name": "Anthony Davis",
+      "rank": 7,
+      "score": 2.31
+     },
+     {
+      "player_id": 4432158,
+      "player_name": "Evan Mobley",
+      "rank": 8,
+      "score": 2.27
+     },
+     {
+      "player_id": 2991230,
+      "player_name": "Fred VanVleet",
+      "rank": 9,
+      "score": 2.21
+     },
+     {
+      "player_id": 6430,
+      "player_name": "Jimmy Butler III",
+      "rank": 10,
+      "score": 2.13
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 3468,
+      "player_name": "Russell Westbrook",
+      "rank": 1,
+      "score": 21.1
+     },
+     {
+      "player_id": 3058254,
+      "player_name": "Christian Wood",
+      "rank": 2,
+      "score": 19.36
+     },
+     {
+      "player_id": 2595516,
+      "player_name": "Norman Powell",
+      "rank": 3,
+      "score": 18.62
+     },
+     {
+      "player_id": 4683634,
+      "player_name": "Bennedict Mathurin",
+      "rank": 4,
+      "score": 18.46
+     },
+     {
+      "player_id": 2566769,
+      "player_name": "Malcolm Brogdon",
+      "rank": 5,
+      "score": 17.82
+     },
+     {
+      "player_id": 4395724,
+      "player_name": "Immanuel Quickley",
+      "rank": 6,
+      "score": 17.69
+     },
+     {
+      "player_id": 3064482,
+      "player_name": "Bobby Portis",
+      "rank": 7,
+      "score": 17.25
+     },
+     {
+      "player_id": 4277811,
+      "player_name": "Collin Sexton",
+      "rank": 8,
+      "score": 16.26
+     },
+     {
+      "player_id": 4432809,
+      "player_name": "Cole Anthony",
+      "rank": 9,
+      "score": 16.18
+     },
+     {
+      "player_id": 3037789,
+      "player_name": "Bogdan Bogdanovic",
+      "rank": 10,
+      "score": 16.15
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 4066336,
+      "player_name": "Lauri Markkanen",
+      "rank": 1,
+      "score": 8.02
+     },
+     {
+      "player_id": 4395702,
+      "player_name": "Isaiah Joe",
+      "rank": 2,
+      "score": 6.54
+     },
+     {
+      "player_id": 4396993,
+      "player_name": "Tyrese Haliburton",
+      "rank": 3,
+      "score": 6.32
+     },
+     {
+      "player_id": 4278073,
+      "player_name": "Shai Gilgeous-Alexander",
+      "rank": 4,
+      "score": 6.07
+     },
+     {
+      "player_id": 3934672,
+      "player_name": "Jalen Brunson",
+      "rank": 5,
+      "score": 4.82
+     },
+     {
+      "player_id": 3064290,
+      "player_name": "Aaron Gordon",
+      "rank": 6,
+      "score": 4.69
+     },
+     {
+      "player_id": 2488653,
+      "player_name": "Mason Plumlee",
+      "rank": 7,
+      "score": 4.64
+     },
+     {
+      "player_id": 4066259,
+      "player_name": "De'Aaron Fox",
+      "rank": 8,
+      "score": 4.44
+     },
+     {
+      "player_id": 3064514,
+      "player_name": "Julius Randle",
+      "rank": 9,
+      "score": 4.33
+     },
+     {
+      "player_id": 4065663,
+      "player_name": "Josh Okogie",
+      "rank": 10,
+      "score": 4.32
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 4432573,
+      "player_name": "Paolo Banchero",
+      "rank": 1,
+      "score": 15.19
+     },
+     {
+      "player_id": 4593803,
+      "player_name": "Jalen Williams",
+      "rank": 2,
+      "score": 12.22
+     },
+     {
+      "player_id": 4433136,
+      "player_name": "Walker Kessler",
+      "rank": 3,
+      "score": 11.99
+     },
+     {
+      "player_id": 4433218,
+      "player_name": "Jaden Ivey",
+      "rank": 4,
+      "score": 11.37
+     },
+     {
+      "player_id": 4683634,
+      "player_name": "Bennedict Mathurin",
+      "rank": 5,
+      "score": 11.34
+     },
+     {
+      "player_id": 4433621,
+      "player_name": "Jalen Duren",
+      "rank": 6,
+      "score": 10.51
+     },
+     {
+      "player_id": 4701232,
+      "player_name": "Mark Williams",
+      "rank": 7,
+      "score": 9.54
+     },
+     {
+      "player_id": 4594327,
+      "player_name": "Keegan Murray",
+      "rank": 8,
+      "score": 9.49
+     },
+     {
+      "player_id": 4432639,
+      "player_name": "Jabari Smith Jr.",
+      "rank": 9,
+      "score": 9.35
+     },
+     {
+      "player_id": 4610139,
+      "player_name": "Jeremy Sochan",
+      "rank": 10,
+      "score": 8.47
+     }
+    ]
+   }
   }
  ]
 }

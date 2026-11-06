@@ -568,6 +568,321 @@
      }
     ]
    }
+  },
+  {
+   "date": "2026-11-06",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3149391,
+      "player_name": "A'ja Wilson",
+      "rank": 1,
+      "score": 19.23
+     },
+     {
+      "player_id": 3917450,
+      "player_name": "Napheesa Collier",
+      "rank": 2,
+      "score": 17.87
+     },
+     {
+      "player_id": 2529140,
+      "player_name": "Alyssa Thomas",
+      "rank": 3,
+      "score": 14.83
+     },
+     {
+      "player_id": 2998928,
+      "player_name": "Breanna Stewart",
+      "rank": 4,
+      "score": 13.79
+     },
+     {
+      "player_id": 2566106,
+      "player_name": "Dearica Hamby",
+      "rank": 5,
+      "score": 13.47
+     },
+     {
+      "player_id": 3058901,
+      "player_name": "Allisha Gray",
+      "rank": 6,
+      "score": 13.09
+     },
+     {
+      "player_id": 4065870,
+      "player_name": "Jackie Young",
+      "rank": 7,
+      "score": 12.32
+     },
+     {
+      "player_id": 4066533,
+      "player_name": "Sabrina Ionescu",
+      "rank": 8,
+      "score": 12.04
+     },
+     {
+      "player_id": 4432831,
+      "player_name": "Aliyah Boston",
+      "rank": 9,
+      "score": 11.94
+     },
+     {
+      "player_id": 4398674,
+      "player_name": "Rhyne Howard",
+      "rank": 10,
+      "score": 11.89
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 3149391,
+      "player_name": "A'ja Wilson",
+      "rank": 1,
+      "score": 3.18
+     },
+     {
+      "player_id": 3913881,
+      "player_name": "Alanna Smith",
+      "rank": 2,
+      "score": 3.09
+     },
+     {
+      "player_id": 3917450,
+      "player_name": "Napheesa Collier",
+      "rank": 3,
+      "score": 3.08
+     },
+     {
+      "player_id": 4420318,
+      "player_name": "Ezi Magbegor",
+      "rank": 4,
+      "score": 2.51
+     },
+     {
+      "player_id": 3142328,
+      "player_name": "Gabby Williams",
+      "rank": 5,
+      "score": 2.39
+     },
+     {
+      "player_id": 2998928,
+      "player_name": "Breanna Stewart",
+      "rank": 6,
+      "score": 2.29
+     },
+     {
+      "player_id": 4398674,
+      "player_name": "Rhyne Howard",
+      "rank": 7,
+      "score": 2.22
+     },
+     {
+      "player_id": 4068042,
+      "player_name": "Natasha Mack",
+      "rank": 8,
+      "score": 2.19
+     },
+     {
+      "player_id": 3142250,
+      "player_name": "Jordin Canada",
+      "rank": 9,
+      "score": 1.91
+     },
+     {
+      "player_id": 2529140,
+      "player_name": "Alyssa Thomas",
+      "rank": 10,
+      "score": 1.84
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 869,
+      "player_name": "DeWanna Bonner",
+      "rank": 1,
+      "score": 11.46
+     },
+     {
+      "player_id": 4398915,
+      "player_name": "Naz Hillmon",
+      "rank": 2,
+      "score": 11.37
+     },
+     {
+      "player_id": 3906949,
+      "player_name": "Jessica Shepard",
+      "rank": 3,
+      "score": 10.85
+     },
+     {
+      "player_id": 3906753,
+      "player_name": "Natisha Hiedeman",
+      "rank": 4,
+      "score": 10.76
+     },
+     {
+      "player_id": 2566081,
+      "player_name": "Elizabeth Williams",
+      "rank": 5,
+      "score": 10.67
+     },
+     {
+      "player_id": 3922628,
+      "player_name": "Kennedy Burke",
+      "rank": 6,
+      "score": 9.3
+     },
+     {
+      "player_id": 5220150,
+      "player_name": "Dominique Malonga",
+      "rank": 7,
+      "score": 9.28
+     },
+     {
+      "player_id": 4433807,
+      "player_name": "Aziaha James",
+      "rank": 8,
+      "score": 9.01
+     },
+     {
+      "player_id": 4398764,
+      "player_name": "Rae Burrell",
+      "rank": 9,
+      "score": 8.72
+     },
+     {
+      "player_id": 3142255,
+      "player_name": "Monique Billings",
+      "rank": 10,
+      "score": 8.69
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 3054590,
+      "player_name": "Nia Brodie",
+      "rank": 1,
+      "score": 5.66
+     },
+     {
+      "player_id": 2529140,
+      "player_name": "Alyssa Thomas",
+      "rank": 2,
+      "score": 5.14
+     },
+     {
+      "player_id": 4398966,
+      "player_name": "Olivia Nelson-Ododa",
+      "rank": 3,
+      "score": 5.05
+     },
+     {
+      "player_id": 4595910,
+      "player_name": "Haley Jones",
+      "rank": 4,
+      "score": 4.79
+     },
+     {
+      "player_id": 4398935,
+      "player_name": "Veronica Burton",
+      "rank": 5,
+      "score": 4.67
+     },
+     {
+      "player_id": 3906753,
+      "player_name": "Natisha Hiedeman",
+      "rank": 6,
+      "score": 4.55
+     },
+     {
+      "player_id": 3142010,
+      "player_name": "Azura Stevens",
+      "rank": 7,
+      "score": 4.38
+     },
+     {
+      "player_id": 2529622,
+      "player_name": "Kayla Thornton",
+      "rank": 8,
+      "score": 4.36
+     },
+     {
+      "player_id": 2566453,
+      "player_name": "Isabelle Harrison",
+      "rank": 9,
+      "score": 4.3
+     },
+     {
+      "player_id": 2491214,
+      "player_name": "Erica Wheeler",
+      "rank": 10,
+      "score": 3.68
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 4433730,
+      "player_name": "Paige Bueckers",
+      "rank": 1,
+      "score": 15.99
+     },
+     {
+      "player_id": 4433524,
+      "player_name": "Sonia Citron",
+      "rank": 2,
+      "score": 11.29
+     },
+     {
+      "player_id": 4898384,
+      "player_name": "Kiki Iriafen",
+      "rank": 3,
+      "score": 10.47
+     },
+     {
+      "player_id": 5208981,
+      "player_name": "Leila Lacan",
+      "rank": 4,
+      "score": 8.03
+     },
+     {
+      "player_id": 4433514,
+      "player_name": "Saniya Rivers",
+      "rank": 5,
+      "score": 7.48
+     },
+     {
+      "player_id": 4790264,
+      "player_name": "Janelle Salaun",
+      "rank": 6,
+      "score": 6.98
+     },
+     {
+      "player_id": 4684384,
+      "player_name": "Aneesah Morrow",
+      "rank": 7,
+      "score": 6.31
+     },
+     {
+      "player_id": 5220150,
+      "player_name": "Dominique Malonga",
+      "rank": 8,
+      "score": 6.3
+     },
+     {
+      "player_id": 4682797,
+      "player_name": "Luisa Geiselsoder",
+      "rank": 9,
+      "score": 5.67
+     },
+     {
+      "player_id": 5274110,
+      "player_name": "Monique Akoa Makani",
+      "rank": 10,
+      "score": 5.61
+     }
+    ]
+   }
   }
  ]
 }

@@ -249,7 +249,7 @@ def test_home_awards_tab_shows_races_and_formula_captions(offline_espn):
     assert "not official nba voting" in captions.lower()
     if (REPO_ROOT / "data" / "dashboard_wnba_awards.json").exists():
         assert "not official wnba voting" in captions.lower()
-    assert "Impact per game" in captions
+    assert "Game Score per game" in captions
     # The MVP trend either drew a line from >=2 daily snapshots or said
     # exactly what is missing -- both captions mention the snapshots.
     assert "snapshot" in captions
@@ -1676,10 +1676,11 @@ def test_load_finals_series_identifies_and_ranks(monkeypatch):
         rows, info, note = shared.load_finals_series("2025-26", "nba")
         assert [r["player_name"] for r in rows] == ["Series Star",
                                                     "Rival Star"]
-        # Series Star: (110 + 0.75*29 + 26)/4 = 39.4375, NYK 3-1 -> x0.9
-        assert rows[0]["score"] == 35.49
-        # Rival Star: (55 + 0.75*13 + 7)/2 = 35.875, SA 1-3 -> x0.7
-        assert rows[1]["score"] == 25.11
+        # Series Star: Game Score (110 + 0.7*26)/4 -- the synthetic lines
+        # carry no shooting/foul/oreb-dreb fields -- NYK 3-1 -> x0.9
+        assert rows[0]["score"] == 28.84
+        # Rival Star: (55 + 0.7*7)/2, SA 1-3 -> x0.7
+        assert rows[1]["score"] == 20.96
         assert info["games"] == 4 and info["min_gp"] == 2
         assert info["standings"] == "NYK 3-1 · SA 1-3"
         assert "4 series games, 4 played" in note
@@ -1907,8 +1908,10 @@ def test_live_rookie_race_filters_candidates_by_draft_class(monkeypatch):
 
     assert [(r["player_id"], r["player_name"]) for r in rows] == \
         [(7, "Rookie One")]
-    # Committed formula: (150 + 0.75*40 + 25)/5 -- no standings involved.
-    assert rows[0]["score"] == 41.0 and rows[0]["rank"] == 1
+    # Committed formula: Game Score/pg ((150 + 0.4*55 − 0.7*120 +
+    # 0.7*25)/5 -- the stubbed line carries no other inputs) -- no
+    # standings involved.
+    assert rows[0]["score"] == 21.1 and rows[0]["rank"] == 1
     assert rows[0]["ppg"] == 30.0 and rows[0]["fgp"] == 45.8
     # The note states every rule it applied: pool, ranked count, the
     # qualifier bar, the draft class, and the skipped-undrafted count.

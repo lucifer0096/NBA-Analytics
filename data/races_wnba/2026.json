@@ -568,6 +568,321 @@
      }
     ]
    }
+  },
+  {
+   "date": "2026-11-06",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3149391,
+      "player_name": "A'ja Wilson",
+      "rank": 1,
+      "score": 20.58
+     },
+     {
+      "player_id": 2998928,
+      "player_name": "Breanna Stewart",
+      "rank": 2,
+      "score": 15.54
+     },
+     {
+      "player_id": 3142191,
+      "player_name": "Kelsey Mitchell",
+      "rank": 3,
+      "score": 15.14
+     },
+     {
+      "player_id": 4433403,
+      "player_name": "Caitlin Clark",
+      "rank": 4,
+      "score": 14.57
+     },
+     {
+      "player_id": 4433791,
+      "player_name": "Olivia Miles",
+      "rank": 5,
+      "score": 14.53
+     },
+     {
+      "player_id": 4433730,
+      "player_name": "Paige Bueckers",
+      "rank": 6,
+      "score": 14.43
+     },
+     {
+      "player_id": 4065870,
+      "player_name": "Jackie Young",
+      "rank": 7,
+      "score": 14.31
+     },
+     {
+      "player_id": 3906949,
+      "player_name": "Jessica Shepard",
+      "rank": 8,
+      "score": 13.82
+     },
+     {
+      "player_id": 4433402,
+      "player_name": "Angel Reese",
+      "rank": 9,
+      "score": 13.65
+     },
+     {
+      "player_id": 2529130,
+      "player_name": "Natasha Howard",
+      "rank": 10,
+      "score": 13.42
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 4398674,
+      "player_name": "Rhyne Howard",
+      "rank": 1,
+      "score": 2.95
+     },
+     {
+      "player_id": 3149391,
+      "player_name": "A'ja Wilson",
+      "rank": 2,
+      "score": 2.9
+     },
+     {
+      "player_id": 2529130,
+      "player_name": "Natasha Howard",
+      "rank": 3,
+      "score": 2.45
+     },
+     {
+      "player_id": 4433402,
+      "player_name": "Angel Reese",
+      "rank": 4,
+      "score": 2.33
+     },
+     {
+      "player_id": 2590093,
+      "player_name": "Kiah Stokes",
+      "rank": 5,
+      "score": 2.3
+     },
+     {
+      "player_id": 4433790,
+      "player_name": "Azzi Fudd",
+      "rank": 6,
+      "score": 2.29
+     },
+     {
+      "player_id": 2998928,
+      "player_name": "Breanna Stewart",
+      "rank": 7,
+      "score": 2.25
+     },
+     {
+      "player_id": 4790266,
+      "player_name": "Awak Kuier",
+      "rank": 8,
+      "score": 2.09
+     },
+     {
+      "player_id": 4398935,
+      "player_name": "Veronica Burton",
+      "rank": 9,
+      "score": 2.02
+     },
+     {
+      "player_id": 3142250,
+      "player_name": "Jordin Canada",
+      "rank": 10,
+      "score": 1.99
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 4790264,
+      "player_name": "Janelle Salaun",
+      "rank": 1,
+      "score": 14.31
+     },
+     {
+      "player_id": 4684384,
+      "player_name": "Aneesah Morrow",
+      "rank": 2,
+      "score": 13.76
+     },
+     {
+      "player_id": 4433404,
+      "player_name": "Cameron Brink",
+      "rank": 3,
+      "score": 11.54
+     },
+     {
+      "player_id": 1054,
+      "player_name": "Tiffany Hayes",
+      "rank": 4,
+      "score": 10.8
+     },
+     {
+      "player_id": 3922628,
+      "player_name": "Kennedy Burke",
+      "rank": 5,
+      "score": 10.3
+     },
+     {
+      "player_id": 2987869,
+      "player_name": "Jewell Loyd",
+      "rank": 6,
+      "score": 9.22
+     },
+     {
+      "player_id": 3907781,
+      "player_name": "Sophie Cunningham",
+      "rank": 7,
+      "score": 9.03
+     },
+     {
+      "player_id": 4432832,
+      "player_name": "Zia Cooke",
+      "rank": 8,
+      "score": 8.49
+     },
+     {
+      "player_id": 4899328,
+      "player_name": "Kaitlyn Chen",
+      "rank": 9,
+      "score": 8.41
+     },
+     {
+      "player_id": 4583144,
+      "player_name": "Cotie McMahon",
+      "rank": 10,
+      "score": 8.29
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 4899328,
+      "player_name": "Kaitlyn Chen",
+      "rank": 1,
+      "score": 7.97
+     },
+     {
+      "player_id": 4703794,
+      "player_name": "Sarah Ashlee Barker",
+      "rank": 2,
+      "score": 7.93
+     },
+     {
+      "player_id": 3904576,
+      "player_name": "Marina Mabrey",
+      "rank": 3,
+      "score": 7.66
+     },
+     {
+      "player_id": 5208982,
+      "player_name": "Carla Leite",
+      "rank": 4,
+      "score": 7.65
+     },
+     {
+      "player_id": 4398776,
+      "player_name": "NaLyssa Smith",
+      "rank": 5,
+      "score": 5.84
+     },
+     {
+      "player_id": 3906972,
+      "player_name": "Bridget Carleton",
+      "rank": 6,
+      "score": 5.7
+     },
+     {
+      "player_id": 4790264,
+      "player_name": "Janelle Salaun",
+      "rank": 7,
+      "score": 5.56
+     },
+     {
+      "player_id": 1054,
+      "player_name": "Tiffany Hayes",
+      "rank": 8,
+      "score": 4.39
+     },
+     {
+      "player_id": 5017726,
+      "player_name": "Jade Melbourne",
+      "rank": 9,
+      "score": 4.24
+     },
+     {
+      "player_id": 4432832,
+      "player_name": "Zia Cooke",
+      "rank": 10,
+      "score": 4.01
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 4433791,
+      "player_name": "Olivia Miles",
+      "rank": 1,
+      "score": 16.15
+     },
+     {
+      "player_id": 4565505,
+      "player_name": "Kiki Rice",
+      "rank": 2,
+      "score": 10.65
+     },
+     {
+      "player_id": 4698736,
+      "player_name": "Flau'jae Johnson",
+      "rank": 3,
+      "score": 10.24
+     },
+     {
+      "player_id": 4433790,
+      "player_name": "Azzi Fudd",
+      "rank": 4,
+      "score": 9.58
+     },
+     {
+      "player_id": 5345444,
+      "player_name": "Laura Juskaite",
+      "rank": 5,
+      "score": 8.28
+     },
+     {
+      "player_id": 4594786,
+      "player_name": "Sydney Taylor",
+      "rank": 6,
+      "score": 8.1
+     },
+     {
+      "player_id": 5345320,
+      "player_name": "Pauline Astier",
+      "rank": 7,
+      "score": 7.86
+     },
+     {
+      "player_id": 5105737,
+      "player_name": "Lauren Betts",
+      "rank": 8,
+      "score": 6.71
+     },
+     {
+      "player_id": 4703609,
+      "player_name": "Charlisse Leger-Walker",
+      "rank": 9,
+      "score": 5.31
+     },
+     {
+      "player_id": 4583144,
+      "player_name": "Cotie McMahon",
+      "rank": 10,
+      "score": 5.27
+     }
+    ]
+   }
   }
  ]
 }

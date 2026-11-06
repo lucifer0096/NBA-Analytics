@@ -568,6 +568,321 @@
      }
     ]
    }
+  },
+  {
+   "date": "2026-11-06",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 766,
+      "player_name": "Sylvia Fowles",
+      "rank": 1,
+      "score": 13.4
+     },
+     {
+      "player_id": 872,
+      "player_name": "Angel McCoughtry",
+      "rank": 2,
+      "score": 12.93
+     },
+     {
+      "player_id": 918,
+      "player_name": "Tina Charles",
+      "rank": 3,
+      "score": 12.53
+     },
+     {
+      "player_id": 125,
+      "player_name": "Tamika Catchings",
+      "rank": 4,
+      "score": 12.01
+     },
+     {
+      "player_id": 545,
+      "player_name": "Lindsay Whalen",
+      "rank": 5,
+      "score": 11.62
+     },
+     {
+      "player_id": 585,
+      "player_name": "Diana Taurasi",
+      "rank": 6,
+      "score": 11.42
+     },
+     {
+      "player_id": 695,
+      "player_name": "Seimone Augustus",
+      "rank": 7,
+      "score": 10.85
+     },
+     {
+      "player_id": 388,
+      "player_name": "Penny Taylor",
+      "rank": 8,
+      "score": 10.76
+     },
+     {
+      "player_id": 689,
+      "player_name": "Candice Dupree",
+      "rank": 9,
+      "score": 10.37
+     },
+     {
+      "player_id": 685,
+      "player_name": "Cappie Pondexter",
+      "rank": 10,
+      "score": 9.89
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 125,
+      "player_name": "Tamika Catchings",
+      "rank": 1,
+      "score": 2.76
+     },
+     {
+      "player_id": 766,
+      "player_name": "Sylvia Fowles",
+      "rank": 2,
+      "score": 2.72
+     },
+     {
+      "player_id": 882,
+      "player_name": "Epiphanny Prince",
+      "rank": 3,
+      "score": 2.38
+     },
+     {
+      "player_id": 384,
+      "player_name": "Tammy  Sutton-Brown",
+      "rank": 4,
+      "score": 2.38
+     },
+     {
+      "player_id": 872,
+      "player_name": "Angel McCoughtry",
+      "rank": 5,
+      "score": 2.14
+     },
+     {
+      "player_id": 680,
+      "player_name": "Sophia Young-Malcolm",
+      "rank": 6,
+      "score": 2.03
+     },
+     {
+      "player_id": 918,
+      "player_name": "Tina Charles",
+      "rank": 7,
+      "score": 2.02
+     },
+     {
+      "player_id": 716,
+      "player_name": "Jessica Davenport",
+      "rank": 8,
+      "score": 1.99
+     },
+     {
+      "player_id": 732,
+      "player_name": "Camille Little",
+      "rank": 9,
+      "score": 1.97
+     },
+     {
+      "player_id": 491,
+      "player_name": "Plenette Pierson",
+      "rank": 10,
+      "score": 1.8
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 537,
+      "player_name": "Jia Perkins",
+      "rank": 1,
+      "score": 13.56
+     },
+     {
+      "player_id": 869,
+      "player_name": "DeWanna Bonner",
+      "rank": 2,
+      "score": 12.88
+     },
+     {
+      "player_id": 1017,
+      "player_name": "Liz Cambage",
+      "rank": 3,
+      "score": 12.57
+     },
+     {
+      "player_id": 485,
+      "player_name": "Kara Lawson",
+      "rank": 4,
+      "score": 12.12
+     },
+     {
+      "player_id": 802,
+      "player_name": "Essence Carson",
+      "rank": 5,
+      "score": 12.06
+     },
+     {
+      "player_id": 716,
+      "player_name": "Jessica Davenport",
+      "rank": 6,
+      "score": 11.9
+     },
+     {
+      "player_id": 1014,
+      "player_name": "Danielle Robinson",
+      "rank": 7,
+      "score": 10.39
+     },
+     {
+      "player_id": 1016,
+      "player_name": "Danielle Adams",
+      "rank": 8,
+      "score": 9.32
+     },
+     {
+      "player_id": 40,
+      "player_name": "Katie Smith",
+      "rank": 9,
+      "score": 9.08
+     },
+     {
+      "player_id": 592,
+      "player_name": "Le'coe Willingham",
+      "rank": 10,
+      "score": 8.04
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 838,
+      "player_name": "Kia Vaughn",
+      "rank": 1,
+      "score": 6.98
+     },
+     {
+      "player_id": 864,
+      "player_name": "Quanitra Hollingsworth",
+      "rank": 2,
+      "score": 4.63
+     },
+     {
+      "player_id": 545,
+      "player_name": "Lindsay Whalen",
+      "rank": 3,
+      "score": 4.33
+     },
+     {
+      "player_id": 608,
+      "player_name": "Roneeka Hodges",
+      "rank": 4,
+      "score": 4.11
+     },
+     {
+      "player_id": 695,
+      "player_name": "Seimone Augustus",
+      "rank": 5,
+      "score": 3.86
+     },
+     {
+      "player_id": 872,
+      "player_name": "Angel McCoughtry",
+      "rank": 6,
+      "score": 3.69
+     },
+     {
+      "player_id": 915,
+      "player_name": "Kelsey Griffin",
+      "rank": 7,
+      "score": 3.45
+     },
+     {
+      "player_id": 802,
+      "player_name": "Essence Carson",
+      "rank": 8,
+      "score": 3.25
+     },
+     {
+      "player_id": 485,
+      "player_name": "Kara Lawson",
+      "rank": 9,
+      "score": 3.21
+     },
+     {
+      "player_id": 735,
+      "player_name": "Shay Murphy",
+      "rank": 10,
+      "score": 3.15
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 956,
+      "player_name": "Maya Moore",
+      "rank": 1,
+      "score": 10.73
+     },
+     {
+      "player_id": 1017,
+      "player_name": "Liz Cambage",
+      "rank": 2,
+      "score": 8.04
+     },
+     {
+      "player_id": 1014,
+      "player_name": "Danielle Robinson",
+      "rank": 3,
+      "score": 6.76
+     },
+     {
+      "player_id": 1016,
+      "player_name": "Danielle Adams",
+      "rank": 4,
+      "score": 5.76
+     },
+     {
+      "player_id": 1018,
+      "player_name": "Kayla Pedersen",
+      "rank": 5,
+      "score": 5.25
+     },
+     {
+      "player_id": 1013,
+      "player_name": "Jantel Lavender",
+      "rank": 6,
+      "score": 4.51
+     },
+     {
+      "player_id": 974,
+      "player_name": "Danielle McCray",
+      "rank": 7,
+      "score": 3.93
+     },
+     {
+      "player_id": 981,
+      "player_name": "Courtney Vandersloot",
+      "rank": 8,
+      "score": 3.82
+     },
+     {
+      "player_id": 842,
+      "player_name": "Courtney Paris",
+      "rank": 9,
+      "score": 3.53
+     },
+     {
+      "player_id": 1008,
+      "player_name": "Jasmine Thomas",
+      "rank": 10,
+      "score": 3.3
+     }
+    ]
+   }
   }
  ]
 }

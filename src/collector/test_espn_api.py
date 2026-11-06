@@ -562,16 +562,20 @@ def test_parse_leader_candidates_dedupes_refs_and_caps_depth():
 
 
 def test_parse_athlete_stats_flattens_season_totals():
-    """The season-scoped statistics payload spreads the ladder's six
-    totals across categories (gp/rebounds under general, points/assists/
-    shooting under offensive): all categories are walked into one flat
-    dict, a stat the payload never carries reads 0 (never None -- the
-    ladder math adds these), and the legacy list-shaped splits answer too."""
+    """The season-scoped statistics payload spreads the ladder's totals
+    across categories (gp/rebounds/fouls/turnovers under general, points/
+    assists/shooting under offensive): all categories are walked into one
+    flat dict, a stat the payload never carries reads 0 (never None -- the
+    ladder math adds these), and the legacy list-shaped splits answer too.
+    The Game Score inputs ride along so the live tracker can feed the same
+    impact formula the committed races rank by."""
     payload = {"splits": {"type": "total", "categories": [
         {"name": "general", "stats": [
             {"name": "gamesPlayed", "value": 3.0},
             {"name": "rebounds", "value": 30.0},
-            {"name": "minutes", "value": 100.0}]},
+            {"name": "minutes", "value": 100.0},
+            {"name": "fouls", "value": 9.0},
+            {"name": "turnovers", "value": 12.0}]},
         {"name": "offensive", "stats": [
             {"name": "points", "value": 90.0},
             {"name": "assists", "value": 21.0},
@@ -579,10 +583,14 @@ def test_parse_athlete_stats_flattens_season_totals():
             {"name": "fieldGoalsAttempted", "value": 66.0}]},
     ]}}
     assert parsing.parse_athlete_stats(payload) == {
-        "gp": 3, "pts": 90, "reb": 30, "ast": 21, "fgm": 33, "fga": 66}
+        "gp": 3, "pts": 90, "reb": 30, "ast": 21, "fgm": 33, "fga": 66,
+        "ftm": 0, "fta": 0, "oreb": 0, "dreb": 0, "stl": 0, "blk": 0,
+        "pf": 9, "to": 12}
     # Empty payload: every stat a zero, so the row can be built and gated.
     assert parsing.parse_athlete_stats({}) == {
-        "gp": 0, "pts": 0, "reb": 0, "ast": 0, "fgm": 0, "fga": 0}
+        "gp": 0, "pts": 0, "reb": 0, "ast": 0, "fgm": 0, "fga": 0,
+        "ftm": 0, "fta": 0, "oreb": 0, "dreb": 0, "stl": 0, "blk": 0,
+        "pf": 0, "to": 0}
     # Legacy list shape: the first split is the one to read.
     legacy = {"splits": [{"categories": [
         {"name": "general", "stats": [{"name": "gamesPlayed", "value": 5.0}]}]}]}

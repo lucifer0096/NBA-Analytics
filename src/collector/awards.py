@@ -10,10 +10,12 @@ the dashboard caption) -- NOT official NBA voting, awards, or any vendor's
 proprietary rating. The point is that a reader can check the math.
 
 Races:
-    MVP      production impact x team-success multiplier
+    MVP      Game Score per game x team-success multiplier
+    ROY      Game Score per game, rookies only (no team-record scaling)
     DPOY     stocks (STL+BLK) per game x team defensive multiplier
     6th Man  bench scoring/playmaking (players who mostly did NOT start)
-    MIP      year-over-year impact improvement (needs the prior season)
+    MIP      year-over-year Game Score per 36 minutes (needs the prior
+             season) -- a rotation bump alone must not read as improvement
 
 Plus per-game stat leaders (PTS/REB/AST/STL/BLK/3PM) behind a games-played
 qualifier, the same way rate titles work, with shooting splits (FG/3P/FT
@@ -63,9 +65,11 @@ REPO_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 RAW_DIR = os.path.join(REPO_ROOT, "data", "raw")
 SEASON_DIR_RE = re.compile(r"^\d{4}-\d{2}$")
 
-# Impact weights, applied identically in MVP and MIP so the two races are
-# comparable: one point ~ one point scored, a rebound worth 3/4 of a bucket,
-# an assist worth a full one (roughly the traditional points-added intuition).
+# The legacy impact/pg reading (PTS + 0.75*REB + 1.0*AST)/gp: the GOAT
+# ladder's peak term only (see _impact -- GOAT's caption describes it in
+# prose). The MVP-family races (MVP/ROY/MIP/Finals) price the WHOLE box
+# score through Game Score instead: GMSC_WEIGHTS below is their impact
+# definition, and their captions are rendered from it.
 IMPACT_RPG_WEIGHT = 0.75
 IMPACT_APG_WEIGHT = 1.00
 
@@ -159,27 +163,56 @@ RACE_LABELS = {"mvp": "MVP race", "dpoy": "DPOY race",
                "roy": "ROY race", "finals_mvp": "Finals MVP"}
 RACE_EMOJI = {"mvp": "🏆", "dpoy": "🛡️", "sixth_man": "🪑", "mip": "📈",
               "roy": "🌟", "finals_mvp": "🏆"}
+# Hollinger Game Score -- the MVP-family impact term (MVP, ROY, Finals MVP;
+# MIP runs the same score on a per-36-minutes basis). The published
+# weights: PTS + 0.4*FGM - 0.7*FGA - 0.4*(FTM - FTA) + 0.7*OREB +
+# 0.3*DREB + STL + 0.7*BLK + 0.7*AST - 0.4*PF - TOV. One dict, kept in
+# display order, because the on-screen caption is RENDERED from it (the
+# goat_formula rule: what's printed IS what's computed) -- so empty volume
+# can't win a race without the caption saying so first.
+GMSC_WEIGHTS = {"pts": 1.0, "fgm": 0.4, "fga": -0.7, "ftm": -0.4,
+                "fta": 0.4, "oreb": 0.7, "dreb": 0.3, "stl": 1.0,
+                "blk": 0.7, "ast": 0.7, "pf": -0.4, "to": -1.0}
+
+
+def gmsc_formula_text(per_36: bool = False) -> str:
+    """'Game Score per game (pts + 0.4·fgm - ...)' rendered from
+    GMSC_WEIGHTS so the race captions can never drift from the math."""
+    unit = "per 36 minutes" if per_36 else "per game"
+    terms = []
+    for stat, weight in GMSC_WEIGHTS.items():
+        if weight == 1:
+            terms.append(f"+ {stat}")
+        elif weight == -1:
+            terms.append(f"− {stat}")
+        elif weight > 0:
+            terms.append(f"+ {weight:g}·{stat}")
+        else:
+            terms.append(f"− {abs(weight):g}·{stat}")
+    body = " ".join(terms).lstrip("+ ")
+    return f"Game Score {unit} ({body})"
+
+
 RACE_FORMULAS = {
-    "mvp": ("Impact per game (PTS + 0.75·REB + 1.0·AST) scaled by the "
-            "team's win percentage, 0.6× floor to 1.0× at a perfect record."),
+    "mvp": (f"{gmsc_formula_text()} scaled by the team's win percentage, "
+            f"{MULTIPLIER_FLOOR:.1f}× floor to 1.0× at a perfect record."),
     "dpoy": ("Stocks per game (STL + BLK) scaled by the team's rank in "
              "points allowed, 0.6× floor to 1.0× for the best defense."),
     "sixth_man": ("Bench production per game (PTS + 0.5·AST + 0.25·REB), "
                   "players who started at most 40% of their games."),
-    "mip": ("Year-over-year change in per-game impact vs the previous "
-            "season; both seasons must clear the games-played qualifier."),
-    "roy": ("Impact per game (PTS + 0.75·REB + 1.0·AST), no team-record "
-            "scaling -- the award goes to the best rookie, not the best "
-            "team's."),
+    "mip": (f"Year-over-year change in {gmsc_formula_text(per_36=True)} "
+            "vs the previous season; both seasons must clear the "
+            "games-played qualifier."),
+    "roy": (f"{gmsc_formula_text()}, no team-record scaling -- the award "
+            "goes to the best rookie, not the best team's."),
 }
 
 # The Finals MVP formula is the season MVP formula applied to a playoff
 # series -- assembled from the very constants the math runs with, so the
 # caption can never drift from the computation (the goat_formula rule).
 FINALS_MVP_FORMULA = (
-    "The MVP race formula, on the series: impact per game (PTS + "
-    f"{IMPACT_RPG_WEIGHT:.2f}·REB + {IMPACT_APG_WEIGHT:.1f}·AST) scaled by "
-    "the team's Finals series win percentage, "
+    f"The MVP race formula, on the series: {gmsc_formula_text()} scaled "
+    "by the team's Finals series win percentage, "
     f"{MULTIPLIER_FLOOR:.1f}× floor to 1.0× for a sweep; qualifiers: "
     "appeared in at least half the series' games.")
 
@@ -330,13 +363,13 @@ def aggregate_players(season: str, raw_dir: str = None,
                         "_team_counts": Counter(),
                         "gp": 0, "starts": 0, "minutes": 0,
                     }
-                    for stat in CAREER_SUM_STATS:
+                    for stat in RACE_SUM_STATS:
                         entry[stat] = 0
                 entry["gp"] += 1
                 if row.get("starter"):
                     entry["starts"] += 1
                 entry["minutes"] += row.get("min") or 0
-                for stat in CAREER_SUM_STATS:
+                for stat in RACE_SUM_STATS:
                     entry[stat] += row.get(stat) or 0
                 if row.get("team_abbrev"):
                     entry["_team_counts"][row["team_abbrev"]] += 1
@@ -426,6 +459,12 @@ CAREER_SUM_STATS = ("pts", "reb", "oreb", "dreb", "ast", "stl", "blk", "to",
                     # career with no collected game keeps None, not 0.
                     "plus_minus")
 
+# Race aggregates also sum personal fouls: Game Score carries a -0.4*fouls
+# term, but fouls are not a display board -- and history's career lines
+# are derived from CAREER_SUM_STATS, so they must not gain a key nothing
+# shows. Season and Finals-series race aggregates sum this list instead.
+RACE_SUM_STATS = CAREER_SUM_STATS + ("pf",)
+
 
 def _per_game(entry: dict, stat: str) -> float:
     return round((entry.get(stat) or 0) / entry["gp"], 1) if entry["gp"] else 0.0
@@ -454,25 +493,53 @@ def efficiency(entry: dict) -> dict:
 
 
 def _impact(entry: dict) -> float:
+    """(PTS + IMPACT_RPG_WEIGHT*REB + IMPACT_APG_WEIGHT*AST)/gp -- the GOAT
+    ladder's peak term only (GOAT's caption describes it in prose). The
+    MVP-family races price the whole box score through _gmsc instead."""
     return (entry["pts"]
             + IMPACT_RPG_WEIGHT * entry["reb"]
             + IMPACT_APG_WEIGHT * entry["ast"]) / entry["gp"] if entry["gp"] else 0.0
 
 
-def mvp_rows(players: list, records: dict, min_gp: int) -> list:
-    """MVP ladder: (pts + 0.75*reb + 1.0*ast)/gp x (0.6 + 0.4 * team win%).
+def _gmsc_total(entry: dict) -> float:
+    """Hollinger Game Score summed over the entry's games: every term of
+    GMSC_WEIGHTS, so shooting efficiency, the rebound split, stocks,
+    turnovers and fouls all move the number."""
+    return sum(weight * (entry.get(stat) or 0)
+               for stat, weight in GMSC_WEIGHTS.items())
 
-    A player's team win percentage scales his production between 0.6x (winless)
-    and 1.0x (.500+ ... scaling tops out at 1.0 for a perfect team). Neutral
-    0.5 win% is used when the player's team can't be matched to a record
-    (traded to a team with no final games yet, abbreviation quirks)."""
+
+def _gmsc(entry: dict) -> float:
+    """Game Score per game -- the MVP/ROY/Finals impact term."""
+    return _gmsc_total(entry) / entry["gp"] if entry.get("gp") else 0.0
+
+
+def _gmsc_per36(entry: dict) -> float:
+    """Game Score per 36 minutes -- MIP's term, so a rotation bump alone
+    can't read as improvement. 0 when minutes were never recorded (the
+    MIP loop skips those rather than comparing at an invented rate)."""
+    minutes = entry.get("minutes") or 0
+    return _gmsc_total(entry) * 36.0 / minutes if minutes else 0.0
+
+
+def mvp_rows(players: list, records: dict, min_gp: int) -> list:
+    """MVP ladder: Game Score per game x (0.6 + 0.4 * team win%).
+
+    Game Score (Hollinger, GMSC_WEIGHTS -- its caption is rendered from
+    those weights) prices the WHOLE box score: shooting efficiency, the
+    rebound split, stocks, turnovers and fouls, so empty volume can't win
+    it. A player's team win percentage scales his production between 0.6x
+    (winless) and 1.0x (.500+ teams; the multiplier tops out at 1.0 for a
+    perfect team). Neutral 0.5 win% is used when the player's team can't
+    be matched to a record (traded to a team with no final games yet,
+    abbreviation quirks)."""
     rows = []
     for p in players:
         if p["gp"] < min_gp:
             continue
         record = records.get(p["team_abbrev"] or "")
         win_pct = record["win_pct"] if record else 0.5
-        score = _impact(p) * (MULTIPLIER_FLOOR + (1 - MULTIPLIER_FLOOR) * win_pct)
+        score = _gmsc(p) * (MULTIPLIER_FLOOR + (1 - MULTIPLIER_FLOOR) * win_pct)
         rows.append({
             "player_id": p["player_id"],
             "player_name": p["player_name"],
@@ -492,7 +559,7 @@ def mvp_rows(players: list, records: dict, min_gp: int) -> list:
 
 
 def roy_rows(players: list, rookies: set, min_gp: int) -> list:
-    """ROY ladder: (pts + 0.75*reb + 1.0*ast)/gp -- NO team-record scaling.
+    """ROY ladder: Game Score per game -- NO team-record scaling.
 
     The award goes to the best rookie, not the best team's, so unlike the
     MVP formula there is no win-percentage multiplier here. `rookies` is
@@ -516,7 +583,7 @@ def roy_rows(players: list, rookies: set, min_gp: int) -> list:
             "rpg": _per_game(p, "reb"),
             "apg": _per_game(p, "ast"),
             "fgp": _pct(p.get("fgm"), p.get("fga")),
-            "score": round(_impact(p), 2),
+            "score": round(_gmsc(p), 2),
         })
     rows.sort(key=lambda r: (-r["score"], -r["ppg"], r["player_name"] or ""))
     return _ranked(rows)
@@ -564,7 +631,7 @@ def series_results(game_metas: list) -> dict:
 def aggregate_series_games(rows: list) -> list:
     """Season-race-shaped per-player series aggregates from already-parsed
     player-game rows (parse_summary output across the series' games): the
-    aggregate_players output shape -- CAREER_SUM_STATS totals + gp/starts/
+    aggregate_players output shape -- RACE_SUM_STATS totals + gp/starts/
     minutes + the identity fields mvp_rows reads -- so the series formula
     IS the season formula, run on a different game list. Did-not-play rows
     don't count (the season rule); a player's team is the one he appeared
@@ -587,12 +654,12 @@ def aggregate_series_games(rows: list) -> list:
                 "starts": 0,
                 "minutes": 0,
             }
-            for stat in CAREER_SUM_STATS:
+            for stat in RACE_SUM_STATS:
                 entry[stat] = 0
         entry["gp"] += 1
         entry["starts"] += 1 if row.get("starter") else 0
         entry["minutes"] += int(row.get("min") or 0)
-        for stat in CAREER_SUM_STATS:
+        for stat in RACE_SUM_STATS:
             entry[stat] += int(row.get(stat) or 0)
     return list(agg.values())
 
@@ -683,24 +750,28 @@ def sixth_man_rows(players: list, records: dict, min_gp: int) -> list:
 
 def mip_rows(players: list, prev_players: list, min_gp: int,
              min_gp_prev: int) -> list:
-    """MIP ladder: this season's impact/pg MINUS last season's impact/pg.
+    """MIP ladder: this season's Game Score per 36 MINUTES minus last
+    season's.
 
-    Uses the same impact formula as MVP, so the delta reads as "+N points of
-    production per game vs last year". Both seasons must clear their own
-    games-played qualifier (a 12-game flash in either year is noise). Empty
-    list when the prior season has no collected games -- a normal state, the
-    dashboard says so instead of inventing a winner."""
+    Per-36 rather than per-game: a rotation bump alone must not read as
+    improvement -- only better per-minute production does (the row still
+    shows the per-game before/after for context). Both seasons must clear
+    their own games-played qualifier (a 12-game flash in either year is
+    noise), and a season with no recorded minutes is skipped rather than
+    compared at an invented rate. Empty list when the prior season has no
+    collected games -- a normal state, the dashboard says so instead of
+    inventing a winner."""
     if not prev_players:
         return []
     prev_by_id = {p["player_id"]: p for p in prev_players if p["gp"] >= min_gp_prev}
     rows = []
     for p in players:
-        if p["gp"] < min_gp:
+        if p["gp"] < min_gp or not p.get("minutes"):
             continue
         prev = prev_by_id.get(p["player_id"])
-        if prev is None:
+        if prev is None or not prev.get("minutes"):
             continue
-        delta = _impact(p) - _impact(prev)
+        delta = _gmsc_per36(p) - _gmsc_per36(prev)
         rows.append({
             "player_id": p["player_id"],
             "player_name": p["player_name"],

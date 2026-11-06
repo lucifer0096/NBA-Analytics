@@ -234,7 +234,7 @@ per league, with that league's season and data.
    Straight below sits the **Finals MVP calculator -- official vs
    formula**: the season MVP
    formula re-applied to the selected season's Finals series (per-game
-   impact from the series' box scores -- live ESPN summaries, 15-min
+   Game Score from the series' box scores -- live ESPN summaries, 15-min
    cache -- times the series-win multiplier, with the series standings
    and the games-played qualifier printed beside the ladder), beside
    the same official Finals MVP winner the headline just showed, in

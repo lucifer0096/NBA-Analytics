@@ -568,6 +568,321 @@
      }
     ]
    }
+  },
+  {
+   "date": "2026-11-06",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3202,
+      "player_name": "Kevin Durant",
+      "rank": 1,
+      "score": 21.52
+     },
+     {
+      "player_id": 1966,
+      "player_name": "LeBron James",
+      "rank": 2,
+      "score": 19.8
+     },
+     {
+      "player_id": 3449,
+      "player_name": "Kevin Love",
+      "rank": 3,
+      "score": 17.34
+     },
+     {
+      "player_id": 3989,
+      "player_name": "Blake Griffin",
+      "rank": 4,
+      "score": 17.02
+     },
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 5,
+      "score": 16.85
+     },
+     {
+      "player_id": 2779,
+      "player_name": "Chris Paul",
+      "rank": 6,
+      "score": 16.65
+     },
+     {
+      "player_id": 3975,
+      "player_name": "Stephen Curry",
+      "rank": 7,
+      "score": 15.59
+     },
+     {
+      "player_id": 2384,
+      "player_name": "Dwight Howard",
+      "rank": 8,
+      "score": 14.82
+     },
+     {
+      "player_id": 2983,
+      "player_name": "LaMarcus Aldridge",
+      "rank": 9,
+      "score": 14.7
+     },
+     {
+      "player_id": 1975,
+      "player_name": "Carmelo Anthony",
+      "rank": 10,
+      "score": 14.53
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 3442,
+      "player_name": "DeAndre Jordan",
+      "rank": 1,
+      "score": 2.64
+     },
+     {
+      "player_id": 3439,
+      "player_name": "Serge Ibaka",
+      "rank": 2,
+      "score": 2.52
+     },
+     {
+      "player_id": 3436,
+      "player_name": "Roy Hibbert",
+      "rank": 3,
+      "score": 2.27
+     },
+     {
+      "player_id": 6450,
+      "player_name": "Kawhi Leonard",
+      "rank": 4,
+      "score": 2.22
+     },
+     {
+      "player_id": 3015,
+      "player_name": "Paul Millsap",
+      "rank": 5,
+      "score": 2.12
+     },
+     {
+      "player_id": 2747,
+      "player_name": "Andrew Bogut",
+      "rank": 6,
+      "score": 2.1
+     },
+     {
+      "player_id": 3206,
+      "player_name": "Marc Gasol",
+      "rank": 7,
+      "score": 2.1
+     },
+     {
+      "player_id": 215,
+      "player_name": "Tim Duncan",
+      "rank": 8,
+      "score": 2.07
+     },
+     {
+      "player_id": 4251,
+      "player_name": "Paul George",
+      "rank": 9,
+      "score": 1.99
+     },
+     {
+      "player_id": 4237,
+      "player_name": "John Wall",
+      "rank": 10,
+      "score": 1.98
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 165,
+      "player_name": "Jamal Crawford",
+      "rank": 1,
+      "score": 19.18
+     },
+     {
+      "player_id": 3243,
+      "player_name": "Nick Young",
+      "rank": 2,
+      "score": 18.27
+     },
+     {
+      "player_id": 6628,
+      "player_name": "Dion Waiters",
+      "rank": 3,
+      "score": 16.8
+     },
+     {
+      "player_id": 6429,
+      "player_name": "Alec Burks",
+      "rank": 4,
+      "score": 15.47
+     },
+     {
+      "player_id": 6461,
+      "player_name": "Markieff Morris",
+      "rank": 5,
+      "score": 14.92
+     },
+     {
+      "player_id": 3235,
+      "player_name": "Rodney Stuckey",
+      "rank": 6,
+      "score": 14.2
+     },
+     {
+      "player_id": 6630,
+      "player_name": "Tony Wroten",
+      "rank": 7,
+      "score": 14.18
+     },
+     {
+      "player_id": 272,
+      "player_name": "Manu Ginobili",
+      "rank": 8,
+      "score": 14.09
+     },
+     {
+      "player_id": 3231,
+      "player_name": "Ramon Sessions",
+      "rank": 9,
+      "score": 13.86
+     },
+     {
+      "player_id": 136,
+      "player_name": "Vince Carter",
+      "rank": 10,
+      "score": 12.88
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 2761,
+      "player_name": "Gerald Green",
+      "rank": 1,
+      "score": 5.23
+     },
+     {
+      "player_id": 6461,
+      "player_name": "Markieff Morris",
+      "rank": 2,
+      "score": 4.97
+     },
+     {
+      "player_id": 6589,
+      "player_name": "Draymond Green",
+      "rank": 3,
+      "score": 4.86
+     },
+     {
+      "player_id": 4267,
+      "player_name": "Cole Aldrich",
+      "rank": 4,
+      "score": 4.64
+     },
+     {
+      "player_id": 6607,
+      "player_name": "Kendall Marshall",
+      "rank": 5,
+      "score": 4.59
+     },
+     {
+      "player_id": 4298,
+      "player_name": "Timofey Mozgov",
+      "rank": 6,
+      "score": 4.58
+     },
+     {
+      "player_id": 4258,
+      "player_name": "DeMarcus Cousins",
+      "rank": 7,
+      "score": 4.49
+     },
+     {
+      "player_id": 3999,
+      "player_name": "James Johnson",
+      "rank": 8,
+      "score": 4.42
+     },
+     {
+      "player_id": 6579,
+      "player_name": "Will Barton",
+      "rank": 9,
+      "score": 4.42
+     },
+     {
+      "player_id": 4004,
+      "player_name": "Patty Mills",
+      "rank": 10,
+      "score": 4.35
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 2596108,
+      "player_name": "Michael Carter-Williams",
+      "rank": 1,
+      "score": 12.99
+     },
+     {
+      "player_id": 2527963,
+      "player_name": "Victor Oladipo",
+      "rank": 2,
+      "score": 9.13
+     },
+     {
+      "player_id": 2579260,
+      "player_name": "Trey Burke",
+      "rank": 3,
+      "score": 8.41
+     },
+     {
+      "player_id": 2488653,
+      "player_name": "Mason Plumlee",
+      "rank": 4,
+      "score": 6.97
+     },
+     {
+      "player_id": 2488651,
+      "player_name": "Ryan Kelly",
+      "rank": 5,
+      "score": 6.37
+     },
+     {
+      "player_id": 2489663,
+      "player_name": "Kelly Olynyk",
+      "rank": 6,
+      "score": 6.26
+     },
+     {
+      "player_id": 3032977,
+      "player_name": "Giannis Antetokounmpo",
+      "rank": 7,
+      "score": 6.05
+     },
+     {
+      "player_id": 2491079,
+      "player_name": "Nate Wolters",
+      "rank": 8,
+      "score": 5.94
+     },
+     {
+      "player_id": 2528210,
+      "player_name": "Tim Hardaway Jr.",
+      "rank": 9,
+      "score": 5.51
+     },
+     {
+      "player_id": 2534781,
+      "player_name": "Gorgui Dieng",
+      "rank": 10,
+      "score": 5.14
+     }
+    ]
+   }
   }
  ]
 }

@@ -568,6 +568,321 @@
      }
     ]
    }
+  },
+  {
+   "date": "2026-11-06",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3032977,
+      "player_name": "Giannis Antetokounmpo",
+      "rank": 1,
+      "score": 25.04
+     },
+     {
+      "player_id": 3945274,
+      "player_name": "Luka Doncic",
+      "rank": 2,
+      "score": 24.95
+     },
+     {
+      "player_id": 3112335,
+      "player_name": "Nikola Jokic",
+      "rank": 3,
+      "score": 24.19
+     },
+     {
+      "player_id": 4278073,
+      "player_name": "Shai Gilgeous-Alexander",
+      "rank": 4,
+      "score": 23.43
+     },
+     {
+      "player_id": 6583,
+      "player_name": "Anthony Davis",
+      "rank": 5,
+      "score": 20.5
+     },
+     {
+      "player_id": 4065648,
+      "player_name": "Jayson Tatum",
+      "rank": 6,
+      "score": 19.86
+     },
+     {
+      "player_id": 1966,
+      "player_name": "LeBron James",
+      "rank": 7,
+      "score": 19.55
+     },
+     {
+      "player_id": 3934672,
+      "player_name": "Jalen Brunson",
+      "rank": 8,
+      "score": 18.68
+     },
+     {
+      "player_id": 3155942,
+      "player_name": "Domantas Sabonis",
+      "rank": 9,
+      "score": 18.18
+     },
+     {
+      "player_id": 3136193,
+      "player_name": "Devin Booker",
+      "rank": 10,
+      "score": 18.15
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 5104157,
+      "player_name": "Victor Wembanyama",
+      "rank": 1,
+      "score": 3.34
+     },
+     {
+      "player_id": 3032976,
+      "player_name": "Rudy Gobert",
+      "rank": 2,
+      "score": 2.82
+     },
+     {
+      "player_id": 4433255,
+      "player_name": "Chet Holmgren",
+      "rank": 3,
+      "score": 2.57
+     },
+     {
+      "player_id": 3102531,
+      "player_name": "Kristaps Porzingis",
+      "rank": 4,
+      "score": 2.54
+     },
+     {
+      "player_id": 6583,
+      "player_name": "Anthony Davis",
+      "rank": 5,
+      "score": 2.51
+     },
+     {
+      "player_id": 4278073,
+      "player_name": "Shai Gilgeous-Alexander",
+      "rank": 6,
+      "score": 2.51
+     },
+     {
+      "player_id": 4277961,
+      "player_name": "Jaren Jackson Jr.",
+      "rank": 7,
+      "score": 2.4
+     },
+     {
+      "player_id": 4222252,
+      "player_name": "Isaiah Hartenstein",
+      "rank": 8,
+      "score": 2.26
+     },
+     {
+      "player_id": 4278067,
+      "player_name": "Nic Claxton",
+      "rank": 9,
+      "score": 2.2
+     },
+     {
+      "player_id": 6450,
+      "player_name": "Kawhi Leonard",
+      "rank": 10,
+      "score": 2.2
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 2528426,
+      "player_name": "Jordan Clarkson",
+      "rank": 1,
+      "score": 20.5
+     },
+     {
+      "player_id": 4066262,
+      "player_name": "Malik Monk",
+      "rank": 2,
+      "score": 18.72
+     },
+     {
+      "player_id": 4395723,
+      "player_name": "Keldon Johnson",
+      "rank": 3,
+      "score": 18.49
+     },
+     {
+      "player_id": 2991043,
+      "player_name": "Caris LeVert",
+      "rank": 4,
+      "score": 17.57
+     },
+     {
+      "player_id": 4683634,
+      "player_name": "Bennedict Mathurin",
+      "rank": 5,
+      "score": 16.57
+     },
+     {
+      "player_id": 3064482,
+      "player_name": "Bobby Portis",
+      "rank": 6,
+      "score": 16.27
+     },
+     {
+      "player_id": 5105550,
+      "player_name": "GG Jackson",
+      "rank": 7,
+      "score": 16.2
+     },
+     {
+      "player_id": 2528210,
+      "player_name": "Tim Hardaway Jr.",
+      "rank": 8,
+      "score": 16.1
+     },
+     {
+      "player_id": 4396971,
+      "player_name": "Naz Reid",
+      "rank": 9,
+      "score": 15.42
+     },
+     {
+      "player_id": 2595516,
+      "player_name": "Norman Powell",
+      "rank": 10,
+      "score": 15.08
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 3449,
+      "player_name": "Kevin Love",
+      "rank": 1,
+      "score": 5.2
+     },
+     {
+      "player_id": 4433134,
+      "player_name": "Scottie Barnes",
+      "rank": 2,
+      "score": 4.86
+     },
+     {
+      "player_id": 4683021,
+      "player_name": "Deni Avdija",
+      "rank": 3,
+      "score": 4.66
+     },
+     {
+      "player_id": 2530530,
+      "player_name": "T.J. McConnell",
+      "rank": 4,
+      "score": 4.56
+     },
+     {
+      "player_id": 4397189,
+      "player_name": "Jalen Smith",
+      "rank": 5,
+      "score": 4.41
+     },
+     {
+      "player_id": 4222252,
+      "player_name": "Isaiah Hartenstein",
+      "rank": 6,
+      "score": 4.21
+     },
+     {
+      "player_id": 4277811,
+      "player_name": "Collin Sexton",
+      "rank": 7,
+      "score": 4.08
+     },
+     {
+      "player_id": 3908845,
+      "player_name": "John Collins",
+      "rank": 8,
+      "score": 3.97
+     },
+     {
+      "player_id": 3157465,
+      "player_name": "Duncan Robinson",
+      "rank": 9,
+      "score": 3.91
+     },
+     {
+      "player_id": 4593803,
+      "player_name": "Jalen Williams",
+      "rank": 10,
+      "score": 3.85
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 5104157,
+      "player_name": "Victor Wembanyama",
+      "rank": 1,
+      "score": 19.29
+     },
+     {
+      "player_id": 4433255,
+      "player_name": "Chet Holmgren",
+      "rank": 2,
+      "score": 15.57
+     },
+     {
+      "player_id": 4433287,
+      "player_name": "Brandon Miller",
+      "rank": 3,
+      "score": 11.54
+     },
+     {
+      "player_id": 4684740,
+      "player_name": "Amen Thompson",
+      "rank": 4,
+      "score": 10.47
+     },
+     {
+      "player_id": 4683688,
+      "player_name": "Dereck Lively II",
+      "rank": 5,
+      "score": 10.4
+     },
+     {
+      "player_id": 5105550,
+      "player_name": "GG Jackson",
+      "rank": 6,
+      "score": 10.25
+     },
+     {
+      "player_id": 4432848,
+      "player_name": "Jaime Jaquez Jr.",
+      "rank": 7,
+      "score": 9.6
+     },
+     {
+      "player_id": 4709138,
+      "player_name": "Brandin Podziemski",
+      "rank": 8,
+      "score": 9.25
+     },
+     {
+      "player_id": 4431684,
+      "player_name": "Trayce Jackson-Davis",
+      "rank": 9,
+      "score": 9.23
+     },
+     {
+      "player_id": 5105592,
+      "player_name": "Cam Whitmore",
+      "rank": 10,
+      "score": 8.86
+     }
+    ]
+   }
   }
  ]
 }

@@ -568,6 +568,321 @@
      }
     ]
    }
+  },
+  {
+   "date": "2026-11-06",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3032977,
+      "player_name": "Giannis Antetokounmpo",
+      "rank": 1,
+      "score": 22.58
+     },
+     {
+      "player_id": 3112335,
+      "player_name": "Nikola Jokic",
+      "rank": 2,
+      "score": 22.39
+     },
+     {
+      "player_id": 3059318,
+      "player_name": "Joel Embiid",
+      "rank": 3,
+      "score": 21.13
+     },
+     {
+      "player_id": 3992,
+      "player_name": "James Harden",
+      "rank": 4,
+      "score": 20.38
+     },
+     {
+      "player_id": 3975,
+      "player_name": "Stephen Curry",
+      "rank": 5,
+      "score": 19.8
+     },
+     {
+      "player_id": 3945274,
+      "player_name": "Luka Doncic",
+      "rank": 6,
+      "score": 19.16
+     },
+     {
+      "player_id": 6606,
+      "player_name": "Damian Lillard",
+      "rank": 7,
+      "score": 19.03
+     },
+     {
+      "player_id": 6450,
+      "player_name": "Kawhi Leonard",
+      "rank": 8,
+      "score": 18.64
+     },
+     {
+      "player_id": 6442,
+      "player_name": "Kyrie Irving",
+      "rank": 9,
+      "score": 18.58
+     },
+     {
+      "player_id": 4395628,
+      "player_name": "Zion Williamson",
+      "rank": 10,
+      "score": 18.48
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 2991280,
+      "player_name": "Nerlens Noel",
+      "rank": 1,
+      "score": 3.3
+     },
+     {
+      "player_id": 3032976,
+      "player_name": "Rudy Gobert",
+      "rank": 2,
+      "score": 3.15
+     },
+     {
+      "player_id": 3133628,
+      "player_name": "Myles Turner",
+      "rank": 3,
+      "score": 2.88
+     },
+     {
+      "player_id": 6583,
+      "player_name": "Anthony Davis",
+      "rank": 4,
+      "score": 2.85
+     },
+     {
+      "player_id": 3907498,
+      "player_name": "Matisse Thybulle",
+      "rank": 5,
+      "score": 2.53
+     },
+     {
+      "player_id": 3102529,
+      "player_name": "Clint Capela",
+      "rank": 6,
+      "score": 2.31
+     },
+     {
+      "player_id": 6430,
+      "player_name": "Jimmy Butler III",
+      "rank": 7,
+      "score": 2.29
+     },
+     {
+      "player_id": 4066211,
+      "player_name": "Robert Williams III",
+      "rank": 8,
+      "score": 2.23
+     },
+     {
+      "player_id": 3059318,
+      "player_name": "Joel Embiid",
+      "rank": 9,
+      "score": 2.18
+     },
+     {
+      "player_id": 4066261,
+      "player_name": "Bam Adebayo",
+      "rank": 10,
+      "score": 2.09
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 2528426,
+      "player_name": "Jordan Clarkson",
+      "rank": 1,
+      "score": 20.64
+     },
+     {
+      "player_id": 4395725,
+      "player_name": "Tyler Herro",
+      "rank": 2,
+      "score": 18.04
+     },
+     {
+      "player_id": 6619,
+      "player_name": "Terrence Ross",
+      "rank": 3,
+      "score": 17.63
+     },
+     {
+      "player_id": 3456,
+      "player_name": "Derrick Rose",
+      "rank": 4,
+      "score": 17.42
+     },
+     {
+      "player_id": 3423,
+      "player_name": "Goran Dragic",
+      "rank": 5,
+      "score": 16.46
+     },
+     {
+      "player_id": 4396993,
+      "player_name": "Tyrese Haliburton",
+      "rank": 6,
+      "score": 16.39
+     },
+     {
+      "player_id": 3948153,
+      "player_name": "Chris Boucher",
+      "rank": 7,
+      "score": 15.85
+     },
+     {
+      "player_id": 3244,
+      "player_name": "Thaddeus Young",
+      "rank": 8,
+      "score": 15.79
+     },
+     {
+      "player_id": 2991055,
+      "player_name": "Montrezl Harrell",
+      "rank": 9,
+      "score": 15.58
+     },
+     {
+      "player_id": 4066383,
+      "player_name": "Miles Bridges",
+      "rank": 10,
+      "score": 15.34
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 4277956,
+      "player_name": "Jordan Poole",
+      "rank": 1,
+      "score": 7.02
+     },
+     {
+      "player_id": 2530923,
+      "player_name": "Alfonzo McKinnie",
+      "rank": 2,
+      "score": 6.19
+     },
+     {
+      "player_id": 3244,
+      "player_name": "Thaddeus Young",
+      "rank": 3,
+      "score": 6.13
+     },
+     {
+      "player_id": 4080610,
+      "player_name": "Hamidou Diallo",
+      "rank": 4,
+      "score": 5.85
+     },
+     {
+      "player_id": 4278049,
+      "player_name": "Daniel Gafford",
+      "rank": 5,
+      "score": 5.73
+     },
+     {
+      "player_id": 3112335,
+      "player_name": "Nikola Jokic",
+      "rank": 6,
+      "score": 5.63
+     },
+     {
+      "player_id": 3447,
+      "player_name": "Robin Lopez",
+      "rank": 7,
+      "score": 5.47
+     },
+     {
+      "player_id": 3133626,
+      "player_name": "Kenrich Williams",
+      "rank": 8,
+      "score": 5.42
+     },
+     {
+      "player_id": 4396907,
+      "player_name": "Darius Garland",
+      "rank": 9,
+      "score": 5.35
+     },
+     {
+      "player_id": 3064482,
+      "player_name": "Bobby Portis",
+      "rank": 10,
+      "score": 4.84
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 4432816,
+      "player_name": "LaMelo Ball",
+      "rank": 1,
+      "score": 13.63
+     },
+     {
+      "player_id": 4594268,
+      "player_name": "Anthony Edwards",
+      "rank": 2,
+      "score": 13.03
+     },
+     {
+      "player_id": 4396993,
+      "player_name": "Tyrese Haliburton",
+      "rank": 3,
+      "score": 11.98
+     },
+     {
+      "player_id": 3136777,
+      "player_name": "Jae'Sean Tate",
+      "rank": 4,
+      "score": 10.2
+     },
+     {
+      "player_id": 4432809,
+      "player_name": "Cole Anthony",
+      "rank": 5,
+      "score": 9.11
+     },
+     {
+      "player_id": 4397136,
+      "player_name": "Saddiq Bey",
+      "rank": 6,
+      "score": 9.01
+     },
+     {
+      "player_id": 4431828,
+      "player_name": "KJ Martin",
+      "rank": 7,
+      "score": 8.7
+     },
+     {
+      "player_id": 4432810,
+      "player_name": "Isaiah Stewart",
+      "rank": 8,
+      "score": 8.11
+     },
+     {
+      "player_id": 4432808,
+      "player_name": "James Wiseman",
+      "rank": 9,
+      "score": 8.09
+     },
+     {
+      "player_id": 4395724,
+      "player_name": "Immanuel Quickley",
+      "rank": 10,
+      "score": 7.8
+     }
+    ]
+   }
   }
  ]
 }

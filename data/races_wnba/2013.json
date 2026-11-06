@@ -568,6 +568,321 @@
      }
     ]
    }
+  },
+  {
+   "date": "2026-11-06",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 812,
+      "player_name": "Candace Parker",
+      "rank": 1,
+      "score": 15.16
+     },
+     {
+      "player_id": 766,
+      "player_name": "Sylvia Fowles",
+      "rank": 2,
+      "score": 14.96
+     },
+     {
+      "player_id": 956,
+      "player_name": "Maya Moore",
+      "rank": 3,
+      "score": 14.63
+     },
+     {
+      "player_id": 2491877,
+      "player_name": "Elena Delle Donne",
+      "rank": 4,
+      "score": 12.88
+     },
+     {
+      "player_id": 585,
+      "player_name": "Diana Taurasi",
+      "rank": 5,
+      "score": 12.78
+     },
+     {
+      "player_id": 872,
+      "player_name": "Angel McCoughtry",
+      "rank": 6,
+      "score": 12.68
+     },
+     {
+      "player_id": 125,
+      "player_name": "Tamika Catchings",
+      "rank": 7,
+      "score": 11.87
+     },
+     {
+      "player_id": 1068,
+      "player_name": "Nneka Ogwumike",
+      "rank": 8,
+      "score": 11.87
+     },
+     {
+      "player_id": 545,
+      "player_name": "Lindsay Whalen",
+      "rank": 9,
+      "score": 11.43
+     },
+     {
+      "player_id": 695,
+      "player_name": "Seimone Augustus",
+      "rank": 10,
+      "score": 10.75
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 125,
+      "player_name": "Tamika Catchings",
+      "rank": 1,
+      "score": 3.87
+     },
+     {
+      "player_id": 766,
+      "player_name": "Sylvia Fowles",
+      "rank": 2,
+      "score": 3.01
+     },
+     {
+      "player_id": 872,
+      "player_name": "Angel McCoughtry",
+      "rank": 3,
+      "score": 2.85
+     },
+     {
+      "player_id": 812,
+      "player_name": "Candace Parker",
+      "rank": 4,
+      "score": 2.71
+     },
+     {
+      "player_id": 2,
+      "player_name": "Erika de Souza",
+      "rank": 5,
+      "score": 2.6
+     },
+     {
+      "player_id": 956,
+      "player_name": "Maya Moore",
+      "rank": 6,
+      "score": 2.53
+     },
+     {
+      "player_id": 2491877,
+      "player_name": "Elena Delle Donne",
+      "rank": 7,
+      "score": 2.22
+     },
+     {
+      "player_id": 2490553,
+      "player_name": "Brittney Griner",
+      "rank": 8,
+      "score": 2.2
+     },
+     {
+      "player_id": 1003,
+      "player_name": "Karima Christmas-Kelly",
+      "rank": 9,
+      "score": 2.18
+     },
+     {
+      "player_id": 1068,
+      "player_name": "Nneka Ogwumike",
+      "rank": 10,
+      "score": 2.12
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 1049,
+      "player_name": "Riquna Williams",
+      "rank": 1,
+      "score": 17.13
+     },
+     {
+      "player_id": 1054,
+      "player_name": "Tiffany Hayes",
+      "rank": 2,
+      "score": 13.04
+     },
+     {
+      "player_id": 881,
+      "player_name": "Monica Wright",
+      "rank": 3,
+      "score": 10.91
+     },
+     {
+      "player_id": 2490773,
+      "player_name": "Alex Bentley",
+      "rank": 4,
+      "score": 10.01
+     },
+     {
+      "player_id": 1013,
+      "player_name": "Jantel Lavender",
+      "rank": 5,
+      "score": 8.63
+     },
+     {
+      "player_id": 2491346,
+      "player_name": "Kelsey Bone",
+      "rank": 6,
+      "score": 8.61
+     },
+     {
+      "player_id": 660,
+      "player_name": "Mistie McCray Bass",
+      "rank": 7,
+      "score": 8.55
+     },
+     {
+      "player_id": 1006,
+      "player_name": "Alex Montgomery",
+      "rank": 8,
+      "score": 8.23
+     },
+     {
+      "player_id": 2490769,
+      "player_name": "Tayler Hill",
+      "rank": 9,
+      "score": 7.65
+     },
+     {
+      "player_id": 773,
+      "player_name": "Charde Houston",
+      "rank": 10,
+      "score": 7.1
+     }
+    ],
+    "mip": [
+     {
+      "player_id": 1054,
+      "player_name": "Tiffany Hayes",
+      "rank": 1,
+      "score": 3.6
+     },
+     {
+      "player_id": 915,
+      "player_name": "Kelsey Griffin",
+      "rank": 2,
+      "score": 3.33
+     },
+     {
+      "player_id": 1049,
+      "player_name": "Riquna Williams",
+      "rank": 3,
+      "score": 3.23
+     },
+     {
+      "player_id": 1018,
+      "player_name": "Kayla Pedersen",
+      "rank": 4,
+      "score": 3.21
+     },
+     {
+      "player_id": 916,
+      "player_name": "Allison Hightower",
+      "rank": 5,
+      "score": 3.08
+     },
+     {
+      "player_id": 851,
+      "player_name": "Shavonte Zellous",
+      "rank": 6,
+      "score": 2.72
+     },
+     {
+      "player_id": 592,
+      "player_name": "Le'coe Willingham",
+      "rank": 7,
+      "score": 2.68
+     },
+     {
+      "player_id": 835,
+      "player_name": "Marissa Coleman",
+      "rank": 8,
+      "score": 2.62
+     },
+     {
+      "player_id": 618,
+      "player_name": "Tanisha Wright",
+      "rank": 9,
+      "score": 2.6
+     },
+     {
+      "player_id": 812,
+      "player_name": "Candace Parker",
+      "rank": 10,
+      "score": 2.4
+     }
+    ],
+    "roy": [
+     {
+      "player_id": 2491877,
+      "player_name": "Elena Delle Donne",
+      "rank": 1,
+      "score": 14.59
+     },
+     {
+      "player_id": 2490553,
+      "player_name": "Brittney Griner",
+      "rank": 2,
+      "score": 11.39
+     },
+     {
+      "player_id": 2490773,
+      "player_name": "Alex Bentley",
+      "rank": 3,
+      "score": 5.39
+     },
+     {
+      "player_id": 2491205,
+      "player_name": "Skylar Diggins",
+      "rank": 4,
+      "score": 5.09
+     },
+     {
+      "player_id": 2491346,
+      "player_name": "Kelsey Bone",
+      "rank": 5,
+      "score": 4.92
+     },
+     {
+      "player_id": 2490769,
+      "player_name": "Tayler Hill",
+      "rank": 6,
+      "score": 4.31
+     },
+     {
+      "player_id": 2325265,
+      "player_name": "Angel Goodrich",
+      "rank": 7,
+      "score": 4.1
+     },
+     {
+      "player_id": 3027368,
+      "player_name": "Emma Meesseman",
+      "rank": 8,
+      "score": 3.99
+     },
+     {
+      "player_id": 2490528,
+      "player_name": "Tierra Ruffin-Pratt",
+      "rank": 9,
+      "score": 3.5
+     },
+     {
+      "player_id": 2491232,
+      "player_name": "Kayla Alexander",
+      "rank": 10,
+      "score": 1.96
+     }
+    ]
+   }
   }
  ]
 }

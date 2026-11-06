@@ -50,13 +50,6 @@
    "date": "2026-11-04T23:58Z"
   },
   {
-   "player_name": "Noah Clowney",
-   "team": "Brooklyn Nets",
-   "status": "Day-To-Day",
-   "detail": "Clowney (knee) supplied seven points (3-6 FG, 1-4 3Pt), one rebound and one assist over 17 minutes during Wednesday's 114-104 victory over the Hornets.",
-   "date": "2026-11-05T07:12Z"
-  },
-  {
    "player_name": "Day'Ron Sharpe",
    "team": "Brooklyn Nets",
    "status": "Day-To-Day",
@@ -106,18 +99,18 @@
    "date": "2026-11-04T23:50Z"
   },
   {
+   "player_name": "Zach Collins",
+   "team": "Chicago Bulls",
+   "status": "Day-To-Day",
+   "detail": "Collins didn't practice Friday due to an illness, per K.C. Johnson of Chicago Sports Network.",
+   "date": "2026-11-06T19:19Z"
+  },
+  {
    "player_name": "Nic Claxton",
    "team": "Chicago Bulls",
    "status": "Out",
    "detail": "Head coach Tiago Splittler said Friday that Claxton (hamstring) is expected to make his season debut Sunday against the 76ers, per Joel Lorenzi of The Athletic.",
    "date": "2026-11-06T18:21Z"
-  },
-  {
-   "player_name": "Zach Collins",
-   "team": "Chicago Bulls",
-   "status": "Day-To-Day",
-   "detail": "Collins (undisclosed) exited to the locker room in the fourth quarter of Wednesday's 135-105 loss to the Knicks, finishing with three points (1-4 FG, 0-2 3Pt, 1-1 FT), three assists, one rebound and one steal across 14 minutes.",
-   "date": "2026-11-05T03:04Z"
   },
   {
    "player_name": "Jalen Smith",
@@ -235,8 +228,8 @@
    "player_name": "Gui Santos",
    "team": "Golden State Warriors",
    "status": "Day-To-Day",
-   "detail": "Santos (knee) has been ruled out for Thursday's game against the Heat.",
-   "date": "2026-11-06T05:46Z"
+   "detail": "Santos (knee) is questionable for Saturday's game versus Orlando, per Nick Friedell of The Athletic.",
+   "date": "2026-11-06T20:49Z"
   },
   {
    "player_name": "Kristaps Porzingis",
@@ -262,9 +255,9 @@
   {
    "player_name": "Clint Capela",
    "team": "Houston Rockets",
-   "status": "Day-To-Day",
-   "detail": "Capela (ankle) is out for Wednesday's game against the Timberwolves.",
-   "date": "2026-11-05T15:04Z"
+   "status": "Out",
+   "detail": "Capela (ankle) is out for Saturday's game against the Suns.",
+   "date": "2026-11-06T20:32Z"
   },
   {
    "player_name": "Steven Adams",
@@ -309,18 +302,18 @@
    "date": "2026-10-28T21:30Z"
   },
   {
+   "player_name": "Brandon Ingram",
+   "team": "LA Clippers",
+   "status": "Out",
+   "detail": "Ingram (Achilles) has progressed to full contact basketball activities, per NBA writer Justin Russo.",
+   "date": "2026-11-06T20:20Z"
+  },
+  {
    "player_name": "Yanic Konan Niederhauser",
    "team": "LA Clippers",
    "status": "Out",
    "detail": "The Clippers recalled Niederhauser (foot) from the G League's San Diego Clippers on Sunday.",
    "date": "2026-11-02T16:12Z"
-  },
-  {
-   "player_name": "Brandon Ingram",
-   "team": "LA Clippers",
-   "status": "Out",
-   "detail": "The Clippers recalled Ingram (Achilles) from the G League's San Diego Clippers on Sunday.",
-   "date": "2026-11-02T16:01Z"
   },
   {
    "player_name": "Bradley Beal",
@@ -335,13 +328,6 @@
    "status": "Out",
    "detail": "Miller underwent surgery Wednesday to repair a torn left rotator cuff and will be re-evaluated in six months, per Law Murray of The Athletic.",
    "date": "2026-08-26T20:04Z"
-  },
-  {
-   "player_name": "Sandro Mamukelashvili",
-   "team": "Los Angeles Lakers",
-   "status": "Day-To-Day",
-   "detail": "Mamukelashvili (illness) is listed as questionable for Friday's game against Portland.",
-   "date": "2026-11-06T01:03Z"
   },
   {
    "player_name": "Isaiah Stewart",
@@ -540,6 +526,13 @@
    "date": "2026-08-24T20:23Z"
   },
   {
+   "player_name": "De'Andre Hunter",
+   "team": "Sacramento Kings",
+   "status": "Day-To-Day",
+   "detail": "Hunter is questionable for Friday against the Spurs due to an illness.",
+   "date": "2026-11-06T21:07Z"
+  },
+  {
    "player_name": "Maxime Raynaud",
    "team": "Sacramento Kings",
    "status": "Out",
@@ -673,6 +666,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-06T19:26:22Z",
+ "_generated_utc": "2026-11-06T21:17:59Z",
  "source": "espn"
 }

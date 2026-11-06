@@ -456,13 +456,14 @@ def parse_leader_candidates(payload: dict, per_category: int = 30) -> list:
 
 def parse_athlete_stats(payload: dict) -> dict:
     """season-scoped athlete statistics payload -> flat season TOTALS for
-    the tracker's rows: gp/pts/reb/ast/fgm/fga.
+    the tracker's rows: the six headline stats (gp/pts/reb/ast/fgm/fga)
+    plus the Game Score inputs (ftm/fta/oreb/dreb/stl/blk/pf/to).
 
-    The payload spreads the totals across categories (gamesPlayed and
-    rebounds under 'general', points/assists/shooting under 'offensive'),
-    so every category is walked into one namespace -- first occurrence
-    wins, and a stat the payload doesn't carry reads 0 (never None: the
-    ladder math adds these)."""
+    The payload spreads the totals across categories (gamesPlayed,
+    rebounds, fouls and turnovers under 'general', points/assists/
+    shooting under 'offensive'), so every category is walked into one
+    namespace -- first occurrence wins, and a stat the payload doesn't
+    carry reads 0 (never None: the ladder math adds these)."""
     splits = payload.get("splits") or {}
     if isinstance(splits, list):        # legacy/list shape: take the first
         splits = splits[0] if splits else {}
@@ -479,7 +480,16 @@ def parse_athlete_stats(payload: dict) -> dict:
     return {"gp": _total("gamesPlayed"), "pts": _total("points"),
             "reb": _total("rebounds"), "ast": _total("assists"),
             "fgm": _total("fieldGoalsMade"),
-            "fga": _total("fieldGoalsAttempted")}
+            "fga": _total("fieldGoalsAttempted"),
+            # Game Score inputs (the ladders' impact term): free throws,
+            # the rebound split, stocks, fouls, turnovers -- all verified
+            # present on ESPN's season statistics payload.
+            "ftm": _total("freeThrowsMade"),
+            "fta": _total("freeThrowsAttempted"),
+            "oreb": _total("offensiveRebounds"),
+            "dreb": _total("defensiveRebounds"),
+            "stl": _total("steals"), "blk": _total("blocks"),
+            "pf": _total("fouls"), "to": _total("turnovers")}
 
 
 # ---------------------------------------------------------------------------

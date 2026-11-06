@@ -153,9 +153,45 @@ def test_mvp_multiplier_orders_equal_production():
     rows = awards.mvp_rows([loser, short, winner], records, min_gp=10)
     assert [r["player_name"] for r in rows] == ["Alpha", "Beta"]
     assert rows[0]["rank"] == 1 and rows[1]["rank"] == 2
-    # impact = (200 + 0.75*80 + 60)/10 = 32; multipliers 0.92 vs 0.68.
-    assert rows[0]["score"] == 29.44
-    assert rows[1]["score"] == 21.76
+    # Game Score = (200 + 0.7*60)/10 = 24.2 (the fixture records no
+    # shooting/foul/oreb-dreb fields); multipliers 0.92 vs 0.68.
+    assert rows[0]["score"] == 22.26
+    assert rows[1]["score"] == 16.46
+
+
+def test_gmsc_caption_prints_every_weight_verbatim():
+    """The on-screen Game Score text is RENDERED from GMSC_WEIGHTS (the
+    goat_formula rule): pin the exact string so a weight change can never
+    ship without its caption following, and the race captions embed it."""
+    expected = ("Game Score per game (pts + 0.4·fgm − 0.7·fga − 0.4·ftm + "
+                "0.4·fta + 0.7·oreb + 0.3·dreb + stl + 0.7·blk + 0.7·ast − "
+                "0.4·pf − to)")
+    assert awards.gmsc_formula_text() == expected
+    assert awards.gmsc_formula_text(per_36=True) == expected.replace(
+        "per game", "per 36 minutes")
+    assert expected in awards.RACE_FORMULAS["mvp"]
+    assert expected in awards.RACE_FORMULAS["roy"]
+    assert (awards.gmsc_formula_text(per_36=True)
+            in awards.RACE_FORMULAS["mip"])
+
+
+def test_mvp_gmsc_prices_efficiency_not_empty_volume():
+    """Same points, rebounds and assists -- the player who needed MORE
+    attempts and committed more fouls/turnovers to get them ranks lower:
+    Game Score prices the whole box score, so empty volume can't win."""
+    records = {"BOS": {"wins": 8, "losses": 2, "win_pct": 0.8,
+                       "opp_pg": 105.0, "games": 10}}
+    efficient = _player(1, "Efficient", "BOS", pts=200, oreb=10, dreb=70,
+                        ast=60, fgm=80, fga=140, ftm=40, fta=45,
+                        pf=20, to=15)
+    volume = _player(2, "Volume", "BOS", pts=200, oreb=10, dreb=70,
+                     ast=60, fgm=70, fga=190, ftm=50, fta=60,
+                     pf=40, to=30)
+    rows = awards.mvp_rows([volume, efficient], records, min_gp=10)
+    assert [r["player_name"] for r in rows] == ["Efficient", "Volume"]
+    # Same team -> same win% multiplier, so only the box score decides:
+    # -0.7 per extra FGA, -0.4 per foul, -1 per turnover.
+    assert (rows[0]["score"], rows[1]["score"]) == (16.84, 11.32)
 
 
 def test_sixth_man_start_filter_boundary():
@@ -174,6 +210,29 @@ def test_mip_needs_prev_season():
     p = _player(1, "Riser", "BOS", pts=300)
     # No collected prior-season games -> honest empty, never an invented winner.
     assert awards.mip_rows([p], [], min_gp=8, min_gp_prev=8) == []
+
+
+def test_mip_per_36_ignores_a_minutes_bump():
+    """MIP ranks per-36-MINUTES Game Score: rotation growth alone (same
+    per-game totals over more minutes -> a worse per-minute rate) does
+    NOT read as improvement, while a genuine per-minute leap does."""
+    # Same scoring totals, 10 more minutes a night: the rate drops.
+    grew = _player(1, "Minutes", gp=40, pts=800, minutes=1600)
+    prev_grew = _player(1, "Minutes", gp=40, pts=800, minutes=1200)
+    # Same minutes, 5 more points a night: the rate climbs.
+    leaped = _player(2, "Leap", gp=40, pts=800, minutes=1200)
+    prev_leaped = _player(2, "Leap", gp=40, pts=600, minutes=1200)
+    rows = awards.mip_rows([grew, leaped], [prev_grew, prev_leaped],
+                           min_gp=10, min_gp_prev=10)
+    assert [r["player_name"] for r in rows] == ["Leap", "Minutes"]
+    assert rows[1]["score"] == -6.0       # more minutes, same output = worse
+    assert rows[0]["score"] == 6.0
+    # No recorded minutes in either season: skipped, never compared at an
+    # invented rate (an honest absent row beats an invented number).
+    assert awards.mip_rows([_player(3, "No Min", gp=40, pts=800,
+                                    minutes=0)],
+                           [_player(3, "No Min", gp=40, pts=600)],
+                           min_gp=10, min_gp_prev=10) == []
 
 
 def test_leader_rows_qualification_and_rank_cap():
@@ -627,7 +686,7 @@ def test_build_payload_envelope(tmp_path):
     mvp = payload["races"]["mvp"]
     assert [r["player_name"] for r in mvp] == ["Star", "Bench", "Tie",
                                                "Traded"]
-    assert mvp[0]["score"] == 42.0                    # (240+48+48)/8 * 1.0
+    assert mvp[0]["score"] == 35.9     # Game Score (240 + 0.7*48 + 8 + 0.7*8)/8 * 1.0
     assert mvp[0]["wins"] == 8                        # BOS swept the fixture
     # DNP guy cleared only 1 game: below the qualifier, in no race.
     assert all(r["player_id"] != 3 for rows in payload["races"].values()
@@ -657,26 +716,29 @@ def test_season_start_year_reads_both_label_shapes():
     assert awards.season_start_year("2026") == 2026
 
 
-def test_roy_rows_ranks_only_the_rookies_by_pure_impact():
+def test_roy_rows_ranks_only_the_rookies_by_gmsc():
     """The ROY ladder ranks EXACTLY the given rookies (the refresh's debut
-    set) by impact per game with no team-record scaling: a veteran who
-    outscored everyone never ranks, a rookie below the games-played bar
-    never ranks, the score is the raw impact -- and an empty/None roster
-    is an honest empty race, never a guess that fills with veterans."""
+    set) by Game Score per game with no team-record scaling: a veteran
+    who outscored everyone never ranks, a rookie below the games-played
+    bar never ranks, the score is the raw Game Score -- and an empty/None
+    roster is an honest empty race, never a guess that fills with
+    veterans."""
     players = [
         {"player_id": 1, "player_name": "Veteran", "team_abbrev": "AAA",
-         "gp": 8, "pts": 400, "reb": 64, "ast": 80, "fgm": 200, "fga": 400},
+         "gp": 8, "pts": 400, "reb": 64, "oreb": 16, "dreb": 48, "ast": 80,
+         "stl": 16, "blk": 8, "to": 32, "pf": 32, "fgm": 200, "fga": 400},
         {"player_id": 2, "player_name": "Rookie", "team_abbrev": "BBB",
-         "gp": 8, "pts": 160, "reb": 40, "ast": 32, "fgm": 60, "fga": 130},
+         "gp": 8, "pts": 160, "reb": 40, "oreb": 8, "dreb": 32, "ast": 32,
+         "stl": 8, "blk": 4, "to": 15, "pf": 16, "fgm": 60, "fga": 130},
         {"player_id": 3, "player_name": "Cup Note", "team_abbrev": "CCC",
          "gp": 2, "pts": 30, "reb": 10, "ast": 6},
     ]
     rows = awards.roy_rows(players, {2, 3}, min_gp=4)
-    # The veteran's 66.0 impact dwarfs the rookie's, but he isn't in the
-    # set; the third player is, but 2 GP clears no 4-game bar.
+    # The veteran's 32.3 Game Score dwarfs the rookie's 15.0, but he isn't
+    # in the set; the third player is, but 2 GP clears no 4-game bar.
     assert [r["player_name"] for r in rows] == ["Rookie"]
     assert rows[0]["rank"] == 1
-    assert rows[0]["score"] == 27.75        # (160 + 0.75*40 + 32)/8
+    assert rows[0]["score"] == 15.0      # Game Score/pg, no win% multiplier
     assert (rows[0]["ppg"], rows[0]["rpg"], rows[0]["apg"]) == (20.0, 5.0, 4.0)
     assert rows[0]["fgp"] == 46.2
     assert "wins" not in rows[0] and "win_pct" not in rows[0]
@@ -718,7 +780,7 @@ def test_build_payload_roy_race_joins_only_with_rookie_identities(tmp_path):
                                      "roy"}
     roy = payload["races"]["roy"]
     assert [r["player_name"] for r in roy] == ["Rookie"]  # 1 GP < 4
-    assert roy[0]["score"] == 27.75       # pure impact, no win% multiplier
+    assert roy[0]["score"] == 22.8       # Game Score/pg, no win% multiplier
     assert payload["min_games"] == 4      # the same qualifier as MVP
 
     empty = awards.build_payload("2012-13", raw_dir=str(tmp_path),
@@ -738,11 +800,14 @@ def _series_meta(home, away, hs, aws, gid=0):
 
 def test_finals_formula_caption_matches_the_math():
     """The printed Finals formula carries every constant the math runs
-    with (rendered from them, the goat_formula rule): the impact weights,
-    the multiplier floor and ceiling, and the series qualifier."""
+    with (rendered from them, the goat_formula rule): the Game Score
+    weights, the multiplier floor and ceiling, and the series qualifier."""
     text = awards.FINALS_MVP_FORMULA
-    assert f"{awards.IMPACT_RPG_WEIGHT:.2f}·REB" in text
-    assert f"{awards.IMPACT_APG_WEIGHT:.1f}·AST" in text
+    assert awards.gmsc_formula_text() in text
+    # Pin the weight VALUES too (not just the helper's output): a GMSC
+    # change that didn't update the printed text would fail here.
+    assert ("pts + 0.4·fgm − 0.7·fga − 0.4·ftm + 0.4·fta + 0.7·oreb + "
+            "0.3·dreb + stl + 0.7·blk + 0.7·ast − 0.4·pf − to") in text
     assert (f"{awards.MULTIPLIER_FLOOR:.1f}× floor to "
             f"{1.0:.1f}× for a sweep") in text
     assert "MVP race formula" in text
@@ -779,9 +844,9 @@ def test_series_results_and_finals_mvp_rows():
         rows.append(_box(1, "Star Guy", "CHI", starter=True, min=36,
                          pts=30, reb=8, ast=6, fgm=12, fga=22, gid=gid))
         rows.append(_box(2, "Runner Guy", "BOS", starter=True, min=35,
-                         pts=28, reb=4, ast=4, gid=gid))
+                         pts=28, reb=4, ast=4, fgm=10, fga=20, gid=gid))
         rows.append(_box(3, "Sixth Guy", "CHI", min=28, pts=14, reb=4,
-                         ast=3, gid=gid))
+                         ast=3, fgm=6, fga=12, gid=gid))
     rows.append(_box(1, "Star Guy", "CHI", dnp=True, pts=0))  # DNP: no GP
     rows.append(_box(4, "Bench Guy", "CHI", min=6, pts=6, gid=1))  # 1 GP: gated
 
@@ -789,16 +854,16 @@ def test_series_results_and_finals_mvp_rows():
     assert min_gp == 2
     top = ladder[0]
     assert top["player_name"] == "Star Guy"
-    # (30 + 0.75*8 + 6) * (0.6 + 0.4*0.75) = 42 * 0.9
-    assert top["score"] == 37.8
+    # Game Score 23.6 ((120 + 0.4*48 − 0.7*88 + 0.7*24)/4) * (0.6 + 0.4*0.75)
+    assert top["score"] == 21.24
     assert (top["wins"], top["losses"], top["win_pct"]) == (3, 1, 0.75)
     assert top["ppg"] == 30.0 and top["rpg"] == 8.0 and top["apg"] == 6.0
     assert top["gp"] == 4
     assert top["fgp"] == round(100 * 48 / 88, 1)
     second = ladder[1]
     assert second["player_name"] == "Runner Guy"
-    # (28 + 0.75*4 + 4) * (0.6 + 0.4*0.25) = 35 * 0.7
-    assert second["score"] == 24.5
+    # Game Score 20.8 * (0.6 + 0.4*0.25) -- his team's 0.25 series win%
+    assert second["score"] == 14.56
     names = [r["player_name"] for r in ladder]
     assert "Bench Guy" not in names and "Star Guy (DNP)" not in names
     assert set(names) == {"Star Guy", "Runner Guy", "Sixth Guy"}
@@ -814,11 +879,12 @@ def test_series_results_and_finals_mvp_rows():
 
 def test_aggregate_series_games_sums_and_skips():
     """Series aggregates follow the season rules: DNP rows and id-less
-    rows count for nothing; totals sum across games."""
+    rows count for nothing; totals sum across games -- including personal
+    fouls (RACE_SUM_STATS, Game Score's -0.4*fouls term)."""
     rows = [_box(7, "Guy", "LAL", starter=True, min=30, pts=20, reb=3,
-                 ast=9, fgm=8, fga=15),
+                 ast=9, fgm=8, fga=15, pf=4),
             _box(7, "Guy", "LAL", starter=True, min=28, pts=25, reb=5,
-                 ast=7, fgm=10, fga=18),
+                 ast=7, fgm=10, fga=18, pf=5),
             _box(7, "Guy", "LAL", dnp=True),
             {"player_name": "No Id", "team_abbrev": "LAL"}]
     agg = awards.aggregate_series_games(rows)
@@ -829,6 +895,7 @@ def test_aggregate_series_games_sums_and_skips():
     assert entry["minutes"] == 58
     assert (entry["pts"], entry["reb"], entry["ast"]) == (45, 8, 16)
     assert (entry["fgm"], entry["fga"]) == (18, 33)
+    assert entry["pf"] == 9
 
 
 def test_in_season_min_gp_scales_with_the_schedule():
