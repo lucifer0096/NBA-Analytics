@@ -187,7 +187,7 @@
    "team": "New York Liberty",
    "status": "Out",
    "detail": "out",
-   "date": "2026-11-07T13:01Z"
+   "date": "2026-11-07T15:01Z"
   },
   {
    "player_name": "Elizabeth Balogun",
@@ -344,6 +344,6 @@
    "date": "2026-08-23T21:07Z"
   }
  ],
- "_generated_utc": "2026-11-07T13:34:02Z",
+ "_generated_utc": "2026-11-07T17:50:06Z",
  "source": "espn"
 }
