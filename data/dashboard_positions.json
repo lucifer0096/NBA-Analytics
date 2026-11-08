@@ -547,12 +547,6 @@
    "team_id": 5
   },
   {
-   "player_id": 4431734,
-   "player_name": "Tristan Enaruna",
-   "position": "F",
-   "team_id": 5
-  },
-  {
    "player_id": 3992,
    "player_name": "James Harden",
    "position": "G",
@@ -568,6 +562,12 @@
    "player_id": 4066757,
    "player_name": "Sam Merrill",
    "position": "G",
+   "team_id": 5
+  },
+  {
+   "player_id": 5177362,
+   "player_name": "Riley Minix",
+   "position": "F",
    "team_id": 5
   },
   {
@@ -1135,6 +1135,12 @@
    "team_id": 10
   },
   {
+   "player_id": 5105837,
+   "player_name": "Bruce Thornton",
+   "position": "G",
+   "team_id": 10
+  },
+  {
    "player_id": 4432827,
    "player_name": "Oscar Tshiebwe",
    "position": "C",
@@ -1558,6 +1564,12 @@
    "player_id": 4595400,
    "player_name": "Olivier-Maxence Prosper",
    "position": "F",
+   "team_id": 29
+  },
+  {
+   "player_id": 5105462,
+   "player_name": "Richie Saunders",
+   "position": "G",
    "team_id": 29
   },
   {
@@ -3145,6 +3157,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-06T10:25:07Z",
+ "_generated_utc": "2026-11-08T07:58:01Z",
  "source": "local"
 }
