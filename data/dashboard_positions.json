@@ -2125,6 +2125,12 @@
    "team_id": 25
   },
   {
+   "player_id": 4702384,
+   "player_name": "Nique Clifford",
+   "position": "G",
+   "team_id": 25
+  },
+  {
    "player_id": 5105800,
    "player_name": "Josh Dix",
    "position": "G",
@@ -2181,12 +2187,6 @@
   {
    "player_id": 5241364,
    "player_name": "Bennett Stirtz",
-   "position": "G",
-   "team_id": 25
-  },
-  {
-   "player_id": 4433159,
-   "player_name": "Dalen Terry",
    "position": "G",
    "team_id": 25
   },
@@ -2650,12 +2650,6 @@
    "player_id": 4433174,
    "player_name": "Dylan Cardwell",
    "position": "C",
-   "team_id": 23
-  },
-  {
-   "player_id": 4702384,
-   "player_name": "Nique Clifford",
-   "position": "G",
    "team_id": 23
   },
   {
@@ -3157,6 +3151,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-08T07:58:01Z",
+ "_generated_utc": "2026-11-09T08:40:15Z",
  "source": "local"
 }

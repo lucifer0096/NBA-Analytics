@@ -1045,6 +1045,199 @@
     "mip": [],
     "roy": []
    }
+  },
+  {
+   "date": "2026-11-09",
+   "races": {
+    "mvp": [
+     {
+      "player_id": 3945274,
+      "player_name": "Luka Doncic",
+      "rank": 1,
+      "score": 30.08
+     },
+     {
+      "player_id": 5104157,
+      "player_name": "Victor Wembanyama",
+      "rank": 2,
+      "score": 25.2
+     },
+     {
+      "player_id": 3975,
+      "player_name": "Stephen Curry",
+      "rank": 3,
+      "score": 22.32
+     },
+     {
+      "player_id": 4278073,
+      "player_name": "Shai Gilgeous-Alexander",
+      "rank": 4,
+      "score": 20.23
+     },
+     {
+      "player_id": 4065648,
+      "player_name": "Jayson Tatum",
+      "rank": 5,
+      "score": 20.21
+     },
+     {
+      "player_id": 4431678,
+      "player_name": "Tyrese Maxey",
+      "rank": 6,
+      "score": 19.89
+     },
+     {
+      "player_id": 3032977,
+      "player_name": "Giannis Antetokounmpo",
+      "rank": 7,
+      "score": 19.75
+     },
+     {
+      "player_id": 3112335,
+      "player_name": "Nikola Jokic",
+      "rank": 8,
+      "score": 19.32
+     },
+     {
+      "player_id": 4871144,
+      "player_name": "Alperen Sengun",
+      "rank": 9,
+      "score": 18.37
+     },
+     {
+      "player_id": 5041939,
+      "player_name": "Cooper Flagg",
+      "rank": 10,
+      "score": 18.03
+     }
+    ],
+    "dpoy": [
+     {
+      "player_id": 5104157,
+      "player_name": "Victor Wembanyama",
+      "rank": 1,
+      "score": 4.62
+     },
+     {
+      "player_id": 4433136,
+      "player_name": "Walker Kessler",
+      "rank": 2,
+      "score": 2.83
+     },
+     {
+      "player_id": 4251,
+      "player_name": "Paul George",
+      "rank": 3,
+      "score": 2.67
+     },
+     {
+      "player_id": 4432166,
+      "player_name": "Cade Cunningham",
+      "rank": 4,
+      "score": 2.67
+     },
+     {
+      "player_id": 3112335,
+      "player_name": "Nikola Jokic",
+      "rank": 5,
+      "score": 2.58
+     },
+     {
+      "player_id": 5041939,
+      "player_name": "Cooper Flagg",
+      "rank": 6,
+      "score": 2.58
+     },
+     {
+      "player_id": 4869342,
+      "player_name": "Dyson Daniels",
+      "rank": 7,
+      "score": 2.44
+     },
+     {
+      "player_id": 4433134,
+      "player_name": "Scottie Barnes",
+      "rank": 8,
+      "score": 2.42
+     },
+     {
+      "player_id": 4278049,
+      "player_name": "Daniel Gafford",
+      "rank": 9,
+      "score": 2.41
+     },
+     {
+      "player_id": 3062679,
+      "player_name": "Josh Hart",
+      "rank": 10,
+      "score": 2.4
+     }
+    ],
+    "sixth_man": [
+     {
+      "player_id": 4397136,
+      "player_name": "Saddiq Bey",
+      "rank": 1,
+      "score": 18.2
+     },
+     {
+      "player_id": 4397183,
+      "player_name": "Aaron Wiggins",
+      "rank": 2,
+      "score": 17.02
+     },
+     {
+      "player_id": 4702382,
+      "player_name": "Tristan da Silva",
+      "rank": 3,
+      "score": 16.86
+     },
+     {
+      "player_id": 3135045,
+      "player_name": "Grayson Allen",
+      "rank": 4,
+      "score": 16.12
+     },
+     {
+      "player_id": 3448,
+      "player_name": "Brook Lopez",
+      "rank": 5,
+      "score": 16.06
+     },
+     {
+      "player_id": 3995,
+      "player_name": "Jrue Holiday",
+      "rank": 6,
+      "score": 15.89
+     },
+     {
+      "player_id": 4278355,
+      "player_name": "Obi Toppin",
+      "rank": 7,
+      "score": 15.86
+     },
+     {
+      "player_id": 4066354,
+      "player_name": "Payton Pritchard",
+      "rank": 8,
+      "score": 15.53
+     },
+     {
+      "player_id": 5101761,
+      "player_name": "Mikel Brown Jr.",
+      "rank": 9,
+      "score": 15.32
+     },
+     {
+      "player_id": 4869780,
+      "player_name": "Derik Queen",
+      "rank": 10,
+      "score": 15.3
+     }
+    ],
+    "mip": [],
+    "roy": []
+   }
   }
  ]
 }
