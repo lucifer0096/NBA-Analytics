@@ -17,14 +17,6 @@
    "slug": "chicago-sky"
   },
   {
-   "team_id": 18,
-   "abbrev": "CON",
-   "display_name": "Connecticut Sun",
-   "location": "Connecticut",
-   "name": "Sun",
-   "slug": "connecticut-sun"
-  },
-  {
    "team_id": 3,
    "abbrev": "DAL",
    "display_name": "Dallas Wings",
@@ -121,6 +113,6 @@
    "slug": "washington-mystics"
   }
  ],
- "_generated_utc": "2026-10-23T17:12:12Z",
+ "_generated_utc": "2026-11-10T19:49:26Z",
  "source": "espn"
 }

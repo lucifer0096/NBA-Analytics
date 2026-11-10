@@ -330,6 +330,13 @@
    "date": "2026-11-09T23:05Z"
   },
   {
+   "player_name": "Kel'el Ware",
+   "team": "Milwaukee Bucks",
+   "status": "Day-To-Day",
+   "detail": "Ware is questionable for Tuesday's game against the Knicks due to a left ankle sprain.",
+   "date": "2026-11-10T17:18Z"
+  },
+  {
    "player_name": "Tyler Herro",
    "team": "Milwaukee Bucks",
    "status": "Day-To-Day",
@@ -353,23 +360,16 @@
   {
    "player_name": "Trendon Watford",
    "team": "New Orleans Pelicans",
-   "status": "Day-To-Day",
-   "detail": "Watford (ankle) is out for Monday's game versus Utah.",
-   "date": "2026-11-10T05:28Z"
+   "status": "Out",
+   "detail": "Watford (ankle) is out for Wednesday's game against the Nets.",
+   "date": "2026-11-10T19:26Z"
   },
   {
    "player_name": "Trey Murphy III",
    "team": "New Orleans Pelicans",
    "status": "Day-To-Day",
-   "detail": "Murphy (knees) has been ruled out for Monday's game against Golden State.",
-   "date": "2026-11-10T05:28Z"
-  },
-  {
-   "player_name": "Zion Williamson",
-   "team": "New Orleans Pelicans",
-   "status": "Day-To-Day",
-   "detail": "Williamson (rest) is out for Monday's game against the Warriors.",
-   "date": "2026-11-10T05:27Z"
+   "detail": "Murphy (knee) is probable for Wednesday's game against the Nets.",
+   "date": "2026-11-10T19:22Z"
   },
   {
    "player_name": "Yves Missi",
@@ -382,8 +382,8 @@
    "player_name": "Josh Hart",
    "team": "New York Knicks",
    "status": "Day-To-Day",
-   "detail": "Hart is questionable for Tuesday's game against the Bucks due to right ankle soreness.",
-   "date": "2026-11-09T22:04Z"
+   "detail": "Hart is doubtful for Tuesday's game against the Bucks due to an illness.",
+   "date": "2026-11-10T19:20Z"
   },
   {
    "player_name": "Jaylin Williams",
@@ -419,6 +419,13 @@
    "status": "Out",
    "detail": "Williams (leg) underwent successful surgery Wednesday to \"address a fractured left fibula and reconstruction of ankle ligaments following a fracture and dislocation.\" He will be re-evaluated before the end of the regular season, Tim MacMahon of ESPN.com reports.",
    "date": "2026-10-28T23:41Z"
+  },
+  {
+   "player_name": "Tristan da Silva",
+   "team": "Orlando Magic",
+   "status": "Day-To-Day",
+   "detail": "Da Silva is questionable for Tuesday's game against the Kings due to a left calf strain.",
+   "date": "2026-11-10T16:50Z"
   },
   {
    "player_name": "Jalen Suggs",
@@ -561,6 +568,13 @@
    "date": "2026-10-05T21:43Z"
   },
   {
+   "player_name": "Kawhi Leonard",
+   "team": "Toronto Raptors",
+   "status": "Out",
+   "detail": "Leonard (knee) is continuing the reconditioning process, and another update will be provided in one week, Blake Murphy of Sportsnet.ca reports.",
+   "date": "2026-11-10T17:33Z"
+  },
+  {
    "player_name": "Immanuel Quickley",
    "team": "Toronto Raptors",
    "status": "Day-To-Day",
@@ -589,24 +603,17 @@
    "date": "2026-11-08T21:20Z"
   },
   {
-   "player_name": "Kawhi Leonard",
-   "team": "Toronto Raptors",
+   "player_name": "Lauri Markkanen",
+   "team": "Utah Jazz",
    "status": "Out",
-   "detail": "Leonard has completed treatment to reduce swelling in his left knee and he will be re-evaluated in one week, Brett Siegel of ClutchPoints.com reports.",
-   "date": "2026-11-04T00:14Z"
+   "detail": "Markkanen is out for Tuesday's game versus the Heat with a right wrist sprain.",
+   "date": "2026-11-10T18:30Z"
   },
   {
    "player_name": "Keyonte George",
    "team": "Utah Jazz",
    "status": "Out",
    "detail": "George (ankle) has been ruled out for Tuesday's game against the Heat.",
-   "date": "2026-11-10T00:08Z"
-  },
-  {
-   "player_name": "Lauri Markkanen",
-   "team": "Utah Jazz",
-   "status": "Day-To-Day",
-   "detail": "Markkanen (wrist) is questionable for Tuesday's game against Miami.",
    "date": "2026-11-10T00:08Z"
   },
   {
@@ -659,6 +666,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-10T08:50:35Z",
+ "_generated_utc": "2026-11-10T19:45:25Z",
  "source": "espn"
 }
