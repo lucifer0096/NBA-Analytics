@@ -691,6 +691,35 @@ def fetch_bundles(pool: set, cache: dict, live: bool = True) -> None:
             cache["athletes"][str(pid)] = entry
 
 
+def ensure_debuts(player_ids, live: bool = True) -> dict:
+    """{player_id: debut year} for `player_ids`, fetching what the cache lacks.
+
+    The committed player index and the all-history pool both gate at
+    ALLTIME_MIN_GP, so players on a season STILL BEING PLAYED -- that
+    season's newcomers, exactly the in-season ROY race's roster -- appear
+    in neither and the race came out empty until someone crossed 41
+    career games. This is the seam that reaches them: the ordinary
+    athlete fetch derives debut the ordinary way (profile debutYear,
+    else the first career row), and ESPN's full-history rows are what
+    keep a veteran who merely first appears in the collected window from
+    reading as a rookie. Anything unfetchable is simply absent from the
+    result -- never guessed. live=False reads the cache as-is
+    (tests/offline), so an unreachable ESPN leaves no trace at all."""
+    ids = {int(i) for i in player_ids}
+    if not ids:
+        return {}
+    cache = _load_cache()
+    fetch_bundles(ids, cache, live)
+    if live:
+        _save_cache(cache)
+    out = {}
+    for pid in ids:
+        debut = (cache["athletes"].get(str(pid)) or {}).get("debut")
+        if debut is not None:
+            out[pid] = int(debut)
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Assembly
 # ---------------------------------------------------------------------------

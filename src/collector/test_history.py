@@ -134,6 +134,46 @@ def test_fetch_athlete_debut_fallback_wnba_vs_nba(monkeypatch):
     assert history._trusted(nba_entry)          # 2019 <= 2018 + 1 exactly
 
 
+def test_ensure_debuts_fetches_missing_and_never_guesses(monkeypatch):
+    """The in-season newcomer seam: a cached id comes back WITHOUT a
+    refetch, a missing id is fetched (debut derived like any other
+    bundle -- from the first career row here), an unfetchable id stays
+    ABSENT instead of being guessed, and live=False reads the cache
+    as-is -- no network, no save."""
+    now = history._now()
+    cache = {"listings": {}, "awards": {}, "leaders": {}, "athletes": {
+        "11": {"complete": True, "position": "G", "debut": 2010,
+               "fetched": history._iso(now),
+               "rows": [[2011, 1, "BOS", 82], [2012, 1, "BOS", 80]]},
+    }}
+    monkeypatch.setattr(history, "_load_cache", lambda: cache)
+    saves = []
+    monkeypatch.setattr(history, "_save_cache",
+                        lambda c: saves.append(len(c["athletes"])))
+    asked = []
+
+    def _fetch(pid, when):
+        asked.append(pid)
+        if pid == 404:
+            return None                  # ESPN knows nothing -> honest absence
+        return {"complete": True, "position": "F", "debut": 2026,
+                "fetched": history._iso(when), "rows": [[2027, 1, "NYK", 8]]}
+
+    monkeypatch.setattr(history, "_fetch_athlete", _fetch)
+
+    out = history.ensure_debuts([11, 99, 404])
+    assert sorted(asked) == [99, 404]      # 11 was fresh in the cache
+    assert out == {11: 2010, 99: 2026}     # 404 unfetchable -> not guessed
+    assert saves == [2]                    # the fetch persists (11 + 99)
+
+    # Offline: the cache as-is -- no fetch attempt, no extra save.
+    asked.clear()
+    assert history.ensure_debuts([99, 404], live=False) == {99: 2026}
+    assert asked == [] and saves == [2]
+    # An empty request never even touches the cache.
+    assert history.ensure_debuts([]) == {} and saves == [2]
+
+
 def test_fetch_athlete_stores_position_and_jersey(monkeypatch):
     """The identity fetch keeps the 2K-corner vitals (position + jersey)
     from the same payload it already reads -- both leagues carry them for

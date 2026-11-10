@@ -505,10 +505,12 @@ def test_refresh_awards_wires_debut_records_into_the_roy_race(
         isolated, monkeypatch):
     """Rookie identities flow into every rebuilt payload from the debut
     records, in the refresh's documented order: the fresh history build's
-    entries (which reach below the index's 41-GP gate -- this season's
-    rookies) merged over the committed index's stable facts (the fallback
+    entries merged over the committed index's stable facts (the fallback
     when history fails), each season filtered to ITS OWN start-year
-    rookies. With debut records nowhere the call degrades to an explicit
+    rookies. (The season being played has its newcomers fetched by a
+    separate seam -- neither source's 41-GP gate reaches them -- in
+    test_refresh_awards_fetches_current_season_newcomers_for_roy.)
+    With debut records nowhere the call degrades to an explicit
     None -- the four box-score races still build, no rookies guessed from
     first appearance in the window."""
     import awards
@@ -574,6 +576,91 @@ def test_refresh_awards_wires_debut_records_into_the_roy_race(
     _write_index({"11": {"player_id": 11, "gp": 800}})
     refresh.refresh_awards(["2024-25"])
     assert captured["2024-25"] is None
+
+
+def test_refresh_awards_fetches_current_season_newcomers_for_roy(
+        isolated, monkeypatch, capsys):
+    """The in-season ROY roster seam: box-score players of the CURRENT
+    season who have no debut record yet (exactly the players the index's
+    and history's 41-GP gates skip) go to ensure_debuts, and whatever it
+    confirms becomes that season's rookie set -- an already-indexed
+    veteran in the same scan is never re-asked, a season that is NOT
+    current never triggers the fetch, and a failed fetch leaves the
+    races standing on the index's records with a warning."""
+    import awards
+    import history
+
+    game = isolated["raw"] / "2024-25" / "games" / "1.json"
+    game.parent.mkdir(parents=True)
+    game.write_text(json.dumps({"players": [
+        {"player_id": 99, "player_name": "Newcomer", "team_abbrev": "NYK",
+         "starter": False, "did_not_play": False, "min": 30, "pts": 12,
+         "reb": 4, "ast": 3, "stl": 1, "blk": 0, "to": 2},
+        {"player_id": 11, "player_name": "Veteran", "team_abbrev": "BOS",
+         "starter": True, "did_not_play": False, "min": 32, "pts": 20,
+         "reb": 5, "ast": 5, "stl": 1, "blk": 0, "to": 3},
+    ]}), encoding="utf-8")
+    # Envelope (window pool from the committed projection) + an index that
+    # already knows the veteran's 2010 debut but nothing about the newcomer.
+    (isolated["data"] / "dashboard_awards.json").write_text(json.dumps(
+        {"seasons": {"2010-11": {"season": "2010-11",
+                                 "races": {"mvp": []}, "leaders": {}}}}),
+        encoding="utf-8")
+    (isolated["data"] / "dashboard_players.json").write_text(json.dumps(
+        {"players": {"11": {"player_id": 11, "debut": 2010, "gp": 800}}}),
+        encoding="utf-8")
+
+    monkeypatch.setattr(refresh.espn_api, "current_season_label",
+                        lambda league="nba": "2024-25")
+    captured, asked = {}, []
+
+    def _capture(season, raw_dir=None, league="nba", rookies=None):
+        captured[season] = rookies
+        return _fresh_payload(season)
+
+    monkeypatch.setattr(awards, "build_payload", _capture)
+    monkeypatch.setattr(history, "build", lambda window_players, cache=None,
+                        live=True: {"players": [], "honours": {},
+                                    "champions": {}, "meta": {}, "stamp": "x"})
+
+    def _ensure(ids, live=True):
+        asked.append(set(ids))
+        return {99: 2024}          # ESPN confirms the newcomer only
+
+    monkeypatch.setattr(history, "ensure_debuts", _ensure)
+
+    refresh.refresh_awards(["2024-25"])
+
+    assert asked == [{99}]                  # 11 already has a record
+    assert captured["2024-25"] == {99}      # start-year rookies from it
+
+    # Not the current season -> the fetch never runs; settled seasons read
+    # their rookies from the index/history exactly as before.
+    asked.clear()
+    monkeypatch.setattr(refresh.espn_api, "current_season_label",
+                        lambda league="nba": "2025-26")
+    refresh.refresh_awards(["2024-25"])
+    assert asked == []
+
+    # A failed fetch must not kill the rebuild: the races still land on
+    # the index's records, with a warning saying why. (The earlier
+    # successful runs rewrote the index from the stub history's -- empty
+    # -- output, so restore the committed facts first, as the real world
+    # has them.)
+    (isolated["data"] / "dashboard_players.json").write_text(json.dumps(
+        {"players": {"11": {"player_id": 11, "debut": 2010, "gp": 800}}}),
+        encoding="utf-8")
+    monkeypatch.setattr(refresh.espn_api, "current_season_label",
+                        lambda league="nba": "2024-25")
+
+    def _boom(ids, live=True):
+        raise OSError("cache unwritable")
+
+    monkeypatch.setattr(history, "ensure_debuts", _boom)
+    captured.clear()
+    refresh.refresh_awards(["2024-25"])
+    assert captured["2024-25"] == set()      # index vet only: honest empty
+    assert "in-season debut fetch failed" in capsys.readouterr().out
 
 
 # ---------------------------------------------------------------------------

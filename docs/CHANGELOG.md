@@ -5,6 +5,47 @@ behind each batch. Automated `data:` collector refreshes are omitted --
 they carry no code change. Every batch below landed with its tests
 green and CI green.
 
+## 2026-11-10
+
+### fix(roy): the in-season ROY race had no rookies -- both debut sources gate at 41 GP
+
+The committed **ROY race** (Awards Ladder) rendered zero rows for the
+season being played -- NBA 2026-27 empty from opening night on -- while
+every settled season and the WNBA had their ten. Rookie identities come
+from ESPN debut records, and the only two sources of them -- the
+committed player index and the all-history build -- BOTH gate their
+pool at 41 career GP. A season still being played has its newcomers in
+neither, so the race stayed empty until someone crossed the gate; past
+seasons only looked healthy because their rows appeared retroactively
+(2025-26's landed in the Oct 26 snapshot, after its rookies hit 41).
+
+- **`history.ensure_debuts(ids)`**: fetches exactly the athletes asked
+  about and returns `{player_id: debut}` for what it could confirm. The
+  ordinary fetch derives debut the ordinary way (profile `debutYear`,
+  else the first career row), and ESPN's full-history rows are what
+  keep a veteran who merely first appears in the collected window from
+  reading as a rookie -- the "never guess first appearance, that would
+  crown 2010 call-ups" guard is untouched: an unfetchable id is simply
+  absent from the result, and live=False reads the cache as-is.
+- **`refresh_awards` wiring**: for the CURRENT season only, every
+  box-score player without a debut record goes to `ensure_debuts`, and
+  whatever it confirms becomes that season's rookie set. Settled
+  seasons keep reading the index/history exactly as before.
+- The comment claiming the all-history build "reaches players below the
+  index's 41-GP gate" was wrong -- both gate in the same place; the
+  comment and docstrings now describe what the code does.
+- Two tests: the seam's contract (a cached id is never refetched, a
+  missing id is fetched, a failure stays absent-not-guessed, offline
+  reads the cache) and the refresh wiring (current-season box ids minus
+  known records; a season that isn't current never fetches; a failed
+  fetch warns and lets the races land anyway).
+- Data: the rebuild appends today's snapshot with 2026-27's ROY ladder
+  populated -- one honest empty-to-ranked step in the race trend, the
+  same day the identities arrived. The same rebuild's weekly ESPN
+  career-line refetch also nudged a few alltime-board rows forward
+  (games played since the last local collection) -- ordinary drift the
+  collector reconciles.
+
 ## 2026-11-07
 
 ### feat(awards): name the ESPN-vs-app split on the Awards Ladder

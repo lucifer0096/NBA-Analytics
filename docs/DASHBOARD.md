@@ -264,8 +264,10 @@ per league, with that league's season and data.
    An empty race names the missing prior
    season instead of inventing a winner, a payload that never carried the
    ROY race says so outright instead of pretending a qualifier gap
-   (rookie identities need the all-history index -- never guessed from
-   first appearance in the collected window), the ROY race's own caption
+   (rookie identities need ESPN debut records -- the all-history index,
+   plus a direct profile fetch for the season being played -- never
+   guessed from first appearance in the collected window), the ROY
+   race's own caption
    adds the **rookie-identity rule** beside the formula (first season in
    the league per ESPN debut records, confirmed live by the draft class),
    and a season with no collected

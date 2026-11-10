@@ -734,15 +734,17 @@ def refresh_awards(seasons_to_try: list) -> dict:
     the per-season games inventory.
 
     Season payloads/games counts are pure-local apart from the ROY race's
-    rookie identities (ESPN debut years, off the all-history build or the
-    committed index of the last one); the all-history half runs
+    rookie identities (ESPN debut years: the committed index and the
+    all-history build for settled seasons, plus a direct profile fetch
+    for the season being played, whose newcomers both of their 41-GP
+    gates skip); the all-history half runs
     through history.py (ESPN + its cache, already switched to LEAGUE by
     set_league). When THAT fails the previous career sections and the
     dashboard_players file are kept, and the freshly computed season races
     still land -- a window-only ladder sneaking in on a bad network day
     would mislead far more than a stale-but-labelled one. With no debut
     records anywhere the four box-score races still build and the ROY race
-    joins on the next successful careers refresh (never guessed from first
+    joins on the next successful profile fetch (never guessed from first
     appearance in the collected window: that would crown 2010 call-ups).
 
     CI SURVIVAL (why merged state exists): every CI checkout has data/raw/
@@ -798,9 +800,9 @@ def refresh_awards(seasons_to_try: list) -> dict:
 
     # {player_id: debut year} for the rookies: the committed index's
     # records first (stable facts, still the fallback when history just
-    # failed), then hist's fresh entries win -- the all-history build
-    # reaches players below the index's 41-GP gate, i.e. this season's
-    # rookies.
+    # failed), then hist's fresh entries win. Both sources draw from a
+    # pool gated at 41 career GP, so a season still being played has its
+    # newcomers in NEITHER -- the current-season fetch below reaches them.
     debut_of: dict = {}
     for pid, row in (players_payload.get("players") or {}).items():
         if row.get("debut"):
@@ -808,10 +810,35 @@ def refresh_awards(seasons_to_try: list) -> dict:
     for row in (hist or {}).get("players") or []:
         if row.get("debut"):
             debut_of[int(row["player_id"])] = int(row["debut"])
+
+    # The in-season ROY roster: whoever has actually appeared in the
+    # current season's collected box scores and still has no debut record
+    # -- exactly the players both 41-GP gates above skip. ensure_debuts
+    # fetches their athlete profiles (ESPN's full-history rows carry the
+    # TRUE debut, so a veteran who merely first appears in the collected
+    # window never reads as a rookie) and returns only what it could
+    # confirm; a failed fetch leaves the race honestly empty instead of
+    # guessing a first-appearance year (that would crown 2010 call-ups).
+    current = espn_api.current_season_label(league=LEAGUE)
+    if current in labels:
+        box_ids = {int(p["player_id"]) for p in awards.aggregate_players(
+            current, raw_dir=RAW_DIR, league=LEAGUE)}
+        history_mod.set_league(LEAGUE)
+        try:
+            fresh_debuts = history_mod.ensure_debuts(box_ids - set(debut_of))
+        except Exception as exc:  # noqa: BLE001 -- the races must still land
+            print(f"  WARNING: in-season debut fetch failed "
+                  f"({type(exc).__name__}: {exc}) -- the ROY race keeps "
+                  "its previous identities")
+            fresh_debuts = {}
+        debut_of.update(fresh_debuts)
+        if fresh_debuts:
+            print(f"  debut records: +{len(fresh_debuts)} fetched for "
+                  f"{current}'s box-score players")
     if not debut_of:
         print("  no debut records anywhere -- this pass builds the four "
-              "box-score races; the ROY race joins on the next careers "
-              "refresh")
+              "box-score races; the ROY race joins on the next successful "
+              "profile fetch")
 
     season_payloads = []
     for season in labels:
