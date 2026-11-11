@@ -115,6 +115,12 @@
    "team_id": 2
   },
   {
+   "player_id": 5142621,
+   "player_name": "Chris Cenac Jr.",
+   "position": "F",
+   "team_id": 2
+  },
+  {
    "player_id": 3195,
    "player_name": "Mike Conley",
    "position": "G",
@@ -895,12 +901,6 @@
    "team_id": 8
   },
   {
-   "player_id": 4700852,
-   "player_name": "Chaz Lanier",
-   "position": "G",
-   "team_id": 8
-  },
-  {
    "player_id": 5258459,
    "player_name": "Ebuka Okorie",
    "position": "G",
@@ -1375,6 +1375,12 @@
    "team_id": 13
   },
   {
+   "player_id": 5105817,
+   "player_name": "Carson Cooper",
+   "position": "C",
+   "team_id": 13
+  },
+  {
    "player_id": 3945274,
    "player_name": "Luka Doncic",
    "position": "G",
@@ -1420,12 +1426,6 @@
    "player_id": 3155535,
    "player_name": "Kevon Looney",
    "position": "F",
-   "team_id": 13
-  },
-  {
-   "player_id": 4596528,
-   "player_name": "Lawson Lovering",
-   "position": "C",
    "team_id": 13
   },
   {
@@ -1486,12 +1486,6 @@
    "player_id": 5041935,
    "player_name": "Cameron Boozer",
    "position": "F",
-   "team_id": 29
-  },
-  {
-   "player_id": 5105817,
-   "player_name": "Carson Cooper",
-   "position": "C",
    "team_id": 29
   },
   {
@@ -1840,12 +1834,6 @@
    "player_id": 4594268,
    "player_name": "Anthony Edwards",
    "position": "G",
-   "team_id": 16
-  },
-  {
-   "player_id": 5061585,
-   "player_name": "Isaiah Evans",
-   "position": "F",
    "team_id": 16
   },
   {
@@ -3151,6 +3139,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-09T08:40:15Z",
+ "_generated_utc": "2026-11-11T08:23:41Z",
  "source": "local"
 }
