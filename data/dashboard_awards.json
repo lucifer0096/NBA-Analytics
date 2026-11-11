@@ -49100,13 +49100,13 @@
       "team_abbrev": "HOU",
       "gp": 9,
       "ppg": 21.3,
-      "rpg": 9.1,
+      "rpg": 9.0,
       "apg": 7.8,
       "wins": 8,
       "losses": 3,
       "win_pct": 0.727,
       "fgp": 51.4,
-      "score": 18.69,
+      "score": 18.66,
       "rank": 10
      }
     ],
@@ -49433,9 +49433,9 @@
       "gp": 11,
       "ppg": 15.7,
       "rpg": 4.0,
-      "apg": 3.9,
+      "apg": 3.8,
       "fgp": 41.1,
-      "score": 11.45,
+      "score": 11.39,
       "rank": 6
      },
      {
@@ -49447,7 +49447,7 @@
       "rpg": 3.5,
       "apg": 3.4,
       "fgp": 32.9,
-      "score": 9.42,
+      "score": 9.52,
       "rank": 7
      },
      {
@@ -49815,7 +49815,7 @@
       "ppg": 7.8,
       "rpg": 12.1,
       "apg": 1.4,
-      "spg": 0.4,
+      "spg": 0.3,
       "bpg": 0.9,
       "fgm": 28,
       "fga": 56,
@@ -50127,7 +50127,7 @@
       "per_game": 7.8,
       "mpg": 34.8,
       "ppg": 21.3,
-      "rpg": 9.1,
+      "rpg": 9.0,
       "apg": 7.8,
       "spg": 1.1,
       "bpg": 1.1,
@@ -50241,30 +50241,6 @@
       "rank": 1
      },
      {
-      "player_id": 4066261,
-      "player_name": "Bam Adebayo",
-      "team_abbrev": "MIA",
-      "gp": 11,
-      "total": 25,
-      "per_game": 2.3,
-      "mpg": 33.2,
-      "ppg": 17.8,
-      "rpg": 8.4,
-      "apg": 3.3,
-      "spg": 2.3,
-      "bpg": 0.7,
-      "fgm": 71,
-      "fga": 140,
-      "fg3m": 6,
-      "fg3a": 35,
-      "fgp": 50.7,
-      "fg3p": 17.1,
-      "ftp": 75.0,
-      "efg": 52.9,
-      "ts": 58.3,
-      "rank": 2
-     },
-     {
       "player_id": 2991139,
       "player_name": "Kris Dunn",
       "team_abbrev": "LAC",
@@ -50286,6 +50262,30 @@
       "ftp": 88.2,
       "efg": 57.4,
       "ts": 62.1,
+      "rank": 2
+     },
+     {
+      "player_id": 4066261,
+      "player_name": "Bam Adebayo",
+      "team_abbrev": "MIA",
+      "gp": 11,
+      "total": 24,
+      "per_game": 2.2,
+      "mpg": 33.2,
+      "ppg": 17.8,
+      "rpg": 8.4,
+      "apg": 3.3,
+      "spg": 2.2,
+      "bpg": 0.7,
+      "fgm": 71,
+      "fga": 140,
+      "fg3m": 6,
+      "fg3a": 35,
+      "fgp": 50.7,
+      "fg3p": 17.1,
+      "ftp": 75.0,
+      "efg": 52.9,
+      "ts": 58.3,
       "rank": 3
      },
      {
@@ -51071,7 +51071,7 @@
       "per_game": 11.9,
       "mpg": 33.9,
       "ppg": 17.0,
-      "rpg": 6.2,
+      "rpg": 6.1,
       "apg": 3.6,
       "spg": 0.9,
       "bpg": 0.8,
@@ -51205,6 +51205,6 @@
   "2011-12": 990,
   "2010-11": 1230
  },
- "_generated_utc": "2026-11-11T08:23:53Z",
+ "_generated_utc": "2026-11-11T19:37:18Z",
  "source": "local"
 }
