@@ -2689,6 +2689,12 @@
    "team_id": 23
   },
   {
+   "player_id": 2488653,
+   "player_name": "Mason Plumlee",
+   "position": "C",
+   "team_id": 23
+  },
+  {
    "player_id": 4898371,
    "player_name": "Maxime Raynaud",
    "position": "C",
@@ -3139,6 +3145,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-11T08:23:41Z",
+ "_generated_utc": "2026-11-12T08:51:06Z",
  "source": "local"
 }
