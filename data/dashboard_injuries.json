@@ -50,20 +50,6 @@
    "date": "2026-11-12T15:02Z"
   },
   {
-   "player_name": "Grant Williams",
-   "team": "Charlotte Hornets",
-   "status": "Out",
-   "detail": "Williams (hamstring) is listed as probable for Thursday's game against the Suns.",
-   "date": "2026-11-12T00:12Z"
-  },
-  {
-   "player_name": "Moussa Diabate",
-   "team": "Charlotte Hornets",
-   "status": "Day-To-Day",
-   "detail": "Diabate (quadriceps) is listed as probable for Thursday's game against the Suns.",
-   "date": "2026-11-12T00:10Z"
-  },
-  {
    "player_name": "Brandon Miller",
    "team": "Charlotte Hornets",
    "status": "Out",
@@ -176,18 +162,18 @@
    "date": "2026-11-08T16:05Z"
   },
   {
+   "player_name": "Stephen Curry",
+   "team": "Golden State Warriors",
+   "status": "Out",
+   "detail": "Curry has been diagnosed with an oblique abdominal tear and will be re-evaluated in two weeks, Shams Charania of ESPN reports.",
+   "date": "2026-11-12T17:03Z"
+  },
+  {
    "player_name": "Gary Payton II",
    "team": "Golden State Warriors",
    "status": "Day-To-Day",
    "detail": "Payton (knee) is out for Wednesday's game against Houston.",
    "date": "2026-11-12T15:03Z"
-  },
-  {
-   "player_name": "Stephen Curry",
-   "team": "Golden State Warriors",
-   "status": "Day-To-Day",
-   "detail": "Steve Kerr told reporters Wednesday that Curry said he tweaked something in his abdominal area and \"had never done it before.\" Kerr added that the concern level is high, but they will await the MRI results, Kelly Iko of Yahoo Sports reports.",
-   "date": "2026-11-12T05:39Z"
   },
   {
    "player_name": "Brandon Williams",
@@ -344,6 +330,20 @@
    "date": "2026-11-07T17:24Z"
   },
   {
+   "player_name": "Pelle Larsson",
+   "team": "Miami Heat",
+   "status": "Day-To-Day",
+   "detail": "Larsson sat out Thursday's practice due to an illness, per Ira Winderman of the South Florida Sun Sentinel.",
+   "date": "2026-11-12T18:35Z"
+  },
+  {
+   "player_name": "Klay Thompson",
+   "team": "Miami Heat",
+   "status": "Day-To-Day",
+   "detail": "Thompson (ankle) didn't practice Thursday, per Ira Winderman of the South Florida Sun Sentinel.",
+   "date": "2026-11-12T18:32Z"
+  },
+  {
    "player_name": "Myles Turner",
    "team": "Milwaukee Bucks",
    "status": "Day-To-Day",
@@ -491,32 +491,32 @@
    "date": "2026-09-28T21:33Z"
   },
   {
-   "player_name": "Adem Bona",
-   "team": "Philadelphia 76ers",
-   "status": "Out",
-   "detail": "Bona (back) is out for Thursday's game against the Raptors, Kyle Neubeck of AllPHLY.com reports.",
-   "date": "2026-11-11T22:10Z"
-  },
-  {
-   "player_name": "Joel Embiid",
-   "team": "Philadelphia 76ers",
-   "status": "Day-To-Day",
-   "detail": "Embiid (foot) is listed as questionable for Thursday's game against Toronto, Adam Aaronson of PhillyVoice.com reports.",
-   "date": "2026-11-11T22:06Z"
-  },
-  {
    "player_name": "LeBron James",
    "team": "Philadelphia 76ers",
-   "status": "Day-To-Day",
-   "detail": "James (back) is questionable for Thursday's game against the Raptors, Kyle Neubeck of AllPHLY.com reports.",
-   "date": "2026-11-11T22:06Z"
+   "status": "Out",
+   "detail": "James (back) is out for Thursday's game against Toronto.",
+   "date": "2026-11-12T18:07Z"
   },
   {
    "player_name": "Dominick Barlow",
    "team": "Philadelphia 76ers",
    "status": "Out",
-   "detail": "Head coach Nick Nurse said Wednesday that Barlow (back) likely needs another 10-12 days before he's cleared to return to the court, Derek Bodner of AllPHLY.com reports.",
-   "date": "2026-11-04T22:41Z"
+   "detail": "Barlow (back) participated in Thursday's shootaround but doesn't have a timeline to return to game action, Ky Carlin of USA Today reports.",
+   "date": "2026-11-12T16:37Z"
+  },
+  {
+   "player_name": "Adem Bona",
+   "team": "Philadelphia 76ers",
+   "status": "Out",
+   "detail": "Bona (back) will be re-evaluated in approximately one week after seeing a specialist, Ky Carlin of USA Today reports.",
+   "date": "2026-11-12T16:36Z"
+  },
+  {
+   "player_name": "Joel Embiid",
+   "team": "Philadelphia 76ers",
+   "status": "Day-To-Day",
+   "detail": "Embiid (foot) remains questionable for Thursday's game against the Raptors, but he participated in the team's morning shootaround, Ky Carlin of USA Today reports.",
+   "date": "2026-11-12T16:34Z"
   },
   {
    "player_name": "Ariel Hukporti",
@@ -605,9 +605,16 @@
   {
    "player_name": "Trayce Jackson-Davis",
    "team": "Toronto Raptors",
-   "status": "Day-To-Day",
-   "detail": "Jackson-Davis (illness) has been ruled out for Wednesday's game against the Celtics, Blake Murphy of Sportsnet.ca reports.",
-   "date": "2026-11-12T03:01Z"
+   "status": "Out",
+   "detail": "Jackson-Davis is out for Thursday's game against the 76ers due to an illness.",
+   "date": "2026-11-12T18:09Z"
+  },
+  {
+   "player_name": "Scottie Barnes",
+   "team": "Toronto Raptors",
+   "status": "Out",
+   "detail": "Barnes (groin) is out for Thursday's game against Philadelphia.",
+   "date": "2026-11-12T18:05Z"
   },
   {
    "player_name": "Kawhi Leonard",
@@ -617,18 +624,18 @@
    "date": "2026-11-11T22:33Z"
   },
   {
-   "player_name": "Scottie Barnes",
-   "team": "Toronto Raptors",
-   "status": "Out",
-   "detail": "Barnes (groin) is out for Wednesday's game against Boston.",
-   "date": "2026-11-10T21:48Z"
-  },
-  {
    "player_name": "Nate Bittle",
    "team": "Toronto Raptors",
    "status": "Out",
    "detail": "Bittle (foot) is listed as out for Monday's game against Memphis.",
    "date": "2026-11-08T21:20Z"
+  },
+  {
+   "player_name": "Trey Alexander",
+   "team": "Utah Jazz",
+   "status": "Out",
+   "detail": "Alexander won't play Wednesday against the Grizzlies due to a left knee bone bruise.",
+   "date": "2026-11-12T15:42Z"
   },
   {
    "player_name": "Lauri Markkanen",
@@ -680,6 +687,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-12T15:34:40Z",
+ "_generated_utc": "2026-11-12T19:55:33Z",
  "source": "espn"
 }
