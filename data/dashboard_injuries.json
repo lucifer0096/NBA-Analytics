@@ -354,22 +354,15 @@
    "player_name": "Klay Thompson",
    "team": "Miami Heat",
    "status": "Day-To-Day",
-   "detail": "Thompson (ankle) is listed as questionable for Friday's game against the Cavaliers.",
-   "date": "2026-11-12T21:23Z"
-  },
-  {
-   "player_name": "Giannis Antetokounmpo",
-   "team": "Miami Heat",
-   "status": "Day-To-Day",
-   "detail": "Antetokounmpo (wrist) is probable for Friday's game against Cleveland.",
-   "date": "2026-11-12T21:22Z"
+   "detail": "Thompson (ankle) is listed as probable for Friday's game against the Cavaliers.",
+   "date": "2026-11-13T18:22Z"
   },
   {
    "player_name": "Pelle Larsson",
    "team": "Miami Heat",
    "status": "Day-To-Day",
-   "detail": "Larsson (illness) is listed as questionable for Friday's game against Cleveland.",
-   "date": "2026-11-12T21:20Z"
+   "detail": "Larsson (illness) is listed as doubtful for Friday's game against Cleveland.",
+   "date": "2026-11-13T18:20Z"
   },
   {
    "player_name": "Anthony Edwards",
@@ -388,9 +381,37 @@
   {
    "player_name": "Bryce McGowens",
    "team": "New Orleans Pelicans",
+   "status": "Out",
+   "detail": "McGowens (elbow) is listed as out for Friday's game against the Grizzlies.",
+   "date": "2026-11-13T18:12Z"
+  },
+  {
+   "player_name": "Yves Missi",
+   "team": "New Orleans Pelicans",
+   "status": "Out",
+   "detail": "Missi (knee) is out for Friday's game against the Grizzlies.",
+   "date": "2026-11-13T18:11Z"
+  },
+  {
+   "player_name": "Bennedict Mathurin",
+   "team": "New Orleans Pelicans",
    "status": "Day-To-Day",
-   "detail": "McGowens (elbow) is listed as doubtful for Friday's game against the Grizzlies.",
-   "date": "2026-11-12T20:56Z"
+   "detail": "Mathurin (thumb) is listed as questionable for Friday's game against Memphis.",
+   "date": "2026-11-13T18:10Z"
+  },
+  {
+   "player_name": "Dejounte Murray",
+   "team": "New Orleans Pelicans",
+   "status": "Day-To-Day",
+   "detail": "Murray (ankle) is doubtful for Friday's game against Memphis.",
+   "date": "2026-11-13T18:09Z"
+  },
+  {
+   "player_name": "Trey Murphy III",
+   "team": "New Orleans Pelicans",
+   "status": "Out",
+   "detail": "Murphy (knee) is out for Friday's game against Memphis.",
+   "date": "2026-11-13T18:07Z"
   },
   {
    "player_name": "Trendon Watford",
@@ -398,27 +419,6 @@
    "status": "Out",
    "detail": "Watford (ankle) is listed as out for Friday's game against the Grizzlies.",
    "date": "2026-11-12T20:53Z"
-  },
-  {
-   "player_name": "Bennedict Mathurin",
-   "team": "New Orleans Pelicans",
-   "status": "Day-To-Day",
-   "detail": "Mathurin (thumb) is listed as doubtful for Friday's game against Memphis.",
-   "date": "2026-11-12T20:53Z"
-  },
-  {
-   "player_name": "Yves Missi",
-   "team": "New Orleans Pelicans",
-   "status": "Out",
-   "detail": "Missi (knee) is listed as doubtful for Friday's game against the Grizzlies.",
-   "date": "2026-11-12T20:50Z"
-  },
-  {
-   "player_name": "Trey Murphy III",
-   "team": "New Orleans Pelicans",
-   "status": "Day-To-Day",
-   "detail": "Murphy (knee) is listed as doubtful for Friday's game against the Grizzlies.",
-   "date": "2026-11-12T20:48Z"
   },
   {
    "player_name": "Thomas Sorber",
@@ -463,25 +463,25 @@
    "date": "2026-10-28T23:41Z"
   },
   {
-   "player_name": "Tristan da Silva",
-   "team": "Orlando Magic",
-   "status": "Day-To-Day",
-   "detail": "Da Silva (calf) is questionable for Friday's game against Milwaukee.",
-   "date": "2026-11-12T22:07Z"
-  },
-  {
    "player_name": "Jamal Cain",
    "team": "Orlando Magic",
    "status": "Day-To-Day",
-   "detail": "Cain (shoulder) is questionable for Friday's game against the Bucks.",
-   "date": "2026-11-12T22:04Z"
+   "detail": "Cain (shoulder) participated in Friday morning's shootaround and remains questionable for Friday's game against the Bucks, Jason Beede of the Orlando Sentinel reports.",
+   "date": "2026-11-13T17:12Z"
+  },
+  {
+   "player_name": "Tristan da Silva",
+   "team": "Orlando Magic",
+   "status": "Day-To-Day",
+   "detail": "Da Silva (calf) participated in Friday's morning shootaround and remains questionable for Friday's game against Milwaukee, Jason Beede of the Orlando Sentinel reports.",
+   "date": "2026-11-13T17:09Z"
   },
   {
    "player_name": "Jalen Suggs",
    "team": "Orlando Magic",
    "status": "Out",
-   "detail": "Suggs (knee) is questionable for Friday's game against Milwaukee.",
-   "date": "2026-11-12T22:03Z"
+   "detail": "Suggs (knee) participated in Friday's morning shootaround and remains questionable for Friday's game against the Bucks, Jason Beede of the Orlando Sentinel reports.",
+   "date": "2026-11-13T17:08Z"
   },
   {
    "player_name": "Jonathan Isaac",
@@ -538,6 +538,13 @@
    "status": "Out",
    "detail": "Hukporti has sustained a season-ending ruptured right Achilles tendon, per Shams Charania of ESPN.",
    "date": "2026-10-06T19:17Z"
+  },
+  {
+   "player_name": "Drew Timme",
+   "team": "Phoenix Suns",
+   "status": "Day-To-Day",
+   "detail": "The Suns claimed Timme off waivers Monday, per Michael Scotto of HoopsHype.com.",
+   "date": "2026-11-13T16:22Z"
   },
   {
    "player_name": "Mark Williams",
@@ -622,6 +629,13 @@
    "status": "Out",
    "detail": "Quaintance has been around the team but has not yet been cleared for basketball activities, Matt Guzman of SI.com reports.",
    "date": "2026-10-05T21:43Z"
+  },
+  {
+   "player_name": "Kevin McCullar Jr.",
+   "team": "Toronto Raptors",
+   "status": "Day-To-Day",
+   "detail": "McCullar signed a two-way contract with the Raptors on Thursday, Michael Scotto of HoopsHype.com reports.",
+   "date": "2026-11-13T15:37Z"
   },
   {
    "player_name": "Trayce Jackson-Davis",
@@ -715,6 +729,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-13T08:45:32Z",
+ "_generated_utc": "2026-11-13T19:43:48Z",
  "source": "espn"
 }
