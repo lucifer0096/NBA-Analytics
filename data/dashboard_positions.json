@@ -511,6 +511,12 @@
    "team_id": 4
   },
   {
+   "player_id": 4593049,
+   "player_name": "Orlando Robinson",
+   "position": "C",
+   "team_id": 4
+  },
+  {
    "player_id": 4898010,
    "player_name": "Jaylin Sellers",
    "position": "G",
@@ -549,6 +555,12 @@
   {
    "player_id": 3934723,
    "player_name": "Thomas Bryant",
+   "position": "C",
+   "team_id": 5
+  },
+  {
+   "player_id": 4997530,
+   "player_name": "Khalifa Diop",
    "position": "C",
    "team_id": 5
   },
@@ -610,6 +622,12 @@
    "player_id": 5041951,
    "player_name": "Meleek Thomas",
    "position": "G",
+   "team_id": 5
+  },
+  {
+   "player_id": 5106268,
+   "player_name": "Nae'Qwan Tomlin",
+   "position": "F",
    "team_id": 5
   },
   {
@@ -1809,6 +1827,12 @@
   {
    "player_id": 5279133,
    "player_name": "Joan Beringer",
+   "position": "F",
+   "team_id": 16
+  },
+  {
+   "player_id": 4433569,
+   "player_name": "Johni Broome",
    "position": "F",
    "team_id": 16
   },
@@ -3151,6 +3175,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-13T08:45:32Z",
+ "_generated_utc": "2026-11-14T08:00:50Z",
  "source": "local"
 }
