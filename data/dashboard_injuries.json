@@ -46,8 +46,8 @@
    "player_name": "Mikel Brown Jr.",
    "team": "Brooklyn Nets",
    "status": "Day-To-Day",
-   "detail": "Brown (illness) is listed as questionable for Saturday's game against Memphis.",
-   "date": "2026-11-13T22:08Z"
+   "detail": "Brown (illness) has been upgraded to probable for Saturday's game at Memphis.",
+   "date": "2026-11-14T17:19Z"
   },
   {
    "player_name": "Nolan Traore",
@@ -78,25 +78,32 @@
    "date": "2026-11-08T22:26Z"
   },
   {
+   "player_name": "Norman Powell",
+   "team": "Chicago Bulls",
+   "status": "Day-To-Day",
+   "detail": "Powell finished with 33 points (12-19 FG, 4-8 3Pt, 5-6 FT), five rebounds, two assists and one steal across 31 minutes in Friday's 125-117 overtime win over the Hawks.",
+   "date": "2026-11-14T17:55Z"
+  },
+  {
+   "player_name": "Dailyn Swain",
+   "team": "Chicago Bulls",
+   "status": "Day-To-Day",
+   "detail": "Swain (back) is out for Friday's game against the Hawks.",
+   "date": "2026-11-14T15:00Z"
+  },
+  {
+   "player_name": "Tobe Awaka",
+   "team": "Chicago Bulls",
+   "status": "Day-To-Day",
+   "detail": "Awaka (back) has been ruled out for Friday's game against the Hawks.",
+   "date": "2026-11-14T15:00Z"
+  },
+  {
    "player_name": "Jalen Smith",
    "team": "Chicago Bulls",
    "status": "Day-To-Day",
    "detail": "Smith (hand) exited Friday's 125-117 win over the Hawks in overtime and did not return, finishing with 15 points (6-15 FG, 1-6 3Pt, 2-2 FT), 12 rebounds, three assists and three steals across 32 minutes.",
    "date": "2026-11-14T03:50Z"
-  },
-  {
-   "player_name": "Dailyn Swain",
-   "team": "Chicago Bulls",
-   "status": "Out",
-   "detail": "Swain (back) is out for Friday's game against the Hawks.",
-   "date": "2026-11-14T00:17Z"
-  },
-  {
-   "player_name": "Tobe Awaka",
-   "team": "Chicago Bulls",
-   "status": "Out",
-   "detail": "Awaka (back) has been ruled out for Friday's game against the Hawks.",
-   "date": "2026-11-12T21:40Z"
   },
   {
    "player_name": "Caleb Wilson",
@@ -108,9 +115,9 @@
   {
    "player_name": "Evan Mobley",
    "team": "Cleveland Cavaliers",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Mobley (toe) is out for Friday's game against the Heat.",
-   "date": "2026-11-12T22:08Z"
+   "date": "2026-11-14T15:01Z"
   },
   {
    "player_name": "Sam Merrill",
@@ -332,16 +339,16 @@
   {
    "player_name": "Quinten Post",
    "team": "Memphis Grizzlies",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Post (concussion) has been ruled out for Friday's game against New Orleans.",
-   "date": "2026-11-12T23:17Z"
+   "date": "2026-11-14T15:02Z"
   },
   {
    "player_name": "Zach Edey",
    "team": "Memphis Grizzlies",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Edey won't play in Friday's game against the Pelicans due to left ankle injury management.",
-   "date": "2026-11-12T23:16Z"
+   "date": "2026-11-14T15:02Z"
   },
   {
    "player_name": "Scotty Pippen Jr.",
@@ -358,18 +365,18 @@
    "date": "2026-11-07T17:24Z"
   },
   {
-   "player_name": "Klay Thompson",
-   "team": "Miami Heat",
-   "status": "Out",
-   "detail": "Thompson (ankle) is out for Friday's game against the Cavaliers.",
-   "date": "2026-11-13T23:21Z"
-  },
-  {
    "player_name": "Pelle Larsson",
    "team": "Miami Heat",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Larsson (illness) is out for Friday's game against Cleveland.",
-   "date": "2026-11-13T23:04Z"
+   "date": "2026-11-14T15:02Z"
+  },
+  {
+   "player_name": "Klay Thompson",
+   "team": "Miami Heat",
+   "status": "Day-To-Day",
+   "detail": "Thompson (ankle) is out for Friday's game against the Cavaliers.",
+   "date": "2026-11-14T15:01Z"
   },
   {
    "player_name": "Anthony Edwards",
@@ -386,6 +393,20 @@
    "date": "2026-10-05T20:53Z"
   },
   {
+   "player_name": "Bryce McGowens",
+   "team": "New Orleans Pelicans",
+   "status": "Out",
+   "detail": "McGowens (elbow) has been ruled out for Saturday's game against the Nuggets.",
+   "date": "2026-11-14T17:55Z"
+  },
+  {
+   "player_name": "Trey Murphy III",
+   "team": "New Orleans Pelicans",
+   "status": "Out",
+   "detail": "Murphy (knees) has been ruled out for Saturday's game against the Nuggets.",
+   "date": "2026-11-14T17:53Z"
+  },
+  {
    "player_name": "Dejounte Murray",
    "team": "New Orleans Pelicans",
    "status": "Out",
@@ -393,25 +414,11 @@
    "date": "2026-11-13T20:19Z"
   },
   {
-   "player_name": "Bryce McGowens",
-   "team": "New Orleans Pelicans",
-   "status": "Out",
-   "detail": "McGowens (elbow) is listed as out for Friday's game against the Grizzlies.",
-   "date": "2026-11-13T18:12Z"
-  },
-  {
    "player_name": "Yves Missi",
    "team": "New Orleans Pelicans",
    "status": "Out",
    "detail": "Missi (knee) is out for Friday's game against the Grizzlies.",
    "date": "2026-11-13T18:11Z"
-  },
-  {
-   "player_name": "Trey Murphy III",
-   "team": "New Orleans Pelicans",
-   "status": "Out",
-   "detail": "Murphy (knee) is out for Friday's game against Memphis.",
-   "date": "2026-11-13T18:07Z"
   },
   {
    "player_name": "Trendon Watford",
@@ -423,9 +430,9 @@
   {
    "player_name": "Ajay Mitchell",
    "team": "Oklahoma City Thunder",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Mitchell (ankle) has been ruled out for Friday's game against the Clippers.",
-   "date": "2026-11-14T02:34Z"
+   "date": "2026-11-14T15:07Z"
   },
   {
    "player_name": "Thomas Sorber",
@@ -463,6 +470,13 @@
    "date": "2026-10-28T23:41Z"
   },
   {
+   "player_name": "Noah Penda",
+   "team": "Orlando Magic",
+   "status": "Out",
+   "detail": "Penda (hamstring) is making progress but remains without a timetable to return to game action, Jason Beede of the Orlando Sentinel reports.",
+   "date": "2026-11-14T17:33Z"
+  },
+  {
    "player_name": "Jonathan Isaac",
    "team": "Orlando Magic",
    "status": "Out",
@@ -475,13 +489,6 @@
    "status": "Out",
    "detail": "Banchero is expected to be sidelined for the next four-to-six weeks due to a right high-ankle sprain, Shams Charania of ESPN reports.",
    "date": "2026-10-24T16:47Z"
-  },
-  {
-   "player_name": "Noah Penda",
-   "team": "Orlando Magic",
-   "status": "Out",
-   "detail": "Penda was diagnosed with a partially torn right hamstring Saturday, Jason Beede of the Orlando Sentinel reports.",
-   "date": "2026-10-17T22:19Z"
   },
   {
    "player_name": "Izaiyah Nelson",
@@ -535,9 +542,9 @@
   {
    "player_name": "Chris Youngblood",
    "team": "Portland Trail Blazers",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Youngblood (foot) is out for Friday's game against Sacramento.",
-   "date": "2026-11-13T01:06Z"
+   "date": "2026-11-14T15:05Z"
   },
   {
    "player_name": "Vit Krejci",
@@ -563,9 +570,9 @@
   {
    "player_name": "Precious Achiuwa",
    "team": "Sacramento Kings",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Achiuwa (ankle) is out for Friday's game against the Trail Blazers.",
-   "date": "2026-11-13T21:20Z"
+   "date": "2026-11-14T15:05Z"
   },
   {
    "player_name": "Maxime Raynaud",
@@ -596,6 +603,13 @@
    "date": "2026-10-05T21:43Z"
   },
   {
+   "player_name": "Scottie Barnes",
+   "team": "Toronto Raptors",
+   "status": "Out",
+   "detail": "Barnes (groin) is listed as questionable for Sunday's game against the Knicks, Michael Grange of Sportsnet.ca reports.",
+   "date": "2026-11-14T17:33Z"
+  },
+  {
    "player_name": "Kevin McCullar Jr.",
    "team": "Toronto Raptors",
    "status": "Day-To-Day",
@@ -608,13 +622,6 @@
    "status": "Day-To-Day",
    "detail": "Jackson-Davis is out for Thursday's game against the 76ers due to an illness.",
    "date": "2026-11-13T03:27Z"
-  },
-  {
-   "player_name": "Scottie Barnes",
-   "team": "Toronto Raptors",
-   "status": "Out",
-   "detail": "Barnes (groin) is out for Thursday's game against Philadelphia.",
-   "date": "2026-11-12T18:05Z"
   },
   {
    "player_name": "Kawhi Leonard",
@@ -701,6 +708,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-14T08:00:50Z",
+ "_generated_utc": "2026-11-14T18:03:04Z",
  "source": "espn"
 }
