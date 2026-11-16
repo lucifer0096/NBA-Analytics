@@ -3,16 +3,16 @@
   {
    "player_name": "Jock Landale",
    "team": "Atlanta Hawks",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Landale (hip) is out for Sunday's game against Bucks, Brad Rowland of the Locked On Podcast Network reports.",
-   "date": "2026-11-15T23:22Z"
+   "date": "2026-11-16T14:47Z"
   },
   {
    "player_name": "Kingston Flemings",
    "team": "Atlanta Hawks",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Flemings (back) has been ruled out for Sunday's game against the Bucks.",
-   "date": "2026-11-14T23:08Z"
+   "date": "2026-11-16T14:47Z"
   },
   {
    "player_name": "Mouhamed Gueye",
@@ -106,25 +106,25 @@
    "date": "2026-10-20T15:11Z"
   },
   {
-   "player_name": "Santi Aldama",
-   "team": "Dallas Mavericks",
-   "status": "Out",
-   "detail": "Aldama (ankle) is out for Sunday's game against the Celtics.",
-   "date": "2026-11-15T22:27Z"
-  },
-  {
    "player_name": "Max Christie",
    "team": "Dallas Mavericks",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Christie (ankle) has been ruled out for Sunday's game against the Celtics.",
-   "date": "2026-11-15T21:24Z"
+   "date": "2026-11-16T14:45Z"
+  },
+  {
+   "player_name": "Santi Aldama",
+   "team": "Dallas Mavericks",
+   "status": "Day-To-Day",
+   "detail": "Aldama (ankle) is out for Sunday's game against the Celtics.",
+   "date": "2026-11-16T14:45Z"
   },
   {
    "player_name": "Kyrie Irving",
    "team": "Dallas Mavericks",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Irving (knee) has been ruled out for Sunday's game against the Celtics.",
-   "date": "2026-11-15T21:20Z"
+   "date": "2026-11-16T14:44Z"
   },
   {
    "player_name": "Dereck Lively II",
@@ -225,18 +225,25 @@
    "date": "2026-10-16T16:11Z"
   },
   {
+   "player_name": "Julian Phillips",
+   "team": "Houston Rockets",
+   "status": "Day-To-Day",
+   "detail": "Phillips (illness) is available for Wednesday's game against Dallas.",
+   "date": "2026-11-16T15:28Z"
+  },
+  {
+   "player_name": "Fred VanVleet",
+   "team": "Houston Rockets",
+   "status": "Day-To-Day",
+   "detail": "VanVleet (right knee injury management) has been ruled out for Sunday's game against the Wizards.",
+   "date": "2026-11-16T14:46Z"
+  },
+  {
    "player_name": "Clint Capela",
    "team": "Houston Rockets",
    "status": "Out",
    "detail": "Capela (ankle) has been ruled out for Sunday's game at Washington.",
    "date": "2026-11-14T21:54Z"
-  },
-  {
-   "player_name": "Fred VanVleet",
-   "team": "Houston Rockets",
-   "status": "Out",
-   "detail": "VanVleet (right knee injury management) has been ruled out for Sunday's game against the Wizards.",
-   "date": "2026-11-14T21:52Z"
   },
   {
    "player_name": "Marcus Smart",
@@ -304,9 +311,9 @@
   {
    "player_name": "Austin Reaves",
    "team": "Los Angeles Lakers",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Reaves (heel) has been ruled out for Sunday's game against the Suns, Daniel Starkand of LakersNation.com reports.",
-   "date": "2026-11-15T00:17Z"
+   "date": "2026-11-16T14:42Z"
   },
   {
    "player_name": "GG Jackson",
@@ -365,18 +372,18 @@
    "date": "2026-11-15T22:47Z"
   },
   {
+   "player_name": "Ryan Rollins",
+   "team": "Milwaukee Bucks",
+   "status": "Day-To-Day",
+   "detail": "Rollins (illness) is out for Sunday's game against the Hawks.",
+   "date": "2026-11-16T14:47Z"
+  },
+  {
    "player_name": "Ousmane Dieng",
    "team": "Milwaukee Bucks",
    "status": "Out",
    "detail": "Dieng will undergo a procedure to repair a fractured left finger Monday, Justin Garcia of the Milwaukee Bucks Radio Network reports.",
    "date": "2026-11-15T23:46Z"
-  },
-  {
-   "player_name": "Ryan Rollins",
-   "team": "Milwaukee Bucks",
-   "status": "Out",
-   "detail": "Rollins (illness) is out for Sunday's game against the Hawks.",
-   "date": "2026-11-15T23:19Z"
   },
   {
    "player_name": "Jaylen Clark",
@@ -568,25 +575,25 @@
    "date": "2026-08-24T20:23Z"
   },
   {
-   "player_name": "De'Andre Hunter",
-   "team": "Sacramento Kings",
-   "status": "Out",
-   "detail": "Hunter (hip) is out for Sunday's game against the Thunder.",
-   "date": "2026-11-16T01:18Z"
-  },
-  {
    "player_name": "Zach LaVine",
    "team": "Sacramento Kings",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "LaVine is out for Sunday's game against Oklahoma City due to illness, Brandon Rahbar of DailyThunder.com reports.",
-   "date": "2026-11-16T01:06Z"
+   "date": "2026-11-16T14:48Z"
+  },
+  {
+   "player_name": "De'Andre Hunter",
+   "team": "Sacramento Kings",
+   "status": "Day-To-Day",
+   "detail": "Hunter (hip) is out for Sunday's game against the Thunder.",
+   "date": "2026-11-16T14:48Z"
   },
   {
    "player_name": "Precious Achiuwa",
    "team": "Sacramento Kings",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Achiuwa (ankle) has been ruled out for Sunday's game against the Thunder, Brenden Nunes of KHTK Sactown Sports 1140 reports.",
-   "date": "2026-11-16T00:24Z"
+   "date": "2026-11-16T14:48Z"
   },
   {
    "player_name": "Maxime Raynaud",
@@ -605,9 +612,9 @@
   {
    "player_name": "De'Aaron Fox",
    "team": "San Antonio Spurs",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Fox (hip) has been ruled out for Sunday's game against the Jazz.",
-   "date": "2026-11-15T20:33Z"
+   "date": "2026-11-16T14:44Z"
   },
   {
    "player_name": "Tobias Harris",
@@ -647,9 +654,9 @@
   {
    "player_name": "Jaxson Hayes",
    "team": "Utah Jazz",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Hayes (knee) has been ruled out for Sunday's game against the Spurs.",
-   "date": "2026-11-15T00:07Z"
+   "date": "2026-11-16T14:44Z"
   },
   {
    "player_name": "Trey Alexander",
@@ -682,9 +689,9 @@
   {
    "player_name": "Tre Johnson",
    "team": "Washington Wizards",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Johnson (back) won't play in Sunday's game against Houston, Josh Robbins of The Athletic reports.",
-   "date": "2026-11-15T22:31Z"
+   "date": "2026-11-16T14:47Z"
   },
   {
    "player_name": "Tristan Vukcevic",
@@ -715,6 +722,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-16T08:35:24Z",
+ "_generated_utc": "2026-11-16T16:21:41Z",
  "source": "espn"
 }
