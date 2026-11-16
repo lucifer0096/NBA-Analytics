@@ -7,6 +7,12 @@
    "team_id": 1
   },
   {
+   "player_id": 4684443,
+   "player_name": "Rafael Castro",
+   "position": "F",
+   "team_id": 1
+  },
+  {
    "player_id": 4869342,
    "player_name": "Dyson Daniels",
    "position": "G",
@@ -39,12 +45,6 @@
   {
    "player_id": 5149077,
    "player_name": "Kingston Flemings",
-   "position": "G",
-   "team_id": 1
-  },
-  {
-   "player_id": 4585618,
-   "player_name": "Keshon Gilbert",
    "position": "G",
    "team_id": 1
   },
@@ -3175,6 +3175,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-14T08:00:50Z",
+ "_generated_utc": "2026-11-16T08:35:24Z",
  "source": "local"
 }
