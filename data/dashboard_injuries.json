@@ -39,8 +39,8 @@
    "player_name": "Neemias Queta",
    "team": "Boston Celtics",
    "status": "Day-To-Day",
-   "detail": "Queta (rest) is questionable for Monday's game against the Magic.",
-   "date": "2026-11-16T18:12Z"
+   "detail": "Queta (rest) won't play in Monday's game against the Magic, Taylor Snow of the Celtics' official site reports.",
+   "date": "2026-11-17T03:37Z"
   },
   {
    "player_name": "Kon Knueppel",
@@ -57,18 +57,25 @@
    "date": "2026-11-08T22:26Z"
   },
   {
+   "player_name": "Jalen Smith",
+   "team": "Chicago Bulls",
+   "status": "Day-To-Day",
+   "detail": "Smith (undisclosed) exited in the fourth quarter of Monday's 126-115 loss to the Cavaliers and did not return.",
+   "date": "2026-11-17T02:58Z"
+  },
+  {
+   "player_name": "Patrick Williams",
+   "team": "Chicago Bulls",
+   "status": "Day-To-Day",
+   "detail": "Williams (finger) has been ruled out for the remainder of Monday's game against Cleveland.",
+   "date": "2026-11-17T02:12Z"
+  },
+  {
    "player_name": "Tobe Awaka",
    "team": "Chicago Bulls",
    "status": "Out",
    "detail": "Awaka (back) has been ruled out for Monday's game against the Cavaliers.",
    "date": "2026-11-15T21:30Z"
-  },
-  {
-   "player_name": "Jalen Smith",
-   "team": "Chicago Bulls",
-   "status": "Day-To-Day",
-   "detail": "Smith (finger) is listed as questionable for Monday's game against Cleveland.",
-   "date": "2026-11-15T21:29Z"
   },
   {
    "player_name": "Caleb Wilson",
@@ -81,22 +88,22 @@
    "player_name": "Jaylon Tyson",
    "team": "Cleveland Cavaliers",
    "status": "Day-To-Day",
-   "detail": "Tyson (ankle) has been downgraded to doubtful for Monday's game against the Bulls.",
-   "date": "2026-11-16T17:35Z"
+   "detail": "Tyson (ankle) has been ruled out for Monday's game against Chicago.",
+   "date": "2026-11-17T03:37Z"
   },
   {
    "player_name": "Peyton Watson",
    "team": "Cleveland Cavaliers",
    "status": "Day-To-Day",
-   "detail": "Watson (abdominal soreness) is questionable to play in Monday's game against the Bulls.",
-   "date": "2026-11-15T22:04Z"
+   "detail": "Watson left Monday's 126-115 win over Chicago due to a head injury and did not return.",
+   "date": "2026-11-17T02:58Z"
   },
   {
    "player_name": "Evan Mobley",
    "team": "Cleveland Cavaliers",
    "status": "Out",
-   "detail": "Mobley (toe) has been ruled out for Monday's game against Chicago.",
-   "date": "2026-11-15T21:58Z"
+   "detail": "Mobley will receive treatment and participate in rehab after the team confirmed a diagnosis of a right great toe sprain, and he'll be re-evaluated in the next 7-to-10 days.",
+   "date": "2026-11-16T22:06Z"
   },
   {
    "player_name": "Sam Merrill",
@@ -162,18 +169,32 @@
    "date": "2026-10-17T00:52Z"
   },
   {
-   "player_name": "Duncan Robinson",
+   "player_name": "Taurean Prince",
    "team": "Detroit Pistons",
-   "status": "Day-To-Day",
-   "detail": "Robinson (thigh) did not return to Saturday's 137-117 win over the Pistons. He finished with 10 points (3-8 FG, 2-6 3Pt, 2-2 FT), one rebound and one assist across 17 minutes.",
-   "date": "2026-11-15T15:58Z"
+   "status": "Out",
+   "detail": "Prince (knee) has been ruled out for Tuesday's game against the Spurs.",
+   "date": "2026-11-16T22:58Z"
+  },
+  {
+   "player_name": "Ronald Holland II",
+   "team": "Detroit Pistons",
+   "status": "Out",
+   "detail": "Holland is out for Tuesday's game against San Antonio due to a left knee contusion.",
+   "date": "2026-11-16T22:53Z"
   },
   {
    "player_name": "Isaiah Joe",
    "team": "Detroit Pistons",
    "status": "Out",
-   "detail": "Joe (hip) is out for Monday against the Wizards.",
-   "date": "2026-11-09T18:54Z"
+   "detail": "Joe (hip) is doubtful to play in Tuesday's game against the Spurs.",
+   "date": "2026-11-16T22:40Z"
+  },
+  {
+   "player_name": "Duncan Robinson",
+   "team": "Detroit Pistons",
+   "status": "Out",
+   "detail": "Robinson (quadriceps) has been ruled out for Tuesday's game against the Spurs.",
+   "date": "2026-11-16T22:37Z"
   },
   {
    "player_name": "Jalen Duren",
@@ -181,13 +202,6 @@
    "status": "Out",
    "detail": "Duren (hamstring) has begun on-court activity and will be re-evaluated in two weeks, Hunter Patterson of The Athletic reports.",
    "date": "2026-11-08T16:05Z"
-  },
-  {
-   "player_name": "Gui Santos",
-   "team": "Golden State Warriors",
-   "status": "Day-To-Day",
-   "detail": "Santos is questionable for Monday's game against New Orleans due to right ankle inflammation.",
-   "date": "2026-11-15T23:03Z"
   },
   {
    "player_name": "Stephen Curry",
@@ -228,8 +242,22 @@
    "player_name": "Amen Thompson",
    "team": "Houston Rockets",
    "status": "Day-To-Day",
-   "detail": "Thompson (knee) is listed as questionable for Monday's game against the Heat.",
-   "date": "2026-11-16T18:13Z"
+   "detail": "Thompson (knee) is out for Monday's game against the Heat.",
+   "date": "2026-11-17T03:39Z"
+  },
+  {
+   "player_name": "Marcus Smart",
+   "team": "Houston Rockets",
+   "status": "Day-To-Day",
+   "detail": "Smart has been suspended three games for throwing a punch during Wednesday's matchup against Golden State, Shams Charania of ESPN reports.",
+   "date": "2026-11-17T03:39Z"
+  },
+  {
+   "player_name": "Steven Adams",
+   "team": "Houston Rockets",
+   "status": "Day-To-Day",
+   "detail": "Adams (calf) is out for Monday's game against the Heat.",
+   "date": "2026-11-17T03:38Z"
   },
   {
    "player_name": "Clint Capela",
@@ -239,25 +267,11 @@
    "date": "2026-11-16T18:09Z"
   },
   {
-   "player_name": "Steven Adams",
-   "team": "Houston Rockets",
-   "status": "Out",
-   "detail": "Adams (calf) is out for Monday's game against the Heat.",
-   "date": "2026-11-16T18:07Z"
-  },
-  {
    "player_name": "Julian Phillips",
    "team": "Houston Rockets",
    "status": "Day-To-Day",
    "detail": "Phillips (illness) is available for Wednesday's game against Dallas.",
    "date": "2026-11-16T15:28Z"
-  },
-  {
-   "player_name": "Marcus Smart",
-   "team": "Houston Rockets",
-   "status": "Suspension",
-   "detail": "Smart has been suspended three games for throwing a punch during Wednesday's matchup against Golden State, Shams Charania of ESPN reports.",
-   "date": "2026-11-12T22:45Z"
   },
   {
    "player_name": "Andrew Nembhard",
@@ -288,18 +302,18 @@
    "date": "2026-10-28T21:41Z"
   },
   {
+   "player_name": "Yanic Konan Niederhauser",
+   "team": "LA Clippers",
+   "status": "Out",
+   "detail": "Niederhauser (foot) has been ruled out for Tuesday's game against the Jazz.",
+   "date": "2026-11-17T01:07Z"
+  },
+  {
    "player_name": "Brandon Ingram",
    "team": "LA Clippers",
    "status": "Out",
    "detail": "Ingram (Achilles) won't play in Friday's game against the Thunder, per Law Murray of The Athletic.",
    "date": "2026-11-12T21:05Z"
-  },
-  {
-   "player_name": "Yanic Konan Niederhauser",
-   "team": "LA Clippers",
-   "status": "Out",
-   "detail": "Niederhauser (foot) is out for Tuesday's game against Phoenix, Ohm Youngmisuk of ESPN.com reports.",
-   "date": "2026-11-10T00:05Z"
   },
   {
    "player_name": "Bradley Beal",
@@ -318,16 +332,30 @@
   {
    "player_name": "Austin Reaves",
    "team": "Los Angeles Lakers",
-   "status": "Day-To-Day",
-   "detail": "Reaves (heel) has been ruled out for Sunday's game against the Suns, Daniel Starkand of LakersNation.com reports.",
-   "date": "2026-11-16T14:42Z"
+   "status": "Out",
+   "detail": "Reaves (heel) is out for Tuesday's game against the Hornets, Dave McMenamin of ESPN.com reports.",
+   "date": "2026-11-17T01:11Z"
+  },
+  {
+   "player_name": "Walker Kessler",
+   "team": "Los Angeles Lakers",
+   "status": "Out",
+   "detail": "Walker (leg) has been ruled out for Tuesday's game against the Hornets.",
+   "date": "2026-11-17T01:10Z"
   },
   {
    "player_name": "Isaiah Stewart",
    "team": "Memphis Grizzlies",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Stewart is out for Monday's game against the Wizards due to an illness.",
-   "date": "2026-11-16T18:05Z"
+   "date": "2026-11-17T03:35Z"
+  },
+  {
+   "player_name": "Ty Jerome",
+   "team": "Memphis Grizzlies",
+   "status": "Day-To-Day",
+   "detail": "Jerome (hip) has been ruled out for Monday's game against the Wizards.",
+   "date": "2026-11-17T03:35Z"
   },
   {
    "player_name": "Scotty Pippen Jr.",
@@ -344,27 +372,6 @@
    "date": "2026-11-16T17:12Z"
   },
   {
-   "player_name": "Ty Jerome",
-   "team": "Memphis Grizzlies",
-   "status": "Out",
-   "detail": "Jerome (hip) has been ruled out for Monday's game against the Wizards.",
-   "date": "2026-11-15T22:13Z"
-  },
-  {
-   "player_name": "Quinten Post",
-   "team": "Memphis Grizzlies",
-   "status": "Out",
-   "detail": "Post (concussion) is questionable for Monday's game against the Wizards.",
-   "date": "2026-11-15T22:12Z"
-  },
-  {
-   "player_name": "Zach Edey",
-   "team": "Memphis Grizzlies",
-   "status": "Day-To-Day",
-   "detail": "Edey (ankle) is questionable for Monday's game against Washington.",
-   "date": "2026-11-15T22:11Z"
-  },
-  {
    "player_name": "Richie Saunders",
    "team": "Memphis Grizzlies",
    "status": "Out",
@@ -375,15 +382,22 @@
    "player_name": "Nikola Jovic",
    "team": "Miami Heat",
    "status": "Day-To-Day",
-   "detail": "Jovic (illness) has been downgraded to questionable for Monday's game against Houston.",
-   "date": "2026-11-16T17:41Z"
+   "detail": "Jovic (illness) is out for Monday's game against Houston.",
+   "date": "2026-11-17T03:40Z"
+  },
+  {
+   "player_name": "Bam Adebayo",
+   "team": "Miami Heat",
+   "status": "Day-To-Day",
+   "detail": "Coach Erik Spoelstra stated after Monday's 128-110 win over Houston that the team held Adebayo (hip) out of the second half in an effort to be proactive, and the injury isn't expected to be a long-term issue, Anthony Chiang of the Miami Herald reports.",
+   "date": "2026-11-17T03:34Z"
   },
   {
    "player_name": "Pelle Larsson",
    "team": "Miami Heat",
-   "status": "Day-To-Day",
-   "detail": "Larsson (illness) has been downgraded to doubtful for Monday's game against Houston.",
-   "date": "2026-11-16T17:39Z"
+   "status": "Out",
+   "detail": "Larsson won't play in Monday's game against the Rockets due to an illness, Ira Winderman of the South Florida Sun Sentinel reports.",
+   "date": "2026-11-16T22:49Z"
   },
   {
    "player_name": "Ryan Rollins",
@@ -398,6 +412,13 @@
    "status": "Out",
    "detail": "Dieng will undergo a procedure to repair a fractured left finger Monday, Justin Garcia of the Milwaukee Bucks Radio Network reports.",
    "date": "2026-11-15T23:46Z"
+  },
+  {
+   "player_name": "Jonathan Kuminga",
+   "team": "Minnesota Timberwolves",
+   "status": "Day-To-Day",
+   "detail": "Kuminga (shoulder) exited in the fourth quarter of Monday's 106-98 win over Portland and did not return. He closed with 13 points (5-12 FG, 1-2 3Pt, 2-2 FT), nine rebounds and one assist across 29 minutes.",
+   "date": "2026-11-17T03:32Z"
   },
   {
    "player_name": "Jaylen Clark",
@@ -421,18 +442,18 @@
    "date": "2026-10-05T20:53Z"
   },
   {
+   "player_name": "Bennedict Mathurin",
+   "team": "New Orleans Pelicans",
+   "status": "Day-To-Day",
+   "detail": "Mathurin (foot) has been ruled out for Monday's game against the Warriors.",
+   "date": "2026-11-17T03:48Z"
+  },
+  {
    "player_name": "Bryce McGowens",
    "team": "New Orleans Pelicans",
    "status": "Out",
    "detail": "McGowens (elbow) has been ruled out for Monday's game against the Warriors.",
    "date": "2026-11-15T23:10Z"
-  },
-  {
-   "player_name": "Bennedict Mathurin",
-   "team": "New Orleans Pelicans",
-   "status": "Out",
-   "detail": "Mathurin (foot) has been ruled out for Monday's game against the Warriors.",
-   "date": "2026-11-15T23:06Z"
   },
   {
    "player_name": "Trey Murphy III",
@@ -519,25 +540,25 @@
    "date": "2026-09-28T21:33Z"
   },
   {
-   "player_name": "Joel Embiid",
+   "player_name": "Jaylen Brown",
    "team": "Philadelphia 76ers",
    "status": "Day-To-Day",
-   "detail": "Embiid (foot) is questionable for Monday's game against the Nets.",
-   "date": "2026-11-16T18:09Z"
+   "detail": "Brown (hamstring/head) will undergo further evaluation Tuesday and could receive an MRI, Kris Rhim of ESPN reports.",
+   "date": "2026-11-17T04:56Z"
   },
   {
    "player_name": "LeBron James",
    "team": "Philadelphia 76ers",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "James (back) has been ruled out for Monday's game against the Nets.",
-   "date": "2026-11-16T18:07Z"
+   "date": "2026-11-17T03:41Z"
   },
   {
    "player_name": "Dominick Barlow",
    "team": "Philadelphia 76ers",
    "status": "Out",
-   "detail": "Barlow (back) participated in Thursday's shootaround but doesn't have a timeline to return to game action, Ky Carlin of USA Today reports.",
-   "date": "2026-11-12T16:37Z"
+   "detail": "Barlow (back) will be re-evaluated later in the week and is thought to be nearing his 2026-27 season debut, Tony Jones of The Athletic reports.",
+   "date": "2026-11-16T23:45Z"
   },
   {
    "player_name": "Adem Bona",
@@ -552,13 +573,6 @@
    "status": "Out",
    "detail": "Hukporti has sustained a season-ending ruptured right Achilles tendon, per Shams Charania of ESPN.",
    "date": "2026-10-06T19:17Z"
-  },
-  {
-   "player_name": "Ryan Dunn",
-   "team": "Phoenix Suns",
-   "status": "Day-To-Day",
-   "detail": "Dunn (thumb) is listed as questionable for Monday's game against Denver.",
-   "date": "2026-11-16T20:18Z"
   },
   {
    "player_name": "Mark Williams",
@@ -638,13 +652,6 @@
    "date": "2026-11-16T19:26Z"
   },
   {
-   "player_name": "De'Aaron Fox",
-   "team": "San Antonio Spurs",
-   "status": "Day-To-Day",
-   "detail": "Fox (hip) has been ruled out for Sunday's game against the Jazz.",
-   "date": "2026-11-16T14:44Z"
-  },
-  {
    "player_name": "Jayden Quaintance",
    "team": "San Antonio Spurs",
    "status": "Out",
@@ -675,16 +682,9 @@
   {
    "player_name": "Jaxson Hayes",
    "team": "Utah Jazz",
-   "status": "Day-To-Day",
-   "detail": "Hayes (knee) has been ruled out for Sunday's game against the Spurs.",
-   "date": "2026-11-16T14:44Z"
-  },
-  {
-   "player_name": "Trey Alexander",
-   "team": "Utah Jazz",
    "status": "Out",
-   "detail": "Alexander won't play Wednesday against the Grizzlies due to a left knee bone bruise.",
-   "date": "2026-11-12T15:42Z"
+   "detail": "Hayes (knee) has been ruled out for Tuesday's game against the Clippers.",
+   "date": "2026-11-17T01:08Z"
   },
   {
    "player_name": "Lauri Markkanen",
@@ -706,13 +706,6 @@
    "status": "Out",
    "detail": "Jackson has been diagnosed with a torn MCL in his right knee and will be sidelined for 6-to-8 weeks, per Shams Charania of ESPN.",
    "date": "2026-10-27T19:25Z"
-  },
-  {
-   "player_name": "Tre Johnson",
-   "team": "Washington Wizards",
-   "status": "Day-To-Day",
-   "detail": "Johnson (back) is listed as questionable for Monday's game against Memphis.",
-   "date": "2026-11-16T18:18Z"
   },
   {
    "player_name": "Tristan Vukcevic",
@@ -743,6 +736,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-16T22:03:19Z",
+ "_generated_utc": "2026-11-17T09:44:33Z",
  "source": "espn"
 }

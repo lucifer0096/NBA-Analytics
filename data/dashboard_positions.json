@@ -2953,12 +2953,6 @@
    "team_id": 28
   },
   {
-   "player_id": 4433268,
-   "player_name": "Trey Alexander",
-   "position": "G",
-   "team_id": 26
-  },
-  {
    "player_id": 4873138,
    "player_name": "Ace Bailey",
    "position": "G",
@@ -3175,6 +3169,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-16T08:35:24Z",
+ "_generated_utc": "2026-11-17T09:44:33Z",
  "source": "local"
 }
