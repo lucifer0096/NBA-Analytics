@@ -45,9 +45,9 @@
   {
    "player_name": "Grayson Allen",
    "team": "Charlotte Hornets",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Allen (concussion-like symptoms) has been ruled out for Tuesday's game against the Lakers.",
-   "date": "2026-11-18T02:19Z"
+   "date": "2026-11-18T15:07Z"
   },
   {
    "player_name": "Kon Knueppel",
@@ -176,6 +176,20 @@
    "date": "2026-10-17T00:52Z"
   },
   {
+   "player_name": "Taurean Prince",
+   "team": "Detroit Pistons",
+   "status": "Day-To-Day",
+   "detail": "Prince (knee) has been ruled out for Tuesday's game against the Spurs.",
+   "date": "2026-11-18T15:05Z"
+  },
+  {
+   "player_name": "Ronald Holland II",
+   "team": "Detroit Pistons",
+   "status": "Day-To-Day",
+   "detail": "Holland is out for Tuesday's game against San Antonio due to a left knee contusion.",
+   "date": "2026-11-18T15:05Z"
+  },
+  {
    "player_name": "Isaiah Joe",
    "team": "Detroit Pistons",
    "status": "Out",
@@ -188,20 +202,6 @@
    "status": "Out",
    "detail": "Robinson will be re-evaluated in one week due to a left quadriceps strain, Coty M. Davis of The Detroit News reports.",
    "date": "2026-11-17T16:25Z"
-  },
-  {
-   "player_name": "Taurean Prince",
-   "team": "Detroit Pistons",
-   "status": "Out",
-   "detail": "Prince (knee) has been ruled out for Tuesday's game against the Spurs.",
-   "date": "2026-11-16T22:58Z"
-  },
-  {
-   "player_name": "Ronald Holland II",
-   "team": "Detroit Pistons",
-   "status": "Out",
-   "detail": "Holland is out for Tuesday's game against San Antonio due to a left knee contusion.",
-   "date": "2026-11-16T22:53Z"
   },
   {
    "player_name": "Jalen Duren",
@@ -274,13 +274,6 @@
    "date": "2026-11-17T20:49Z"
   },
   {
-   "player_name": "Julian Phillips",
-   "team": "Houston Rockets",
-   "status": "Day-To-Day",
-   "detail": "Phillips (illness) is available for Wednesday's game against Dallas.",
-   "date": "2026-11-16T15:28Z"
-  },
-  {
    "player_name": "T.J. McConnell",
    "team": "Indiana Pacers",
    "status": "Day-To-Day",
@@ -344,18 +337,18 @@
    "date": "2026-08-26T20:04Z"
   },
   {
-   "player_name": "Walker Kessler",
-   "team": "Los Angeles Lakers",
-   "status": "Out",
-   "detail": "Head coach JJ Redick said he expects Walker (leg) to be available for Wednesday's game against the Jazz, Thuc Nhi Nguyen of the Los Angeles Times reports.",
-   "date": "2026-11-18T02:57Z"
-  },
-  {
    "player_name": "Austin Reaves",
    "team": "Los Angeles Lakers",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Reaves (heel) is out for Tuesday's game against the Hornets, Dave McMenamin of ESPN.com reports.",
-   "date": "2026-11-17T01:11Z"
+   "date": "2026-11-18T15:02Z"
+  },
+  {
+   "player_name": "Walker Kessler",
+   "team": "Los Angeles Lakers",
+   "status": "Day-To-Day",
+   "detail": "Head coach JJ Redick said he expects Walker (leg) to be available for Wednesday's game against the Jazz, Thuc Nhi Nguyen of the Los Angeles Times reports.",
+   "date": "2026-11-18T15:02Z"
   },
   {
    "player_name": "GG Jackson",
@@ -423,16 +416,16 @@
   {
    "player_name": "Zyon Pullin",
    "team": "Minnesota Timberwolves",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Pullin (quadriceps) has been ruled out for Tuesday's game against Portland.",
-   "date": "2026-11-17T19:05Z"
+   "date": "2026-11-18T15:04Z"
   },
   {
    "player_name": "Jonathan Kuminga",
    "team": "Minnesota Timberwolves",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Kuminga (shoulder) is out for Tuesday's game against Portland.",
-   "date": "2026-11-17T19:03Z"
+   "date": "2026-11-18T15:04Z"
   },
   {
    "player_name": "Jaylen Clark",
@@ -591,9 +584,9 @@
   {
    "player_name": "Deni Avdija",
    "team": "Portland Trail Blazers",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Avdija (foot) won't play Tuesday versus Minnesota.",
-   "date": "2026-11-18T00:28Z"
+   "date": "2026-11-18T15:04Z"
   },
   {
    "player_name": "Chris Youngblood",
@@ -696,9 +689,9 @@
   {
    "player_name": "Jaxson Hayes",
    "team": "Utah Jazz",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Hayes (knee) has been ruled out for Tuesday's game against the Clippers.",
-   "date": "2026-11-17T01:08Z"
+   "date": "2026-11-18T14:59Z"
   },
   {
    "player_name": "Lauri Markkanen",
@@ -757,6 +750,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-18T09:06:56Z",
+ "_generated_utc": "2026-11-18T15:57:50Z",
  "source": "espn"
 }
