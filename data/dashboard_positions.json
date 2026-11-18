@@ -553,6 +553,12 @@
    "team_id": 5
   },
   {
+   "player_id": 4702099,
+   "player_name": "Zack Austin",
+   "position": "G",
+   "team_id": 5
+  },
+  {
    "player_id": 3934723,
    "player_name": "Thomas Bryant",
    "position": "C",
@@ -3181,6 +3187,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-18T09:06:56Z",
+ "_generated_utc": "2026-11-18T20:32:53Z",
  "source": "local"
 }
