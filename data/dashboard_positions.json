@@ -919,6 +919,12 @@
    "team_id": 8
   },
   {
+   "player_id": 4700852,
+   "player_name": "Chaz Lanier",
+   "position": "G",
+   "team_id": 8
+  },
+  {
    "player_id": 5258459,
    "player_name": "Ebuka Okorie",
    "position": "G",
@@ -2953,6 +2959,12 @@
    "team_id": 28
   },
   {
+   "player_id": 4684682,
+   "player_name": "Jonas Aidoo",
+   "position": "C",
+   "team_id": 26
+  },
+  {
    "player_id": 4873138,
    "player_name": "Ace Bailey",
    "position": "G",
@@ -3169,6 +3181,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-17T09:44:33Z",
+ "_generated_utc": "2026-11-18T09:06:56Z",
  "source": "local"
 }
