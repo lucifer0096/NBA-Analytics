@@ -148,6 +148,13 @@
    "date": "2026-10-17T00:52Z"
   },
   {
+   "player_name": "Ugonna Onyenso",
+   "team": "Detroit Pistons",
+   "status": "Day-To-Day",
+   "detail": "Onyenso agreed to a two-way contract with the Pistons on Thursday.",
+   "date": "2026-11-19T16:15Z"
+  },
+  {
    "player_name": "Taurean Prince",
    "team": "Detroit Pistons",
    "status": "Day-To-Day",
@@ -185,16 +192,16 @@
   {
    "player_name": "Draymond Green",
    "team": "Golden State Warriors",
-   "status": "Day-To-Day",
-   "detail": "Green (elbow) is available for Wednesday's game against the Mavericks.",
-   "date": "2026-11-19T14:59Z"
+   "status": "Out",
+   "detail": "Green (elbow) is out for Thursday's game against the Grizzlies.",
+   "date": "2026-11-19T18:51Z"
   },
   {
-   "player_name": "Al Horford",
+   "player_name": "LJ Cryer",
    "team": "Golden State Warriors",
    "status": "Day-To-Day",
-   "detail": "Horford (back) is out for Wednesday's game against the Mavericks, but will play Thursday against the Grizzlies, Nick Friedell of The Athletic reports.",
-   "date": "2026-11-19T14:51Z"
+   "detail": "Cryer (back) is questionable for Thursday's game against Memphis.",
+   "date": "2026-11-19T18:46Z"
   },
   {
    "player_name": "Brandon Williams",
@@ -312,8 +319,22 @@
    "player_name": "Isaiah Stewart",
    "team": "Memphis Grizzlies",
    "status": "Day-To-Day",
-   "detail": "Stewart (illness) won't play Wednesday against the Cavs.",
-   "date": "2026-11-19T14:44Z"
+   "detail": "Stewart is questionable for Thursday's game against the Warriors due to an illness.",
+   "date": "2026-11-19T19:11Z"
+  },
+  {
+   "player_name": "Zach Edey",
+   "team": "Memphis Grizzlies",
+   "status": "Out",
+   "detail": "Edey (hip) has been ruled out for Thursday's game against the Warriors.",
+   "date": "2026-11-19T19:09Z"
+  },
+  {
+   "player_name": "Ty Jerome",
+   "team": "Memphis Grizzlies",
+   "status": "Out",
+   "detail": "Jerome (hip) has been ruled out for Thursday's game against the Warriors.",
+   "date": "2026-11-19T19:07Z"
   },
   {
    "player_name": "GG Jackson",
@@ -321,13 +342,6 @@
    "status": "Out",
    "detail": "Jackson underwent a procedure Wednesday to repair a broken fifth metatarsal in his left foot. He is expected to recover fully and will be re-evaluated in approximately three months.",
    "date": "2026-11-17T23:18Z"
-  },
-  {
-   "player_name": "Ty Jerome",
-   "team": "Memphis Grizzlies",
-   "status": "Out",
-   "detail": "Jerome (hip) has been ruled out for Wednesday's game in Cleveland.",
-   "date": "2026-11-17T22:07Z"
   },
   {
    "player_name": "Scotty Pippen Jr.",
@@ -351,11 +365,18 @@
    "date": "2026-11-19T14:45Z"
   },
   {
-   "player_name": "Ryan Rollins",
+   "player_name": "Kyle Kuzma",
    "team": "Milwaukee Bucks",
-   "status": "Day-To-Day",
-   "detail": "Rollins (illness) has been ruled out for Wednesday's game at Miami.",
-   "date": "2026-11-19T14:45Z"
+   "status": "Out",
+   "detail": "Kuzma (shoulder) has been ruled out for Thursday's game against Portland due to a right shoulder contusion.",
+   "date": "2026-11-19T19:20Z"
+  },
+  {
+   "player_name": "Myles Turner",
+   "team": "Milwaukee Bucks",
+   "status": "Out",
+   "detail": "Turner (shoulder) has been ruled out for Thursday's game against Portland due to a left shoulder contusion,",
+   "date": "2026-11-19T19:15Z"
   },
   {
    "player_name": "Ousmane Dieng",
@@ -363,13 +384,6 @@
    "status": "Out",
    "detail": "Dieng will undergo a procedure to repair a fractured left finger Monday, Justin Garcia of the Milwaukee Bucks Radio Network reports.",
    "date": "2026-11-15T23:46Z"
-  },
-  {
-   "player_name": "Zyon Pullin",
-   "team": "Minnesota Timberwolves",
-   "status": "Day-To-Day",
-   "detail": "Pullin (quadriceps) is listed as questionable for Thursday's game against the Knicks.",
-   "date": "2026-11-18T23:11Z"
   },
   {
    "player_name": "Jonathan Kuminga",
@@ -613,8 +627,8 @@
    "player_name": "Dylan Harper",
    "team": "San Antonio Spurs",
    "status": "Out",
-   "detail": "Harper (hip) won't play in Thursday's game against the Clippers, Jeff McDonald of the San Antonio Express-News reports.",
-   "date": "2026-11-18T23:05Z"
+   "detail": "Harper (hip) is expected to miss two to three weeks, Brett Siegel of ClutchPoints.com reports.",
+   "date": "2026-11-19T20:07Z"
   },
   {
    "player_name": "Tobias Harris",
@@ -722,6 +736,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-19T16:01:50Z",
+ "_generated_utc": "2026-11-19T20:39:16Z",
  "source": "espn"
 }
