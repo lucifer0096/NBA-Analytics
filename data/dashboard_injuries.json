@@ -3,16 +3,16 @@
   {
    "player_name": "Jock Landale",
    "team": "Atlanta Hawks",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Landale (hip) won't play Wednesday in Oklahoma City.",
-   "date": "2026-11-17T23:07Z"
+   "date": "2026-11-19T14:50Z"
   },
   {
    "player_name": "Kingston Flemings",
    "team": "Atlanta Hawks",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Flemings (back) is out for Wednesday's game against the Thunder.",
-   "date": "2026-11-17T23:06Z"
+   "date": "2026-11-19T14:50Z"
   },
   {
    "player_name": "Asa Newell",
@@ -41,6 +41,13 @@
    "status": "Out",
    "detail": "Veesaar was diagnosed with a torn right ACL and is expected to miss the 2026-27 season, the Hawks announced Monday.",
    "date": "2026-09-21T19:50Z"
+  },
+  {
+   "player_name": "Grant Nelson",
+   "team": "Brooklyn Nets",
+   "status": "Day-To-Day",
+   "detail": "Nelson signed a two-way contract with the Nets on Friday, Michael Scotto of HoopsHype.com reports.",
+   "date": "2026-11-19T15:45Z"
   },
   {
    "player_name": "Grayson Allen",
@@ -78,18 +85,18 @@
    "date": "2026-11-12T21:35Z"
   },
   {
-   "player_name": "Peyton Watson",
-   "team": "Cleveland Cavaliers",
-   "status": "Out",
-   "detail": "Watson (back) is out for Wednesday's game versus Memphis.",
-   "date": "2026-11-18T23:17Z"
-  },
-  {
    "player_name": "Jaylon Tyson",
    "team": "Cleveland Cavaliers",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Tyson (ankle) has been ruled out for Wednesday's game against Memphis.",
-   "date": "2026-11-18T18:21Z"
+   "date": "2026-11-19T14:45Z"
+  },
+  {
+   "player_name": "Peyton Watson",
+   "team": "Cleveland Cavaliers",
+   "status": "Day-To-Day",
+   "detail": "Watson (back) is out for Wednesday's game versus Memphis.",
+   "date": "2026-11-19T14:44Z"
   },
   {
    "player_name": "Nae'Qwan Tomlin",
@@ -108,9 +115,9 @@
   {
    "player_name": "Tobi Lawal",
    "team": "Dallas Mavericks",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Lawal is out for Wednesday's game against the Warriors due to tightness in his right groin.",
-   "date": "2026-11-18T23:59Z"
+   "date": "2026-11-19T14:51Z"
   },
   {
    "player_name": "Sergio de Larrea",
@@ -141,25 +148,25 @@
    "date": "2026-10-17T00:52Z"
   },
   {
-   "player_name": "Cade Cunningham",
-   "team": "Detroit Pistons",
-   "status": "Out",
-   "detail": "Cunningham (knee) won't play in Wednesday's game against New Orleans.",
-   "date": "2026-11-19T00:37Z"
-  },
-  {
    "player_name": "Taurean Prince",
    "team": "Detroit Pistons",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Prince (knee) is out for Wednesday's game against the Pelicans.",
-   "date": "2026-11-18T19:05Z"
+   "date": "2026-11-19T14:49Z"
   },
   {
    "player_name": "Ronald Holland II",
    "team": "Detroit Pistons",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Holland (knee) is out for Wednesday's game against the Pelicans.",
-   "date": "2026-11-18T19:04Z"
+   "date": "2026-11-19T14:49Z"
+  },
+  {
+   "player_name": "Cade Cunningham",
+   "team": "Detroit Pistons",
+   "status": "Day-To-Day",
+   "detail": "Cunningham (knee) won't play in Wednesday's game against New Orleans.",
+   "date": "2026-11-19T14:49Z"
   },
   {
    "player_name": "Duncan Robinson",
@@ -176,11 +183,18 @@
    "date": "2026-11-08T16:05Z"
   },
   {
+   "player_name": "Draymond Green",
+   "team": "Golden State Warriors",
+   "status": "Day-To-Day",
+   "detail": "Green (elbow) is available for Wednesday's game against the Mavericks.",
+   "date": "2026-11-19T14:59Z"
+  },
+  {
    "player_name": "Al Horford",
    "team": "Golden State Warriors",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Horford (back) is out for Wednesday's game against the Mavericks, but will play Thursday against the Grizzlies, Nick Friedell of The Athletic reports.",
-   "date": "2026-11-18T23:38Z"
+   "date": "2026-11-19T14:51Z"
   },
   {
    "player_name": "Brandon Williams",
@@ -232,18 +246,18 @@
    "date": "2026-11-17T20:58Z"
   },
   {
+   "player_name": "Andrew Nembhard",
+   "team": "Indiana Pacers",
+   "status": "Day-To-Day",
+   "detail": "Nembhard (hip) won't play in Wednesday's game against the Rockets, Tony East of Forbes.com reports.",
+   "date": "2026-11-19T14:45Z"
+  },
+  {
    "player_name": "Braden Smith",
    "team": "Indiana Pacers",
    "status": "Day-To-Day",
    "detail": "Smith suffered a right ankle sprain during Wednesday's game against the Wizards, Tony East of Forbes.com reports.",
    "date": "2026-11-19T02:52Z"
-  },
-  {
-   "player_name": "Andrew Nembhard",
-   "team": "Indiana Pacers",
-   "status": "Out",
-   "detail": "Nembhard (hip) won't play in Wednesday's game against the Rockets, Tony East of Forbes.com reports.",
-   "date": "2026-11-18T22:27Z"
   },
   {
    "player_name": "Tyrese Haliburton",
@@ -295,18 +309,18 @@
    "date": "2026-11-19T01:38Z"
   },
   {
+   "player_name": "Isaiah Stewart",
+   "team": "Memphis Grizzlies",
+   "status": "Day-To-Day",
+   "detail": "Stewart (illness) won't play Wednesday against the Cavs.",
+   "date": "2026-11-19T14:44Z"
+  },
+  {
    "player_name": "GG Jackson",
    "team": "Memphis Grizzlies",
    "status": "Out",
    "detail": "Jackson underwent a procedure Wednesday to repair a broken fifth metatarsal in his left foot. He is expected to recover fully and will be re-evaluated in approximately three months.",
    "date": "2026-11-17T23:18Z"
-  },
-  {
-   "player_name": "Isaiah Stewart",
-   "team": "Memphis Grizzlies",
-   "status": "Out",
-   "detail": "Stewart (illness) won't play Wednesday against the Cavs.",
-   "date": "2026-11-17T22:10Z"
   },
   {
    "player_name": "Ty Jerome",
@@ -332,16 +346,16 @@
   {
    "player_name": "Myron Gardner",
    "team": "Miami Heat",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Gardner (hamstring) is out for Wednesday's game against the Bucks.",
-   "date": "2026-11-18T18:09Z"
+   "date": "2026-11-19T14:45Z"
   },
   {
    "player_name": "Ryan Rollins",
    "team": "Milwaukee Bucks",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Rollins (illness) has been ruled out for Wednesday's game at Miami.",
-   "date": "2026-11-18T18:10Z"
+   "date": "2026-11-19T14:45Z"
   },
   {
    "player_name": "Ousmane Dieng",
@@ -423,9 +437,9 @@
   {
    "player_name": "Alex Caruso",
    "team": "Oklahoma City Thunder",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Caruso won't return to Wednesday's game against the Hawks due to right hip soreness, Clemente Almanza of USA Today reports.",
-   "date": "2026-11-19T03:13Z"
+   "date": "2026-11-19T14:50Z"
   },
   {
    "player_name": "Thomas Sorber",
@@ -484,18 +498,18 @@
    "date": "2026-10-24T16:47Z"
   },
   {
-   "player_name": "Tyrese Maxey",
-   "team": "Philadelphia 76ers",
-   "status": "Out",
-   "detail": "Maxey (foot) is out for Wednesday's game in Orlando, Ky Carlin of USA Today reports.",
-   "date": "2026-11-18T23:33Z"
-  },
-  {
    "player_name": "Dean Wade",
    "team": "Philadelphia 76ers",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Wade (hamstring) is out for Wednesday's game in Orlando.",
-   "date": "2026-11-18T23:19Z"
+   "date": "2026-11-19T14:47Z"
+  },
+  {
+   "player_name": "Tyrese Maxey",
+   "team": "Philadelphia 76ers",
+   "status": "Day-To-Day",
+   "detail": "Maxey (foot) is out for Wednesday's game in Orlando, Ky Carlin of USA Today reports.",
+   "date": "2026-11-19T14:46Z"
   },
   {
    "player_name": "Jaylen Brown",
@@ -533,6 +547,13 @@
    "date": "2026-09-11T16:03Z"
   },
   {
+   "player_name": "Chris Youngblood",
+   "team": "Portland Trail Blazers",
+   "status": "Out",
+   "detail": "Youngblood (heel) has been ruled out for Thursday's game against the Bucks.",
+   "date": "2026-11-19T15:06Z"
+  },
+  {
    "player_name": "Robert Williams III",
    "team": "Portland Trail Blazers",
    "status": "Out",
@@ -552,13 +573,6 @@
    "status": "Day-To-Day",
    "detail": "Camara is questionable to play Thursday against the Bucks due to general soreness.",
    "date": "2026-11-18T22:53Z"
-  },
-  {
-   "player_name": "Chris Youngblood",
-   "team": "Portland Trail Blazers",
-   "status": "Out",
-   "detail": "Youngblood (heel) has been ruled out for Tuesday's game at Minnesota.",
-   "date": "2026-11-17T19:19Z"
   },
   {
    "player_name": "Vit Krejci",
@@ -617,25 +631,25 @@
    "date": "2026-10-05T21:43Z"
   },
   {
+   "player_name": "RJ Barrett",
+   "team": "Toronto Raptors",
+   "status": "Day-To-Day",
+   "detail": "Barrett (hamstring) is out for Wednesday's game against the Wizards, Michael Grange of Sportsnet.ca reports.",
+   "date": "2026-11-19T14:48Z"
+  },
+  {
+   "player_name": "Scottie Barnes",
+   "team": "Toronto Raptors",
+   "status": "Day-To-Day",
+   "detail": "Barnes (injury management) has been ruled out for Wednesday's game against Washington, Esfandiar Baraheni of The Athletic reports.",
+   "date": "2026-11-19T14:48Z"
+  },
+  {
    "player_name": "Collin Murray-Boyles",
    "team": "Toronto Raptors",
    "status": "Day-To-Day",
    "detail": "Murray-Boyles will not return to Wednesday's game against the Wizards due to an illness, Blake Murphy of Sportsnet.ca reports.",
    "date": "2026-11-19T01:34Z"
-  },
-  {
-   "player_name": "RJ Barrett",
-   "team": "Toronto Raptors",
-   "status": "Out",
-   "detail": "Barrett (hamstring) is out for Wednesday's game against the Wizards, Michael Grange of Sportsnet.ca reports.",
-   "date": "2026-11-18T22:55Z"
-  },
-  {
-   "player_name": "Scottie Barnes",
-   "team": "Toronto Raptors",
-   "status": "Out",
-   "detail": "Barnes (injury management) has been ruled out for Wednesday's game against Washington, Esfandiar Baraheni of The Athletic reports.",
-   "date": "2026-11-18T17:46Z"
   },
   {
    "player_name": "Kawhi Leonard",
@@ -708,6 +722,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-19T09:30:35Z",
+ "_generated_utc": "2026-11-19T16:01:50Z",
  "source": "espn"
 }
