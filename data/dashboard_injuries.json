@@ -78,6 +78,13 @@
    "date": "2026-11-08T22:26Z"
   },
   {
+   "player_name": "Jalen Smith",
+   "team": "Chicago Bulls",
+   "status": "Day-To-Day",
+   "detail": "Smith (illness) has been downgraded to questionable for Friday's game against the Wizards.",
+   "date": "2026-11-20T17:41Z"
+  },
+  {
    "player_name": "Noa Essengue",
    "team": "Chicago Bulls",
    "status": "Day-To-Day",
@@ -127,6 +134,13 @@
    "date": "2026-11-16T22:06Z"
   },
   {
+   "player_name": "Dereck Lively II",
+   "team": "Dallas Mavericks",
+   "status": "Out",
+   "detail": "Head coach Dusty May said Friday that Lively (foot) is moving well and progressing in his recovery, and the big man told May he's \"close\" to returning, Mike Curtis of The Dallas Morning News reports.",
+   "date": "2026-11-20T19:31Z"
+  },
+  {
    "player_name": "Tobi Lawal",
    "team": "Dallas Mavericks",
    "status": "Day-To-Day",
@@ -139,13 +153,6 @@
    "status": "Out",
    "detail": "De Larrea (knee) is listed as out for Wednesday's game against the Warriors.",
    "date": "2026-11-17T22:53Z"
-  },
-  {
-   "player_name": "Dereck Lively II",
-   "team": "Dallas Mavericks",
-   "status": "Out",
-   "detail": "Lively (foot) is out for Wednesday's game against the Warriors.",
-   "date": "2026-11-17T22:45Z"
   },
   {
    "player_name": "Tarik Biberovic",
@@ -162,6 +169,13 @@
    "date": "2026-10-17T00:52Z"
   },
   {
+   "player_name": "Ronald Holland II",
+   "team": "Detroit Pistons",
+   "status": "Day-To-Day",
+   "detail": "Holland (knee) has been upgraded to doubtful for Friday's game against Toronto, Hunter Patterson of The Athletic reports.",
+   "date": "2026-11-20T17:46Z"
+  },
+  {
    "player_name": "Taurean Prince",
    "team": "Detroit Pistons",
    "status": "Out",
@@ -174,13 +188,6 @@
    "status": "Out",
    "detail": "Okorie (oblique) has been ruled out for Friday's game against Toronto.",
    "date": "2026-11-19T21:43Z"
-  },
-  {
-   "player_name": "Ronald Holland II",
-   "team": "Detroit Pistons",
-   "status": "Out",
-   "detail": "Holland (knee) won't play in Friday's game against the Raptors, Blake Murphy of Sportsnet.ca reports.",
-   "date": "2026-11-19T21:41Z"
   },
   {
    "player_name": "Cade Cunningham",
@@ -470,6 +477,13 @@
    "date": "2026-11-13T20:19Z"
   },
   {
+   "player_name": "Nikola Topic",
+   "team": "Oklahoma City Thunder",
+   "status": "Out",
+   "detail": "Topic (hip) is out for Friday's game against New Orleans.",
+   "date": "2026-11-20T17:02Z"
+  },
+  {
    "player_name": "Alex Caruso",
    "team": "Oklahoma City Thunder",
    "status": "Day-To-Day",
@@ -533,39 +547,32 @@
    "date": "2026-10-24T16:47Z"
   },
   {
-   "player_name": "Dean Wade",
+   "player_name": "Adem Bona",
    "team": "Philadelphia 76ers",
-   "status": "Day-To-Day",
-   "detail": "Wade (hamstring) is out for Wednesday's game in Orlando.",
-   "date": "2026-11-19T14:47Z"
+   "status": "Out",
+   "detail": "Bona (back) participated in Friday's practice, though he still needs to go through a full practice with contact before being cleared to return to game action, Adam Aaronson of PhillyVoice.com reports.",
+   "date": "2026-11-20T17:33Z"
   },
   {
    "player_name": "Tyrese Maxey",
    "team": "Philadelphia 76ers",
    "status": "Day-To-Day",
-   "detail": "Maxey (foot) is out for Wednesday's game in Orlando, Ky Carlin of USA Today reports.",
-   "date": "2026-11-19T14:46Z"
+   "detail": "Maxey (foot) was a full participant in Friday's practice, Tony Jones of The Athletic reports.",
+   "date": "2026-11-20T17:28Z"
   },
   {
    "player_name": "Jaylen Brown",
    "team": "Philadelphia 76ers",
    "status": "Out",
-   "detail": "Brown (hamstring) will be re-evaluated at some point this weekend, per Kris Rihm of ESPN.com.",
-   "date": "2026-11-18T22:21Z"
+   "detail": "Brown (hamstring) went through individual work during Friday's practice, Tony Jones of The Athletic reports.",
+   "date": "2026-11-20T17:26Z"
   },
   {
    "player_name": "Dominick Barlow",
    "team": "Philadelphia 76ers",
    "status": "Out",
-   "detail": "Barlow (back) is out for Wednesday's game against Orlando.",
-   "date": "2026-11-17T22:12Z"
-  },
-  {
-   "player_name": "Adem Bona",
-   "team": "Philadelphia 76ers",
-   "status": "Out",
-   "detail": "Bona (back) will be re-evaluated in approximately one week after seeing a specialist, Ky Carlin of USA Today reports.",
-   "date": "2026-11-12T16:36Z"
+   "detail": "Barlow (back) is trending toward making his season debut in Saturday's game against the Bucks, Tony Jones of The Athletic reports.",
+   "date": "2026-11-20T17:20Z"
   },
   {
    "player_name": "Ariel Hukporti",
@@ -757,6 +764,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-20T09:11:13Z",
+ "_generated_utc": "2026-11-20T20:22:17Z",
  "source": "espn"
 }
