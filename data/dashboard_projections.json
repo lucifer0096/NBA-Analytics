@@ -14488,7 +14488,7 @@
    "opponent_id": 25,
    "is_home": false,
    "position": "F",
-   "projected_points": 33.2956450412
+   "projected_points": 33.3147143003
   },
   {
    "game_id": "401909319",
@@ -26907,7 +26907,7 @@
    "opponent_id": 23,
    "is_home": false,
    "position": "F",
-   "projected_points": 30.7857647382
+   "projected_points": 30.8048339973
   },
   {
    "game_id": "401910060",
@@ -32352,7 +32352,7 @@
    "opponent_id": 22,
    "is_home": false,
    "position": "F",
-   "projected_points": 28.8059140767
+   "projected_points": 28.8249833358
   },
   {
    "game_id": "401910074",
@@ -38526,6 +38526,6 @@
    "projected_points": 1.5776392405
   }
  ],
- "_generated_utc": "2026-11-20T09:14:12Z",
+ "_generated_utc": "2026-11-20T15:46:03Z",
  "source": "local"
 }

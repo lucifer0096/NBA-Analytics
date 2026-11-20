@@ -786,6 +786,34 @@
    "ts": 66.6
   },
   {
+   "player_id": 4431671,
+   "player_name": "Jaden McDaniels",
+   "team_abbrev": "MIN",
+   "games": 16,
+   "minutes": 542,
+   "fantasy_points": 553.0,
+   "pts": 273,
+   "reb": 96,
+   "oreb": 29,
+   "dreb": 67,
+   "ast": 57,
+   "stl": 19,
+   "blk": 16,
+   "to": 35,
+   "fgm": 112,
+   "fga": 210,
+   "fg3m": 24,
+   "fg3a": 68,
+   "ftm": 25,
+   "fta": 29,
+   "plus_minus": 151,
+   "fgp": 53.3,
+   "fg3p": 35.3,
+   "ftp": 86.2,
+   "efg": 59.0,
+   "ts": 61.3
+  },
+  {
    "player_id": 4845367,
    "player_name": "Stephon Castle",
    "team_abbrev": "SA",
@@ -812,34 +840,6 @@
    "ftp": 78.6,
    "efg": 50.2,
    "ts": 53.3
-  },
-  {
-   "player_id": 4431671,
-   "player_name": "Jaden McDaniels",
-   "team_abbrev": "MIN",
-   "games": 16,
-   "minutes": 542,
-   "fantasy_points": 552.0,
-   "pts": 273,
-   "reb": 95,
-   "oreb": 29,
-   "dreb": 66,
-   "ast": 57,
-   "stl": 19,
-   "blk": 16,
-   "to": 35,
-   "fgm": 112,
-   "fga": 210,
-   "fg3m": 24,
-   "fg3a": 68,
-   "ftm": 25,
-   "fta": 29,
-   "plus_minus": 151,
-   "fgp": 53.3,
-   "fg3p": 35.3,
-   "ftp": 86.2,
-   "efg": 59.0,
-   "ts": 61.3
   },
   {
    "player_id": 4433136,
@@ -13246,6 +13246,6 @@
    "ts": null
   }
  ],
- "_generated_utc": "2026-11-20T14:22:50Z",
+ "_generated_utc": "2026-11-20T15:44:33Z",
  "source": "local"
 }
