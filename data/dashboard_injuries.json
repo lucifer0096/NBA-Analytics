@@ -73,16 +73,16 @@
   {
    "player_name": "Grant Williams",
    "team": "Charlotte Hornets",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Williams (hamstring) is listed as out for Friday's game versus the Hawks.",
-   "date": "2026-11-19T22:21Z"
+   "date": "2026-11-21T14:49Z"
   },
   {
    "player_name": "Grayson Allen",
    "team": "Charlotte Hornets",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Allen (concussion) has been ruled out for Friday's game against Atlanta.",
-   "date": "2026-11-19T22:02Z"
+   "date": "2026-11-21T14:49Z"
   },
   {
    "player_name": "Kon Knueppel",
@@ -190,6 +190,13 @@
    "date": "2026-10-17T00:52Z"
   },
   {
+   "player_name": "Ebuka Okorie",
+   "team": "Detroit Pistons",
+   "status": "Day-To-Day",
+   "detail": "Okorie (oblique) has been ruled out for Friday's game against Toronto.",
+   "date": "2026-11-21T14:53Z"
+  },
+  {
    "player_name": "Ronald Holland II",
    "team": "Detroit Pistons",
    "status": "Out",
@@ -202,13 +209,6 @@
    "status": "Out",
    "detail": "Prince (knee) underwent surgery to address lingering issues and has no timeline for a return, Hunter Patterson of The Athletic reports.",
    "date": "2026-11-20T23:02Z"
-  },
-  {
-   "player_name": "Ebuka Okorie",
-   "team": "Detroit Pistons",
-   "status": "Out",
-   "detail": "Okorie (oblique) has been ruled out for Friday's game against Toronto.",
-   "date": "2026-11-19T21:43Z"
   },
   {
    "player_name": "Ugonna Onyenso",
@@ -626,9 +626,9 @@
   {
    "player_name": "Precious Achiuwa",
    "team": "Sacramento Kings",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Achiuwa (lower leg) has been ruled out for Friday's game against the Lakers.",
-   "date": "2026-11-20T21:21Z"
+   "date": "2026-11-21T14:55Z"
   },
   {
    "player_name": "Maxime Raynaud",
@@ -666,18 +666,18 @@
    "date": "2026-10-05T21:43Z"
   },
   {
+   "player_name": "Collin Murray-Boyles",
+   "team": "Toronto Raptors",
+   "status": "Day-To-Day",
+   "detail": "Murray-Boyles (concussion) has been ruled out for Friday's game against the Pistons.",
+   "date": "2026-11-21T14:52Z"
+  },
+  {
    "player_name": "Kawhi Leonard",
    "team": "Toronto Raptors",
    "status": "Out",
    "detail": "Leonard (knee) could return in the next few weeks, per Shams Charania of ESPN.",
    "date": "2026-11-20T20:42Z"
-  },
-  {
-   "player_name": "Collin Murray-Boyles",
-   "team": "Toronto Raptors",
-   "status": "Out",
-   "detail": "Murray-Boyles (concussion) has been ruled out for Friday's game against the Pistons.",
-   "date": "2026-11-19T21:41Z"
   },
   {
    "player_name": "RJ Barrett",
@@ -717,9 +717,9 @@
   {
    "player_name": "Felix Okpara",
    "team": "Washington Wizards",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Okpara (illness) is available for Friday's game against Toronto.",
-   "date": "2026-11-21T00:43Z"
+   "date": "2026-11-21T14:54Z"
   },
   {
    "player_name": "Tristan Vukcevic",
@@ -750,6 +750,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-21T08:46:46Z",
+ "_generated_utc": "2026-11-21T14:56:27Z",
  "source": "espn"
 }
