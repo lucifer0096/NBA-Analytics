@@ -50,18 +50,18 @@
    "date": "2026-11-22T20:58Z"
   },
   {
+   "player_name": "Nolan Traore",
+   "team": "Brooklyn Nets",
+   "status": "Out",
+   "detail": "Traore will be re-evaluated in approximately 8-10 weeks due to a right hamstring strain, Michael Scotto of HoopsHype.com reports.",
+   "date": "2026-11-23T15:22Z"
+  },
+  {
    "player_name": "Grant Nelson",
    "team": "Brooklyn Nets",
    "status": "Day-To-Day",
    "detail": "Nelson (ankle) is probable for Monday's game against the Timberwolves.",
    "date": "2026-11-22T20:39Z"
-  },
-  {
-   "player_name": "Nolan Traore",
-   "team": "Brooklyn Nets",
-   "status": "Out",
-   "detail": "Traore (hamstring) has been ruled out for Monday's game against the Timberwolves.",
-   "date": "2026-11-22T20:37Z"
   },
   {
    "player_name": "Grayson Allen",
@@ -729,6 +729,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-23T15:20:25Z",
+ "_generated_utc": "2026-11-23T16:30:15Z",
  "source": "espn"
 }
