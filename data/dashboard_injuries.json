@@ -36,18 +36,11 @@
    "date": "2026-09-21T19:50Z"
   },
   {
-   "player_name": "Paul George",
-   "team": "Boston Celtics",
-   "status": "Day-To-Day",
-   "detail": "George (rest) has been ruled out for Sunday's game against Golden State, Justin Turpin of WEEI.com reports.",
-   "date": "2026-11-23T15:07Z"
-  },
-  {
    "player_name": "Mitchell Robinson",
    "team": "Boston Celtics",
    "status": "Out",
-   "detail": "Robinson (illness) has been ruled out for Sunday's game against Golden State, Justin Turpin of WEEI.com reports.",
-   "date": "2026-11-22T20:58Z"
+   "detail": "Robinson (illness) is out for Tuesday's game against Washington, Taylor Snow of the Celtics' official site reports.",
+   "date": "2026-11-23T21:09Z"
   },
   {
    "player_name": "Nolan Traore",
@@ -61,13 +54,6 @@
    "team": "Charlotte Hornets",
    "status": "Out",
    "detail": "Allen (concussion) has been ruled out for Monday's game against the Grizzlies.",
-   "date": "2026-11-22T22:08Z"
-  },
-  {
-   "player_name": "Brandon Miller",
-   "team": "Charlotte Hornets",
-   "status": "Day-To-Day",
-   "detail": "Miller is probable for Monday's game against the Grizzlies due to a right knee contusion.",
    "date": "2026-11-22T22:08Z"
   },
   {
@@ -90,13 +76,6 @@
    "status": "Out",
    "detail": "Schroder has been diagnosed with a left hamstring strain and will be reevaluated in two weeks, Michael Scotto of HoopsHype.com reports.",
    "date": "2026-11-08T22:26Z"
-  },
-  {
-   "player_name": "Nic Claxton",
-   "team": "Chicago Bulls",
-   "status": "Day-To-Day",
-   "detail": "Claxton (illness) won't play in Sunday's game against the Nuggets.",
-   "date": "2026-11-23T15:06Z"
   },
   {
    "player_name": "Norman Powell",
@@ -134,18 +113,18 @@
    "date": "2026-11-16T22:06Z"
   },
   {
-   "player_name": "P.J. Washington",
-   "team": "Dallas Mavericks",
-   "status": "Day-To-Day",
-   "detail": "Washington (illness) has been ruled out for Sunday's game against the Jazz.",
-   "date": "2026-11-23T15:05Z"
-  },
-  {
    "player_name": "Tobi Lawal",
    "team": "Dallas Mavericks",
    "status": "Out",
-   "detail": "Lawal (groin) has been ruled out for Sunday's game against the Jazz.",
-   "date": "2026-11-22T19:04Z"
+   "detail": "Lawal (groin) is out for Tuesday's game against Denver.",
+   "date": "2026-11-23T23:25Z"
+  },
+  {
+   "player_name": "P.J. Washington",
+   "team": "Dallas Mavericks",
+   "status": "Day-To-Day",
+   "detail": "Washington (illness) is questionable for Tuesday's game against the Nuggets.",
+   "date": "2026-11-23T23:21Z"
   },
   {
    "player_name": "Dereck Lively II",
@@ -178,9 +157,23 @@
   {
    "player_name": "Ebuka Okorie",
    "team": "Detroit Pistons",
+   "status": "Out",
+   "detail": "Okorie (oblique) won't play Tuesday in Orlando.",
+   "date": "2026-11-23T22:10Z"
+  },
+  {
+   "player_name": "Jalen Duren",
+   "team": "Detroit Pistons",
+   "status": "Out",
+   "detail": "Duren (hamstring) has been ruled out for Tuesday's game against the Magic.",
+   "date": "2026-11-23T22:08Z"
+  },
+  {
+   "player_name": "Cade Cunningham",
+   "team": "Detroit Pistons",
    "status": "Day-To-Day",
-   "detail": "Okorie (oblique) is out for Sunday's game in Atlanta.",
-   "date": "2026-11-22T22:57Z"
+   "detail": "Cunningham (knee) is probable for Tuesday's game against the Orlando.",
+   "date": "2026-11-23T22:07Z"
   },
   {
    "player_name": "Taurean Prince",
@@ -197,18 +190,11 @@
    "date": "2026-11-17T16:25Z"
   },
   {
-   "player_name": "Jalen Duren",
-   "team": "Detroit Pistons",
-   "status": "Out",
-   "detail": "Duren (hamstring) has begun on-court activity and will be re-evaluated in two weeks, Hunter Patterson of The Athletic reports.",
-   "date": "2026-11-08T16:05Z"
-  },
-  {
    "player_name": "Brandon Williams",
    "team": "Golden State Warriors",
    "status": "Out",
-   "detail": "Williams (hamstring) is out for Sunday's game against the Celtics.",
-   "date": "2026-11-22T06:10Z"
+   "detail": "Head coach Steve Kerr said Monday that Williams (hamstring) is on track to return Wednesday against the Kings, Kenzo Fukuda of ClutchPoints.com reports.",
+   "date": "2026-11-23T20:52Z"
   },
   {
    "player_name": "Stephen Curry",
@@ -250,13 +236,6 @@
    "team": "Indiana Pacers",
    "status": "Out",
    "detail": "Nesmith is out for Monday's game against the Thunder due to right foot soreness.",
-   "date": "2026-11-23T18:22Z"
-  },
-  {
-   "player_name": "Pascal Siakam",
-   "team": "Indiana Pacers",
-   "status": "Day-To-Day",
-   "detail": "Siakam is questionable for Monday's game against Oklahoma City due to left hip injury management, according to the NBA's injury report.",
    "date": "2026-11-23T18:22Z"
   },
   {
@@ -302,18 +281,18 @@
    "date": "2026-11-23T01:09Z"
   },
   {
+   "player_name": "Cameron Boozer",
+   "team": "Memphis Grizzlies",
+   "status": "Out",
+   "detail": "Boozer (ankle) will be re-evaluated in four weeks, Brett Siegel of ClutchPoints.com reports.",
+   "date": "2026-11-23T23:07Z"
+  },
+  {
    "player_name": "Jerami Grant",
    "team": "Memphis Grizzlies",
    "status": "Out",
    "detail": "Grant was diagnosed with a grade 1 left calf strain and will be re-evaluated in two weeks.",
    "date": "2026-11-23T04:04Z"
-  },
-  {
-   "player_name": "Cameron Boozer",
-   "team": "Memphis Grizzlies",
-   "status": "Out",
-   "detail": "Boozer (ankle) won't play Monday's game against the Hornets.",
-   "date": "2026-11-22T22:18Z"
   },
   {
    "player_name": "GG Jackson",
@@ -365,20 +344,6 @@
    "date": "2026-10-05T20:53Z"
   },
   {
-   "player_name": "Trey Murphy III",
-   "team": "New Orleans Pelicans",
-   "status": "Day-To-Day",
-   "detail": "Murphy (knees) is listed as probable for Monday's game against the Suns.",
-   "date": "2026-11-22T21:02Z"
-  },
-  {
-   "player_name": "Bryce McGowens",
-   "team": "New Orleans Pelicans",
-   "status": "Out",
-   "detail": "McGowens (elbow) is listed as probable for Monday's game against Phoenix.",
-   "date": "2026-11-22T20:53Z"
-  },
-  {
    "player_name": "Zion Williamson",
    "team": "New Orleans Pelicans",
    "status": "Day-To-Day",
@@ -428,39 +393,39 @@
    "date": "2026-11-22T18:05Z"
   },
   {
-   "player_name": "Aday Mara",
-   "team": "Oklahoma City Thunder",
-   "status": "Day-To-Day",
-   "detail": "Mara (shin) is listed as out for Sunday's game versus Miami.",
-   "date": "2026-11-23T15:04Z"
-  },
-  {
    "player_name": "Jaylin Williams",
    "team": "Oklahoma City Thunder",
-   "status": "Day-To-Day",
-   "detail": "Williams (back) is listed as out for Sunday's game against Miami.",
-   "date": "2026-11-23T15:03Z"
+   "status": "Out",
+   "detail": "Williams (back) has been ruled out for Monday's game against the Pacers",
+   "date": "2026-11-23T19:09Z"
   },
   {
    "player_name": "Nikola Topic",
    "team": "Oklahoma City Thunder",
-   "status": "Day-To-Day",
-   "detail": "Topic (hip) is listed as out for Sunday's game versus the Heat.",
-   "date": "2026-11-23T15:03Z"
+   "status": "Out",
+   "detail": "Topic (hip) has been ruled out for Monday's game against the Pacers, according to the NBA's official injury report.",
+   "date": "2026-11-23T18:49Z"
   },
   {
-   "player_name": "Shai Gilgeous-Alexander",
+   "player_name": "Aday Mara",
    "team": "Oklahoma City Thunder",
-   "status": "Day-To-Day",
-   "detail": "Gilgeous-Alexander (back/neck) is listed as out for Sunday's game against the Heat.",
-   "date": "2026-11-23T15:03Z"
+   "status": "Out",
+   "detail": "Mara (shin) has been ruled out for Monday's game against the Pacers.",
+   "date": "2026-11-23T18:45Z"
+  },
+  {
+   "player_name": "Jalen Williams",
+   "team": "Oklahoma City Thunder",
+   "status": "Out",
+   "detail": "Williams (ankle) has been ruled out for Monday's game against the Pacers, according to the NBA's official injury report.",
+   "date": "2026-11-23T18:43Z"
   },
   {
    "player_name": "Alex Caruso",
    "team": "Oklahoma City Thunder",
-   "status": "Day-To-Day",
-   "detail": "Caruso (hip) won't play Sunday against the Heat.",
-   "date": "2026-11-23T15:03Z"
+   "status": "Out",
+   "detail": "Caruso (hip) has been ruled out for Monday's game against the Pacers, according to the NBA's official injury report.",
+   "date": "2026-11-23T18:38Z"
   },
   {
    "player_name": "Thomas Sorber",
@@ -482,13 +447,6 @@
    "status": "Out",
    "detail": "Holmgren underwent a biological treatment Friday to address a small patellar tendon tear and will miss at least 8-10 weeks, Nick Crain of Slam reports.",
    "date": "2026-10-31T01:02Z"
-  },
-  {
-   "player_name": "Jalen Williams",
-   "team": "Oklahoma City Thunder",
-   "status": "Out",
-   "detail": "Williams (leg) underwent successful surgery Wednesday to \"address a fractured left fibula and reconstruction of ankle ligaments following a fracture and dislocation.\" He will be re-evaluated before the end of the regular season, Tim MacMahon of ESPN.com reports.",
-   "date": "2026-10-28T23:41Z"
   },
   {
    "player_name": "Jonathan Isaac",
@@ -521,30 +479,9 @@
   {
    "player_name": "Joel Embiid",
    "team": "Philadelphia 76ers",
-   "status": "Day-To-Day",
-   "detail": "Embiid (knee) has been downgraded to questionable for Monday's game against Portland.",
-   "date": "2026-11-23T16:49Z"
-  },
-  {
-   "player_name": "Adem Bona",
-   "team": "Philadelphia 76ers",
    "status": "Out",
-   "detail": "Bona (back) is listed as probable for Monday's game against the Trail Blazers.",
-   "date": "2026-11-22T22:22Z"
-  },
-  {
-   "player_name": "Jaylen Brown",
-   "team": "Philadelphia 76ers",
-   "status": "Day-To-Day",
-   "detail": "Brown (hamstring) is listed as probable for Monday's game versus Portland.",
-   "date": "2026-11-22T22:17Z"
-  },
-  {
-   "player_name": "Dean Wade",
-   "team": "Philadelphia 76ers",
-   "status": "Day-To-Day",
-   "detail": "Wade (hamstring) is listed as probable for Monday's game against Portland.",
-   "date": "2026-11-22T22:15Z"
+   "detail": "Embiid (illness) is out for Monday's game against Portland, Austin Krell of OnPattison.com reports.",
+   "date": "2026-11-23T22:49Z"
   },
   {
    "player_name": "Ariel Hukporti",
@@ -552,13 +489,6 @@
    "status": "Out",
    "detail": "Hukporti has sustained a season-ending ruptured right Achilles tendon, per Shams Charania of ESPN.",
    "date": "2026-10-06T19:17Z"
-  },
-  {
-   "player_name": "Ryan Dunn",
-   "team": "Phoenix Suns",
-   "status": "Day-To-Day",
-   "detail": "Dunn (quadriceps) is listed as questionable for Monday's game against the Pelicans.",
-   "date": "2026-11-22T23:24Z"
   },
   {
    "player_name": "Mark Williams",
@@ -652,20 +582,6 @@
    "date": "2026-10-05T21:43Z"
   },
   {
-   "player_name": "Jaden Bradley",
-   "team": "Toronto Raptors",
-   "status": "Day-To-Day",
-   "detail": "Bradley is questionable for Monday's game against the Bucks due to an ankle sprain, Blake Murphy of Sportsnet.ca reports.",
-   "date": "2026-11-23T17:37Z"
-  },
-  {
-   "player_name": "Collin Murray-Boyles",
-   "team": "Toronto Raptors",
-   "status": "Day-To-Day",
-   "detail": "Murray-Boyles (concussion) is listed as probable for Monday's game against Milwaukee, Blake Murphy of Sportsnet.ca reports.",
-   "date": "2026-11-22T21:15Z"
-  },
-  {
    "player_name": "Nate Bittle",
    "team": "Toronto Raptors",
    "status": "Out",
@@ -689,9 +605,9 @@
   {
    "player_name": "Jaxson Hayes",
    "team": "Utah Jazz",
-   "status": "Day-To-Day",
-   "detail": "Hayes (knee) has been ruled out for the remainder of Sunday's game against the Mavericks, Grant Afseth of DallasHoopsJournal.com reports.",
-   "date": "2026-11-23T15:06Z"
+   "status": "Out",
+   "detail": "Hayes (knee) has been ruled out for Monday's game against the Lakers.",
+   "date": "2026-11-23T21:04Z"
   },
   {
    "player_name": "Jusuf Nurkic",
@@ -718,8 +634,8 @@
    "player_name": "Tristan Vukcevic",
    "team": "Washington Wizards",
    "status": "Out",
-   "detail": "Vukcevic (hip) has been ruled out for Monday's game against Memphis.",
-   "date": "2026-11-16T18:14Z"
+   "detail": "Vukcevic (hip) has been ruled out for Tuesday's game against Boston.",
+   "date": "2026-11-23T22:10Z"
   },
   {
    "player_name": "Reece Beekman",
@@ -743,6 +659,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-23T18:43:00Z",
+ "_generated_utc": "2026-11-23T23:55:15Z",
  "source": "espn"
 }

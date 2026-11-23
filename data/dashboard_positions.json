@@ -2761,6 +2761,12 @@
    "team_id": 23
   },
   {
+   "player_id": 3137259,
+   "player_name": "Gabe Vincent",
+   "position": "G",
+   "team_id": 23
+  },
+  {
    "player_id": 6578,
    "player_name": "Harrison Barnes",
    "position": "F",
@@ -3187,6 +3193,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-18T20:32:53Z",
+ "_generated_utc": "2026-11-23T23:55:15Z",
  "source": "local"
 }
