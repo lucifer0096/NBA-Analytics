@@ -36,18 +36,18 @@
    "date": "2026-09-21T19:50Z"
   },
   {
+   "player_name": "Paul George",
+   "team": "Boston Celtics",
+   "status": "Day-To-Day",
+   "detail": "George (rest) has been ruled out for Sunday's game against Golden State, Justin Turpin of WEEI.com reports.",
+   "date": "2026-11-23T15:07Z"
+  },
+  {
    "player_name": "Mitchell Robinson",
    "team": "Boston Celtics",
    "status": "Out",
    "detail": "Robinson (illness) has been ruled out for Sunday's game against Golden State, Justin Turpin of WEEI.com reports.",
    "date": "2026-11-22T20:58Z"
-  },
-  {
-   "player_name": "Paul George",
-   "team": "Boston Celtics",
-   "status": "Out",
-   "detail": "George (rest) has been ruled out for Sunday's game against Golden State, Justin Turpin of WEEI.com reports.",
-   "date": "2026-11-22T20:56Z"
   },
   {
    "player_name": "Grant Nelson",
@@ -101,9 +101,9 @@
   {
    "player_name": "Nic Claxton",
    "team": "Chicago Bulls",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Claxton (illness) won't play in Sunday's game against the Nuggets.",
-   "date": "2026-11-22T20:22Z"
+   "date": "2026-11-23T15:06Z"
   },
   {
    "player_name": "Norman Powell",
@@ -143,9 +143,9 @@
   {
    "player_name": "P.J. Washington",
    "team": "Dallas Mavericks",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Washington (illness) has been ruled out for Sunday's game against the Jazz.",
-   "date": "2026-11-22T22:24Z"
+   "date": "2026-11-23T15:05Z"
   },
   {
    "player_name": "Tobi Lawal",
@@ -248,9 +248,9 @@
   {
    "player_name": "T.J. McConnell",
    "team": "Indiana Pacers",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "McConnell (hamstring) is listed as out for Sunday's game in New York.",
-   "date": "2026-11-21T22:29Z"
+   "date": "2026-11-23T15:06Z"
   },
   {
    "player_name": "Tyrese Haliburton",
@@ -332,9 +332,9 @@
   {
    "player_name": "Giannis Antetokounmpo",
    "team": "Miami Heat",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Antetokounmpo (groin) won't play in Sunday's game against Oklahoma City, Clemente Almanza of USA Today reports.",
-   "date": "2026-11-22T22:09Z"
+   "date": "2026-11-23T15:04Z"
   },
   {
    "player_name": "Ousmane Dieng",
@@ -409,16 +409,16 @@
   {
    "player_name": "Miles McBride",
    "team": "New York Knicks",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "McBride (abdomen) has been ruled out for Sunday's game against the Pacers.",
-   "date": "2026-11-23T00:04Z"
+   "date": "2026-11-23T15:07Z"
   },
   {
    "player_name": "OG Anunoby",
    "team": "New York Knicks",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Anunoby (calf) won't play Sunday against the Pacers.",
-   "date": "2026-11-22T18:13Z"
+   "date": "2026-11-23T15:07Z"
   },
   {
    "player_name": "Jordan Clarkson",
@@ -430,37 +430,37 @@
   {
    "player_name": "Aday Mara",
    "team": "Oklahoma City Thunder",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Mara (shin) is listed as out for Sunday's game versus Miami.",
-   "date": "2026-11-22T22:35Z"
-  },
-  {
-   "player_name": "Shai Gilgeous-Alexander",
-   "team": "Oklahoma City Thunder",
-   "status": "Out",
-   "detail": "Gilgeous-Alexander (back/neck) is listed as out for Sunday's game against the Heat.",
-   "date": "2026-11-22T21:35Z"
-  },
-  {
-   "player_name": "Nikola Topic",
-   "team": "Oklahoma City Thunder",
-   "status": "Out",
-   "detail": "Topic (hip) is listed as out for Sunday's game versus the Heat.",
-   "date": "2026-11-21T22:39Z"
+   "date": "2026-11-23T15:04Z"
   },
   {
    "player_name": "Jaylin Williams",
    "team": "Oklahoma City Thunder",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Williams (back) is listed as out for Sunday's game against Miami.",
-   "date": "2026-11-21T22:34Z"
+   "date": "2026-11-23T15:03Z"
+  },
+  {
+   "player_name": "Nikola Topic",
+   "team": "Oklahoma City Thunder",
+   "status": "Day-To-Day",
+   "detail": "Topic (hip) is listed as out for Sunday's game versus the Heat.",
+   "date": "2026-11-23T15:03Z"
+  },
+  {
+   "player_name": "Shai Gilgeous-Alexander",
+   "team": "Oklahoma City Thunder",
+   "status": "Day-To-Day",
+   "detail": "Gilgeous-Alexander (back/neck) is listed as out for Sunday's game against the Heat.",
+   "date": "2026-11-23T15:03Z"
   },
   {
    "player_name": "Alex Caruso",
    "team": "Oklahoma City Thunder",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Caruso (hip) won't play Sunday against the Heat.",
-   "date": "2026-11-21T22:29Z"
+   "date": "2026-11-23T15:03Z"
   },
   {
    "player_name": "Thomas Sorber",
@@ -675,9 +675,9 @@
   {
    "player_name": "Jaxson Hayes",
    "team": "Utah Jazz",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Hayes (knee) has been ruled out for the remainder of Sunday's game against the Mavericks, Grant Afseth of DallasHoopsJournal.com reports.",
-   "date": "2026-11-23T01:16Z"
+   "date": "2026-11-23T15:06Z"
   },
   {
    "player_name": "Jusuf Nurkic",
@@ -729,6 +729,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-23T09:46:38Z",
+ "_generated_utc": "2026-11-23T15:20:25Z",
  "source": "espn"
 }
