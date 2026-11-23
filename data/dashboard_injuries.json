@@ -57,13 +57,6 @@
    "date": "2026-11-23T15:22Z"
   },
   {
-   "player_name": "Grant Nelson",
-   "team": "Brooklyn Nets",
-   "status": "Day-To-Day",
-   "detail": "Nelson (ankle) is probable for Monday's game against the Timberwolves.",
-   "date": "2026-11-22T20:39Z"
-  },
-  {
    "player_name": "Grayson Allen",
    "team": "Charlotte Hornets",
    "status": "Out",
@@ -248,9 +241,23 @@
   {
    "player_name": "T.J. McConnell",
    "team": "Indiana Pacers",
+   "status": "Out",
+   "detail": "McConnell is out for Monday's game against the Thunder due to left hamstring soreness.",
+   "date": "2026-11-23T18:25Z"
+  },
+  {
+   "player_name": "Aaron Nesmith",
+   "team": "Indiana Pacers",
+   "status": "Out",
+   "detail": "Nesmith is out for Monday's game against the Thunder due to right foot soreness.",
+   "date": "2026-11-23T18:22Z"
+  },
+  {
+   "player_name": "Pascal Siakam",
+   "team": "Indiana Pacers",
    "status": "Day-To-Day",
-   "detail": "McConnell (hamstring) is listed as out for Sunday's game in New York.",
-   "date": "2026-11-23T15:06Z"
+   "detail": "Siakam is questionable for Monday's game against Oklahoma City due to left hip injury management, according to the NBA's injury report.",
+   "date": "2026-11-23T18:22Z"
   },
   {
    "player_name": "Tyrese Haliburton",
@@ -335,13 +342,6 @@
    "status": "Day-To-Day",
    "detail": "Antetokounmpo (groin) won't play in Sunday's game against Oklahoma City, Clemente Almanza of USA Today reports.",
    "date": "2026-11-23T15:04Z"
-  },
-  {
-   "player_name": "Ousmane Dieng",
-   "team": "Milwaukee Bucks",
-   "status": "Out",
-   "detail": "Dieng (finger) is questionable for Monday's game against the Raptors.",
-   "date": "2026-11-22T21:37Z"
   },
   {
    "player_name": "Jaylen Clark",
@@ -519,6 +519,13 @@
    "date": "2026-10-24T16:47Z"
   },
   {
+   "player_name": "Joel Embiid",
+   "team": "Philadelphia 76ers",
+   "status": "Day-To-Day",
+   "detail": "Embiid (knee) has been downgraded to questionable for Monday's game against Portland.",
+   "date": "2026-11-23T16:49Z"
+  },
+  {
    "player_name": "Adem Bona",
    "team": "Philadelphia 76ers",
    "status": "Out",
@@ -645,6 +652,13 @@
    "date": "2026-10-05T21:43Z"
   },
   {
+   "player_name": "Jaden Bradley",
+   "team": "Toronto Raptors",
+   "status": "Day-To-Day",
+   "detail": "Bradley is questionable for Monday's game against the Bucks due to an ankle sprain, Blake Murphy of Sportsnet.ca reports.",
+   "date": "2026-11-23T17:37Z"
+  },
+  {
    "player_name": "Collin Murray-Boyles",
    "team": "Toronto Raptors",
    "status": "Day-To-Day",
@@ -729,6 +743,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-23T16:30:15Z",
+ "_generated_utc": "2026-11-23T18:43:00Z",
  "source": "espn"
 }
