@@ -85,6 +85,13 @@
    "date": "2026-11-08T22:26Z"
   },
   {
+   "player_name": "Jalen Smith",
+   "team": "Chicago Bulls",
+   "status": "Day-To-Day",
+   "detail": "Smith (illness) is listed as questionable for Wednesday's game against the Hornets.",
+   "date": "2026-11-24T18:21Z"
+  },
+  {
    "player_name": "Norman Powell",
    "team": "Chicago Bulls",
    "status": "Out",
@@ -151,15 +158,29 @@
    "player_name": "Ebuka Okorie",
    "team": "Detroit Pistons",
    "status": "Out",
-   "detail": "Okorie (oblique) won't play Tuesday in Orlando.",
-   "date": "2026-11-23T22:10Z"
+   "detail": "The Pistons announced Tuesday that Okorie (oblique) will miss at least two weeks, per Eric Vincent of ClutchPoints.com.",
+   "date": "2026-11-24T18:37Z"
+  },
+  {
+   "player_name": "Taurean Prince",
+   "team": "Detroit Pistons",
+   "status": "Out",
+   "detail": "Prince underwent arthroscopic right knee surgery Nov. 18 and will be re-evaluated in four weeks, Eric Vincent of ClutchPoints.com reports.",
+   "date": "2026-11-24T18:33Z"
+  },
+  {
+   "player_name": "Duncan Robinson",
+   "team": "Detroit Pistons",
+   "status": "Out",
+   "detail": "Robinson (quadriceps) is considered day-to-day as he progresses in his rehab, Eric Vincent of ClutchPoints.com reports.",
+   "date": "2026-11-24T18:30Z"
   },
   {
    "player_name": "Jalen Duren",
    "team": "Detroit Pistons",
    "status": "Out",
-   "detail": "Duren (hamstring) has been ruled out for Tuesday's game against the Magic.",
-   "date": "2026-11-23T22:08Z"
+   "detail": "Duren (hamstring) is being assigned to the Motor City Cruise on Wednesday for practice as he ramps up for a return, Eric Vincent of ClutchPoints.com reports.",
+   "date": "2026-11-24T18:27Z"
   },
   {
    "player_name": "Cade Cunningham",
@@ -169,25 +190,11 @@
    "date": "2026-11-23T22:07Z"
   },
   {
-   "player_name": "Taurean Prince",
-   "team": "Detroit Pistons",
-   "status": "Out",
-   "detail": "Prince (knee) underwent surgery to address lingering issues and has no timeline for a return, Hunter Patterson of The Athletic reports.",
-   "date": "2026-11-20T23:02Z"
-  },
-  {
-   "player_name": "Duncan Robinson",
-   "team": "Detroit Pistons",
-   "status": "Out",
-   "detail": "Robinson will be re-evaluated in one week due to a left quadriceps strain, Coty M. Davis of The Detroit News reports.",
-   "date": "2026-11-17T16:25Z"
-  },
-  {
    "player_name": "Brandon Williams",
    "team": "Golden State Warriors",
    "status": "Out",
-   "detail": "Head coach Steve Kerr said Monday that Williams (hamstring) is on track to return Wednesday against the Kings, Kenzo Fukuda of ClutchPoints.com reports.",
-   "date": "2026-11-23T20:52Z"
+   "detail": "Head coach Steve Kerr said Tuesday that Williams (hamstring) is questionable to play Wednesday against the Kings, per Dalton Johnson of NBC Sports Bay Area.",
+   "date": "2026-11-24T20:58Z"
   },
   {
    "player_name": "Stephen Curry",
@@ -221,15 +228,15 @@
    "player_name": "T.J. McConnell",
    "team": "Indiana Pacers",
    "status": "Day-To-Day",
-   "detail": "McConnell (hamstring) was assigned to the G League's Noblesville Boom on Tuesday.",
-   "date": "2026-11-24T16:02Z"
+   "detail": "McConnell (hamstring) was recalled from the G League's Noblesville Boom on Tuesday, Shams Charania of ESPN reports.",
+   "date": "2026-11-24T19:43Z"
   },
   {
    "player_name": "Tyrese Haliburton",
    "team": "Indiana Pacers",
    "status": "Out",
-   "detail": "Haliburton (hamstring) was assigned to the G League's Noblesville Boom on Tuesday.",
-   "date": "2026-11-24T15:57Z"
+   "detail": "Haliburton (hamstring) was recalled from the G League's Noblesville Boom on Tuesday, Tony East of Forbes.com reports.",
+   "date": "2026-11-24T19:41Z"
   },
   {
    "player_name": "Aaron Nesmith",
@@ -312,8 +319,8 @@
    "player_name": "Giannis Antetokounmpo",
    "team": "Miami Heat",
    "status": "Day-To-Day",
-   "detail": "Antetokounmpo (groin) won't play in Sunday's game against Oklahoma City, Clemente Almanza of USA Today reports.",
-   "date": "2026-11-23T15:04Z"
+   "detail": "Antetokounmpo (groin) is questionable for Wednesday's game in Philadelphia.",
+   "date": "2026-11-24T22:07Z"
   },
   {
    "player_name": "Donte DiVincenzo",
@@ -361,22 +368,36 @@
    "player_name": "Miles McBride",
    "team": "New York Knicks",
    "status": "Day-To-Day",
-   "detail": "McBride (abdomen) has been ruled out for Sunday's game against the Pacers.",
-   "date": "2026-11-23T15:07Z"
-  },
-  {
-   "player_name": "OG Anunoby",
-   "team": "New York Knicks",
-   "status": "Day-To-Day",
-   "detail": "Anunoby (calf) won't play Sunday against the Pacers.",
-   "date": "2026-11-23T15:07Z"
+   "detail": "McBride (adductor) is listed as questionable for Wednesday's game versus Cleveland.",
+   "date": "2026-11-24T21:56Z"
   },
   {
    "player_name": "Jordan Clarkson",
    "team": "New York Knicks",
    "status": "Out",
-   "detail": "Clarkson (foot) has been ruled out for Sunday's game against Indiana.",
-   "date": "2026-11-22T18:05Z"
+   "detail": "Clarkson (foot) is out for Wednesday's game against Cleveland.",
+   "date": "2026-11-24T21:56Z"
+  },
+  {
+   "player_name": "Josh Hart",
+   "team": "New York Knicks",
+   "status": "Day-To-Day",
+   "detail": "Hart (shoulder) is listed as questionable for Wednesday's game against Cleveland.",
+   "date": "2026-11-24T21:54Z"
+  },
+  {
+   "player_name": "OG Anunoby",
+   "team": "New York Knicks",
+   "status": "Out",
+   "detail": "Anunoby (calf) is out for Wednesday's game against Cleveland.",
+   "date": "2026-11-24T21:53Z"
+  },
+  {
+   "player_name": "Karl-Anthony Towns",
+   "team": "New York Knicks",
+   "status": "Day-To-Day",
+   "detail": "Towns (knee) is questionable for Wednesday's game against Cleveland.",
+   "date": "2026-11-24T21:50Z"
   },
   {
    "player_name": "Jaylin Williams",
@@ -466,8 +487,8 @@
    "player_name": "Joel Embiid",
    "team": "Philadelphia 76ers",
    "status": "Day-To-Day",
-   "detail": "Embiid (illness) is out for Monday's game against Portland, Austin Krell of OnPattison.com reports.",
-   "date": "2026-11-24T04:33Z"
+   "detail": "Embiid (illness) is listed as doubtful for Wednesday's game versus Miami.",
+   "date": "2026-11-24T22:09Z"
   },
   {
    "player_name": "Ariel Hukporti",
@@ -561,18 +582,18 @@
    "date": "2026-10-05T21:43Z"
   },
   {
+   "player_name": "Kawhi Leonard",
+   "team": "Toronto Raptors",
+   "status": "Out",
+   "detail": "Leonard has begun individual on-court workouts following treatment to address swelling in his left knee, and he will be re-evaluated in one week, Marc J. Spears of ESPN.com reports.",
+   "date": "2026-11-24T21:15Z"
+  },
+  {
    "player_name": "Nate Bittle",
    "team": "Toronto Raptors",
    "status": "Out",
    "detail": "Bittle (foot) has been ruled out for Monday's game against the Bucks, Blake Murphy of Sportsnet.ca reports.",
    "date": "2026-11-22T21:13Z"
-  },
-  {
-   "player_name": "Kawhi Leonard",
-   "team": "Toronto Raptors",
-   "status": "Out",
-   "detail": "Leonard (knee) could return in the next few weeks, per Shams Charania of ESPN.",
-   "date": "2026-11-20T20:42Z"
   },
   {
    "player_name": "RJ Barrett",
@@ -645,6 +666,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-24T18:15:17Z",
+ "_generated_utc": "2026-11-24T22:28:14Z",
  "source": "espn"
 }
