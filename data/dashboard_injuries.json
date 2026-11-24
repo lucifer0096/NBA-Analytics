@@ -316,6 +316,13 @@
    "date": "2026-11-23T15:04Z"
   },
   {
+   "player_name": "Donte DiVincenzo",
+   "team": "Minnesota Timberwolves",
+   "status": "Out",
+   "detail": "DiVincenzo (Achilles) has been cleared for team basketball activities and is targeting a return to game action in January, Jon Krawczynski of The Athletic reports.",
+   "date": "2026-11-24T17:10Z"
+  },
+  {
    "player_name": "Jaylen Clark",
    "team": "Minnesota Timberwolves",
    "status": "Out",
@@ -328,13 +335,6 @@
    "status": "Out",
    "detail": "Edwards underwent a successful arthroscopic procedure on his right knee Thursday, the Timberwolves announced.",
    "date": "2026-10-29T18:33Z"
-  },
-  {
-   "player_name": "Donte DiVincenzo",
-   "team": "Minnesota Timberwolves",
-   "status": "Out",
-   "detail": "DiVincenzo (Achilles) remains confident that he'll return during the 2026-27 season, Jon Krawczynski of The Athletic reports.",
-   "date": "2026-10-05T20:53Z"
   },
   {
    "player_name": "Trendon Watford",
@@ -610,6 +610,13 @@
    "date": "2026-10-27T19:25Z"
   },
   {
+   "player_name": "Tre Mann",
+   "team": "Washington Wizards",
+   "status": "Day-To-Day",
+   "detail": "Mann (illness) has been downgraded to questionable for Tuesday's game against Boston.",
+   "date": "2026-11-24T16:47Z"
+  },
+  {
    "player_name": "Tristan Vukcevic",
    "team": "Washington Wizards",
    "status": "Out",
@@ -638,6 +645,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-24T16:26:30Z",
+ "_generated_utc": "2026-11-24T18:15:17Z",
  "source": "espn"
 }
