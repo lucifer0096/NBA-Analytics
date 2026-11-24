@@ -218,17 +218,24 @@
    "date": "2026-10-16T16:11Z"
   },
   {
+   "player_name": "T.J. McConnell",
+   "team": "Indiana Pacers",
+   "status": "Day-To-Day",
+   "detail": "McConnell (hamstring) was assigned to the G League's Noblesville Boom on Tuesday.",
+   "date": "2026-11-24T16:02Z"
+  },
+  {
+   "player_name": "Tyrese Haliburton",
+   "team": "Indiana Pacers",
+   "status": "Out",
+   "detail": "Haliburton (hamstring) was assigned to the G League's Noblesville Boom on Tuesday.",
+   "date": "2026-11-24T15:57Z"
+  },
+  {
    "player_name": "Aaron Nesmith",
    "team": "Indiana Pacers",
    "status": "Day-To-Day",
    "detail": "Nesmith is out for Monday's game against the Thunder due to right foot soreness.",
-   "date": "2026-11-24T04:40Z"
-  },
-  {
-   "player_name": "T.J. McConnell",
-   "team": "Indiana Pacers",
-   "status": "Day-To-Day",
-   "detail": "McConnell is out for Monday's game against the Thunder due to left hamstring soreness.",
    "date": "2026-11-24T04:40Z"
   },
   {
@@ -237,20 +244,6 @@
    "status": "Day-To-Day",
    "detail": "Nance exited Monday's game against the Thunder due to a sore right ankle and he will not return, Tony East of Forbes.com reports.",
    "date": "2026-11-24T02:00Z"
-  },
-  {
-   "player_name": "Tyrese Haliburton",
-   "team": "Indiana Pacers",
-   "status": "Out",
-   "detail": "Haliburton (hamstring) is expected to miss at least two more weeks, Shams Charania of ESPN reports.",
-   "date": "2026-11-20T20:41Z"
-  },
-  {
-   "player_name": "Johnny Furphy",
-   "team": "Indiana Pacers",
-   "status": "Out",
-   "detail": "Furphy (knee) is practicing with the G League's Noblesville Boom, per Alex Golden of SI.com.",
-   "date": "2026-10-30T19:06Z"
   },
   {
    "player_name": "Ben Sheppard",
@@ -645,6 +638,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-24T11:37:13Z",
+ "_generated_utc": "2026-11-24T16:26:30Z",
  "source": "espn"
 }
