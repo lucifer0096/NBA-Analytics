@@ -50,25 +50,32 @@
    "date": "2026-11-23T15:22Z"
   },
   {
-   "player_name": "Grant Williams",
-   "team": "Charlotte Hornets",
-   "status": "Day-To-Day",
-   "detail": "Williams (hamstring) won't play Monday's game against the Grizzlies.",
-   "date": "2026-11-24T04:32Z"
-  },
-  {
    "player_name": "Ryan Kalkbrenner",
    "team": "Charlotte Hornets",
    "status": "Day-To-Day",
-   "detail": "Kalkbrenner has been ruled out for the rest of Monday's game against Memphis due to left hip soreness. He'll end with two rebounds in nine minutes.",
-   "date": "2026-11-24T02:14Z"
+   "detail": "Kalkbrenner (hip) is doubtful to play Wednesday against the Bulls.",
+   "date": "2026-11-24T22:33Z"
+  },
+  {
+   "player_name": "Dennis Schroder",
+   "team": "Charlotte Hornets",
+   "status": "Out",
+   "detail": "Schroder (hamstring) is out for Wednesday's game the Bulls.",
+   "date": "2026-11-24T22:32Z"
+  },
+  {
+   "player_name": "Sion James",
+   "team": "Charlotte Hornets",
+   "status": "Day-To-Day",
+   "detail": "James is probable for Wednesday's game against the Bulls due to general soreness.",
+   "date": "2026-11-24T22:30Z"
   },
   {
    "player_name": "Grayson Allen",
    "team": "Charlotte Hornets",
    "status": "Out",
-   "detail": "Allen (concussion) has been ruled out for Monday's game against the Grizzlies.",
-   "date": "2026-11-22T22:08Z"
+   "detail": "Allen (concussion) is listed as questionable for Wednesday's game versus Chicago.",
+   "date": "2026-11-24T22:29Z"
   },
   {
    "player_name": "Kon Knueppel",
@@ -76,13 +83,6 @@
    "status": "Out",
    "detail": "Knueppel (hamstring) was diagnosed with a left hamstring strain Sunday and will be re-evaluated in four weeks.",
    "date": "2026-11-08T22:31Z"
-  },
-  {
-   "player_name": "Dennis Schroder",
-   "team": "Charlotte Hornets",
-   "status": "Out",
-   "detail": "Schroder has been diagnosed with a left hamstring strain and will be reevaluated in two weeks, Michael Scotto of HoopsHype.com reports.",
-   "date": "2026-11-08T22:26Z"
   },
   {
    "player_name": "Jalen Smith",
@@ -127,13 +127,6 @@
    "date": "2026-11-23T23:25Z"
   },
   {
-   "player_name": "P.J. Washington",
-   "team": "Dallas Mavericks",
-   "status": "Day-To-Day",
-   "detail": "Washington (illness) is questionable for Tuesday's game against the Nuggets.",
-   "date": "2026-11-23T23:21Z"
-  },
-  {
    "player_name": "Dereck Lively II",
    "team": "Dallas Mavericks",
    "status": "Out",
@@ -153,6 +146,13 @@
    "status": "Out",
    "detail": "Biberovic (heel) is out for Wednesday's game against the Warriors.",
    "date": "2026-11-17T22:42Z"
+  },
+  {
+   "player_name": "Cade Cunningham",
+   "team": "Detroit Pistons",
+   "status": "Out",
+   "detail": "Cunningham (knee) is listed as out for Tuesday's game against Orlando.",
+   "date": "2026-11-24T23:36Z"
   },
   {
    "player_name": "Ebuka Okorie",
@@ -183,11 +183,11 @@
    "date": "2026-11-24T18:27Z"
   },
   {
-   "player_name": "Cade Cunningham",
-   "team": "Detroit Pistons",
+   "player_name": "Yaxel Lendeborg",
+   "team": "Golden State Warriors",
    "status": "Day-To-Day",
-   "detail": "Cunningham (knee) is probable for Tuesday's game against the Orlando.",
-   "date": "2026-11-23T22:07Z"
+   "detail": "Lendeborg is questionable for Wednesday's game against the Kings with an illness.",
+   "date": "2026-11-24T23:20Z"
   },
   {
    "player_name": "Brandon Williams",
@@ -281,6 +281,13 @@
    "date": "2026-11-24T01:31Z"
   },
   {
+   "player_name": "Scotty Pippen Jr.",
+   "team": "Memphis Grizzlies",
+   "status": "Out",
+   "detail": "Pippen (back) is out for Wednesday's game against the Clippers.",
+   "date": "2026-11-24T23:04Z"
+  },
+  {
    "player_name": "Cameron Boozer",
    "team": "Memphis Grizzlies",
    "status": "Out",
@@ -300,13 +307,6 @@
    "status": "Out",
    "detail": "Jackson underwent a procedure Wednesday to repair a broken fifth metatarsal in his left foot. He is expected to recover fully and will be re-evaluated in approximately three months.",
    "date": "2026-11-17T23:18Z"
-  },
-  {
-   "player_name": "Scotty Pippen Jr.",
-   "team": "Memphis Grizzlies",
-   "status": "Out",
-   "detail": "Pippen (back) is progressing in his recovery but is still considered week-to-week.",
-   "date": "2026-11-16T17:16Z"
   },
   {
    "player_name": "Richie Saunders",
@@ -400,25 +400,25 @@
    "date": "2026-11-24T21:50Z"
   },
   {
+   "player_name": "Nikola Topic",
+   "team": "Oklahoma City Thunder",
+   "status": "Out",
+   "detail": "Topic (hip) is listed as out for Wednesday's game versus Minnesota.",
+   "date": "2026-11-24T23:29Z"
+  },
+  {
    "player_name": "Jaylin Williams",
    "team": "Oklahoma City Thunder",
-   "status": "Day-To-Day",
-   "detail": "Williams (back) has been ruled out for Monday's game against the Pacers",
-   "date": "2026-11-24T04:36Z"
+   "status": "Out",
+   "detail": "Williams (back) is listed as out for Wednesday's game against Minnesota.",
+   "date": "2026-11-24T23:24Z"
   },
   {
    "player_name": "Aday Mara",
    "team": "Oklahoma City Thunder",
-   "status": "Day-To-Day",
-   "detail": "Mara (shin) has been ruled out for Monday's game against the Pacers.",
-   "date": "2026-11-24T04:36Z"
-  },
-  {
-   "player_name": "Nikola Topic",
-   "team": "Oklahoma City Thunder",
    "status": "Out",
-   "detail": "Topic (hip) has been ruled out for Monday's game against the Pacers, according to the NBA's official injury report.",
-   "date": "2026-11-23T18:49Z"
+   "detail": "Mara (leg) is out for Wednesday's game versus the Timberwolves.",
+   "date": "2026-11-24T23:19Z"
   },
   {
    "player_name": "Jalen Williams",
@@ -426,13 +426,6 @@
    "status": "Out",
    "detail": "Williams (ankle) has been ruled out for Monday's game against the Pacers, according to the NBA's official injury report.",
    "date": "2026-11-23T18:43Z"
-  },
-  {
-   "player_name": "Alex Caruso",
-   "team": "Oklahoma City Thunder",
-   "status": "Out",
-   "detail": "Caruso (hip) has been ruled out for Monday's game against the Pacers, according to the NBA's official injury report.",
-   "date": "2026-11-23T18:38Z"
   },
   {
    "player_name": "Thomas Sorber",
@@ -536,8 +529,8 @@
    "player_name": "Maxime Raynaud",
    "team": "Sacramento Kings",
    "status": "Out",
-   "detail": "Raynaud (knee) will remain on the inactive list for Wednesday's game against the Suns.",
-   "date": "2026-11-18T05:54Z"
+   "detail": "Raynaud (knee) is out for Wednesday's game against the Warriors.",
+   "date": "2026-11-25T04:21Z"
   },
   {
    "player_name": "Ben Simmons",
@@ -547,18 +540,18 @@
    "date": "2026-10-21T04:22Z"
   },
   {
-   "player_name": "Victor Wembanyama",
-   "team": "San Antonio Spurs",
-   "status": "Day-To-Day",
-   "detail": "Wembanyama (back) won't play Monday against the Kings, Jeff McDonald of the San Antonio Express-News reports.",
-   "date": "2026-11-24T06:06Z"
-  },
-  {
    "player_name": "De'Aaron Fox",
    "team": "San Antonio Spurs",
    "status": "Day-To-Day",
-   "detail": "Fox (shin) has been ruled out for Monday's game against the Kings, Jeff McDonald of the San Antonio Express-News reports.",
-   "date": "2026-11-24T06:06Z"
+   "detail": "Fox (shin) is questionable to play Wednesday's game against the Trail Blazers.",
+   "date": "2026-11-25T01:27Z"
+  },
+  {
+   "player_name": "Victor Wembanyama",
+   "team": "San Antonio Spurs",
+   "status": "Day-To-Day",
+   "detail": "Wembanyama (back) is questionable for Wednesday's game in Portland.",
+   "date": "2026-11-25T01:23Z"
   },
   {
    "player_name": "Dylan Harper",
@@ -631,13 +624,6 @@
    "date": "2026-10-27T19:25Z"
   },
   {
-   "player_name": "Tre Mann",
-   "team": "Washington Wizards",
-   "status": "Day-To-Day",
-   "detail": "Mann (illness) has been downgraded to questionable for Tuesday's game against Boston.",
-   "date": "2026-11-24T16:47Z"
-  },
-  {
    "player_name": "Tristan Vukcevic",
    "team": "Washington Wizards",
    "status": "Out",
@@ -666,6 +652,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-24T22:28:14Z",
+ "_generated_utc": "2026-11-25T10:29:13Z",
  "source": "espn"
 }
