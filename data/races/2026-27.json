@@ -5081,7 +5081,7 @@
       "player_id": 4278073,
       "player_name": "Shai Gilgeous-Alexander",
       "rank": 5,
-      "score": 19.75
+      "score": 19.7
      },
      {
       "player_id": 4871144,
@@ -5122,16 +5122,16 @@
       "score": 5.1
      },
      {
-      "player_id": 4869342,
-      "player_name": "Dyson Daniels",
-      "rank": 2,
-      "score": 2.68
-     },
-     {
       "player_id": 3907498,
       "player_name": "Matisse Thybulle",
-      "rank": 3,
+      "rank": 2,
       "score": 2.67
+     },
+     {
+      "player_id": 4869342,
+      "player_name": "Dyson Daniels",
+      "rank": 3,
+      "score": 2.64
      },
      {
       "player_id": 4433136,

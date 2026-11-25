@@ -344,6 +344,13 @@
    "date": "2026-10-29T18:33Z"
   },
   {
+   "player_name": "Julian Reese",
+   "team": "New Orleans Pelicans",
+   "status": "Day-To-Day",
+   "detail": "The Pelicans transferred Reese from the G League's Laketown Squadron, and he will be available for New Orleans' game against the Warriors on Monday.",
+   "date": "2026-11-25T16:11Z"
+  },
+  {
    "player_name": "Trendon Watford",
    "team": "New Orleans Pelicans",
    "status": "Out",
@@ -529,8 +536,8 @@
    "player_name": "Maxime Raynaud",
    "team": "Sacramento Kings",
    "status": "Out",
-   "detail": "Raynaud (knee) is out for Wednesday's game against the Warriors.",
-   "date": "2026-11-25T04:21Z"
+   "detail": "Raynaud (knee) was assigned to the G League's Stockton Kings on Wednesday, James Ham of ESPN 1320 Sacramento reports.",
+   "date": "2026-11-25T16:25Z"
   },
   {
    "player_name": "Ben Simmons",
@@ -652,6 +659,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-25T10:29:13Z",
+ "_generated_utc": "2026-11-25T17:35:55Z",
  "source": "espn"
 }

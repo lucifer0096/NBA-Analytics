@@ -49031,7 +49031,7 @@
       "losses": 8,
       "win_pct": 0.556,
       "fgp": 47.9,
-      "score": 19.75,
+      "score": 19.7,
       "rank": 5
      },
      {
@@ -49124,18 +49124,6 @@
       "rank": 1
      },
      {
-      "player_id": 4869342,
-      "player_name": "Dyson Daniels",
-      "team_abbrev": "ATL",
-      "gp": 17,
-      "spg": 3.0,
-      "bpg": 0.4,
-      "stocks_pg": 3.4,
-      "opp_pg": 113.6,
-      "score": 2.68,
-      "rank": 2
-     },
-     {
       "player_id": 3907498,
       "player_name": "Matisse Thybulle",
       "team_abbrev": "LAL",
@@ -49145,6 +49133,18 @@
       "stocks_pg": 3.3,
       "opp_pg": 112.7,
       "score": 2.67,
+      "rank": 2
+     },
+     {
+      "player_id": 4869342,
+      "player_name": "Dyson Daniels",
+      "team_abbrev": "ATL",
+      "gp": 17,
+      "spg": 3.0,
+      "bpg": 0.4,
+      "stocks_pg": 3.4,
+      "opp_pg": 113.6,
+      "score": 2.64,
       "rank": 3
      },
      {
@@ -51167,7 +51167,7 @@
       "per_game": 9.6,
       "mpg": 30.3,
       "ppg": 11.6,
-      "rpg": 4.0,
+      "rpg": 4.1,
       "apg": 2.9,
       "spg": 1.6,
       "bpg": 0.4,
@@ -51205,6 +51205,6 @@
   "2011-12": 990,
   "2010-11": 1230
  },
- "_generated_utc": "2026-11-25T10:29:19Z",
+ "_generated_utc": "2026-11-25T17:36:13Z",
  "source": "local"
 }
