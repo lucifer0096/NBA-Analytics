@@ -39,8 +39,8 @@
    "player_name": "Mitchell Robinson",
    "team": "Boston Celtics",
    "status": "Out",
-   "detail": "Robinson (illness) is out for Tuesday's game against Washington, Taylor Snow of the Celtics' official site reports.",
-   "date": "2026-11-23T21:09Z"
+   "detail": "Robinson (illness) is questionable for Friday's game against the Hawks.",
+   "date": "2026-11-26T19:00Z"
   },
   {
    "player_name": "Moritz Wagner",
@@ -309,6 +309,20 @@
    "date": "2026-11-07T17:24Z"
   },
   {
+   "player_name": "Giannis Antetokounmpo",
+   "team": "Miami Heat",
+   "status": "Day-To-Day",
+   "detail": "Antetokounmpo is probable for Friday's game against the Knicks due to right groin tendinitis.",
+   "date": "2026-11-26T21:15Z"
+  },
+  {
+   "player_name": "Andrew Wiggins",
+   "team": "Miami Heat",
+   "status": "Day-To-Day",
+   "detail": "Wiggins is probable for Friday's game against the Knicks due to a right ankle sprain.",
+   "date": "2026-11-26T21:08Z"
+  },
+  {
    "player_name": "LaMelo Ball",
    "team": "Minnesota Timberwolves",
    "status": "Day-To-Day",
@@ -337,25 +351,25 @@
    "date": "2026-10-29T18:33Z"
   },
   {
-   "player_name": "Julian Reese",
-   "team": "New Orleans Pelicans",
-   "status": "Day-To-Day",
-   "detail": "The Pelicans transferred Reese from the G League's Laketown Squadron, and he will be available for New Orleans' game against the Warriors on Monday.",
-   "date": "2026-11-25T16:11Z"
-  },
-  {
    "player_name": "Trendon Watford",
    "team": "New Orleans Pelicans",
    "status": "Out",
-   "detail": "Watford (ankle) is out for Saturday's game against the Spurs.",
-   "date": "2026-11-21T18:21Z"
+   "detail": "Watford (ankle) is probable for Friday's game against the Clippers.",
+   "date": "2026-11-26T21:22Z"
   },
   {
    "player_name": "Bennedict Mathurin",
    "team": "New Orleans Pelicans",
    "status": "Out",
-   "detail": "Mathurin (foot) has been ruled out for Friday's game against the Thunder.",
-   "date": "2026-11-19T21:07Z"
+   "detail": "Mathurin (foot) is doubtful for Friday's game against the Clippers.",
+   "date": "2026-11-26T21:21Z"
+  },
+  {
+   "player_name": "Julian Reese",
+   "team": "New Orleans Pelicans",
+   "status": "Day-To-Day",
+   "detail": "The Pelicans transferred Reese from the G League's Laketown Squadron, and he will be available for New Orleans' game against the Warriors on Monday.",
+   "date": "2026-11-25T16:11Z"
   },
   {
    "player_name": "Dejounte Murray",
@@ -582,6 +596,13 @@
    "date": "2026-10-05T21:43Z"
   },
   {
+   "player_name": "Alijah Martin",
+   "team": "Toronto Raptors",
+   "status": "Day-To-Day",
+   "detail": "Martin is questionable for Friday's game against the Nets due to left knee soreness.",
+   "date": "2026-11-26T21:18Z"
+  },
+  {
    "player_name": "Kawhi Leonard",
    "team": "Toronto Raptors",
    "status": "Out",
@@ -659,6 +680,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-26T17:17:36Z",
+ "_generated_utc": "2026-11-26T21:33:26Z",
  "source": "espn"
 }
