@@ -2329,6 +2329,12 @@
    "team_id": 19
   },
   {
+   "player_id": 4397140,
+   "player_name": "Kevin Porter Jr.",
+   "position": "G",
+   "team_id": 19
+  },
+  {
    "player_id": 5239561,
    "player_name": "Jase Richardson",
    "position": "G",
@@ -3193,6 +3199,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-23T23:55:15Z",
+ "_generated_utc": "2026-11-26T10:03:10Z",
  "source": "local"
 }

@@ -43,6 +43,13 @@
    "date": "2026-11-23T21:09Z"
   },
   {
+   "player_name": "Moritz Wagner",
+   "team": "Brooklyn Nets",
+   "status": "Out",
+   "detail": "Wagner (knee) will not return to Wednesday's game against the Bucks, C.J. Holmes of the New York Daily News reports.",
+   "date": "2026-11-26T02:48Z"
+  },
+  {
    "player_name": "Nolan Traore",
    "team": "Brooklyn Nets",
    "status": "Out",
@@ -52,9 +59,9 @@
   {
    "player_name": "Ryan Kalkbrenner",
    "team": "Charlotte Hornets",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Kalkbrenner (hip) has been ruled out for Wednesday's matchup with Chicago.",
-   "date": "2026-11-25T17:41Z"
+   "date": "2026-11-26T05:30Z"
   },
   {
    "player_name": "Grayson Allen",
@@ -71,13 +78,6 @@
    "date": "2026-11-24T22:32Z"
   },
   {
-   "player_name": "Sion James",
-   "team": "Charlotte Hornets",
-   "status": "Day-To-Day",
-   "detail": "James is probable for Wednesday's game against the Bulls due to general soreness.",
-   "date": "2026-11-24T22:30Z"
-  },
-  {
    "player_name": "Kon Knueppel",
    "team": "Charlotte Hornets",
    "status": "Out",
@@ -88,8 +88,8 @@
    "player_name": "Jalen Smith",
    "team": "Chicago Bulls",
    "status": "Day-To-Day",
-   "detail": "Smith (illness) is listed as questionable for Wednesday's game against the Hornets.",
-   "date": "2026-11-24T18:21Z"
+   "detail": "Smith (illness) is listed as out for Wednesday's game against Charlotte.",
+   "date": "2026-11-26T05:29Z"
   },
   {
    "player_name": "Norman Powell",
@@ -183,25 +183,11 @@
    "date": "2026-11-24T18:27Z"
   },
   {
-   "player_name": "Yaxel Lendeborg",
-   "team": "Golden State Warriors",
-   "status": "Day-To-Day",
-   "detail": "Lendeborg is questionable for Wednesday's game against the Kings with an illness.",
-   "date": "2026-11-24T23:20Z"
-  },
-  {
-   "player_name": "Brandon Williams",
-   "team": "Golden State Warriors",
-   "status": "Out",
-   "detail": "Head coach Steve Kerr said Tuesday that Williams (hamstring) is questionable to play Wednesday against the Kings, per Dalton Johnson of NBC Sports Bay Area.",
-   "date": "2026-11-24T20:58Z"
-  },
-  {
    "player_name": "Stephen Curry",
    "team": "Golden State Warriors",
    "status": "Out",
-   "detail": "Curry has been diagnosed with an oblique abdominal tear and will be re-evaluated in two weeks, Shams Charania of ESPN reports.",
-   "date": "2026-11-12T17:03Z"
+   "detail": "Curry (abdomen) will be re-evaluated Friday after Thanksgiving, Anthony Slater of ESPN.com reports.",
+   "date": "2026-11-26T01:36Z"
   },
   {
    "player_name": "Kristaps Porzingis",
@@ -281,6 +267,13 @@
    "date": "2026-11-25T20:33Z"
   },
   {
+   "player_name": "Zach Edey",
+   "team": "Memphis Grizzlies",
+   "status": "Day-To-Day",
+   "detail": "Edey (ankle) did not return to Wednesday's 115-97 win over the Clippers. He finished with seven points (3-4 FG, 1-1 FT), four rebounds, two assists and two blocks across nine minutes.",
+   "date": "2026-11-26T03:43Z"
+  },
+  {
    "player_name": "Scotty Pippen Jr.",
    "team": "Memphis Grizzlies",
    "status": "Out",
@@ -314,6 +307,13 @@
    "status": "Out",
    "detail": "Saunders signed a two-way contract with the Grizzlies on Saturday, Shams Charania of ESPN reports.",
    "date": "2026-11-07T17:24Z"
+  },
+  {
+   "player_name": "LaMelo Ball",
+   "team": "Minnesota Timberwolves",
+   "status": "Day-To-Day",
+   "detail": "Ball (ankle) did not return to Wednesday's 113-106 win over the Thunder.",
+   "date": "2026-11-26T03:37Z"
   },
   {
    "player_name": "Donte DiVincenzo",
@@ -365,32 +365,25 @@
    "date": "2026-11-13T20:19Z"
   },
   {
-   "player_name": "Josh Hart",
-   "team": "New York Knicks",
-   "status": "Day-To-Day",
-   "detail": "Hart (shoulder) has been upgraded to probable for Wednesday's game against the Cavaliers.",
-   "date": "2026-11-25T17:57Z"
-  },
-  {
    "player_name": "Miles McBride",
    "team": "New York Knicks",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "McBride (adductor) has been ruled out for Wednesday's game against the Cavaliers.",
-   "date": "2026-11-25T17:57Z"
+   "date": "2026-11-26T05:31Z"
   },
   {
-   "player_name": "Karl-Anthony Towns",
+   "player_name": "Andre Drummond",
    "team": "New York Knicks",
    "status": "Day-To-Day",
-   "detail": "Towns (knee) is probable for Wednesday's game against Cleveland.",
-   "date": "2026-11-25T17:54Z"
+   "detail": "Drummond (head) did not return to Wednesday's 121-102 win over the Cavaliers.",
+   "date": "2026-11-26T03:40Z"
   },
   {
-   "player_name": "Jalen Brunson",
+   "player_name": "OG Anunoby",
    "team": "New York Knicks",
-   "status": "Day-To-Day",
-   "detail": "Brunson (illness) has been downgraded to questionable for Wednesday's game against the Cavaliers.",
-   "date": "2026-11-25T17:53Z"
+   "status": "Out",
+   "detail": "Anunoby (calf) participated in on-court work for the first time since sustaining the injury, Ian Begley of SportsNet New York reports.",
+   "date": "2026-11-25T23:19Z"
   },
   {
    "player_name": "Jordan Clarkson",
@@ -398,13 +391,6 @@
    "status": "Out",
    "detail": "Clarkson (foot) is out for Wednesday's game against Cleveland.",
    "date": "2026-11-24T21:56Z"
-  },
-  {
-   "player_name": "OG Anunoby",
-   "team": "New York Knicks",
-   "status": "Out",
-   "detail": "Anunoby (calf) is out for Wednesday's game against Cleveland.",
-   "date": "2026-11-24T21:53Z"
   },
   {
    "player_name": "Nikola Topic",
@@ -486,9 +472,16 @@
   {
    "player_name": "Joel Embiid",
    "team": "Philadelphia 76ers",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Embiid (illness) is out for Wednesday's game against Miami, Ira Winderman of the South Florida Sun Sentinel reports.",
-   "date": "2026-11-25T20:07Z"
+   "date": "2026-11-26T01:06Z"
+  },
+  {
+   "player_name": "Jaylen Brown",
+   "team": "Philadelphia 76ers",
+   "status": "Day-To-Day",
+   "detail": "Brown (hamstring) will receive imaging, and the Sixers will provide an update Thursday, Ky Carlin of USA Today reports.",
+   "date": "2026-11-26T01:06Z"
   },
   {
    "player_name": "Ariel Hukporti",
@@ -536,15 +529,15 @@
    "player_name": "Zach LaVine",
    "team": "Sacramento Kings",
    "status": "Day-To-Day",
-   "detail": "LaVine (knee) has been downgraded to questionable for Wednesday's game against Golden State.",
-   "date": "2026-11-25T20:49Z"
+   "detail": "LaVine (knee) is listed as out for Wednesday's game versus the Warriors.",
+   "date": "2026-11-26T05:33Z"
   },
   {
    "player_name": "Maxime Raynaud",
    "team": "Sacramento Kings",
    "status": "Out",
-   "detail": "Raynaud (knee) was assigned to the G League's Stockton Kings on Wednesday, James Ham of ESPN 1320 Sacramento reports.",
-   "date": "2026-11-25T16:25Z"
+   "detail": "Raynaud (knee) was recalled from the G League's Stockton Kings on Wednesday, Marc J. Spears of ESPN.com reports.",
+   "date": "2026-11-25T21:38Z"
   },
   {
    "player_name": "Ben Simmons",
@@ -557,15 +550,8 @@
    "player_name": "De'Aaron Fox",
    "team": "San Antonio Spurs",
    "status": "Day-To-Day",
-   "detail": "Fox (shin) is questionable to play Wednesday's game against the Trail Blazers.",
-   "date": "2026-11-25T01:27Z"
-  },
-  {
-   "player_name": "Victor Wembanyama",
-   "team": "San Antonio Spurs",
-   "status": "Day-To-Day",
-   "detail": "Wembanyama (back) is questionable for Wednesday's game in Portland.",
-   "date": "2026-11-25T01:23Z"
+   "detail": "Fox (shin) has been ruled out for Wednesday's game against Portland, Jeff McDonald of the San Antonio Express-News reports.",
+   "date": "2026-11-26T06:01Z"
   },
   {
    "player_name": "Dylan Harper",
@@ -666,6 +652,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-25T21:43:39Z",
+ "_generated_utc": "2026-11-26T10:03:10Z",
  "source": "espn"
 }
