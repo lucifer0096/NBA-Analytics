@@ -442,6 +442,13 @@
    "date": "2026-10-31T01:02Z"
   },
   {
+   "player_name": "Colin Castleton",
+   "team": "Orlando Magic",
+   "status": "Day-To-Day",
+   "detail": "Castleton totaled five points (2-4 FG, 1-1 3Pt) and four rebounds in seven minutes during Tuesday's 132-116 preseason win over the Cavaliers.",
+   "date": "2026-11-26T16:10Z"
+  },
+  {
    "player_name": "Jonathan Isaac",
    "team": "Orlando Magic",
    "status": "Out",
@@ -652,6 +659,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-26T15:48:05Z",
+ "_generated_utc": "2026-11-26T17:17:36Z",
  "source": "espn"
 }
