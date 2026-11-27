@@ -211,6 +211,13 @@
    "date": "2026-10-16T16:11Z"
   },
   {
+   "player_name": "Tyrese Haliburton",
+   "team": "Indiana Pacers",
+   "status": "Out",
+   "detail": "Haliburton (hamstring) has been ruled out per Scott Agness of FieldhouseFiles.com for Friday's game against the 76ers. The guard participated in practice activities earlier this week as he continues working toward his return.",
+   "date": "2026-11-27T16:20Z"
+  },
+  {
    "player_name": "Kelly Oubre Jr.",
    "team": "Indiana Pacers",
    "status": "Day-To-Day",
@@ -230,13 +237,6 @@
    "status": "Day-To-Day",
    "detail": "McConnell (hamstring) is questionable for Friday's game against the 76ers.",
    "date": "2026-11-26T22:29Z"
-  },
-  {
-   "player_name": "Tyrese Haliburton",
-   "team": "Indiana Pacers",
-   "status": "Out",
-   "detail": "Haliburton (hamstring) was recalled from the G League's Noblesville Boom on Tuesday, Tony East of Forbes.com reports.",
-   "date": "2026-11-24T19:41Z"
   },
   {
    "player_name": "Ben Sheppard",
@@ -386,6 +386,20 @@
    "date": "2026-11-13T20:19Z"
   },
   {
+   "player_name": "Karl-Anthony Towns",
+   "team": "New York Knicks",
+   "status": "Day-To-Day",
+   "detail": "Towns is questionable for Friday's game against the Heat due to a right abdominal contusion.",
+   "date": "2026-11-27T16:51Z"
+  },
+  {
+   "player_name": "Andre Drummond",
+   "team": "New York Knicks",
+   "status": "Out",
+   "detail": "Drummond (concussion) has been ruled out for Friday's game against the Heat.",
+   "date": "2026-11-27T15:36Z"
+  },
+  {
    "player_name": "Miles McBride",
    "team": "New York Knicks",
    "status": "Day-To-Day",
@@ -405,13 +419,6 @@
    "status": "Out",
    "detail": "Anunoby (calf) is doubtful for Friday's game against the Heat.",
    "date": "2026-11-26T21:57Z"
-  },
-  {
-   "player_name": "Andre Drummond",
-   "team": "New York Knicks",
-   "status": "Day-To-Day",
-   "detail": "Drummond (head) is questionable for Friday's game against the Heat.",
-   "date": "2026-11-26T21:51Z"
   },
   {
    "player_name": "Nikola Topic",
@@ -501,8 +508,8 @@
    "player_name": "Joel Embiid",
    "team": "Philadelphia 76ers",
    "status": "Day-To-Day",
-   "detail": "Embiid (illness) is questionable for Friday's game against the Pacers.",
-   "date": "2026-11-26T22:16Z"
+   "detail": "Embiid (illness) was at shootaround for the 76ers on Friday, Chris Hine of The Philly Inquirer reports.",
+   "date": "2026-11-27T16:32Z"
   },
   {
    "player_name": "Jaylen Brown",
@@ -631,6 +638,13 @@
    "date": "2026-11-19T21:13Z"
   },
   {
+   "player_name": "Mo Bamba",
+   "team": "Utah Jazz",
+   "status": "Day-To-Day",
+   "detail": "Bamba (illness) is listed as questionable for Friday's game against the Nuggets, according to the Jazz's injury report.",
+   "date": "2026-11-27T16:41Z"
+  },
+  {
    "player_name": "Jaxson Hayes",
    "team": "Utah Jazz",
    "status": "Day-To-Day",
@@ -687,6 +701,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-27T10:08:31Z",
+ "_generated_utc": "2026-11-27T16:58:15Z",
  "source": "espn"
 }
