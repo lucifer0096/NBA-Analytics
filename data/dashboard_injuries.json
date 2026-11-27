@@ -39,8 +39,8 @@
    "player_name": "Mitchell Robinson",
    "team": "Boston Celtics",
    "status": "Out",
-   "detail": "Robinson (illness) is questionable for Friday's game against the Hawks.",
-   "date": "2026-11-26T19:00Z"
+   "detail": "Robinson has been ruled out Marc D'Amico of the Celtics' official sitefor Friday's game.",
+   "date": "2026-11-27T17:31Z"
   },
   {
    "player_name": "Moritz Wagner",
@@ -85,11 +85,18 @@
    "date": "2026-11-08T22:31Z"
   },
   {
+   "player_name": "Noa Essengue",
+   "team": "Chicago Bulls",
+   "status": "Day-To-Day",
+   "detail": "Essengue (thumb) is probable to play Saturday against the Pacers.",
+   "date": "2026-11-27T19:06Z"
+  },
+  {
    "player_name": "Jalen Smith",
    "team": "Chicago Bulls",
    "status": "Day-To-Day",
-   "detail": "Smith (illness) is listed as out for Wednesday's game against Charlotte.",
-   "date": "2026-11-26T05:29Z"
+   "detail": "Smith (illness) is listed as probable for Saturday's game against Indiana.",
+   "date": "2026-11-27T18:36Z"
   },
   {
    "player_name": "Norman Powell",
@@ -118,6 +125,13 @@
    "status": "Out",
    "detail": "Mobley will receive treatment and participate in rehab after the team confirmed a diagnosis of a right great toe sprain, and he'll be re-evaluated in the next 7-to-10 days.",
    "date": "2026-11-16T22:06Z"
+  },
+  {
+   "player_name": "Kyrie Irving",
+   "team": "Dallas Mavericks",
+   "status": "Day-To-Day",
+   "detail": "Irving (knee) is listed as questionable for Friday's game against the Suns due to left knee injury management.",
+   "date": "2026-11-27T19:07Z"
   },
   {
    "player_name": "Tobi Lawal",
@@ -211,6 +225,13 @@
    "date": "2026-10-16T16:11Z"
   },
   {
+   "player_name": "Larry Nance Jr.",
+   "team": "Indiana Pacers",
+   "status": "Day-To-Day",
+   "detail": "Nance (ankle) is probable for Friday's game against the 76ers.",
+   "date": "2026-11-27T18:07Z"
+  },
+  {
    "player_name": "Tyrese Haliburton",
    "team": "Indiana Pacers",
    "status": "Out",
@@ -223,13 +244,6 @@
    "status": "Day-To-Day",
    "detail": "Oubre is questionable for Friday's game against the 76ers due to a right hand laceration.",
    "date": "2026-11-27T00:42Z"
-  },
-  {
-   "player_name": "Larry Nance Jr.",
-   "team": "Indiana Pacers",
-   "status": "Day-To-Day",
-   "detail": "Nance (ankle) is questionable for Friday's game against the 76ers.",
-   "date": "2026-11-26T22:43Z"
   },
   {
    "player_name": "T.J. McConnell",
@@ -258,13 +272,6 @@
    "status": "Out",
    "detail": "Miller underwent surgery Wednesday to repair a torn left rotator cuff and will be re-evaluated in six months, per Law Murray of The Athletic.",
    "date": "2026-08-26T20:04Z"
-  },
-  {
-   "player_name": "Austin Reaves",
-   "team": "Los Angeles Lakers",
-   "status": "Out",
-   "detail": "Reaves (heel) is questionable for Friday's game against the Spurs.",
-   "date": "2026-11-26T23:21Z"
   },
   {
    "player_name": "Isaiah Stewart",
@@ -323,18 +330,18 @@
    "date": "2026-11-26T21:15Z"
   },
   {
-   "player_name": "Andrew Wiggins",
-   "team": "Miami Heat",
-   "status": "Day-To-Day",
-   "detail": "Wiggins is probable for Friday's game against the Knicks due to a right ankle sprain.",
-   "date": "2026-11-26T21:08Z"
+   "player_name": "Kasparas Jakucionis",
+   "team": "Milwaukee Bucks",
+   "status": "Out",
+   "detail": "Jakucionis (ankle) won't play Friday's game against the Pistons.",
+   "date": "2026-11-27T17:58Z"
   },
   {
    "player_name": "LaMelo Ball",
    "team": "Minnesota Timberwolves",
-   "status": "Day-To-Day",
-   "detail": "Ball (ankle) is questionable for Friday's game against the Grizzlies.",
-   "date": "2026-11-26T23:14Z"
+   "status": "Out",
+   "detail": "Ball (ankle) has been ruled out for Friday's game against the Grizzlies. The guard was previously questionable after spraining his left ankle during Wednesday's win over Oklahoma City.",
+   "date": "2026-11-27T18:52Z"
   },
   {
    "player_name": "Donte DiVincenzo",
@@ -386,6 +393,27 @@
    "date": "2026-11-13T20:19Z"
   },
   {
+   "player_name": "Miles McBride",
+   "team": "New York Knicks",
+   "status": "Out",
+   "detail": "McBride (groin) is out for Friday's game against the Heat.",
+   "date": "2026-11-27T18:21Z"
+  },
+  {
+   "player_name": "OG Anunoby",
+   "team": "New York Knicks",
+   "status": "Out",
+   "detail": "Anunoby (calf) has been ruled out for Friday's game against the Heat. The forward was previously listed as doubtful and will miss his third consecutive contest due to a left calf strain.",
+   "date": "2026-11-27T18:20Z"
+  },
+  {
+   "player_name": "Jordan Clarkson",
+   "team": "New York Knicks",
+   "status": "Out",
+   "detail": "Clarkson (foot) is out for Friday's game against the Heat.",
+   "date": "2026-11-27T18:19Z"
+  },
+  {
    "player_name": "Karl-Anthony Towns",
    "team": "New York Knicks",
    "status": "Day-To-Day",
@@ -398,27 +426,6 @@
    "status": "Out",
    "detail": "Drummond (concussion) has been ruled out for Friday's game against the Heat.",
    "date": "2026-11-27T15:36Z"
-  },
-  {
-   "player_name": "Miles McBride",
-   "team": "New York Knicks",
-   "status": "Day-To-Day",
-   "detail": "McBride (groin) is questionable for Friday's game against the Heat.",
-   "date": "2026-11-26T22:11Z"
-  },
-  {
-   "player_name": "Jordan Clarkson",
-   "team": "New York Knicks",
-   "status": "Out",
-   "detail": "Clarkson (foot) is questionable for Friday's game against the Heat.",
-   "date": "2026-11-26T22:03Z"
-  },
-  {
-   "player_name": "OG Anunoby",
-   "team": "New York Knicks",
-   "status": "Out",
-   "detail": "Anunoby (calf) is doubtful for Friday's game against the Heat.",
-   "date": "2026-11-26T21:57Z"
   },
   {
    "player_name": "Nikola Topic",
@@ -533,6 +540,13 @@
    "date": "2026-09-11T16:03Z"
   },
   {
+   "player_name": "Damian Lillard",
+   "team": "Portland Trail Blazers",
+   "status": "Out",
+   "detail": "Lillard (calf) has been ruled out for Friday's game against the Warriors. The veteran guard is dealing with right calf tightness and soreness.",
+   "date": "2026-11-27T18:38Z"
+  },
+  {
    "player_name": "Chris Youngblood",
    "team": "Portland Trail Blazers",
    "status": "Out",
@@ -585,8 +599,8 @@
    "player_name": "Dylan Harper",
    "team": "San Antonio Spurs",
    "status": "Out",
-   "detail": "Harper (hip) is questionable for Friday's game against the Lakers.",
-   "date": "2026-11-26T23:41Z"
+   "detail": "Harper (hip) participated in Friday's morning shootaround, per Matt Guzman of SI.com.",
+   "date": "2026-11-27T18:51Z"
   },
   {
    "player_name": "De'Aaron Fox",
@@ -701,6 +715,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-27T16:58:15Z",
+ "_generated_utc": "2026-11-27T21:18:51Z",
  "source": "espn"
 }
