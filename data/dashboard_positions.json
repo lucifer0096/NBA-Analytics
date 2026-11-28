@@ -1561,6 +1561,12 @@
    "team_id": 29
   },
   {
+   "player_id": 4596528,
+   "player_name": "Lawson Lovering",
+   "position": "C",
+   "team_id": 29
+  },
+  {
    "player_id": 4683934,
    "player_name": "Jahmai Mashack",
    "position": "G",
@@ -3199,6 +3205,6 @@
    "team_id": 27
   }
  ],
- "_generated_utc": "2026-11-26T10:03:10Z",
+ "_generated_utc": "2026-11-28T09:27:24Z",
  "source": "local"
 }
