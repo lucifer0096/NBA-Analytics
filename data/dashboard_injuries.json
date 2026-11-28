@@ -246,18 +246,18 @@
    "date": "2026-11-27T22:06Z"
   },
   {
+   "player_name": "Tyrese Haliburton",
+   "team": "Indiana Pacers",
+   "status": "Out",
+   "detail": "The Pacers recalled Haliburton (hamstring) from the G League's Noblesville Boom on Friday, per the NBA G League transaction report.",
+   "date": "2026-11-28T15:24Z"
+  },
+  {
    "player_name": "T.J. McConnell",
    "team": "Indiana Pacers",
    "status": "Out",
    "detail": "McConnell (hamstring) has been ruled out for Friday's game against the 76ers, Alex Golden of SI.com reports.",
    "date": "2026-11-27T23:02Z"
-  },
-  {
-   "player_name": "Tyrese Haliburton",
-   "team": "Indiana Pacers",
-   "status": "Out",
-   "detail": "Haliburton (hamstring) has been ruled out per Scott Agness of FieldhouseFiles.com for Friday's game against the 76ers. The guard participated in practice activities earlier this week as he continues working toward his return.",
-   "date": "2026-11-27T16:20Z"
   },
   {
    "player_name": "Ben Sheppard",
@@ -701,6 +701,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-28T14:32:39Z",
+ "_generated_utc": "2026-11-28T15:49:12Z",
  "source": "espn"
 }
