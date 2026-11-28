@@ -45,9 +45,9 @@
   {
    "player_name": "Moritz Wagner",
    "team": "Brooklyn Nets",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Wagner (knee) won't be available for Friday's game against Toronto.",
-   "date": "2026-11-26T21:33Z"
+   "date": "2026-11-28T13:58Z"
   },
   {
    "player_name": "Nolan Traore",
@@ -269,9 +269,9 @@
   {
    "player_name": "Yanic Konan Niederhauser",
    "team": "LA Clippers",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Niederhauser suffered a right toe injury during Friday's game against the Pelicans and won't return, Joey Linn of SI.com reports.",
-   "date": "2026-11-28T04:17Z"
+   "date": "2026-11-28T13:57Z"
   },
   {
    "player_name": "Bradley Beal",
@@ -332,9 +332,9 @@
   {
    "player_name": "Kasparas Jakucionis",
    "team": "Milwaukee Bucks",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Jakucionis (ankle) won't play Friday's game against the Pistons.",
-   "date": "2026-11-27T17:58Z"
+   "date": "2026-11-28T13:58Z"
   },
   {
    "player_name": "LaMelo Ball",
@@ -512,6 +512,13 @@
    "date": "2026-10-24T16:47Z"
   },
   {
+   "player_name": "Dean Wade",
+   "team": "Philadelphia 76ers",
+   "status": "Day-To-Day",
+   "detail": "Wade (hamstring) is out for Friday's game against the Pacers, Austin Krell of Vertical 76 reports.",
+   "date": "2026-11-28T13:58Z"
+  },
+  {
    "player_name": "Joel Embiid",
    "team": "Philadelphia 76ers",
    "status": "Out",
@@ -524,13 +531,6 @@
    "status": "Out",
    "detail": "James (back injury management) won't be available for Saturday's game against the Rockets, according to Kris Rhim of ESPN.",
    "date": "2026-11-28T05:46Z"
-  },
-  {
-   "player_name": "Dean Wade",
-   "team": "Philadelphia 76ers",
-   "status": "Out",
-   "detail": "Wade (hamstring) is out for Friday's game against the Pacers, Austin Krell of Vertical 76 reports.",
-   "date": "2026-11-27T23:33Z"
   },
   {
    "player_name": "Jaylen Brown",
@@ -626,9 +626,9 @@
   {
    "player_name": "Ja'Kobe Walter",
    "team": "Toronto Raptors",
-   "status": "Out",
+   "status": "Day-To-Day",
    "detail": "Walter won't return to Friday's game against Brooklyn due to a right quad contusion, Josh Lewenberg of TSN.ca reports.",
-   "date": "2026-11-28T02:34Z"
+   "date": "2026-11-28T13:57Z"
   },
   {
    "player_name": "Kawhi Leonard",
@@ -701,6 +701,6 @@
    "date": "2026-07-30T20:11Z"
   }
  ],
- "_generated_utc": "2026-11-28T09:27:24Z",
+ "_generated_utc": "2026-11-28T14:32:39Z",
  "source": "espn"
 }
